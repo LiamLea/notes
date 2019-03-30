@@ -54,8 +54,6 @@
 
   	]# git remote add origin git@github.com:MX-Steve/nsd1903_step01.git //复制github上的内容
       //git remote remove origin(若已连接则用这条命令)
-  	]# git push -u origin master //上传装车的内容 
-         
-       若无法上传,则执行ssh-agent命令重新初始化再push
+  	]# git push -u origin master //上传装车的内容(若无法上传,则执行ssh-agent命令重新初始化再push)
 		
-		
+	    要删除和修改远程仓库的文件,也在本地仓库删除和修改,然后再add,commit和push	
