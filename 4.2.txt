@@ -38,10 +38,10 @@ Linux磁盘表示
 
 find xxx -perm mode    查找完全符合该权限的文件或文件,
                        如find / -perm 1700(表示查找只有拥有者可读写执行,并且设置了STID的)
-find xxx -perm -mode   查找所有位符合此权限的文件或文件夹,
-                       如find / -perm 2 (表示查找所有人可以写的)
-find xxx -perm /mode   查找任意位符合此玄仙的文件或文件夹,
-                       如find / -perm 2 (表示查找有人可以写的)
+find xxx -perm -mode   查找所有位都满足要求,
+                       如find / -perm /1742 (表示至少要有STID权限,用户至少有rwx权限,组至少要有r权限,其他至少有w权限)
+find xxx -perm /mode   查找任意位满足要求即可,
+                       如find / -perm /1742 (表示具有STID权限,或用户有rwx权限,或组有r权限,或其他有w权限)
 查找符合SUID等权限的:find / -perm -1000 (表示查找设置了STID的)
                   find / -perm -2000 (表示查找设置了SGID的)
 
