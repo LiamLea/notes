@@ -40,7 +40,7 @@
   查看具体用户信息:id
 
 操作用户
-  useradd -u(uid) -g(初始用户组) -G(附属主) -d(dirctory) -s(shell)
+  useradd -u(uid) -g(初始用户组) -G(附属主) -d(dirctory) -s(shell,更改登录解释器,如设为/sbin/nologin就不能进行登录)
   userdel -r(remove 主文件夹) 
   usermod -u -g -G -d -s
   echo '密码' | passwd --stdin 用户名
