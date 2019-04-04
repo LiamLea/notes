@@ -13,19 +13,19 @@
 	xargs 用于无法使用管道的命令,当作参数
 	      如:ls不能使用管道,就可以find -name xx | xargs ll (这里xargs接受管道传来的数据,并用作ls命令的参数)
 	awk 用于模式扫描
-	      awk '条件1 {动作1} ...' filename 
+	     awk '条件1 {动作1} ...' filename 
 	      如:awk 'NF==2 {print $0}' /etc/passwd   打印该文件的第二行
 
 	sed 用于过滤和文本转换
 	      -n  slient安静模式,即显示操作的部分
-				-e  expression可以进行多次sed操作,如:sed -e '第一次操作' -e '第二次操作' 文件名
-				-i  直接修改文件的内容
+		-e  expression可以进行多次sed操作,如:sed -e '第一次操作' -e '第二次操作' 文件名
+		-i  直接修改文件的内容
 	对行的操作
-	  删除行(d):sed '1,$d' filename  删除文件的1到最后一行
-	  添加行(a,i):sed '1a xx' filename 在文件第一行后添加一行,内容位xx
+	    删除行(d):sed '1,$d' filename  删除文件的1到最后一行
+	    添加行(a,i):sed '1a xx' filename 在文件第一行后添加一行,内容位xx
 	              sed '1i xx' filennme 在第一行前添加
-	  选取行(p):sed '2,5p' 打印2到5行,若不加-n,则2到5行会输出两次
-	  替换行(c):sed '2,3c xx'将2到5行内容替换为xx
+	    选取行(p):sed '2,5p' 打印2到5行,若不加-n,则2到5行会输出两次
+	    替换行(c):sed '2,3c xx'将2到5行内容替换为xx
 	对字符串的操作
 	      sed '/xx/d' filename 删除有xx的行
 		sed '/xx/p' filename 打印有xx的行
