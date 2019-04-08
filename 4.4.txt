@@ -52,9 +52,9 @@
   groupadd -g(gid)
   groupdel
   gpasswd(管理组)
-    gpasswd -a 用户名 ... 组名 将用户添加到该组
+    gpasswd -a 用户名 组名 将用户添加到该组
             -d                  删除
-    gpasswd -A 用户名 ...组名  设置可以管理该组的用户
+    gpasswd -A 用户名 组名  设置可以管理该组的用户
   newgrp 组名   打开一个新的shell,并更改有效用户组
                 (在touch文件时,该文件的所属主就为这个组,exit返回原来shell,有效用户组恢复)
 
