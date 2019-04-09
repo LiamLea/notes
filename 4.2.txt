@@ -12,7 +12,8 @@
 ###############################################################################
 命令补充
 	lscpu  列出CPU信息
-	cat /etc/redhat-release 查看内核版本
+	cat /etc/redhat-release 查看系统版本
+  uname -r 查看内核版本
 	cat /proc/meminfo 查看内存信息
 	修改hostname后重新开启终端即可
 
