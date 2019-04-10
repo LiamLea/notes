@@ -1,0 +1,68 @@
+###############################################################################
+
+命令补充
+	ctrl + shift + t  //开启多个窗口(alt+数字切换)
+      systemctl list-unit-files    //显示systemctl管理的服务 
+	ssh -X root@172.25.0.11
+      head : 看文件前几行
+		head -数字 a.txt
+	tail : 看文件结尾几行
+		tail -数字 a.txt
+        |  : 管道 
+		命令1 | 命令2  ： 将前一个命令的结果传递给第二个命令做参数使用
+       数据重定向:直接在命令后面加空格,然后输入 1>xx(将标准输入重定向)
+
+###############################################################################
+
+yum源管理使用
+	/etc/yum.repos.d/xx.repo 软件源配置文件
+
+	[root@room9pc01 yum.repos.d]# cat CentOS.repo
+		[CentOS7]      ==> 仓库名称
+		name=CentOS 7  ==> 描述信息
+		baseurl=file:///var/ftp/centos-1804
+		enabled=1      ==>是否启用
+		gpgcheck=0     ==> 	是否检测软件的签名
+	
+  baseurl:
+		file:// 本地
+		http:// 网站
+		ftp://  ftp
+	file:// 本地 /var/ftp/centos-1804
+
+	rpm : 查看包有没有装
+		rpm -q 包名 : 
+				如果安装了，就显示完整包名
+		rpm -ql 包名：
+				安装这个包，产生的新的文件
+
+###############################################################################
+
+git 本地仓库，关联远程仓库
+
+ (1).创建秘钥
+  	]# ssh-keygen -t rsa -C "xxx@qq.com"
+  		overwrite> y
+  	]# cd /root/.ssh/
+  	]# cat id_rsa.pub
+  		ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/p8VCyHSZhf/kHb45b3XaPT7hKDU9YkFF/22b9VLawnCPTfX8MZ9CjTlIvharZSYRFCM+eANsD2dZTfIapnuAS9WK56ii+wMmzxCvzwYh6nllbrB0t/xQartgJkvT2nAkRUpgR7Tq2h55ErwosLcEZZC3Xq1spLjwBZ4FKlInEQ6Ly3xEZC+2CdGsv9DgpP/yakgMov7rU1uUv6xzGwVVwP5OV3QsDLLuzFZfE1LNJSjuBe1KiTzpokrfcsBR6CFNOoW6oOAipsT5vGHwdTjVqN92zNYLuOPIW3cFcDUQKIpeK7S0d6zC0nLL4HQrRf50UDWtOVgkDRL1KD3PeGGB xxx@qq.com
+  		(将这段内容复制到github上的SSH中)
+
+ (2).初始化本地仓库
+    选择一个目录
+  	]# git init 
+  	//git status
+  	]# git config --global user.name "github名字"
+  	]# git config --global user.email "xxx@qq.com"
+
+  	]# git add README.md //将要上传的文件装车
+  	]# git commit -m "对该文件的说明"
+
+  	]# git remote add origin git@github.com:MX-Steve/nsd1903_step01.git //复制github上的内容
+      //git remote remove origin(若已连接则用这条命令)
+  	]# git push -u origin master //上传装车的内容(若无法上传,则执行ssh-agent命令重新初始化再push)
+		
+	    要删除和修改远程仓库的文件,也在本地仓库删除和修改,然后再add,commit和push	
+			(如果直接在远程仓库改,下次使用本地仓库连接远程仓库就不能识别了)
+
+###############################################################################
