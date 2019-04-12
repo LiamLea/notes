@@ -1,16 +1,101 @@
+##################################################### 
+
 1.相关术语
   关系:表
   元组;表的行
   属性:表的列
   域:属性的类型,即允许的取值
-  主键(primary key):唯一表示一行
+  主键(primary key):唯一表示一行(不能为空)
   外键(foreign key):需要一个参照表,外建的值只能是该参照表主键存在的值
-2.连接
+
+2.连接(重点:join using)
   自然连接(natural join):只考虑在要连接的表中 都出现的属性且取值相同的 行
     如 select name from table1 natural join table2;
        select name from table1 join table2 using (id); //指定以id这列进行连接
   笛卡尔积:包含要连接的表中行的所有配对,不考虑属性值是否匹配
     如 select name from table1,table2;
        //若table1有n行,table2有m行,则两个表连接后有n乘以m行
-3.去除重复的结果
+
+##################################################### 
+初级SQL语句(执行顺序:from,where,select)
+
+1.基本数据类型:
+  varchar(n):可变长字符串,最长为n
+  numeric(n,m):一共n个数(不包括小数点),m个小数
+2.创建table(带主键或外键)
+  crate table 表明
+        (属性1 类型 not null, //代表不能为空
+         属性2 类型,
+         primary key(某个属性),
+         foreign key(某个属性) references 表名);
+3.得到的结果去除重复内容:用distinct修饰要得到的属性(all是保留重复的,是默认值)
      select distinct xx from table;
+4.select子句还可以带 +  - * /    //如:select salary*1.1 from table1;    
+5.连接两个表
+  自然连接: select 属性 from 表1 joining 表2 using(属性);
+  直接连接(笛卡尔积):select 属性 from 表1,表2;
+6.别名设置:as  
+7.匹配字符串:like... escape
+   如:where xx like 'yy' escape '\'  //寻找符合要求的字符串,字符串的内容有特殊字符可用'\'转义
+8.排序:order by
+   如:order by id descend,name ascend
+9.where可以使用:and,or等,也可以使用括号
+   如:where (table1.id,table1.name)=(table2.id,table2.name)
+10.有三个逻辑值(布尔值):true,false,unkown(比较一个值与空值时会出现)
+11.集合运算:union(并),intersect(交),except(差)
+    如:(select id
+        from table1
+        where id=1)
+       union
+       (select name
+        from table1
+        where name=lisi);
+
+12.聚集函数:avg min max sum count
+  (1)基本聚集
+      如:select count(id)
+         from table1
+         where salary>1000;   //找出薪资大于1000的人数
+  (2)分组聚集(group by 用于分组,后面可接多个属性)
+      如:select salary,time,count(id)
+         from table1
+         group by salary,time;  //以薪资和工作时间这两个属性为一个整体进行分组,列出每组的人数
+  (3)对分组进行条件限制(group by ... having ...)
+      如:select salary,time,count(id)
+         from table1
+         group by salary,time
+         having count(id)>2;   //找出以薪资和工作时间分组中,组的人数大于2的组,并列出每组的人数
+
+13.嵌套子查询
+  (1)嵌套在where中:in       not in
+                   some     all          //some(select...)子查询中的某一个
+                   exists   not exists   //检测子查询是否为空
+                   unique   not unique   //检查子查询是否有重复
+     如:select id
+        from table1
+        where salary>1000 and
+          id in (select id
+                 from table1
+                 where salary<500);   //找出工资大于1000和小于500的id
+  (2)嵌套在from中                 
+  (3)with子句(将子查询提出来)
+     如:with xx(id) as
+          (select id
+           from table1
+           where salary<500)
+        select id 
+        from table1,xx
+        where salary>1000;
+
+14.删除:delete 表名 where...
+   插入:insert into 表名 values();
+        insert into 表名
+              select... ;  //将查询结果插进去
+   更新:update 表名 set ...              
+
+15.判断语句:case
+            when
+            else
+            end
+
+##################################################### 
