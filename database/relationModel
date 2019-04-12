@@ -1,0 +1,16 @@
+1.相关术语
+  关系:表
+  元组;表的行
+  属性:表的列
+  域:属性的类型,即允许的取值
+  主键(primary key):唯一表示一行
+  外键(foreign key):需要一个参照表,外建的值只能是该参照表主键存在的值
+2.连接
+  自然连接(natural join):只考虑在要连接的表中 都出现的属性且取值相同的 行
+    如 select name from table1 natural join table2;
+       select name from table1 join table2 using (id); //指定以id这列进行连接
+  笛卡尔积:包含要连接的表中行的所有配对,不考虑属性值是否匹配
+    如 select name from table1,table2;
+       //若table1有n行,table2有m行,则两个表连接后有n乘以m行
+3.去除重复的结果
+     select distinct xx from table;
