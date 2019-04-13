@@ -1,0 +1,74 @@
+###############################################################################
+单词补充
+  descend 下降
+  ascend  上升
+  intersect 相交
+  marquee  选取框
+  lateral  侧面的
+
+###############################################################################
+
+系统安全保护,SELinux安全机制
+• Security-Enhanced Linux
+– 美国NSA国家安全局主导开发,一套增强Linux系统安
+全的强制访问控制体系
+– 集成到Linux内核(2.6及以上)中运行
+– RHEL7基于SELinux体系针对用户、进程、目录和文件
+提供了预设的保护策略,以及管理工具
+
+• SELinux的运行模式
+– enforcing(强制)、permissive(宽松)
+– disabled(彻底禁用)
+
+• 切换运行模式(任何模式切换到disabled模式,必须修改配置文件重启)
+– 临时切换:setenforce 1|0
+– 固定配置:/etc/selinux/config
+
+###############################################################################
+配置用户环境
+
+• 影响指定用户的 bash 解释环境
+– ~/.bashrc,每次开启 bash 终端时生效
+• 影响所有用户的 bash 解释环境
+– /etc/bashrc,每次开启 bash 终端时生效
+
+###############################################################################
+web,ftp简单的服务搭建:
+
+  web:
+    systemctl start httpd
+    默认网页存放路径:/var/www/html/
+    默认主页名称:index.html
+
+  ftp:
+    systemctl start vsftpd
+    默认FTP共享路径:/var/ftp
+
+###############################################################################
+防火墙策略(硬件防火墙,软件防火墙)
+
+  • 系统服务:firewalld
+  • 管理工具:firewall-cmd、firewall-config(图形化,不用)
+
+预设安全区域
+  • 根据所在的网络场所区分,预设保护规则集
+  – public:仅允许访问本机的sshd  ping  dhcpd服务
+  – trusted:允许任何访问
+  – block:阻塞任何来访请求(明确拒绝,客户端有接收回应)
+  – drop:丢弃任何来访的数据包(直接丢弃,客户端没有接收回应) 节省服务器资源
+
+防火墙判定的规则:匹配及停止
+  1.查看请求数据包中源IP地址,然后查询防火墙所有区域,那个区域有该IP地址的规则,则进入该区域
+  2.进入默认区域public(由root指定)
+
+防火墙命令(需要永久设置加上--permanent.然后重新加载读取配置文件):
+  firewall-cmd --get-default-zone        //查看默认区域
+  firewall-cmd --set-default-zone=xx     //设置默认区域
+  firewall-cmd --zone=xx --list-all      //列出该区域的设置
+  firewall-cmd --zone=xx --add-service=协议名  //在某个区域内添加协议
+  firewall-cmd --zone=xx --add-source=ip地址   //在某个区域内添加源ip
+  
+  firewall-cmd --premanent ...
+  firewall-cmd --reload                 //重新读取配置文件,加载防火墙策略
+
+###############################################################################

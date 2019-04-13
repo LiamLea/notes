@@ -54,6 +54,16 @@ LDAP(lightweight directory access protocol) 实现网络用户认证,达到用�
 [root@server0 ~]# mount classroom.example.com:/home/guests/   /home/guests
 
 ###############################################################################
+触发挂载(autofs)
+  软件名:autofs
+  服务名:autofs
+  配置文件:/etc/auto.master    //指定监控点,指定设置挂载策略的配置文件
+
+通过该服务,可以实现lsap用户登录自动触发相应的家目录挂载.如:
+  /etc/auto.master 配置为:/home/guests /etc/guests.rule
+  /etc/guests.rule 配置为:* -rw classroom.example.com:/home/guests/&
+
+###############################################################################
 
 Shell脚本基础
 规范Shell脚本的组成

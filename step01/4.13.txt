@@ -1,0 +1,59 @@
+##################################################### 
+单词积累
+  hyper   亢奋的
+  trivial 不重要的,琐碎的
+
+##################################################### 
+命令补充
+  DNS中dc表示domain controller
+
+##################################################### 
+常用协议及其端口号
+  http(80):Hyper Text Transform protocol                      
+  https(443):http Secure                                       
+  DNS(53):Domain Name System                                  
+  FTP(21):File Tansform Protocol                              
+  SSH(22):Secure Shell                                        
+  TFTP(69):Trivial File Tansform Protocol(简单文件传输协议)    
+  telnet(23):远程登录                                          
+  pop3(110):Post office Protocol (邮局协议,用户收邮件协议)      
+  SMTP(25):Simple Mail Tansport protocol(用户发邮件协议)      
+  SNMP(161):Simple Network Manager Protocol                     
+
+##################################################### 
+端口映射(端口重定向,如:从客户端访问端口1的请求,自动映射到端口2)
+  端口范围:1-65535
+           1-1024     为系统保留端口
+           1024-5000  为一般程序通信端口
+           5000-65535 为用户自定义端口
+
+  查看端口号是否在被占用:ss -tulnp  //t:tcp,u:udp,l:listen.n:numeric(显示端口号,而不是服务名),p:pid和program
+
+  利用防火墙进行端口映射:
+firewall-cmd --permanent --zone=public --add-forward-port=port=原端口:proto=协议:toport=映射到的端口
+
+
+##################################################### 
+
+修改ip(修改后重启网络:systemctl restart network)
+
+  nmcli connection modify 网卡 ipv4.address xx ipv4.gateway xx
+  nmcli connection up 网卡
+
+connection和device区别:
+  多个connection可以应用到同一个device,但同一时间只能启动其中一个connection
+
+##################################################### 
+
+添加一个swap分区
+  分区:fdisk
+  更新分区表:partprobe
+  格式化:mkswap
+  启动,查看,关闭:swapon
+                 swapon -s
+                 swapoff
+
+  开机自动挂载格式:/dev/vdc swap swap defaults 0 0
+  检测开机挂载是否设置成功:swapon -a
+
+##################################################### 
