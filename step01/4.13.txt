@@ -9,16 +9,18 @@
 
 ##################################################### 
 常用协议及其端口号
-  http(80):Hyper Text Transform protocol                      
-  https(443):http Secure                                       
-  DNS(53):Domain Name System                                  
-  FTP(21):File Tansform Protocol                              
-  SSH(22):Secure Shell                                        
-  TFTP(69):Trivial File Tansform Protocol(简单文件传输协议)    
-  telnet(23):远程登录                                          
-  pop3(110):Post office Protocol (邮局协议,用户收邮件协议)      
-  SMTP(25):Simple Mail Tansport protocol(用户发邮件协议)      
-  SNMP(161):Simple Network Manager Protocol                     
+  http:Hyper Text Transform protocol            80
+  https:http Secure                            443           
+  DNS:Domain Name System                        53          
+  FTP:File Tansform Protocol                    21          
+  SSH:Secure Shell                              22          
+  TFTP:Trivial File Tansform Protocol(简单文件传输协议) 69    
+  telnet:远程登录                               23           
+  pop3:Post office Protocol (邮局协议,用户收邮件协议) 110     
+  SMTP:Simple Mail Tansport protocol(用户发邮件协议)   25   
+  SNMP:Simple Network Manager Protocol                161     
+  iSCSI:internet Small Computer System Interface(网络共享磁盘协议) 3260
+  DB:database                                  3306
 
 ##################################################### 
 端口映射(端口重定向,如:从客户端访问端口1的请求,自动映射到端口2)
@@ -37,8 +39,8 @@ firewall-cmd --permanent --zone=public --add-forward-port=port=原端口:proto=�
 
 修改ip(修改后重启网络:systemctl restart network)
 
-  nmcli connection modify 网卡 ipv4.address xx ipv4.gateway xx
-  nmcli connection up 网卡
+  nmcli connection modify 连接名 ipv4.method manual ipv4.address xx ipv4.gateway xx
+  nmcli connection up 连接名
 
 connection和device区别:
   多个connection可以应用到同一个device,但同一时间只能启动其中一个connection
