@@ -66,7 +66,7 @@ iSCSI(一种基于C/S架构的虚拟磁盘技术,3260)
 3.运行iscsiadm命令,发现服务端共享存储
     iscsiadm -m discovery -t st -p ip地址  //st:sendtargets
 4.重启iscsi服务(客户端服务),加载服务端共享存储
-    systemctl restart iscsi
+    systemctl restart iscsi   //这里错误,即可能是声称的名字不匹配
     lsblk 
 
 ##################################################### 
