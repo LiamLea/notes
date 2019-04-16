@@ -1,0 +1,125 @@
+##################################################### 
+单词积累
+  dummy 虚的,假的
+
+##################################################### 
+命令补充
+  man 5 文件名   //查看配置文件内容,如:man 5 hostname
+  小技巧:选中目标,在输入处按下键盘'中间建',即可粘贴
+
+##################################################### 
+NFS共享(Network File System)
+– 用途:为客户机提供共享使用的文件夹
+– 协议:NFS(TCP/UDP 2049)、RPC(TCP/UDP 111)
+
+服务端:
+  所需软件包:nfs-utils
+  系统服务:nfs-server
+1.安装软件包nfs-utils
+2.创建共享目录:mkdir
+3.修改配置文件/etc/exports,指定共享的目录(可以利用man查看格式)
+    格式:– 共享的文件夹路径    客户机地址(权限)    客户机地址(权限) .. ..
+          /public     *(ro)
+4.重启服务:systemctl restart nfs-server
+
+客户端
+1.查看服务端共享路径:showmount -e ...
+2.挂载访问
+    如:mount 172.25.0.11:/public  /mnt/nfs/
+3.开机自动挂载
+  _netdev:声明为网络设备(开机启动Linux系统时,首先具备网络参数后,再进行挂载本设备)
+  如:172.25.0.11:/public /mnt/nfs nfs defaults,_netdev 0 0
+4.查看:df -h (当有挂载了多个NFS时,需要df -ah查看)
+
+##################################################### 
+
+web服务器
+
+• 提供的默认配置
+– Listen:监听地址:端口(80)
+– ServerName:本站点注册的DNS名称(空缺)
+– DocumentRoot:网页根目录(默认为/var/www/html)
+
+  DNS服务器:虚拟机classroom提供域名解析
+            server0.example.com
+            www0.example.com
+            webapp0.example.com
+测试解析结果:
+[root@server0 ~]# dig server0.example.com
+[root@server0 ~]# dig www0.example.com
+[root@server0 ~]# dig webapp0.example.com
+
+服务端:
+  软件和服务:httpd
+  主配置文件:/etc/httpd/conf/httpd.conf  //不修改
+  调用配置文件:/etc/httpd/conf.d/*.conf  //通过此种方法进行配置,方便管理,安全
+客户端:
+  firefox ip地址   //访问DocumentRoot/index.html
+  firefox ip地址/nsd  //访问DocumentRoot/nsd/index.html
+
+##################################################### 
+
+虚拟web主机(由同一台服务器提供多个不同的Web站点)
+• 区分方式
+ – 基于域名的虚拟主机
+ – 基于端口的虚拟主机
+ – 基于IP地址的虚拟主机
+
+基于域名的虚拟主机:
+  1.规则:
+      优先级由上而下,即输入ip地址访问最上面域名对应的主机
+      一旦使用了虚拟Web主机,所有的页面都必须使用虚拟Web主机来呈现
+  2.添加一个调用配置文件:/etc/httpd/conf.d/*.conf
+    格式如下:<VirtualHost  IP地址:端口>
+               ServerName  此站点的DNS名称
+               DocumentRoot  此站点的网页根目录
+             </VirtualHost>
+  3.例子:
+    <VirtualHost  *:80>
+      ServerName www0.example.com
+      DocumentRoot  /var/www/baidu
+    </VirtualHost>
+    <VirtualHost  *:80>
+      ServerName server0.example.com
+      DocumentRoot  /var/www/qq
+    </VirtualHost>
+    <VirtualHost  *:80>
+      ServerName  webapp0.example.com
+      DocumentRoot  /var/www/myweb
+    </VirtualHost>
+
+##################################################### 
+Samba共享服务 (Windows平台与Linux平台   跨平台的共享)
+      协议:smb(沟通验证身份)   cifs(存储或传输数据)
+  默认情况下必须通用户(即samba共享用户)验证,才可以访问
+  1.必须要有相应的本地用户对应           
+  2.采用独立的密码设置             
+
+服务端:
+  软件:samba
+  服务:smb(server message block,用于验证身份)
+1.安装软件包samba
+2.创建Samba共享帐号
+]# useradd -s /sbin/nologin harry
+]# pdbedit -a harry      #将用户添加为Samba共享帐号
+   pdbedit -x 用户名     #删除Samba共享帐号
+   pdbedit -L  #查看当前系统,所有的Samba共享帐号
+3.修改配置文件:/etc/samba/smb.conf 
+  [nsd]                #设置共享名
+  path = /common       #设置实际共享的目录
+4.重启smb服务
+5.修改SELinux策略,布尔值策略(功能的开关)
+]# getsebool -a | grep samba   #查看SELinux所有布尔值
+]# setsebool samba_export_all_ro=on  #修改SELinux布尔值
+
+客户端:
+  软件:cifs-utils
+1.安装软件包,支持Samba共享的挂载,让本机识别cifs协议
+2.挂载访问Samba共享
+格式:
+mount -o user=用户名,pass=密码  //服务端IP地址/共享名   挂载点
+如:mount -o user=harry,pass=123  //172.25.0.11/nsd   /mnt/smb/
+3.开机自动挂载
+//172.25.0.11/nsd /mnt/smb  cifs defaults,_netdev,user=harry,pass=123 0 0
+
+##################################################### 
