@@ -70,7 +70,7 @@ web服务器
       优先级由上而下,即输入ip地址访问最上面域名对应的主机
       一旦使用了虚拟Web主机,所有的页面都必须使用虚拟Web主机来呈现
   2.添加一个调用配置文件:/etc/httpd/conf.d/*.conf
-    格式如下:<VirtualHost  IP地址:端口>
+    格式如下:<VirtualHost  对外提供的IP地址:端口>
                ServerName  此站点的DNS名称
                DocumentRoot  此站点的网页根目录
              </VirtualHost>
