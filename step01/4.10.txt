@@ -23,13 +23,13 @@
     |
     | pvcreate(可以跳过这一步,vgcreate会自动进行pvcreate)
     |
-    | 将分区分为多个PE,即物理卷由多个PE组成
+    | 标识分区
     |
   物理卷 pvs(整体查看) pvdisplay(具体查看)
     |
     | vgcreate 组名 分区
     |
-  卷 组 vgs  vgdisplay
+  卷 组 vgs  vgdisplay    (卷组才划分PE)
     |
     | lvcreate -n 逻辑卷名字 -L 逻辑卷大小 卷组名
     |
