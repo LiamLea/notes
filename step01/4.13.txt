@@ -39,7 +39,7 @@ firewall-cmd --permanent --zone=public --add-forward-port=port=原端口:proto=�
 
 修改ip(修改后重启网络:systemctl restart network)
 
-  nmcli connection modify 连接名 ipv4.method manual ipv4.address xx ipv4.gateway xx
+  nmcli connection modify 连接名 ipv4.method manual ipv4.address xx ipv4.gateway xx connection.autoconnect yes  //设置开机自启
   nmcli connection up 连接名
 
 connection和device区别:
