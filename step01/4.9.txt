@@ -41,7 +41,7 @@ yum软件包管理(不需要考虑依赖关系)
          总结:构建web或ftp服务,共享光盘所有内容
   客户端:仓库配置文件/etc/yum.repos.d/*.repo
         [nsd1903]　　　　　　　＃仓库标识　　
-        name=rhel7　　　　　　＃仓库描述信息
+        name=rhel7　　　　　　＃仓库名
         baseurl=http://classroom.example.com/content/rhel7.0/x86_64/dvd　　
         enabled=1　　　　　　　＃启用本文件
         gpgcheck=0　　　　　　　＃不检测软件包的签名
