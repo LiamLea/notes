@@ -63,7 +63,7 @@ web,ftp简单的服务搭建:
 
 防火墙命令(需要永久设置加上--permanent.然后重新加载读取配置文件):
   firewall-cmd --get-default-zone        //查看默认区域
-  firewall-cmd --set-default-zone=xx     //设置默认区域
+  firewall-cmd --set-default-zone=xx     // 永久 设置默认区域
   firewall-cmd --zone=xx --list-all      //列出该区域的设置
   firewall-cmd --zone=xx --add-service=协议名  //在某个区域内添加协议
   firewall-cmd --zone=xx --add-source=ip地址   //在某个区域内添加源ip
