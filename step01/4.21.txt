@@ -1,0 +1,113 @@
+##################################################### 
+单词积累
+  secpol:security policy local
+  convert  转变
+  KVM:kernel virtual machine
+  sphere  范围,球体
+  qemu:quick emulator
+  serial  连续的
+  -n:none-zero
+  xml:extensible markup language
+  WCHAN:waiting channel //进程正在睡眠的内核函数名称
+
+##################################################### 
+命令补充
+  rpm -qf 文件名   //利用这个可以找到执行某个命令的软件包(先找出该命令的绝对路径)
+  bash -c '命令'  //执行某一条命令,可以解决sudo可能无法重定向的问题
+  镜像文件:类似于压缩包,将一系列文件安装一定格式制作成单文件
+  LANG=en 命令    //在英文环境下执行该命令
+
+##################################################### 
+u盘读取:
+   文件系统:fat   一般可以直接识别
+   文件系统:NTFS  mount.ntfs-3g  /dev/sdb1     挂载点
+
+##################################################### 
+虚拟化概述
+• virtualization 资源管理
+    x个物理资源 --> y个逻辑资源
+    实现程度:完全、部分、硬件辅助(CPU)
+
+• 虚拟化主要厂商及产品
+	VMware 		VMware Workstation、vSphere
+	Microsoft 	VirtualPC、Hyper-V
+	RedHat 		KVM、RHEV
+	Citrix 		Xen
+	Oracle 		Oracle VM VirtualBox
+
+• 使用虚拟化功能,需要CPU支持虚拟化功能
+
+##################################################### 
+构建KVM虚拟化服务器平台
+• 主要软件包
+– qemu-kvm	:为 kvm 提供底层仿真支持
+– libvirt-daemon	:libvirtd 守护进程,管理虚拟机
+– libvirt-client	:用户端软件,提供客户端管理命令
+– libvirt-daemon-driver-qemu	:libvirtd 连接 qemu 的驱动
+– virt-manager	:图形管理工具
+
+• 虚拟化服务:libvirtd
+• 图形管理虚拟化工具:virt-manager
+• 虚拟机的磁盘镜像文件格式:qcow2
+
+• 一台KVM虚拟机的组成
+    1.xml配置文件(虚拟机配置文件):定义虚拟机的名称、UUID、CPU、内存、虚拟磁盘、网卡等各种参数设置(/etc/libvirt/qemu/)
+    2.磁盘镜像文件:保存虚拟机的操作系统及文档数据,镜像路径取决于xml配置文件中的定义(/var/lib/libvirt/images/)
+
+本机管理虚拟机:virt-manager或命令行
+virsh控制工具:
+  virsh  console  虚拟机名字      //真机直接管理相应虚拟机
+  virsh nodeinfo          //查看KVM节点(服务器)信息
+  virsh list [--all]      //列出虚拟机
+  virsh net-list [--all]  //列出虚拟网络
+  virsh autostart win2008     //将虚拟机设置为开机自启
+  virsh autostart --disable win2008   
+  virsh start 虚拟机名称
+  virsh destroy 虚拟机名称  //强制关机,都采用这种关机方式
+  virsh dumpxml 虚拟机名   //查看虚拟机配置文件信息,可以利用此命令导出配置文件信息
+
+##################################################### 
+生动生成一台虚拟机
+
+  1.将虚拟机nsd01的磁盘文件复制一份,修改磁盘文件的名称
+      cp  /var/lib/libvirt/images/nsd01.qcow2  /var/lib/libvirt/images/nsd02.qcow2    //复制磁盘文件
+
+  2.将虚拟机nsd01的xml文件复制一份,修改内容
+      virsh dumpxml nsd01 > /xmlfile/nsd02.xml  #导出虚拟机xml文件
+      vim  /xmlfile/haha.xml 
+        <name>nsd02</name>   //修改虚拟主机名
+        UUID:   <uuid></uuid>     //删除整行内容
+        file='/var/lib/libvirt/images/nsd02.qcow2'   //设置虚拟磁盘文件路径  
+        <mac address='52:54:00:32:a3:aa'/>    //删除整行内容
+
+   3.导入虚拟机信息
+      virsh define /xmlfile/haha.xml     //导入虚拟机信息
+
+   可以将第2步和第3步合为一步:virsh edit nsd01 ,直接修改保存即可
+
+   4.删除虚拟机
+  ]# virsh undefine  nsd02  //删除虚拟机nsd02,仅会删除/etc/libvirt/qemu/下的xml文件
+
+##################################################### 
+COW技术原理
+
+• Copy On Write
+    看时链接,写时复制(将要修改的文件复制到前端盘来)
+    修改后端盘,前端盘会崩溃
+    前端盘大小最好大于原始盘
+
+• qemu-img 指令
+– qemu-img create -f qcow2 -b 后端盘 前端盘 前端盘大小  //b:back file
+– qemu-img info   磁盘文件     //查看磁盘文件的信息
+– qemu-img create  磁盘文件    //快速产生一个任意大小的磁盘文件,内容为空
+
+通过COW技术快速生成虚拟机:
+  1.qemu-img create -f qcow2 -b 原始盘   前端盘    前端盘大小
+  2.virsh edit nsd01
+
+##################################################### 
+离线挂载虚拟机磁盘(可以访问虚拟机的内容)
+
+  guestmount  -a  虚拟机磁盘路径   -i  挂载点  //i:inspect 检测磁盘内的文件系统(即根目录)
+
+##################################################### 
