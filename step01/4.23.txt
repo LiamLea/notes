@@ -3,6 +3,11 @@
   利用cp复制进行服务配置时,一定要加上-p(preserve)
   dig @服务器 要查询的域名
   nsswitch:name service switch ,名称服务开关
+  
+  远程连接到主机或运行Xterm都使用pts终端
+  pty:由ptmx和pts   /dev/ptmx和/dev/pts/* 一对多
+  tty1连接Xterm,所以有图形界面,终端tty1用来连接图形界面,pts来表示终端
+  tty2即第二个终端(即文字终端)
 
 ##################################################### 
 DNS服务
