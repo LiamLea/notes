@@ -39,8 +39,8 @@ subnet 192.168.4.0 netmask 255.255.255.0 { //分配的网段
 PXE组件及过程分析
 • 需要哪些服务组件
 – DHCP服务,分配IP地址、定位引导程序(next-server,filename)
-– TFTP服务,提供引导程序下载(客户端首先获得pxelinux.0,然后读取指定的默认菜单文件)
-– HTTP服务(或FTP),提供yum安装源和ks.cfg应答文件  //ks:kick start,回答安装的一系列问题
+– TFTP服务,提供引导程序下载(客户端首先获得pxelinux.0,然后读取指定的默认菜单文件,菜单文件会指定ks.cfg应答文件)
+– HTTP服务(或FTP),提供ks.cfg应答文件和yum安装源 //ks:kick start,回答安装的一系列问题,包括指定的yum安装源
 
 • 客户机应具备的条件
 – 网卡芯片必须支持PXE协议
