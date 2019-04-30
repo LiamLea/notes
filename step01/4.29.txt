@@ -3,6 +3,7 @@
   ar:access router   接入路由器
   ac:access controller  接入控制器
   pvid:port-base vlan id   基于端口的虚拟局域网id
+  //交换机给accsess口下行数据打上PVID标记,上行数据去除PVID(这种数据进入交换机才能确定其属于哪个VLAN)
   网卡的链路聚合有两种模式:热备份(activebackup)连接冗余 //这种模式下只有一个网卡工作
                            轮询式(roundrobin)的流量负载均衡
 
@@ -38,8 +39,8 @@ VLAN
         port trunk allow-pass vlan all
 
   TRUNK原理
-    交换机给每个去往其他交换机的数据帧打上VLAN标识(PVID)
-          给每个去往PC机的数据帧去除标识
+    通过trunk口时PVID保留(即传输数据中包含PVID标记)    //这样就可以实现传输多种VLAN的数据
+   
 
   配置链路聚合(增加网络可靠性和负载均衡)
     [Huawei]interface eth-trunk 1     //开启链路聚合接口1
