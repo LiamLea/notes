@@ -93,6 +93,10 @@ ensp的使用
    [Huawei]user-interface console 0
    [Huawei-ui-console0]authentication-mode aaa   //激活配置
 
+  设置控制台会话时间
+    [Huawei]user-interface console 0
+    [Huawei-ui-console0]idle-timeout 0
+
   保存配置:<Huawei>save   //即保存配置文件
   恢复出厂设置:<Huawei>reset saved-configuration   //即删除配置文件,之后还是可以利用save保存设置,只要不重启
 
