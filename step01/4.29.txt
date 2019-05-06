@@ -21,7 +21,7 @@ VLAN(主要目的是 控制广播)
   相关命令:
     clear configuration interface Ethernet0/0/x  //恢复某个接口的默认状态
     shutdown   //关闭某个接口
-    sudo  命令  //取消某个设置
+    undo  命令  //取消某个设置
 
   静态VLAN的配置
     1.创建VLAN
