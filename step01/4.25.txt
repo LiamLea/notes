@@ -8,7 +8,7 @@ DHCP服务器(Dynamic Host Configuration Protocol)
 • DHCP原理(四次握手)
   DISCOVERY :进行广播,寻找DHCP服务器
   OFFER :DHCP提供IP等参数
-  REQUEST :客户端决定是否使用提供的参数
+  REQUEST :客户端广播租用提供的IP地址的请求
   ACK :确认该IP没有被其他人使用
   注意:广播进行(因为客户端没有IP)，先到先得，一个网络里只能有一个DHCP服务器
 
