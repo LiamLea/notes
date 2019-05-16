@@ -2,6 +2,7 @@
 单词;积累
   PCRE:perl compatible regular expression
   penetration 渗透
+  intrusion 侵入
 
 ###############################################################################
 命令补充
