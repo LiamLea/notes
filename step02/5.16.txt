@@ -1,0 +1,83 @@
+###############################################################################
+单词;积累
+  PCRE:perl compatible regular expression
+  penetration 渗透
+
+###############################################################################
+命令补充
+
+  killall 命令   //杀死由该命令启动的所有进程
+
+  在sbin中创建快捷方式:
+    ln -s 源可执行文件 /sbin/
+
+  netstat -tuanp     //a:显示指定协议(这里指定的是TCP和UDP)的所有端口信息,包括监听和未监听的,多于TCP包括连接和未连接的
+
+  tailf    //f:follow 动态观察文件的最后几行,用于排错
+
+###############################################################################
+安装nginx
+
+1.安装依赖包
+  yum -y install gcc pcre-devel openssl-devel    //以devel结尾的一般都是依赖文件,不能单独执行
+
+2.添加系统用户    
+  //所有的安全策略都是针对 用户和组
+  //之后以该身份运行nginx软件,为了安全,及时网站被入侵,权限也只是普通用户的
+  //用yum装包时会自动为我们创建普通用户
+  useradd -s /sbin/nologin nginx
+
+3.生成makefile
+  ./configure \
+  > --prefix=/usr/local/nginx \   //默认也安装在这个路径下
+  > --user=nginx \
+  > --group=nginx \
+  > --with-http_ssl_module     //指定需要安装的模块,提供ssl加密功能
+
+4.编译安装
+  make && make install
+
+###############################################################################
+升级nginx
+
+  1.生成makefile
+    ./configure \
+    > --prefix=/usr/local/nginx \   //这个路径必须要与旧版软件的安装路径相同
+    > --user=nginx \
+    > --group=nginx \
+    > --with-http_ssl_module
+
+  2.生成新版的nginx执行文件
+    make       //生成的新的执行文件在objs文件夹下
+
+  3.拷贝新的执行文件去覆盖旧版的  //旧版的可以换个名字,不要删除
+
+  4.升级
+    killall nginx   //杀死旧版的
+    nginx           //运行新版的
+
+###############################################################################
+配置nginx
+
+配置文件:nginx/conf/nginx.conf
+  server {                                //一个server就是一个网站
+      listen       80;                    //可以实现基于端口的虚拟web
+      server_name  localhost;             //可以实现基于主机名的虚拟web
+
+      location / {                        //定义网站的根路径
+          root   html;                    //网站的根路径为html文件夹
+          index  index.html;              //默认的主页
+      }
+  }
+
+添加用户认证
+  1.修改配置文件
+    server{
+      ...
+      auth_basic "提示信息";
+      auth_basic_user_file "/usr/local/nginx/pass";   //指定提供用户名和密码的文件
+    }
+  2.创建用于认证的文件(需要安装提供htpasswd命令的软件)
+    htpasswd -c 文件名 用户名      //回车后输入密码,如果需要继续添加用户,则不要加c选项
+
+###############################################################################
