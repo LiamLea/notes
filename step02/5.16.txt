@@ -77,6 +77,7 @@
       ...
       auth_basic "提示信息";
       auth_basic_user_file "/usr/local/nginx/pass";   //指定提供用户名和密码的文件
+      ...
     }
   2.创建用于认证的文件(需要安装提供htpasswd命令的软件)
     htpasswd -c 文件名 用户名      //回车后输入密码,如果需要继续添加用户,则不要加c选项
