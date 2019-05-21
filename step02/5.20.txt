@@ -4,6 +4,11 @@
   upstream   上行
   正向代理:为客户端作代理
   反向代理:为服务端作代理
+  操作系统有资源限制(为了防止用户或某些程序恶意的使用资源)
+  ulimit    //-a 显示各种限制值
+            //ulimit -Hn 65535,修改能打开的文件数量的硬限制
+            //ulimit -Sn 65535,修改能打开的文件数量的软限制
+            //永久修改:/etc/security/limits.conf
 
 ###############################################################################
 地址重写(地址栏根路径被改写,可以在站内跳,也可以往站外跳)
@@ -38,7 +43,7 @@ nginx反向代理    //nginx两大功能:web服务器,代理服务器
     http{
       upstream 集群名称{
         ip_hash;       //不加这个选项,默认采用轮询调度算法
-        server 服务器ip地址:端口 属性;
+        server 服务器ip地址:80 属性;
         ...
       }
     }
@@ -56,5 +61,104 @@ nginx反向代理    //nginx两大功能:web服务器,代理服务器
     }
 
 二.TCP,UDP代理(4层代理,能够实现其他服务的代理)
+  1.添加相应模块
+    --with-stream
+  2.定义集群
+    stream{
+      upstream 集群名称{
+        ...                 //这里端口不再是80了,需要转发的服务的相应的端口
+      }
+      server{
+        listen 端口;       //取没有被使用的端口,也可以设置需要转发的服务的相应的端口(但需要将该服务关闭,否则nginx无法监听该端口)
+        proxy_pass 集群名;
+      }
+    }
+    http{...}
+
+###############################################################################
+nginx优化
+
+1.设置404页面
+  http{
+    server{
+      ...
+      charset utf-8;     //可以显示中文
+      error_page 错误码 /页面名;
+      ...
+    }
+  }
+
+2.常见状态码:
+  202   一切正常
+  301   永久重定向
+  302   临时重定向
+  401   用户名或密码错误
+  403   禁止访问
+  404   文件不存在
+  414   URL太长
+  500   服务器内部错误
+  502   Bad Gateway
+
+3.服务器状态信息(添加相应模块--with-http_stub_status_module)
+#修改配置文件
+  location /status {
+    stub_status on;
+    allow 允许的ip;
+    deny all;
+  }
+#用浏览器访问该页面即可获取状态
+#PV量(page view)  wc -l access.log
+#UV量(user view)  awk '{IP[$1]++}END{for(i in ip){print i,IP[i]}}' access.log
+
+4.优化nginx并发量
+
+#修改配置文件
+  worker_processes 数字;    //开启的进程数,与cpu内核数量一致(lscpu中core那一项)
+  events{
+    worker_connections 数字;   //最大连接数,65535(改大一点,其实达不到)
+  }
+#修改能打开的文件数量的限制值,及时生效用umlimit
+#vim /etc/security/limits.conf
+  * soft nofile 65535
+  * hard nofile 65535
+
+5.优化nginx数据包头缓存 
+#修改配置文件
+  http{
+    client_header_buffer_size 1k;     //默认请求包头信息的缓存
+    large_client_header_buffers 4 4k; //大请求包头信息的缓存个数和容量(即最多缓存16k)
+    ...
+  }
+
+6.浏览器本地缓存静态数据
+#浏览器带缓存功能,但是缓存什么和缓存多久由服务器端的配置
+#修改配置文件
+  location ~ \.(jpg|png|mp3)$ {
+    expires 30d;     //缓存30天
+  }
+
+7.日志分割
+  mv access.log access.log.bak
+  kill -SIGUSR1 $(cat /usr/local/nginx/logs/nginx.pid)    //SIGUSR1是用户自定义信号
+
+8.对页面进行压缩处理
+  http{
+    ...
+    gzip on;
+    gzip_min_length 1000;   //小于1000字节的文件不压缩
+    gzip_comp_level;        //压缩比率(1-9),越大压缩效果越好,但是速度越慢
+    gzip_types 文件类型    //仅对特定文件类型压缩,文件类型参考nginx/conf/mime.types
+    ...
+  }
+
+9.服务器内存缓存
+  http{
+    ...
+    open_file_cache max=2000 inactive=20s;   //最多缓存2000个文件,清除20秒无请求的文件的缓存
+    open_file_cache_valid 60s;          //缓存的文件的有效期是60s(如果一直有人访问还是清除重新读取)
+    open_file_cache_min_uses 5;         //最小被请求5次的文件才被缓存
+    open_file_cache_errors off;         //过期了等都会报错,所以关闭
+    ...
+  }
 
 ###############################################################################
