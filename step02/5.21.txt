@@ -12,7 +12,7 @@ Cookies:由服务器下发给客户端,保存在客户端的一个文件里  //c
 ###############################################################################
 搭建memcached服务(存储共享的session)
 
-1.安装memcached(存储共享session的服务器)    
+1.安装memcached(存储共享session的服务器)并启动服务
 #配置文件:/usr/lib/systemed/system/memcached.service
 #通过telnet访问memcache:
 #  telnet 127.0.0.1 端口号     //端口号查看配置文件获得
