@@ -1,0 +1,122 @@
+###############################################################################
+单词积累
+  encapsulation 封装
+
+###############################################################################
+命令补充
+  模块存放的目录: /lib/modules/3.10.0-862.el7.x86_64/kernel    //3.10.0...为内核版本
+  lsmod    //查看系统已经激活的模块
+  modprobe 模块名   //激活相应模块
+  modinfo 模块名   //查看模块的具体信息
+  rmmod 模块名    //禁用该模块
+
+  ip命令中的link就相当于nmcli中的device的概念.是一个网卡设备,但是是虚拟出来的
+            addr就相当于nmcli中的connection的概念
+  
+  rpm -qc 软件名   //查看该软件的配置文件
+
+###############################################################################
+
+VPN:virtual private network
+  在公共网络上建立私有网络,进行加密通讯  //仿佛在一个局域网内
+
+GRE:generic routing encapsulation,通用路由封装协议
+
+PPTP:point to point tunneling protocol,点对点隧道协议
+chap认证:challenge handshake authentication protocol,是ppp协议的认证协议
+
+L2TP:Layer Two Tunneling protocol,二层隧道协议
+IPSec:internet protocol security,互联网安全协议
+
+###############################################################################
+GRE VPN  //只有Linux支持,不进行加密
+
+在两端需要进行相同的配置:
+1.启动Linux的GRE模块
+  modprobe ip_gre
+2.创建隧道(这里的隧道就是一个虚拟的网卡)
+  ip tunnel add 隧道名 mode gre remote 对方IP local 本地IP  //不需要标识网段,否则出错
+3.启动隧道
+  ip link set 隧道名 up
+4.配置隧道IP地址(随便配私有ip地址)
+  ip addr add 本地私有ip地址 peer 对方私有ip地址 dev 隧道名
+5.开启路由转发(如果需要转到公网还需要开启NAT功能)
+  echo 1 > /proc/sys/net/ipv4/ip_forward
+
+###############################################################################
+PPTP VPN    //都支持,进行加密
+
+服务端:
+
+1.安装pptpd软件(lnmp_soft/vpn/下)
+
+2.修改配置文件
+#vim /etc/pptd.conf
+#参考最后两行注释
+#localip 本地IP
+#remoteip 隧道IP,是一个地址池,当有人连接会分配给对方,所以能够决定多少人可以同时连接
+
+#vim /etc/ppp/options.pptpd
+  require-mappe-128     //使用MPPE加密
+  ms-dns 8.8.8.8       //ms:micrsoft,客户端会将DNS设置为8.8.8.8
+
+#vim /etc/ppp/chap-secrets
+ tom * 123 *
+//用户名 服务器标识(在第二个配置文件中有) 密码 客户端
+
+3.开启路由转发(翻墙还需要开启NAT功能)
+
+4.启动服务(pptpd)
+
+
+
+windows客户端:
+
+  设置新的连接 -> 连接到新的工作区 -> VPN -> 稍后设置 -> 输入服务器地址和新建的网卡的名称
+#连上后服务器和客户端都会多出一张新的虚拟网卡
+
+###############################################################################
+L2TP+IPSec VPN
+
+服务端:
+
+一.部署IPSec服务
+
+1.安装libreswan软件
+
+2.部署IPSec秘钥验证配置文件
+#查看/etc/ipsec.conf 最后一行
+#cp myipsec.conf /etc/ipsec.d/
+#vim myipsec.conf    //需要修改left的值,为服务器的ip地址
+
+3.创建IPSec预定以共享秘钥(PSK:pre-share-key)
+#查看/etc/ipsec.secrets 最后一行
+#vim /etc/ipsec.d/mypass.secrets
+  服务器ip地址 %any: PSK "密码"    
+
+4.启动ipsec服务
+
+二.部署XL2TP服务
+1.安装xl2tp软件
+2.修改配置文件
+#vim /etc/xl2tpd/xl2tpd.conf
+#ip range
+#localip
+
+#vim /etc/ppp/options.xl2tp
+  require-mschap-v2    //去注释,且顶格
+  #crtscts    //注释掉
+  #lock
+
+#vim /etc/ppp/chap-secrets
+  tom * 123 *
+//账号名 服务器表示 密码 客户端ip
+
+3.启动服务:xl2tpd
+4.设置路由转发
+
+
+window客户端:
+  前面与上面的一样
+  最后需要设置PSK:找到网卡->属性->安全->l2tp加密->高级设置
+###############################################################################
