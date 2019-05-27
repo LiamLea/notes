@@ -4,7 +4,7 @@
 
 ###############################################################################
 命令补充
-  模块存放的目录: /lib/modules/3.10.0-862.el7.x86_64/kernel    //3.10.0...为内核版本
+  模块存放的目录: /lib/modules/3.10.0-862.el7.x86_64/kernel/    //3.10.0...为内核版本
   lsmod    //查看系统已经激活的模块
   modprobe 模块名   //激活相应模块
   modinfo 模块名   //查看模块的具体信息
@@ -28,6 +28,8 @@ chap认证:challenge handshake authentication protocol,是ppp协议的认证协�
 L2TP:Layer Two Tunneling protocol,二层隧道协议
 IPSec:internet protocol security,互联网安全协议
 
+PPTP和L2TP都是利用ppp协议建立VPN并进行加密
+
 ###############################################################################
 GRE VPN  //只有Linux支持,不进行加密
 
@@ -44,7 +46,7 @@ GRE VPN  //只有Linux支持,不进行加密
   echo 1 > /proc/sys/net/ipv4/ip_forward
 
 ###############################################################################
-PPTP VPN    //都支持,进行加密
+PPTP VPN    //都支持,部分加密
 
 服务端:
 
@@ -76,7 +78,7 @@ windows客户端:
 #连上后服务器和客户端都会多出一张新的虚拟网卡
 
 ###############################################################################
-L2TP+IPSec VPN
+L2TP+IPSec VPN    //都支持,数据全部加密
 
 服务端:
 
@@ -89,7 +91,7 @@ L2TP+IPSec VPN
 #cp myipsec.conf /etc/ipsec.d/
 #vim myipsec.conf    //需要修改left的值,为服务器的ip地址
 
-3.创建IPSec预定以共享秘钥(PSK:pre-share-key)
+3.创建IPSec预定义共享秘钥(PSK:pre-share-key)
 #查看/etc/ipsec.secrets 最后一行
 #vim /etc/ipsec.d/mypass.secrets
   服务器ip地址 %any: PSK "密码"    
@@ -119,4 +121,20 @@ L2TP+IPSec VPN
 window客户端:
   前面与上面的一样
   最后需要设置PSK:找到网卡->属性->安全->l2tp加密->高级设置
+
+###############################################################################
+NTP时间同步  //分层设计(不超过15层)
+
+缺陷:当闰秒的时候要将服务器暂时关闭,否则会崩溃
+
+服务端:
+#vim /etc/chrony.conf
+  server 上层NTP服务器 iburst
+  allow ip或网段      //允许哪些客户端访问,设置了这个选项,就可以当NTP服务器了
+  local stratum 层数    //声明自己所在的层
+
+客户端:
+#vim /etc/chrony.conf
+  server 上层NTP服务器 iburst
+
 ###############################################################################
