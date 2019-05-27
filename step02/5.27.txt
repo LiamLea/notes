@@ -1,0 +1,137 @@
+###############################################################################
+单词积累
+  masquerade 伪装,欺骗
+
+###############################################################################
+集群(cluster)  将多台计算机组成一个组,并以单一系统的模式加以管理
+  
+  核心技术是任务调度
+
+  目的:提高性能
+       降低成本
+       提高可扩展性
+       增强可靠性
+
+  集群分类:高性能计算集群(HPC)
+           负载均衡集群(LBC)  //如nginx
+           高可用集群(HAC)    //避免单点故障
+
+  常用集群软件:nginx,LVS,haproxy,big-ip
+
+  nginx和LVS工作原理不同:
+    nginx 是代理服务器,客户端只知道自己访问的是nginx,服务器只知道是nginx访问自己的,不知道客户端的存在
+    LVS 工作原理是路由器(必须开启ip_forward功能,提供服务的服务器必须配网关)
+
+  性能:nginx<LVS
+  功能:nginx>LVS
+
+###############################################################################
+LVS(linux virtual server)
+
+LVS集群组成
+  前端:负载均衡层     //由一台或多台调度器构成
+  中间:服务器群组层   //由一组运行实际服务的服务器组成
+  后端:数据共享存储层 //提供共享存储
+
+LVS专业术语
+  director server :调度服务器  //将负载分发到real server的服务器
+  real server :真实服务器     //真正提供应用服务的服务器
+  VIP :虚拟IP地址         //公布给用户访问的IP地址
+  DIP :直连IP地址         //调度器 连接 节点服务器 的IP地址
+  RIP :真实IP地址         //节点服务器使用的IP地址
+
+LVS工作模式(对于真实服务器而言的)
+  NAT模式  //通过NAT技术,请求和回复都经过调度机,性能会成为瓶颈
+  DR模式(默认模式)   //DR:direct routing,请求经过调度机,回复直接给客户机
+  TUN模式  //TUN:tunnel,通过隧道方式,调度机和服务器不在同一个局域网内,不常使用
+
+负载均衡 常用调度算法(对于调度机而言的)
+  rr    //roundrobin,问题:某些服务器的连接已经断开,有些没断开,依旧轮询,没断开的压力会更大
+  wrr   //weight roundrobin,这个可以设置权重
+  sh   //source hashing,相当于ip_hash
+  lc   //least connections
+  wlc  //weight least connections
+
+ipvsadm命令
+
+  对集群的操作:-A -E -D
+    如:ipvsadm -A -t 192.168.4.5:80 -s rr 
+#-A创建集群,-t对TCP协议有效(根据想转发的协议决定),ip地址为虚拟服务器地址
+#-s scheduling-method 调度算法
+
+  对真实服务器的操作:-a -e -d
+    如:ipvsadm -a -t 192.168.4.5:80 -r 192.168.2.100:80 -m -w 2
+#-r,将真实服务器加入到集群中
+#-m(masquerading,NAT模式),-g(gatewaying,DR模式,默认),-i(ipip encapsulation,隧道模式)
+#-w设置权重,当使用的覅度算法使用权重时才有意义
+
+  其他操作:
+    ipvsadm -C   //清除所有
+    ipvsadm -Ln  //列出所有集群,-n显示端口号
+    ipvsadm --save -n > /etc/sysconfig/ipvsadm  //永久保存所有规则
+
+###############################################################################
+部署LVS-NAT模式调度器
+
+1.开启调度器的路由转发功能
+  echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+  echo 1 > /proc/sys/net/ipv4/ip_forward
+
+2.创建一个集群
+  ipvsadm -A -t VIP:端口 -s 调度算法
+
+3.添加真实服务器(真实服务器要设好网关)
+  ipvsadm -a -t VIP:端口 -r RIP:端口 -m
+  ...
+
+4.保存规则
+
+###############################################################################
+部署LVS-DR模式调度器(前提:真实服务器也必须有公网IP或者装一台路由器,比linux用作路由的效果好的多)
+
+为什么要在调度机和真实服务器都设置VIP:
+  因为有一个基本原则:当请求的目的IP是多少,回应的IP也必须是多少,
+  所以,DR模式下真实服务器需要伪装源IP地址,客户端才会接受其回应的数据
+
+1.在调度机上配置VIP
+#为了避免冲突,VIP必须配置在网卡的虚拟接口上(即子网卡,能够实现一个网卡多个IP)
+#vim /etc/sysconfig/network-scripts/ifcfg-eth0:0
+  TYPE=Ethenet
+  BOOTPROTO=none    //可以是DHCP
+  NAME=eth0:0
+  DEVICE=eth0:0
+  ONBOOT=yes
+  IPADDR=192.168.4.15
+  PREFIX=24        //子网掩码
+#重启network服务
+
+2.在真实服务器上配置VIP
+#为了避免冲突.VIP设置在lo虚拟网卡中
+#vim /etc/sysconfig/network-scripts/ifcfg-lo:0
+  NAME=lo:0
+  DEVICE=lo:0
+  ONBOOT=yes
+  IPADDR=192.168.4.15
+  PREFIX=32
+#重启network服务
+
+#抑制arp
+#vim /etc/sysctl.conf
+  net.ipv4.conf.all.arp_ignore=1    
+  net.ipv4.conf.lo.arp_ignore=1    
+#arg_ignore=1表示只响应目的IP与接收网卡的IP一样
+#all和lo都要设置,因为选择其中较大的值
+  net.ipv4.conf.all.arp_announce=2
+  net.ipv4.conf.lo.arp_announce=2
+#arg_announce=2表示arp时选择自身的网卡IP地址,防止选到VIP,发生错误
+#sysctl -p 立即读取/etc/sysctl.conf中的参数
+
+3.调度机开启路由转发功能
+4.创建一个集群
+  ipvsadm -A -t VIP:端口 -s 调度算法
+5.添加真实服务器
+  ipvsadm -a -t VIP:端口 -r RIP:端口  -g   //默认就是-g,可以不写
+  ...
+6.保存规则
+
+###############################################################################
