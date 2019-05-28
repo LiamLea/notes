@@ -36,7 +36,7 @@ LVS集群组成
 LVS专业术语
   director server :调度服务器  //将负载分发到real server的服务器
   real server :真实服务器     //真正提供应用服务的服务器
-  VIP :虚拟IP地址         //公布给用户访问的IP地址
+  VIP :虚拟IP地址         //公布给用户访问的IP地址,因为该地址配置在虚拟网卡上的,所有叫VIP
   DIP :直连IP地址         //调度器 连接 节点服务器 的IP地址
   RIP :真实IP地址         //节点服务器使用的IP地址
 
@@ -53,6 +53,7 @@ LVS工作模式(对于真实服务器而言的)
   wlc  //weight least connections
 
 ipvsadm命令
+#LVS内置在内核中的,但要使用该管理命令需要安装相关软件
 
   对集群的操作:-A -E -D
     如:ipvsadm -A -t 192.168.4.5:80 -s rr 
@@ -68,10 +69,12 @@ ipvsadm命令
   其他操作:
     ipvsadm -C   //清除所有
     ipvsadm -Ln  //列出所有集群,-n显示端口号
-    ipvsadm --save -n > /etc/sysconfig/ipvsadm  //永久保存所有规则
+    ipvsadm --save -n > /etc/sysconfig/ipvsadm  //永久保存所有规则,开机之后重启服务即可
 
 ###############################################################################
 部署LVS-NAT模式调度器
+
+NAT指的是VIP和RIP之间的互相转换,当访问director server时,调度机将VIP转换为RIP,当回复数据时,director server将RIP转换位VIP)
 
 1.开启调度器的路由转发功能
   echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
@@ -93,6 +96,9 @@ ipvsadm命令
   因为有一个基本原则:当请求的目的IP是多少,回应的IP也必须是多少,
   所以,DR模式下真实服务器需要伪装源IP地址,客户端才会接受其回应的数据
 
+为什么调度机上的VIP要设置在虚拟机接口上:
+  因为优先使用主接口,client先访问VIP,然后调度机用主接口上的IP地址转给real server,否则用的VIP转给real server会冲突,因为real server也有VIP
+
 1.在调度机上配置VIP
 #为了避免冲突,VIP必须配置在网卡的虚拟接口上(即子网卡,能够实现一个网卡多个IP)
 #vim /etc/sysconfig/network-scripts/ifcfg-eth0:0
@@ -106,7 +112,7 @@ ipvsadm命令
 #重启network服务
 
 2.在真实服务器上配置VIP
-#为了避免冲突.VIP设置在lo虚拟网卡中
+#为了避免冲突,VIP设置在lo虚拟网卡中,结合抑制arp
 #vim /etc/sysconfig/network-scripts/ifcfg-lo:0
   NAME=lo:0
   DEVICE=lo:0
@@ -119,7 +125,7 @@ ipvsadm命令
 #vim /etc/sysctl.conf
   net.ipv4.conf.all.arp_ignore=1    
   net.ipv4.conf.lo.arp_ignore=1    
-#arg_ignore=1表示只响应目的IP与接收网卡的IP一样
+#arg_ignore=1表示只响应目的IP与接收网卡的IP一样,即只回复 接收到arp请求的网卡 上的信息
 #all和lo都要设置,因为选择其中较大的值
   net.ipv4.conf.all.arp_announce=2
   net.ipv4.conf.lo.arp_announce=2
