@@ -111,7 +111,7 @@ Git服务器(使用协议:SSH  //或Git或HTTP)
 
 用SSH协议搭建:
   //客户端使用git clone
-  //设置ssl秘钥,就不需要输入密码
+  //设置ssh秘钥,就不需要输入密码
 
 用Git协议搭建(只读)
   装包:git-daemon
