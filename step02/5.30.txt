@@ -24,8 +24,10 @@ Ceph
 特点:自动切割为小文件
      每个文件有3个副本
      并发写并发读
-     osd有缓存盘和数据盘,每个数据盘都有一个缓存盘.对应一个osd服务
-           //实际中缓存盘用固态盘(容量小,速度快).数据盘用磁盘
+     osd有日志盘和数据盘,每个数据盘都有一个日志盘.对应一个osd服务
+            //日志盘有缓存功能
+           //实际中日志盘用固态盘(容量小,速度快).数据盘用磁盘
+     通过镜像共享存储空间
 
 
 ceph组件(需要安装相应软件):
@@ -33,16 +35,14 @@ ceph组件(需要安装相应软件):
   OSD  提供存储设备(至少3个,保证至少3个副本)
 #object storage device,对象存储设备
 
-  MDS  提供文件系统
+  MON  monitor,集群监控组件(至少3台,高可用)
+
+  MDS  提供元数据管理,这样才能实现文件系统共享
 #metadata server,元数据服务器
 
   RGW  提高对象存储
 #rados:reliable,autonomic distributed object storage 可靠自主分布对象存储
 #RGW:rados gateway
-
-  Monitor 集群监控组件(至少3台,高可用)
-
-  client 客户端
 
 ###############################################################################
 部署Ceph集群(部署只需要在一台主机上进行操作)
@@ -54,16 +54,19 @@ ceph组件(需要安装相应软件):
   部署ssh秘钥                 //使ceph能够远程配置
   设置/etc/hosts主机解析      //使ceph能够找到这些主机
   所有节点主机用NTP同步时间   //ceph对时间要求严格,必须统一
-  添加磁盘                
+  添加磁盘                   //用于后面创建日志盘
+#创建分区用作日志盘
+  parted xx mklabel gpt
+  parted xx mkpart primary 起点 终点
 
-二.部署ceph集群
+二.部署mon和整个集群的配置
 
 1.安装部署软件:ceph-deploy
 
 2.创建目录  //用于存放集群配置文件
 
-3.进入目录,创建集群的配置文件
-  ceph-deploy 主机名1 主机名2 ...
+3.生成集群的配置文件,部署monitor
+  ceph-deploy new 主机名1 主机名2 ...
 #填写的主机是monitor
 #主机名需要在/etc/hosts进行解析,否则找不到这些主机
 
@@ -74,34 +77,31 @@ ceph组件(需要安装相应软件):
     ceph-radosgw //用于共享对象
 
 5.启动所有monitor节点的mon服务
-  ceph-deploy mon create-inittial
+  ceph-deploy mon create-initial
 
-三.创建OSD(这里的节点不必是上面添加到集群中的了)
+三.部署OSD服务器
 
-1.设置缓存盘
-#创建分区用作缓存盘
-  parted xx mklabel gpt
-  parted xx mkpart primary 起点 终点
-#需要更改分区所属
+1.更改用于日志盘的分区的所属   //磁盘不需要改
   chown ceph:ceph 分区
 #永久更改,/etc/udev/rules.d/xx.rules
   ENV{DEVNAME}=="/dev/vdb1",OWNER="ceph",GROUP="ceph"
   ...
 
-2.设置数据盘,即OSD存储空间
+2.创建osd,包括日志盘和数据盘
 #先清空磁盘数据
-  ceph-deploy zap 主机名或IP:磁盘名 ...
-#创建OSD存储空间
-  ceph-deploy osd create 主机名或IP:磁盘名:/dev/分区名
-#这里的分区是上面创建的缓冲盘
+  ceph-deploy disk zap 主机名或IP:磁盘名 ...
+#创建OSD,并且启动ceph-osd服务
+  ceph-deploy osd create 主机名或IP:数据盘:日志盘
+  ceph-deploy admin IP     //同步配置,使得能够与monitor服务器通信
 
 3.验证
-  ceph-deploy -s
+  ceph -s
+  ceph osd lspools    //查看资源池
 
 四.创建ceph块存储
   (rbd:rados block device)
 
-1.创建镜像
+1.创建镜像  
 #查看存储池(默认有rbd池)
   ceph osd lspools
 #创建镜像
@@ -117,20 +117,19 @@ ceph组件(需要安装相应软件):
 
 1.安装软件:ceph-common
 
-2.拷贝集群上的配置文件
-#否则不知道集群在哪里
-  /etc/ceph/ceph,conf
+2.同步配置文件:
+  ceph-deploy admin IP地址
+#或者直接拷贝集群上的配置文件
+#/etc/ceph/ceph.conf     //否则不知道集群在哪里
+#/etc/ceph/ceph.client.admin.keyring  //否则无连接权限
 
-3.拷贝集群上的连接秘钥
-#否则无连接权限
-  /etc/ceph/ceph.client.admin.keyring
-
-4.获得磁盘镜像
+4.加载磁盘镜像
   rbd map 镜像名
+#查看服务器提供的镜像:rbd list
 #查看本机加载的镜像:rbd showmapped
-#移除镜像:rbd unmap /dev/xx  
+#移除镜像:rbd unmap 镜像名  //首先要卸载分区
 
-5.进行格式化,挂载使用
+5.进行格式化,挂载使用  //之后其他客户端使用都不需要再次挂载
 
 六.给镜像创建快照
   rbd snap ls 镜像名  //查看该镜像的快照
@@ -139,6 +138,9 @@ ceph组件(需要安装相应软件):
 
 七.利用快照克隆镜像
 #克隆出来的镜像数据是利用COW技术产生的
+  snap protect 镜像名 --snap 快照名    //将快照保护起来,才能进行一下的操作
   rbd clone 镜像名 --snap 快照名 新的镜像名 --image-feature layering
+  rbd flatten 克隆的镜像名   //将克隆的镜像独立出来
+  snap unprotect 镜像名 --snap 快照名 //取消保护
 
 ###############################################################################
