@@ -1,0 +1,91 @@
+###############################################################################
+云的迁移(虚拟就迁移) 
+
+云:虚拟机镜像文件存储在ceph中
+
+虚拟器性能较差,为什么要用?
+  优点是物理机做不到的,虚拟机本身是文件,原则上是不会坏的,而且方便迁移
+
+###############################################################################
+
+文件系统
+  inode 元数据(描述信息)
+  block 数据   //默认为4k,存储小文件,block要小一点,否则会造成浪费
+               //存储大文件,block要大一点,否则速度会比较慢
+删除为什么很快:其实并没有删除,只是将flag标记设为delete,表示该文件的空间为所用空间,所有只要不覆盖这些空间,文件的内容还是可以恢复的
+
+###############################################################################
+通过ceph提供的镜像文件创建虚拟机
+
+1.创建一个磁盘镜像
+  rbd create 镜像名 --image-feture layering --size 大小
+
+2.配置libvirt secret
+#让KVM知道ceph的账户名称
+#vim secret.xml
+  <secret ephemeral='no' private='no'>
+    <usage type='ceph'>
+      <name>client.admin secret</name>
+    </usage>
+  </secret>
+
+  virsh secret-define secret.xml   //会产生该文件的UUID
+
+#给secret绑定admin账户的密码,内容参考ceph.client...
+  virsh secret-set-value --secret 认证文件的UUID --base64 密码
+
+3.修改虚拟机的XML配置文件
+#virsh edit 虚拟机名
+<disk type='network' device='disk'>
+  <driver name='qemu' type='raw'/>
+  <auth username='admin'> 
+  <secret type='ceph' uuid='733f0fd1-e3d6-4c25-a69f-6681fc19802b'/>
+  </auth>
+  <source protocol='rbd' name='rbd/vm1-image'>          <host name='192.168.4.11' port='6789'/>     </source>
+  <target dev='vda' bus='virtio'/>
+  <address type='pci' domain='0x0000' bus='0x09' slot='0x08' function='0x0'/>
+</disk>
+
+###############################################################################
+Ceph实现文件系统共享(必须在部署了mon和osd的基础上)
+  需要两个共享池,一个用于存储inode,一个用于存储block,最后将两个池进行合并
+
+1.部署mds服务器,并启动ceph-mds服务    
+#该服务器是用于管理文件系统的,真正存储还是在OSD中
+  ceph-deploy mds create 主机名或ip  
+  ceph-deploy admin 主机名或ip     //同步配置,能够与monitor进行通信
+
+#下面的操作都是在mds服务器上进行的
+2.创建两个存储池
+  ceph osd pool create 池名 128
+  ceph osd pool create 池名 128
+#PG:placement group,要为2的指数
+
+3.创建ceph文件系统
+  ceph fs new 文件系统名 池1 池2
+//池1就是元数据池
+//池2就是数据池
+
+4.验证
+  ceph fs ls
+
+5.客户端挂载
+  mount -t ceph ip:6789:/ 挂载点 -o name=admin,secret=xx
+
+##############################################################################
+ceph实现对象存储(必须在部署了mon,osd和mds基础上)
+#OBS:object based storage
+
+1.部署rgw服务器
+  ceph-deploy rgw create IP地址
+  ceph-deploy admin IP地址  //同步配置
+
+2.修改服务端口
+#vim /etv/ceph/ceph.conf
+  [client.rgw.主机名]
+  host=主机名
+  rgw_frontends="civetweb port=8000"
+
+3.重启服务:ceph-radosgw@...
+
+##############################################################################
