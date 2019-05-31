@@ -48,6 +48,7 @@ keepalived+LVS
 3.修改配置文件/etc/keepalived/keepalived.conf
 #VRRP配置同上
 #主要进行集群配置
+#注意工作模式选项:lb_kind
 #一个virtual server 就是一个集群,健康检查可以只对端口检查(TCP_CHECK)
 #一个集群内有多个real_server
 #下面的virtual server都删掉
