@@ -123,7 +123,7 @@ Git服务器(使用协议:SSH  //或Git或HTTP)
   装包:gitweb,httpd
   修改配置文件/etc/gitweb.conf修改$projectroot选项
   启动服务:httpd
-  //客户端:firefox http://192.168.2.100/git
+  //客户端:firefox http://192.168.2.100/git   //必须填git
 
 ###############################################################################
 制作nginx的RPM包
