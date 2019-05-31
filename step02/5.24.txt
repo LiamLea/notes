@@ -148,7 +148,7 @@ RPM就是一个安装好的软件的压缩包
   Name:nginx
   Version:1.10.3
   ...
-  Source0:nginx-1-10-3.tar.gz
+  Source0:nginx-1.10.3.tar.gz
 
   %post         //在下面写安装后脚本,非必需
   ...
