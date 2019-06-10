@@ -153,7 +153,7 @@ ceph组件(需要安装相应软件):
 六.给镜像创建快照
   rbd snap ls 镜像名  //查看该镜像的快照
   rbd snap create 镜像名 --snap 快照名
-  rbd sanp rollback image --snap 快照名   //还原快照
+  rbd sanp rollback 镜像名 --snap 快照名   //还原快照
 
 七.利用快照克隆镜像
 #克隆出来的镜像数据是利用COW技术产生的
