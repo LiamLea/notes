@@ -37,7 +37,7 @@ SQL命令分类
   DDL   //data define language,如:create,alter,drop
   DML   //data manipulate language,如:insert,update,delete
   DCL   //data control language,如:grant,revoke
-  DTL   //date tansaction language,如:commit,rollback,savepoint
+  DTL   //date transaction language,如:commit,rollback,savepoint
 
 ###############################################################################
 mysql命令补充
