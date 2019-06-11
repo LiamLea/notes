@@ -17,7 +17,8 @@
 
   alter table 表 执行动作;
 
-    执行动作:add       //first,表示添加在最前面
+    执行动作:add       //添加字段,键值等
+                       //first,表示添加在最前面
                        //after 字段名,表示在某个字段的后面
              drop
              modify   //修改字段类型,约束条件,字段位置(first,after)
