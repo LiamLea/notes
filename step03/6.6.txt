@@ -67,6 +67,7 @@ mysql命令补充
 7.显示当前信息
     select database()           //显示当前所在的库
     select user()               //显示当前的用户
+    select @@hostname           //显示当前的主机名,hostname是内置变量,@@表示后面是变量
     show create table 表\G;     //显示表的信息
     show create database 库\G;  //显示库的信息
 
