@@ -81,6 +81,8 @@ root密码
   也称为 二进制日志
   记录除查询之外的SQL命令
   配置mysql主从同步的必要条件
+  有两个相关文件:主机名-bin.xxxxxx   //binlog日志文件
+                 主机名-bin.index    //索引文件
 
 2.启动binlog日志
   [mysqld]
