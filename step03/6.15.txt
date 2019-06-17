@@ -16,7 +16,7 @@
   log-bin=xx
   server_id=xx
 
-2.授权可以同步的用户
+2.授权用于同步的用户
   grant replication slave on *.* to 用户名@"%" identified by "密码";
 
 3.查看binlog日志信息
@@ -52,7 +52,7 @@
   主机名-relay-bin.index    //索引文件
 
 ###############################################################################
-主从同步结构
+主从同步结构模式
 
 一.结构类型
 1.一主一从(单向复制)
@@ -66,4 +66,39 @@
 4.互为主从
 
 ###############################################################################
+复制模式
+  异步复制模式(默认)
+    主库执行完一次事务后,立即通知客户端是否存储成功,不管从库是否已经接收并处理
+  全同步复制模式
+    主库执行完一次事务后,且所有从库都执行了该事务后才将结果返回给客户端
+  半同步复制模式
+    主库执行完一次事务后,等待至少一个从库接收到并写入到relaylog中才将结果返回个客户端
 
+###############################################################################
+半同步复制模式
+
+相关命令:
+  show variables like "have_dynamic_loading";   //查看是否允许动态加载模块
+  select plugin_name,plugin_status from information_schema.plugins where plugin_name like "%semi%";    //查看是否安装了相关插件
+  show variables like "rpl_semi_sync_%_enabled";  //查看是否激活了相应模块
+
+主库:
+#加载rpl_semi_sync_master插件中的semisync_master.so模块
+  insatll plugin rpl_semi_sync_master SONAME "semisync_master.so";
+  set global rpl_semi_master_slave_enabled=1;
+#永久设置
+#vim /etc/my.cnf
+  [mysqld]
+  plugin-load=rpl_semi_sync_master=semisync_master.so   //若有多个模块,用;隔开
+  rpl_semi_sync_master_enabled=1
+
+从库:
+#加载rpl_semi_sync_slave插件中的semisync_slave.so模块
+  install plugin rpl_semi_sync_slave SONAME "semisync_slave.so";
+  set global rpl_semi_sync_slave_enabled=1;
+#永久配置
+#vim /etc/my.cnf
+  plugin-load=rpl_semi_sync_slave=semisync_slave.so
+  rpl_semi_sync_slave_enabled=1
+
+###############################################################################
