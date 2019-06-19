@@ -4,6 +4,11 @@
 安装免安装的软件包
   首先解压tar包,然后将目录移动到/usr/local/下,然后修改所属
 
+删除了grub.cfg恢复方法:
+  linux16 /boot/vmlinuz-3... root=/dev/sda2
+  initrd16 /boot/initrd...
+  boot
+
 ###############################################################################
 数据分片(分库分表)
 
@@ -86,6 +91,5 @@ mycat是基于java的分布式数据库系统中间件
   首先要在配置文件中添加相应的逻辑库和逻辑表  //逻辑库的添加用 逗号 隔开,逻辑表的添加用 table标签
 
 ###############################################################################
-GRUB2_PASSWORD=grub.pbkdf2.sha512.10000.4AFD14C93578A269CC31446E220D63FF8B4D1D64FAC24E065E3CC4ED56CB29372C352D9A6528E9D0155BC55A66BB1691F30D7D011ABB7C2D9EEEFFC9F27A26C7.7BC168A6D3A1116FFBC2D248A6CC0CF9AD9633    3CF0DCDDCA3C3C8BFEEB2234404641DA1AEAEDA06CAC0F3B083D742EB2ED0379BFE884FFB3DC778BB698C009E4
 
 
