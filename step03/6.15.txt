@@ -22,6 +22,10 @@
 3.查看binlog日志信息
   show master status;
 
+4.主服务器备份数据
+#主服务器备份数据,加--master-data记录利用的日志和备份到的位置,用这个选项之前必须开启binlog日志
+  mysqldump -uroot -p密码 --master-data 数据库名 > 目录/xx.sql
+
 二.从服务器
 
 1.指定server_id(不能与主服务器的相同)
@@ -29,10 +33,7 @@
   [mysqld]
   server_id=xx
 
-2.与主服务器数据一致
-#主服务器备份数据,加--master-data记录利用的日志和备份到的位置,用这个选项之前必须开启binlog日志
-  mysqldump -uroot -p密码 --master-data 数据库名 > 目录/xx.sql
-#从服务器恢复数据
+2.从服务器恢复数据
 
 3.配置从服务器
   change master to
