@@ -15,6 +15,11 @@ MHA组成:
   当master宕机时,Manager自动将拥有最新数据的slave提升为新的master
   当master宕机时,manager服务会停掉,然后调用故障迁移脚本,进行故障迁移
 
+实质就是对master服务器进行监控,
+        当master宕机时,则将某个slave提升为master,并配置vip,取消之前的vip,
+        并且监控程序停止,即需要重新启动才能继续进行监视
+        当宕机的服务器重启后,需要手动配置主从和修改配置文件,才能加入到集群
+
 ###############################################################################
 部署MHA集群
 
@@ -37,7 +42,7 @@ MHA组成:
   [server default]   //管理服务的默认配置
   manager_workdir=/etc/mha          //工作目录
   manager_log=/etc/mha/manager.log  //日志文件
-  master_ip_failover_script=/etc/mha/master_ip_failover //故障切换脚本,实现vip的迁移
+  master_ip_failover_script=/etc/mha/master_ip_failover //故障切换脚本,实现vip的迁移,即取消宕机的主机的vip,设置到新的master上
 
   ssh-user=root    //访问ssh服务用户
   ssh_port=22      //ssh服务端口
