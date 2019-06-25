@@ -69,7 +69,7 @@ hash slots(0~16383)
 
 三.移除slave服务器
   redis-trib.rb del-node 集群ip:端口 id号
-#移除的服务器要想再次使用集群,需要移除集群信息:/var/lib/redis/端口/
+#移除的服务器要想再次使用集群,需要移除集群信息:/var/lib/redis/端口/nodes-xx.conf
 
 四.移除master服务器
 1.释放占用的hash槽
