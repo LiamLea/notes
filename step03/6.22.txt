@@ -1,8 +1,5 @@
 ###############################################################################
 命令补充
-  1k => 1000 bytes
-  1kb => 1024 bytes
-
   eviction 逐出,赶出
 
 ###############################################################################
@@ -96,9 +93,10 @@ remote dictionary server 远程字典服务器
   phpize            //生成配置文件php-config及configure命令
   ./configure --with-php-config=/usr/bin/php-config
   make
-  make install
+  make install     //安装后,会提示redis.so存放的路径
 
 2.将模块添加进php   //提前要准备好php环境
+#vim /etc/php.ini
   extension_dir="目录名";
   extension="模块名";
 
