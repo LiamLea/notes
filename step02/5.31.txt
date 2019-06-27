@@ -53,9 +53,7 @@ Ceph实现文件系统共享(必须在部署了mon和osd的基础上)
 1.部署mds服务器,并启动ceph-mds服务    
 #该服务器是用于管理文件系统的,真正存储还是在OSD中
   ceph-deploy mds create 主机名或ip  
-  ceph-deploy admin 主机名或ip     //同步配置,能够与monitor进行通信
 
-#下面的操作都是在mds服务器上进行的
 2.创建两个存储池
   ceph osd pool create 池名 128
   ceph osd pool create 池名 128
@@ -78,9 +76,8 @@ ceph实现对象存储(必须在部署了mon和os基础上)
 
 1.部署rgw服务器
   ceph-deploy rgw create IP地址
-  ceph-deploy admin IP地址  //同步配置
 
-2.修改服务端口
+2.修改服务端口   //用于测试
 #vim /etv/ceph/ceph.conf
   [client.rgw.主机名]
   host=主机名

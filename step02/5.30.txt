@@ -33,7 +33,7 @@ ceph架构和基本概念
      //PG是OSD上一层逻辑
   pool 抽象的存储池,由多个PG组成
      //pool是PG上一层逻辑
-  image 提供块设备,image的数据被保存为若干个对象
+  image:将块空间映射成镜像,提供给客户端使用
   fs 提供文件系统
   rgw 提供对象存储
 
@@ -63,10 +63,13 @@ ceph组件(需要安装相应软件):
 #rados:reliable,autonomic distributed object storage 可靠自主分布对象存储
 #RGW:rados gateway
 
+命令:
+  ceph-deploy     //配置命令,必须在指定目录下执行
+  ceph            //管理命令,必须在有ceph配置文件的主机上执行,通过ceph-deploy ip可以同步配置文件
+  rbd             //客户端命令
+
 ###############################################################################
 部署Ceph集群(部署只需要在一台主机上进行操作)
-
-注意:命令需要在指定目录下执行
 
 一.环境准备
   搭建ceph的yum源             //为了安装ceph相关软件
@@ -83,6 +86,7 @@ ceph组件(需要安装相应软件):
 1.安装部署软件:ceph-deploy
 
 2.创建目录  //用于存放集群配置文件
+  ceph-deploy 命令必须在此目录下执行
 
 3.生成集群的配置文件,部署monitor
   ceph-deploy new 主机名1 主机名2 ...
@@ -120,10 +124,10 @@ ceph组件(需要安装相应软件):
 四.创建ceph块存储(即image)
   (rbd:rados block device)
 
-1.创建镜像  
+1.创建镜像    //只能在服务端创建 ,客户端使用
 #查看存储池(默认有rbd池)
   ceph osd lspools
-#创建镜像
+#创建镜像,必须在服务器端执行
   rbd create 镜像名 --image-feature layering --size 大小
 #layering指的是COW功能
 #查看镜像的信息
@@ -142,11 +146,11 @@ ceph组件(需要安装相应软件):
 #/etc/ceph/ceph.conf     //否则不知道集群在哪里
 #/etc/ceph/ceph.client.admin.keyring  //否则无连接权限
 
-3.加载磁盘镜像
-  rbd map 镜像名
+3.加载磁盘镜像    
+  rbd map 镜像名     //其实就是加载了一个块设备:/dev/rdbx
 #查看服务器提供的镜像:rbd list
 #查看本机加载的镜像:rbd showmapped
-#移除镜像:rbd unmap 镜像名  //首先要卸载分区
+#移除镜像:rbd unmap /dev/rdbx  //首先要卸载分区
 
 4.进行格式化,挂载使用  //之后其他客户端使用都不需要再次挂载
 
@@ -157,9 +161,9 @@ ceph组件(需要安装相应软件):
 
 七.利用快照克隆镜像
 #克隆出来的镜像数据是利用COW技术产生的
-  snap protect 镜像名 --snap 快照名    //将快照保护起来,才能进行一下的操作
+  rdb snap protect 镜像名 --snap 快照名    //将快照保护起来,才能进行一下的操作
   rbd clone 镜像名 --snap 快照名 新的镜像名 --image-feature layering
   rbd flatten 克隆的镜像名   //将克隆的镜像独立出来
-  snap unprotect 镜像名 --snap 快照名 //取消保护
+  rbd snap unprotect 镜像名 --snap 快照名 //取消保护
 
 ###############################################################################
