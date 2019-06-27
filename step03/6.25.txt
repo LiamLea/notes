@@ -118,5 +118,11 @@ redis主从复制
 
 三.hash表
 #一个key可对应多个field,一个field对应一个value
+  hset key field1 value1 field2 value2 ...
+  hget key field
+  hmget key field1 field2 ...
+  hgetall key
+  hkeys key
+  hdel key field1 field2 ...
 
 ###############################################################################
