@@ -118,11 +118,11 @@ Zabbix通过B/S模式实现查看和管理
   ServerActive=xx   //监控服务器的ip地址
 
 3.启动服务
-  useradd -s /sbin/nologin
+  useradd -s /sbin/nologin zabbix
   zabbix_agentd
 
 4.访问服务器web,添加监控主机
-  configuration -> Hosts -> Create Host
+  configuration -> Hosts -> Create Host -> Host,Templates
 #注意选择模板,即选择要监控的内容
 
 5.查看监控数据
@@ -160,4 +160,19 @@ Zabbix通过B/S模式实现查看和管理
 
 4.将模板添加到主机中
   
+###############################################################################
+监控案例
+
+一.监控nginx状态
+  1.部署好nginx
+  2.自定义key
+    UserParameter=nginx.status[*],/root/nginx_status.sh $1
+//$1匹配前面的*,即前面*是什么,传递给脚本的参数就是什么,*是监控端定义的
+  3.编写脚本:/root/nginx_status.sh
+  4.赋予脚本执行权限
+  5.重启zabbix_agenntd服务
+  6.测试
+      zabbix_get -s 127.0.0.1 -k nginx.status[accepts]
+  7.在监控页面进行配置
+
 ###############################################################################
