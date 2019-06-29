@@ -67,3 +67,31 @@ Zabbix进阶操作
       Monitoring -> Screens -> create screen -> constructor -> change
 
 ###############################################################################
+监控案例
+
+一.监控nginx状态
+  1.部署好nginx
+  2.自定义key
+    UserParameter=nginx.status[*],/root/nginx_status.sh $1
+//$1匹配前面的*,即前面*是什么,传递给脚本的参数就是什么,*是监控端定义的
+  3.编写脚本:/root/nginx_status.sh
+  4.赋予脚本执行权限
+  5.重启zabbix_agenntd服务
+  6.测试
+      zabbix_get -s 127.0.0.1 -k nginx.status[accepts]
+  7.在监控页面进行配置
+
+二.监控网络连接状态
+
+1.TCP连接状态
+  SYN_SENT:发起了连接请求
+  ESTABLISHED:建立了连接
+  SYN_RCVD:接收到了SYN
+
+  FIN_WAIT1:发送fin请求后,等待对方的FIN,如果对方只回复ACK,则进入FIN_WAIT2状态
+  FIN_WAIT2:在接受到ACK后,等待对方的FIN
+  TIME_WAIT:等待2*MSL(max segment lifetime)时间即变为CLOSED状态
+  CLOSE_WAIT:等待关闭,即对方发送FIN过来,回复了ACK,等待自己这边处理完,发送FIN过去
+  LAST_ACK:等待最后一个ACK,即完成断开连接
+
+###############################################################################
