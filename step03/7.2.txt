@@ -1,0 +1,109 @@
+###############################################################################
+审计
+  基于事先配置的规则生成日志,记录可能发生在系统上的事件
+  审计不会为系统提供额外的安全保护,但他会发现并记录违反安全策略的人及其对应的行为
+
+###############################################################################
+部署audit
+
+1.命令:auditctl
+  auditctl -s     //查询状态
+  auditctl -l     //查看规则
+  auditctl -D     //删除所有规则
+
+2.定义规则:/etc/audit/rules.d/aidit.rules
+  -w  路径 -p  权限 -k  日志项    //w:watch
+#路径:可以为文件或目录
+#权限:r,w,x,a       //a:文件或目录的属性发生变化则记录
+#日志项:自己取名字
+
+3.定义临时规则
+  auditctl -w ...
+
+4.查看日志:/var/log/audit.log
+  type=CWD ...     //用来记录当前工作目录
+  type=PATH ouid=xx ogid=xx ... //被监视对象的所有者的uid和gid
+  type=xx success=yes/no ppid=xx auid=xx uid=xx gid=xx tty=xx   
+#auid是审核用户的id,用su切换也能追踪到原始用户
+
+5.搜索日志
+  ausearch  -k  日志项
+
+###############################################################################
+Nginx安全
+
+1.删除不需要的模块(最小化安装)
+  ./configure --without-http_autoindex_module
+
+2.修改版本信息:src/http/ngx_http_header_filter_module.c
+  "Server: xx" 变量 CRLF    //xx随便写,把变量都删除
+
+3.限制每个客户端的并发连接数(降低DDos风险)
+#vim /usr/local/nginx/conf/nginx.conf
+  http{
+    limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+#将客户端IP信息存储名称为one的共享内存,空间为10M
+#每秒仅接受同一客户端的1个请求
+#同一客户端的多余的请求放入内存
+    server{
+      ...
+      limit_req zone=one burst=5;
+#内存最多放5个,其余的都拒绝
+#所以同一个客户端最多只能有6个并发访问
+      ...
+    }
+  }
+
+4.拒绝非法访问(只允许GET|POST)
+  if  ($request_method !~ ^(GET|POST)$){
+    return 444;
+  }
+
+5.防止buffer溢出
+#防止客户端请求数据溢出
+#有效降低Dos攻击风险
+  http{
+    client_body_buffer_size 1k;
+    client_max_body_size 16k;
+    client_header_buffer_size 1k;
+    large_client_header_buffers 4 4k;
+  }
+
+###############################################################################
+数据库安全
+
+1.执行初始化安全脚本:mysql_secure_installation
+
+2.密码安全
+  mysqladmin -uroot -pxx password 'xx' 
+#这条命令会记录在 ~/.bash_history中
+  set password for 用户@"主机"=password("xx");
+#这条命令会记录在 ~/.mysql_history中
+
+3.数据备份与还原
+
+4.数据安全
+  数据库的数据都是明文传输的,通过抓包能够获得账号和密码
+  
+###############################################################################
+Tomcat安全
+
+1.隐藏版本信息
+  安装java-1.8.0-openjdk-devel
+  cd /usr/local/tomcat/lib/ 
+  jar -xf catalina.jar
+  vim org/apache/catalina/util/ServerInfo.properties 修改最后三行  //访问错误页面时,显示的版本信息
+  vim /usr/local/tomcat/conf/server.xml
+    <Connector port="8080" ... server="xx" />   //访问正确网页时,显示的版本信息
+  启动程序即可
+
+2.降权启动
+  useradd tomcat
+  chown -R tomcat:tomcat /usr/local/tomcat/   //更改了文件夹及其内容的所属
+  su -c /usr/local/tomcat/bin/startup.sh tomcat
+
+3.删除默认的测试页面
+  rm -rf /usr/local/tomcat/webapps/ROOT/*
+
+###############################################################################
+

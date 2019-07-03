@@ -106,5 +106,23 @@ SElinux安全防护
   移动的文件,原有的上下文属性不变
   创建和复制文件,会继承目标位置的上下文
 
+3.修改安全上下文
+  chcon -t 上下文类型 文件
+        -R  //递归改
+
+4.恢复安全上下文(即恢复成该目录下相应的上下文)
+  restorecon 文件
+
+5.文件:/.autorelabel
+  下次重启后重置所有文件上下文,即恢复所有文件上下文
+
+6.调整selinux布尔值(功能的开关)
+  getsebool -a     //查看所有的selinux布尔值
+  setsebool -P xx on或off
+
+7.查看因selinux造成的错误
+    软件:setroubleshoot
+    查看日志:grep setroubleshoot /var/log/messages | tail -1
+
 ###############################################################################
 
