@@ -1,0 +1,101 @@
+###############################################################################
+命令补充
+  rsync -avXLH --delete xx xx    //X:extend,保留扩展属性(acl)
+                                 //L:symlinks,单独处理软连接
+                                 //H:hard-linkes,单独处理硬连接
+
+  查看命令帮助: 主命令 help 子命令
+               如:virsh help list
+
+  查看文件类型: file xx
+
+  OVS:open vSwitch   //开放虚拟交换
+
+###############################################################################
+Openstack
+
+1.7大核心组件:
+                 Horizon                        --   Keystone 
+  Nova -- Glance -- Swift -- Quantum -- Cinder  --
+//Horizon 基于web的管理接口
+//Nova 在节点上用于管理虚拟机的服务
+//keystone 为其他服务提供认证和授权的集中身份管理服务
+//Glance 扮演虚拟机镜像注册的角色(后端盘)
+//Swift 对象存储
+//Cinder 逻辑卷存储
+//Neutron 网络组件,用于连接不同物理机上的虚拟机
+
+2.openstack会接管网路和防火墙,所以不能安装NetworkManger服务和firewalld,iptables服务
+
+###############################################################################
+安装openstack
+
+基础软件:qemu-kvm
+         libvirt-daemon
+         libvirt-client
+         libvirt-daemon-driver-qemu
+         python-setuptools  //python安装工具
+
+一.管理节点
+  1.准备
+    参数:2CPU  6G内存  50G硬盘
+    软件:openstack-packstack
+    配置DNS:删除/etc/reslove中search的行,在/etc/hosts中设置各个节点的主机名解析
+    配置NTP:配置后用 chronyc sources -v 查看是否同步成功
+    配置yum:  CentOS7-1804.iso    //提供系统软件
+              RHEL7-extras.iso   //提供python依赖文件
+              RHEL7OSP-10.iso :openstack-10-rpms和openstack-10-devtools-rpms
+                                  //提供openstack需要的软件
+
+  2.使用packstack创建应答文件
+    packstack --gen-answer-file=xx.ini
+      CONFIG_SWIFT_INSTALL=n      //不使用对象存储(当有ceph集群时使用)
+      CONFIG_CEILOMETER_INSTALL=n     //不需要计费
+      CONFIG_AODH_INSTALL=n
+      CONFIG_CNOCCHI_INSTALL=n
+      CONFIG_NTP_SERVERS=NTP的ip地址
+      CONFIG_COMPUTE_HOSTS=nova的ip地址
+      CONFIG_NETWORK_HOSTS=需要配置quantum网路的ip地址(逗号隔开) //所有的都要
+      CONFIG_KEYSTONE_ADMIN_USERNAME=xx
+      CONFIG_KEYSTONE_ADMIN_PW=a      //PW:password
+      CONFIG_NEUTRON_ML2_TYPE_DRIVERS=flat,vxlan   //flat:直连网络,支持flat和vxlan
+      CONFIG_NEUTRON_OVS_BRIDGE_MAPPINGS=physnet1:br-ex  //虚拟交换机的名字
+      CONFIG_NEUTRON_OVS_BRIDGE_IFACES=br-ex:eth0     //虚拟交换机外出的接口(能够与其他交换机通信,所以eth0为相对于虚拟机的真实接口)
+      CONFIG_PROVISION_DEMO=n
+
+  3.packstack --answer-file=xx.ini
+    
+
+二.nova节点
+  1.准备
+    参数:2CPU 4.5G内存 100G硬盘
+    软件:
+    配置DNS:同上
+    配置NTP:同上
+    配置yum:同上
+
+###############################################################################
+查看openstack配置
+
+一.网络配置
+1.br-ex为外部OVS网桥:ifcfg-br-ex        //OVS为虚拟交换机,只能连接计算机内部
+  ...
+  DEVICETYPE=ovs
+  TYPE=OVSBridge
+  ...
+
+2.eth0为外部OVS网桥的端口:ifcfg-eth0    
+#将eth0设置为OVS的端口,就可以连接外部计算机,即原本工作在2层,现在工作在2和3层
+  ...
+  DEVICETYPE=ovs
+  TYPE=OVSPort
+  ...
+
+3.查看网络配置:ovs-vsctl show
+
+二.Horizon配置
+#vim /etc/httpd/conf.d/15-horizon_vhost.conf
+#WSGIProcessGroup apache下面添加
+  WSGIApplicationGroup %{GLOBAL}      //否则无法访问网页
+
+###############################################################################
