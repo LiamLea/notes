@@ -16,7 +16,7 @@ Openstack
 
 1.7大核心组件:
                  Horizon                        --   Keystone 
-  Nova -- Glance -- Swift -- Quantum -- Cinder  --
+  Nova -- Glance -- Swift -- Neutron -- Cinder  --
 //Horizon 基于web的管理接口
 //Nova 在节点上用于管理虚拟机的服务
 //keystone 为其他服务提供认证和授权的集中身份管理服务
@@ -55,7 +55,7 @@ Openstack
       CONFIG_CNOCCHI_INSTALL=n
       CONFIG_NTP_SERVERS=NTP的ip地址
       CONFIG_COMPUTE_HOSTS=nova的ip地址
-      CONFIG_NETWORK_HOSTS=需要配置quantum网路的ip地址(逗号隔开) //所有的都要
+      CONFIG_NETWORK_HOSTS=需要配置neutron网路的ip地址(逗号隔开) //所有的都要
       CONFIG_KEYSTONE_ADMIN_USERNAME=xx
       CONFIG_KEYSTONE_ADMIN_PW=a      //PW:password
       CONFIG_NEUTRON_ML2_TYPE_DRIVERS=flat,vxlan   //flat:直连网络,支持flat和vxlan
