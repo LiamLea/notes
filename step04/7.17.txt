@@ -9,6 +9,10 @@
   ip addr add IP地址 dev eth0 label eth0:0   //默认添加ip地址都是叠加,即一个网卡多个ip  
                                              //不加标签ifconfig无法识别
 4.ip route
+  ip route add 目标 via 网关地址
+#永久设置:/etc/sysconfig/network-scripts/route-网卡名
+  目标 via ip地址     
+
 5.ip netns     //ns:namsspace,用于隔离内部网络,进行虚拟化
   ip netns add xx  //xx为新的网络空间
   ip link set 设备名称 netns xx  //此时在当前环境下就看不到该网络设备
