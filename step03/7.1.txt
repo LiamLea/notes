@@ -29,11 +29,11 @@ GnuPG(GNU private guard)加密工具
 
 二.gpg非对称加/解密
   1.创建秘钥对
-    gpg --gen-key
+    gpg --gen-key                 //随机数不够:rngd -r /dev/random
   2.查看秘钥对
     pgp --list-keys
-  3.导出公钥
-    gpg --export 名字 > xx.pub
+  3.导出公钥   
+    gpg --export 名字 > xx.pub     //--export-secret-keys,导出私钥
   4.导入公钥
     gpg --import xx.pub
   5.加密
@@ -84,7 +84,6 @@ AIDE(advanced intrusion detection environment)入侵检测系统
       -sP  //ICMP扫描
       -A   //对目标系统全面分析
     选项:
-      -nn  //显示ip地址和端口号,不显示主机名和服务名
       -p 端口1-端口2    //扫描指定范围内的端口,或者用逗号间隔不连续的
 
 二.抓包
@@ -94,6 +93,7 @@ AIDE(advanced intrusion detection environment)入侵检测系统
     -i   //interface,指定监控的网路接口,默认只抓eth0
     -c   //count,指定抓包的个数
     -A   //转换为ACSII
+    -nn  //显示ip地址和端口号,不显示主机名和服务名
     -w   //write,将抓到的包存入指定文件中
     -r   //read,读取指定文件中的数据包信息
   过滤条件:
