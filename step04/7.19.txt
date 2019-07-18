@@ -1,0 +1,45 @@
+###############################################################################
+
+一.部署mapreduce   //该框架都是开发使用的
+#所有主机修改配置文件:mapred-site.xml
+#先复制模板在修改
+<configuration>
+  <property>
+    <name>mapreduce.framework.name</name>   //指定框架,只有local和yarn两种
+    <value>yarn</value>
+  </property>
+</configuration>
+
+二.部署yarn
+1.所有主机配置yarn:yarn-site.xml
+<configuration>
+  <property>
+    <name>yarn.resourcemanager.hostname</name>   //指定ResourceManager
+    <value>nn01</value>
+  </property>
+  <property>
+    <name>yarn.nodemanager.aux-services</name>    //指定使用哪个计算框架
+    <value>名字</value>    //我们使用的框架是mapreduce_shuffle
+  </property>
+</configuration>
+
+2.启动yarn
+  sbin/start-yarn.sh
+
+3.验证
+  jps
+  bin/yarn node -list
+
+4.web访问hadoop
+  访问NameNode页面:
+    http;//ip:50070/
+  访问secondary NameNode页面:
+    http://ip:50090/
+  访问DataNode页面
+    http://ip:50075/
+  访问ResourceManager页面
+    http://ip:8088/
+  访问NodeManager页面
+    http://ip:8042/
+
+###############################################################################

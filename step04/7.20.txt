@@ -1,0 +1,108 @@
+###############################################################################
+DNS根域的正解和反解
+
+1.配置文件的部分:
+  zone "." IN {
+    type master;
+    file "root.zone";
+  };
+  zone "1.168.192.in-addr.arpa" IN {    //ip要反过来写
+    type master;
+    file "root.in-addr-arpa.zone";
+  };
+
+2.反解的域文件:
+                NS      dns主机名.
+  dns主机名.    A       192.168.1.253
+  61            PTR     node1.       //PTR:pointer
+
+###############################################################################
+系统资源管理
+
+1.ps
+  a:与终端有关的
+  x:与终端无关的
+  u:以用户为中心组织进程状态显示
+常用组合:ps axu
+         ps axo pid,ni,pri,psr,pcpu,stat,comm,tty,ppid   //psr指明运行在哪个cpu上
+显示内容;
+  VSZ    //virtual size,虚拟内存集
+  RSS    //resident size,常驻内存集,即不能移动到swap中
+  STAT: R     //running
+        S     //interruptable sleeping
+        D     //uninterruptable sleeping
+        T     //stopped
+        Z     //zombie
+
+        +     //前台数据
+        l     //多线程进程
+        N     //低优先级进程
+        <     //高优先级进程
+        s     //session leader
+
+2.pgrep
+  -u 有效用户
+  -U 真实用户
+  -t 终端
+  -a  //显示完整格式
+
+3.top
+  P   //以cpu百分比排序
+  M   //以占据内存百分比排序
+  T   //以累计占用cpu时间排序
+
+4.vmstat命令的显示结果
+  procs:
+    r   //running,等待运行的进程的个数
+    b   //block,处于不可中断睡眠态的进程个数
+  memory:
+    swap
+    free
+    buffer
+    cache
+  swap:
+    si   //数据进入swap的速率(ks/s)
+    so
+  io:
+    bi   //从块设备读入数据的速率
+    bo
+  system:
+    in    //interrupt,中断速率
+    cs    //context switch,上下文切换的速率
+  cpu:    //都是指的时间
+    us    //user time
+    sy    //system time
+    id    //idle time
+    wa    //wait time
+    st    //stolen time,被虚拟机偷走的时间
+
+5.dstat 显示系统资源的使用情况(包括网络等)
+
+###############################################################################
+内核
+
+一.内核的组成:
+  核心文件:/boot/vmlinuz-VERSION-RELEASE     //vmlinuz中的z表示进行了压缩
+  ramdisk:将部分内存虚拟成磁盘用   //现在一般用的是ramfs,就不要进行缓存了
+#提供临时的根分区,为了提供根分区的驱动程序(该驱动程序是安装系统时通过扫描磁盘生成的)
+
+二.开启启动流程
+1.POST:power and self test  //加电自检,代码存储在ROM中
+    ROM:CMOS
+      BIOS
+2.Boot sequence:    //按次序查找各引导设备
+    bootloader:引导加载程序,在MBR中
+      LILO:linux loader,用于手机等
+      GRUB:grant uniform bootloader
+#bootloader功能:
+#   提供一个菜单,允许用户选择要启动的系统或不同版本的内核
+#   把用户选定的内核加载到RAM中的特定空间中,解压,展开
+#   而后把系统的控制权移交给内核
+
+3.kernel
+    自身初始化
+    加载硬件驱动程序
+    以只读方式挂载根文件系统
+    运行用户空间的第一个应用程序:/sbin/init
+
+###############################################################################
