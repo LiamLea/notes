@@ -1,0 +1,114 @@
+###############################################################################
+大数据
+
+1.5V特性:volume
+         variety
+         velocity
+         veracity
+         value
+
+2.Hadoop核心组件:
+  HDFS:Hadoop分布式文件系统
+  MapReduce:分布式计算框架  //有其他的计算框架
+  Yarn:集群资源管理系统
+
+一.HDFS
+  client        //即运行程序:bin/hadoop
+                //切分文件
+                //与NameNode交互,获取文件存储的位置信息
+                //与DataNode交互,读取和写入数据
+
+  NameNode      //master节点
+                //管理HDFS的名称空间和数据块的映射空间
+                //配置副本策略
+
+  DataNode      //存储实际的数据
+                //汇报存储信息给NameNode
+
+  Secondary NameNode   //定期合并fsimage和fsedits,推送给NameNode
+                       //可辅助恢复数据
+#fsedits    //数字变更日志,相当于补丁
+#fsimgae   //记录数据的映射空间
+
+二.MapReduce
+  Jobtracker    //master节点,且只有一个,管理所有任务等
+                //将任务分解成一系列任务,分派给TaskTracker
+
+  TaskTracker   //slave节点,一般是多台
+                //运行Map Task和Reduce Task
+                //与JobTracker交互,汇报任务状态
+
+  Map Task      //解析数据,存储本地磁盘
+  Reducer Task  //读取数据并处理
+
+三.yarn
+  ResourceManager  //处理客户端请求
+                  //监控NodeManager
+                  //资源分配和调度
+
+  NodeManager     //单个节点上的资源管理
+                  //处理来自resourceManager和ApplicarionMaster的任务
+
+  Container       //对任务运行环境的抽象
+
+  ApplicationMaster   //表示每个应用
+
+
+###############################################################################
+部署hdfs
+
+一.环境准备
+  所有主机能够正解和反解
+  NameNode能够无密码ssh到其他机器,且不用输yes
+#/etc/ssh/ssh_config: StrictHostKeyChecking no
+  需要部署java环境:java-1.8.0-openjdk-devel
+
+二.所有主机布置配置文件
+
+1.hadoop.env.sh    //能够使用java
+export JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.161-2.b14.el7.x86_64"
+export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/usr/local/hadoop/etc/hadoop"}
+
+2.core-site.xml
+<configuration>
+  <property>
+    <name>fs.defaultFS</name>         //指定使用的文件系统
+    <value>hdfs://nn01:9000</value>
+  </property>
+  <property>
+    <name>hadoop.tmp.dir</name>    //指定hadoop的数据根目录
+    <value>/var/hadoop</value>
+  </property>
+</configuration>
+
+3.hdfs-site.xml
+<configuration>
+  <property>
+    <name>dfs.namenode.http-address</name>
+    <value>nn01:50070</value>
+  </property>
+  <property>
+    <name>dfs.namenode.secondary.http-address</name>
+    <value>nn01:50090</value>
+  </property>
+  <property>
+    <name>dfs.replication</name>
+    <value>3</value>
+  </property>
+</configuration>
+
+4.slaves
+  主机名1     //DataNode的主机名
+  主机名2
+  ...
+
+三.启动dfs(在NameNode上操作)
+1.创建hadoop的数据根目录
+2.格式化数据根目录
+  bin/hdfs namenode --format
+3.启动集群
+  sbin/start-dfs.sh
+#验证角色:jps  //jvm process status
+#验证集群:bin/hdfs dfsadmin -report
+
+###############################################################################

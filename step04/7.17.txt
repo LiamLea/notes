@@ -110,7 +110,7 @@ input{
 4.logstash-filter-grok 插件的使用:
 filter{
   grok{
-    match => { "message" => "正则" }     //通过 (?<组名>正则) 来匹配字段  
+    match => { "message" => "正则" }     //通过 (?<字段名>正则) 给匹配的内容对应一个字段  
   }
 }
 #如http日志正则:{ "message" => "(?<ip>^[0-9.]+).*\[(?<time>.+)\] \"(?<method>[A-Z]+) (?<url>\S+) (?<proto>[A-Z]+)\/(?<ver>[0-9.]+)\" (?<rc>\d+) (?<size>\d+) \"(?<ref>\S+)\" \"(?<agent>\S+)\"" }
