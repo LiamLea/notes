@@ -3,7 +3,7 @@ DNS根域的正解和反解
 
 1.配置文件的部分:
   zone "." IN {
-    type master;
+    type master;      //如果为hint,文件就为named.ca,用来提示13根域服务器在哪
     file "root.zone";
   };
   zone "1.168.192.in-addr.arpa" IN {    //ip要反过来写
@@ -84,7 +84,7 @@ DNS根域的正解和反解
 一.内核的组成:
   核心文件:/boot/vmlinuz-VERSION-RELEASE     //vmlinuz中的z表示进行了压缩
   ramdisk:将部分内存虚拟成磁盘用   //现在一般用的是ramfs,就不要进行缓存了
-#提供临时的根分区,为了提供根分区的驱动程序(该驱动程序是安装系统时通过扫描磁盘生成的)
+#提供临时的根分区,为了提供根文件系统的驱动程序(该驱动程序是安装系统时通过扫描磁盘生成的)
 
 二.开启启动流程
 1.POST:power and self test  //加电自检,代码存储在ROM中
@@ -99,10 +99,120 @@ DNS根域的正解和反解
 #   把用户选定的内核加载到RAM中的特定空间中,解压,展开
 #   而后把系统的控制权移交给内核
 
-3.kernel
+3.kernel    
     自身初始化
     加载硬件驱动程序
     以只读方式挂载根文件系统
     运行用户空间的第一个应用程序:/sbin/init
+
+4.识别磁盘上的根文件系统,并切换至该根文件系统
+
+5.init程序
+  设定默认运行级别
+  系统初始化
+  关闭及启动服务
+  启动终端
+
+###############################################################################
+grub
+
+一.基础
+
+stage1:mbr
+stage1_5:mbr之后的扇区,让stage1中的bootloader能识别stage2所在的分区上的文件系统
+stage2:存放在磁盘分区上(/boot/grub2/)  //内核等存放在/boot/
+
+stage2及内核等通常放在一个基本磁盘分区(通常是一个单独的分区),原因: 
+  一般根分区可能会设置为逻辑卷,用于动态扩展
+  如果/boot目录和根目录在同一个分区,grub很难识别特殊的分区
+
+功能:
+  (1)提供菜单,并提供交互式接口
+    e: 编辑模式
+    c: 命令模式
+  (2)加载用户选择的内核
+  (3)为菜单和内核提供加密机制
+
+二.用grub的命令启动系统:
+
+  set root='hd0,msdos2'    
+  linux16 /boot/vmlinuz... root=/dev/分区 各种参数 
+  initrd16 /boot/initramfs...     
+#第一个root:
+#   用来指定使用哪个磁盘上的boot
+#   所以如果boot没有单独的分区,就需要使用/boot/vmlinuz...来加载内核
+#第二个root:
+#   用来指定根文件系统具体的位置(一般在某个磁盘下,如:/dev/sd2)
+#各种参数:
+#   比如rd.break console=tty0就可以进入ramdisk,进行系统操作
+#initrd16:
+#   指定ramdisk(或ramfs)
+#   ramdisk:用内存虚拟磁盘,是一个简装版的rootfs,提供设备驱动等,并非必须,取决与内核能否直接驱动rootfs所在的设备
+
+三.进入单用户模式:
+  (1) 选择指定目录,按"e"进入编辑模式
+  (2) 在内核那一行,最后加上single(或者1,或者s)
+  (3) 按ctrl+x即可进入
+
+四.进入ramdisk(即救援模式):
+  (1) 选择指定目录,按"e"进入编辑模式
+  (2) 在内核那一行,最后加上rd.break console=tty0
+  (3) 按ctrl+x即可进入
+
+五.给grub加密:
+#在所有title之前写上
+  set superusers="root"
+  export superusers
+  password_pbkdf2 root '加密后的密码'    //用grub2-mkpasswd-pbkdf2生成
+
+
+六.制作引导盘:     //可以破解系统
+
+1.添加磁盘,进行分区和格式化  //分区的格式为msdos
+  parted /dev/vdb mklabel msdos
+  parted /dev/vdb mkpart primary 1 10%
+
+2.创建boot目录进行挂载 
+  mkdir /mnt/boot
+  mount /dev/vdb1 /mnt/boot
+
+3.安装grub2
+  grub2-install 磁盘 --boot-directory=/路径/boot 
+
+4.将vmlinuz和initrd移如boot目录下
+
+5.开机进入BIOS,选择指定的引导盘
+
+
+七.制作简单的根文件系统:
+  
+1.创建sysroot目录并根所需要的相应目录
+  mkdir /mnt/sysroot
+  cd /mnt/sysroot
+  mkdir etc bin sbin lib lib64 home root usr var proc dev
+
+2.复制/bin/bash程序到目录下
+  cp /bin/bash /mnt/sysroot/bin
+
+3.复制bash所需要的动态库
+  ldd /bin/bash
+  cp ...
+
+4.用chroot验证
+  chroot /mnt/sysroot
+
+
+八.利用安装盘进行系统修复:     
+
+#光盘的救援模式会提供一个完好的文件系统,并且会把我们的操作系统挂载到一个目录下
+#可以切换至我们的根目录进行相关操作
+
+1.引导方式选择安装盘
+2.进入troubleshooting
+3.选择rescue system
+
+九.生成initramfs
+
+  dracut /boot/initramfs-`uname -r`.img `uname -r`
 
 ###############################################################################
