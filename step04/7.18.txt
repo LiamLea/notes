@@ -31,6 +31,9 @@
 #fsimgae   //记录数据的映射空间
 
 二.MapReduce
+
+是一个分布式运算程序的编程框架,将用户的代码整合成一个完整的分布式运算程序
+
   Jobtracker    //master节点,且只有一个,管理所有任务等
                 //将任务分解成一系列任务,分派给TaskTracker
 
@@ -42,17 +45,20 @@
   Reducer Task  //读取数据并处理
 
 三.yarn
+
+集群模式时,将mapreduce程序提交给yarn集群的ResourceManager,分布到很多节点上并执行,yarn负责的是资源调度
+
   ResourceManager  //处理客户端请求
                   //监控NodeManager
-                  //资源分配和调度
+                  //分配计算任务
 
   NodeManager     //单个节点上的资源管理
-                  //处理来自resourceManager和ApplicarionMaster的任务
+                  //处理来自resourceManager和ApplicarionMaster的计算任务
+                  //越多,计算速率越快
 
   Container       //对任务运行环境的抽象
 
-  ApplicationMaster   //表示每个应用
-
+  ApplicationMaster   //表示一个应用,每个应用有多个Container在NodeManager上运行
 
 ###############################################################################
 部署hdfs
@@ -73,7 +79,7 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/usr/local/hadoop/etc/hadoop"}
 <configuration>
   <property>
     <name>fs.defaultFS</name>         //指定使用的文件系统
-    <value>hdfs://nn01:9000</value>
+    <value>hdfs://nn01:9000</value>    //使用集群文件系统,也可以使用本地文件系统
   </property>
   <property>
     <name>hadoop.tmp.dir</name>    //指定hadoop的数据根目录
@@ -109,6 +115,6 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/usr/local/hadoop/etc/hadoop"}
 3.启动集群
   sbin/start-dfs.sh
 #验证角色:jps  //jvm process status
-#验证集群:bin/hdfs dfsadmin -report
+#验证集群:bin/hdfs dfsadmin -report   //hdfs为管理hdfs集群的命令
 
 ###############################################################################
