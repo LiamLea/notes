@@ -80,7 +80,7 @@ service unit文件的常见选项:
   [Service]
   Type=xx           //simple,表明启动的进程是该服务的主进程
                     //notify,与simple类似,只不过启动后会发送通知消息
-                    //forking,nginx的类型为这个
+                    //forking,会fork新的进程作为主进程,然后父进程退出，用于守护进程的程序，nginx的类型为这个
   Environment=xx    //提供变量的文件
   ExecStart=xx      //启动服务的命令或脚本
   ExecStop=xx       //关闭服务的命令或脚本
