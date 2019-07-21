@@ -15,7 +15,7 @@ screen 命用于会话保持,该进程不依赖于终端,命令如下:
   trap '命令' 信号   
 #常用信号:
 #         INT   //中断信号,即按下ctrl+c产生
-#         HUB   //在控制终端被挂起,或者控制进程结束
+#         HUP   //一般用来重新载入程序
 
 创建临时文件:mktemp    //用X代表随机字符,如mktemp XXXX.txt
 #该命令的返回结果为创建的临时文件的名字,可以结合$()使用
@@ -69,7 +69,7 @@ unit常见类型:
   path        //定义文件系统中的文件和目录
 
 
-service unit文件的格式:
+service unit文件的常见选项:
 
   [Unit]
   Description=xxx   //描述信息
@@ -78,14 +78,16 @@ service unit文件的格式:
   Wants=xx          //弱依赖,如果所依赖的unit没启动,这个unit还是可以启动
 
   [Service]
-  Type=xx
+  Type=xx           //simple,表明启动的进程是该服务的主进程
+                    //notify,与simple类似,只不过启动后会发送通知消息
+                    //forking,nginx的类型为这个
   Environment=xx    //提供变量的文件
   ExecStart=xx      //启动服务的命令或脚本
   ExecStop=xx       //关闭服务的命令或脚本
 
   [Install]
   RequiredBy=xx     //被其他unit所强依赖
-  WantedBy=xx       //被其他unit所弱依赖
+  WantedBy=xx       //被其他unit所弱依赖,比如填:multi-user.target
 
 #创建或修改unit后需要重新载入systemd:systemctl daemon-reload
 
