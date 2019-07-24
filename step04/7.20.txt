@@ -216,4 +216,12 @@ stage2及内核等通常放在一个基本磁盘分区(通常是一个单独的�
 
   dracut /boot/initramfs-`uname -r`.img `uname -r`
 
+十.在一块磁盘上安装双操作系统
+  1.先安装windows,且留有充足空间
+  2.利用U盘引导
+  3.安装centos,安装在剩余的分区上
+  4.安装后,只能启动centos
+  5.下载ntfs-3G软件,编译安装,能够识别windows操作系统
+  6.修改grub.cfg文件:grub2-mkconfig -o /boot/grub2/grub.cfg
+
 ###############################################################################
