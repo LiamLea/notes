@@ -25,7 +25,7 @@ redis主从复制
   slaveof ip port
   masterauth 密码
 
-二.哨兵服务器
+二.哨兵服务器(至少需要三台,因为要投票选取master)
   监视master服务器,发现master宕机后,将从库升级为主库
   主配置文件:/etc/sentinel.conf
 1.创建配置文件:
