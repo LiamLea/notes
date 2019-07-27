@@ -119,4 +119,7 @@ ansible主机管理(利用的SSH协议)
 10.setup     //统计目标主机的信息
   ansible xx -m setup -a 'filter=xx'   //过滤某项信息,以JSON格式显示
 
+注意：template 只能用playbook实现    //可以在传递的文件中使用变量
+  ansible xx -m template -a 'src=xx dest=xx'    //变量名，是用setup查出来的
+
 ###############################################################################
