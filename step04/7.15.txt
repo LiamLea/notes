@@ -110,7 +110,7 @@ playbook进阶
   - 模块: 
       参数1: xx
       ...
-    task: 标签名
+    tags: 标签名
 #ansible-playbook xx.yml -t 标签名    //执行指定标签的模块
 
 6.触发器
