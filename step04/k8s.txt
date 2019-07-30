@@ -1,0 +1,172 @@
+# 什么是k8s
+
+- **Kubernetes**的名字来自希腊语，意思是“舵手” 或 “领航员”。K8s是将8个字母“ubernete”替换为“8”的缩写。
+- K8S的创造者，是众人皆知的行业巨头——**Google**。
+- 然而K8S并不是一件全新的发明。它的前身，是Google自己捣鼓了十多年的**Borg系统**。
+- K8S是2014年6月由Google公司正式公布出来并宣布开源的。
+
+# 为什么要使用k8s
+
+- 就在Docker容器技术被炒得热火朝天之时，大家发现，如果想要将Docker应用于具体的业务实现，是存在困难的——编排、管理和调度等各个方面，都不容易。于是，人们迫切需要一套管理系统，对Docker及容器进行更高级更灵活的管理，就在这个时候，K8S出现了
+- Kubernetes是Google 2014年创建管理的，是Google 10多年大规模容器管理技术Borg的开源版本。
+- K8s 是容器集群管理系统，是一个开源的平台，可以实现容器集群的自动化部署、自动扩缩容、维护等功能
+
+# 什么时候用
+
+- 快速部署应用
+- 快速扩展应用
+- 无缝对接新的应用功能
+- 节省资源，优化硬件资源的使用
+
+# 在那用
+
+- **可移植**: 支持公有云，私有云，混合云，多重云（multi-cloud）
+- **可扩展**: 模块化, 插件化, 可挂载, 可组合
+- **自动化**: 自动部署，自动重启，自动复制，自动伸缩/扩展
+
+# 怎么用
+
+- **Build, Ship and Run （创建，发送和运行）**
+- **Build once，Run anywhere（搭建一次，到处能用）**
+- Docker技术的三大核心概念，分别是：
+
+1. 镜像（Image）
+2. 容器（Container）
+3. 仓库（Repository）
+
+## k8s 架构
+
+一个K8S系统，通常称为一个**K8S集群（Cluster）**
+
+这个集群主要包括两个部分：
+
+- **一个Master节点（主节点）**
+
+- Master节点包括API Server、Scheduler、Controller manager、etcd。
+
+  ​    API Server是整个系统的对外接口，供客户端和其它组件调用，相当于“营业厅”。
+
+  ​    Scheduler负责对集群内部的资源进行调度，相当于“调度室”。
+
+  ​    Controller manager负责管理控制器，相当于“大总管”。
+
+
+- **一群Node节点（计算节点）**
+
+- Node节点包括**Docker、kubelet、kube-proxy、Fluentd、kube-dns**（可选），还有就是**Pod**。
+
+  ​    **Pod**是Kubernetes最基本的操作单元。
+
+  ​    一个Pod代表着集群中运行的一个进程，它内部封装了一个或多个紧密相关的容器。
+
+  ​    除了Pod之外，K8S还有一个**Service**，一个Service可以看作一组提供相同服务的Pod的对外访问接口
+
+  ​    Docker，不用说了，创建容器的。
+
+  ​    Kubelet，主要负责监视指派到它所在Node上的Pod，包括创建、修改、监控、删除等。
+
+  ​    Kube-proxy，主要负责为Pod对象提供代理。
+
+  ​    Fluentd，主要负责日志收集、存储与查询。
+
+安装配置
+
+1 设置 ip 和主机名
+  /etc/hosts
+
+2 开启路由转发
+  net.ipv4.ip_forward=1
+
+3 配置 yum 源
+
+4 配置私有仓库 registry [master]
+      yum install docker-distribution
+  管理镜像使用 docker
+      yum install docker
+      /etc/sysconfig/docker
+  上传镜像
+      centos.tar
+      kubernetes-dashboard.tar
+      pod-infrastructure.tar
+  验证
+      curl http://192.168.1.100:5000/v2/_catalog
+
+5 配置 kubernets - master
+   package:
+     etcd
+     kubernetes-master
+     kubernetes-client
+   service:
+     kube-apiserver
+     kube-controller-manager
+     kube-scheduler
+     etcd
+   conf:
+     /etc/etcd/etcd.conf
+        6: ETCD_LISTEN_CLIENT_URLS="http://192.168.1.100:2379"
+     /etc/kubernetes/config
+       22: KUBE_MASTER="--master=http://192.168.1.100:8080"
+     /etc/kubernetes/apiserver
+        8: KUBE_API_ADDRESS="--insecure-bind-address=0.0.0.0"
+       17: KUBE_ETCD_SERVERS="--etcd-servers=http://192.168.1.100:2379"
+       23: 删除 ServiceAccount 参数
+     /etc/kubernetes/controller-manager
+     /etc/kubernetes/scheduler
+    验证
+     kubectl get cs
+     kubectl get csr
+     kubectl get node
+
+6 配置 kubernets - minion
+  package:
+     kubernetes-node 
+     docker 
+  service:
+     kubelet
+     kube-proxy
+     docker
+  conf:
+     /etc/sysconfig/docker
+        4: 添加参数 --insecure-registry=192.168.1.100:5000 --add-registry 192.168.1.100:5000
+     /etc/kubernetes/config
+       22: KUBE_MASTER="--master=http://192.168.1.100:8080"
+     /etc/kubernetes/kubelet
+        5: KUBELET_ADDRESS="--address=0.0.0.0"
+       11: KUBELET_HOSTNAME="--hostname-override=本机名称"
+       14: 添加 --kubeconfig=/etc/kubernetes/kubelet.kubeconfig 
+                --pod-infra-container-image=pod-infrastructure:latest
+     /etc/kubernetes/kubelet.kubeconfig
+apiVersion: v1
+kind: Config
+clusters:
+  - cluster:
+      server: http://192.168.1.100:8080                ###Master的IP，即自身IP
+    name: local
+contexts:
+  - context:
+      cluster: local
+    name: local
+current-context: local
+
+
+7 网络
+   master:
+     /etc/etcd/etcd.conf
+     ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379"
+
+     etcdctl mk /atomic.io/network/config '{"Network": "10.254.0.0/16", "Backend": {"Type": "vxlan"}}'
+
+   minion:
+     package: flannel
+     /etc/sysconfig/flanneld
+     FLANNEL_ETCD_ENDPOINTS="http://192.168.1.100:2379"
+  
+     systemctl restart flanneld docker
+
+8 创建容器，测试
+  kubectl create -f baseos.yaml
+  测试
+     kubectl get pod -o wide
+     kubectl exec -it test-os-3826630470-jc5j4 -- /bin/bash
+  
+  kubectl create -f kube-dashboard.yaml
