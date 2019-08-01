@@ -1,3 +1,73 @@
 ###############################################################################
+centos下安装搜狗输入法
+
+1.配置yum源
+  找一个镜像站,下载一个epel包,自动配置;epel的yum源
+2.卸载ibus
+3.安装fcitx
+  yum -y install fcitx fcitx-pinyin fcitx-configtool
+4.安装dpkg
+  yum -y install dpkg
+5.下载搜狗输入法
+6.解压搜狗输入法的dpkg包
+  ar vx xx.deb
+7.解压data.tar.xz
+8.复制搜狗的库
+  cp usr/lib/x86.../fcitx/fcitx-sogoupinyin.so /usr/lib64/fcitx/
+9.启动fcitx和搜狗(前提系统的语言等都是中文)
+  fcitx
+  usr/bin/sogou-qimpanel   //可能需要安装libQtWebKit*
+
+###############################################################################
+安装python3
+
+1.安装依赖包
+  yum -y install gcc gcc-c++ zlib-devel openssl-devel readline-devel libffi-devel splite-devel tcl-devel tk-devel
+
+2.安装python3  //去python.org下载
+
+###############################################################################
+python虚拟环境
+
+1.图形化创建
+  settings -> project -> project interpreter -> add local... -> 
+  指定虚拟环境的目录和python的目录 -> 确定 -> 使用exsiting env -> 确定
+
+2.手动创建
+  python3 -m venv 目录      //该虚拟环境使用的是python3
+  source 目录/bin/activate
+#此时就进入python虚拟环境了,退出输入:deactivate
+#交换式直接输入python
+#执行python脚本:python xx.py
+
+###############################################################################
+python基础
+
+1.靠缩进表达代码逻辑
+2.命令
+  变量名 用小写字母,多个单词用_隔开
+  类名   用驼峰形式
+3.变量初始化必须赋值
+4.divmod(x,y)   //同时获得商和余数
+5.幂运算:**     //优先级高于乘法
+6.逻辑运算符号:and or
+7.进制表示(不区分大小写)
+  0o    八进制
+  0x    十六进制
+  0b    二进制
+8.列表用中括号表示
+  元组用小括号表示,不能够修改
+  字典用花括号表示(一个元素是键值对)
+9.数量类型分类
+  按存储模型分:
+    标量:数字,字符串
+    容器:列表,元祖,字典
+  按更新模型分
+    不可变:数字,字符串,元祖
+    可变:列表,字典
+  按访问模型分
+    直接:数字
+    顺序:字符串,列表,元祖
+    映射:字典
 
 ###############################################################################
