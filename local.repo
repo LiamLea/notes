@@ -1,0 +1,5 @@
+[local]
+name=local
+baseurl=ftp://192.168.1.254/centos-1804
+gpgcheck=0
+enabled=1
