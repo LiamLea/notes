@@ -77,4 +77,10 @@ def xx():
   xx.function()
   xx.variable
 
+4.导入模块中的某些功能
+  from xx import function1,function2,...
+
+5.导入模块时起别名
+  import xx as yy
+
 ###############################################################################
