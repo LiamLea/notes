@@ -15,14 +15,15 @@
 
 注意 文件指针的移动
 
-1.读取文本文件
+1.读取文本文件(用for循环读取,for line in f)
   f=open('xx')
   data=f.read()
 #data=f.readline()   //读取一行
 #data=f.readlines()  //读取所有行放入列表
   f.close()
 
-2.以bytes方式读取文件  //用于处理非文本文件,如可执行程序
+2.以bytes方式读取文件(用whiled循环读取,终止条件 if not data)  
+//用于处理非文本文件,如可执行程序
   f=open('xx','rb')
   data=f.read(4096)    //括号填字节数,一个块为4096字节,所以一般一次读取4096字节
   f.close()
