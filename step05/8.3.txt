@@ -126,5 +126,10 @@ if __name__=='__main__'
   str.rstrip()
   str.startswith('xx')  //如果以xx开头,返回True
   str.endswith('xx')	//如果以xx结尾,返回True
+  str.replace('xx','yy')
+  str.split()           //默认以空格进行切割
+  str.split('x')        //默认以'x'进行切割
+  'xx'.join(列表等)
+如:'-'.join(['ni','hao'])   //输出 'ni-hao'
 
 ###############################################################################
