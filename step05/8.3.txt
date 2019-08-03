@@ -1,0 +1,30 @@
+###############################################################################
+shutil模块
+
+1.copy(src,dst)    //src必须为文件,dst可以为目录
+
+2.copy2(src,dst)   //相当于:cp -p
+
+3.copytree(src,dst)   //相当于:cp -r
+
+4.move(src,dst)
+
+5.rmtree(src)  //只能删除目录
+
+6.chown(src,owner='xx',group='xx')
+
+###############################################################################
+subprocess模块
+
+1.run(command,shell=True)  //在shell下执行command命令
+
+2.result=run(command,shell=True)
+  result.returncode     //returncode就是$?
+
+3.result=run(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)  
+#不显示命令的输出结果,将所有输出信息都放入返回值中
+  result.returncode   
+  result.stdout
+  result.stderr
+
+###############################################################################
