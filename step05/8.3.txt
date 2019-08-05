@@ -89,7 +89,7 @@ if __name__=='__main__'
 1.相互转换:
   list(iter)    
   tuple(iter)
-  str(iter)
+  str(obj)
       str([10,20,30])   //转换为:'[10,20,30]'  
 
 2.翻转:
