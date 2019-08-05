@@ -56,4 +56,13 @@
   adict={'key1':'a','key2':'b','key3':'c'}
   print('%(key1)s,%(key3)s' %adict
 
+5.相关函数
+  keys()
+  values()
+  items()
+  pop(key)
+  update(dict)   //将另一个字典加上去
+  get(key)        //若key不存在返回none
+  get(key,'xx')   //若key不存在返回xx
+
 ###############################################################################
