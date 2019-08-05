@@ -42,7 +42,7 @@ python虚拟环境
 
 1.图形化创建
   settings -> project -> project interpreter -> add local... -> 
-  指定虚拟环境的目录和python的目录 -> 确定 -> 使用exsiting env -> 确定
+  指定虚拟环境的目录和python的目录 -> 确定 -> 选择解释器(即选择了虚拟环境)
 
 2.手动创建
   python3 -m venv 目录      //该虚拟环境使用的是python3
@@ -96,7 +96,7 @@ zz'''
   print(str1,str2,sep='xxx')
 
 14.随机数模块:import random
-  random()   //里面可以时字符串,列表等等
+  choice()   //里面可以时字符串,列表等等
 
 15.range()   //不包含最后一个数,默认从0开始
 
