@@ -1,3 +1,4 @@
+###############################################################################
 # 什么是k8s
 
 - **Kubernetes**的名字来自希腊语，意思是“舵手” 或 “领航员”。K8s是将8个字母“ubernete”替换为“8”的缩写。
@@ -34,139 +35,127 @@
 2. 容器（Container）
 3. 仓库（Repository）
 
-## k8s 架构
+###############################################################################
+k8s 架构
 
-一个K8S系统，通常称为一个**K8S集群（Cluster）**
+1.一个Master节点(主节点)
 
-这个集群主要包括两个部分：
+相关服务:
+  kube-apiserver              //是整个集群对外的接口
+  kube-scheduler 	      //负责调度资源
+  kube-controller-manager     //负责容器编排
+  etcd			      //负责数据的持久化存储
 
-- **一个Master节点（主节点）**
+2.一群Node节点
 
-- Master节点包括API Server、Scheduler、Controller manager、etcd。
+相关组件:
+  pod                        //是kubernetes最基本的操作单元,一个pod是一个进程,内部封装了多个紧密相关的容器
+  Docker		     //用于创建容器
+  kubelet    		     //负责监视pod
+  kube-proxy                 //负责为pod对象提供代理
+  fluentd		     //负责日志收集,存储和查询
 
-  ​    API Server是整个系统的对外接口，供客户端和其它组件调用，相当于“营业厅”。
+###############################################################################
+部署k8s
 
-  ​    Scheduler负责对集群内部的资源进行调度，相当于“调度室”。
+一.环境准备:
+  设置ip和主机名
+  开启路由转发
+  配置 yum 源
+    因为自带的kubernets版本过低,所以要添加一个yum源(可以去华为找)
+  配置私有docker仓库
+    需要上传相应的镜像,用于配置k8s:
+	kubernetes-dashboard.tar     //用于配置图像界面
+        pod-infrastructure.tar       //用于配置kubelet
 
-  ​    Controller manager负责管理控制器，相当于“大总管”。
+二.部署master
+1.装包:
+  etcd
+  kubernetes-master
+  kubernetes-client
 
+2.修改配置文件
+  /etc/etcd/etcd.conf
+     ETCD_LISTEN_CLIENT_URLS="http://主ip:2379"
 
-- **一群Node节点（计算节点）**
+  /etc/kubernetes/config
+     KUBE_MASTER="--master=http://主ip:8080"
 
-- Node节点包括**Docker、kubelet、kube-proxy、Fluentd、kube-dns**（可选），还有就是**Pod**。
+  /etc/kubernetes/apiserver
+     KUBE_API_ADDRESS="--insecure-bind-address=0.0.0.0"
+     KUBE_ETCD_SERVERS="--etcd-servers=http://主ip:2379"
+#注意KUBE_SERVICE_ADDRESSES 设置的地址范围
+     删除 ServiceAccount 参数   //这个参数会开启证书认证机制
 
-  ​    **Pod**是Kubernetes最基本的操作单元。
+  /etc/kubernetes/controller-manager    //查看即可
+  /etc/kubernetes/scheduler
 
-  ​    一个Pod代表着集群中运行的一个进程，它内部封装了一个或多个紧密相关的容器。
+3.启动服务(一起启动)
+  etcd kube-apiserver kube-controller-manager kube-scheduler
 
-  ​    除了Pod之外，K8S还有一个**Service**，一个Service可以看作一组提供相同服务的Pod的对外访问接口
+4.验证:
+  kube-ctl get cs    //cs:cluster,查看集群状态
+  kube-ctl get csr   //csr:cluster resource,查看集群资源,此时没有
+  kube-ctl get node  //查看node状态,此时也没有
 
-  ​    Docker，不用说了，创建容器的。
+二.部署node
 
-  ​    Kubelet，主要负责监视指派到它所在Node上的Pod，包括创建、修改、监控、删除等。
+1.装包
+  kubernetes-node 
+  docker 
 
-  ​    Kube-proxy，主要负责为Pod对象提供代理。
+2.修改配置文件
+  /etc/sysconfig/docker   
+     #设置私有仓库的地址
 
-  ​    Fluentd，主要负责日志收集、存储与查询。
+  /etc/kubernetes/config
+     KUBE_MASTER="--master=http://主ip:8080"
 
-安装配置
+  /etc/kubernetes/kubelet
+     KUBELET_ADDRESS="--address=0.0.0.0"        //设置kubelet监听地址
+     KUBELET_HOSTNAME="--hostname-override=本机名称"
+    添加 --kubeconfig=/etc/kubernetes/kubelet.kubeconfig 
+         --pod-infra-container-image=pod-infrastructure:latest
 
-1 设置 ip 和主机名
-  /etc/hosts
+  /etc/kubernetes/kubelet.kubeconfig
+	apiVersion: v1
+	kind: Config
+	clusters:
+	  - cluster:
+	      server: http://主ip:8080
+	    name: local
+	contexts:
+	  - context:
+	      cluster: local
+	    name: local
+	current-context: local
 
-2 开启路由转发
-  net.ipv4.ip_forward=1
-
-3 配置 yum 源
-
-4 配置私有仓库 registry [master]
-      yum install docker-distribution
-  管理镜像使用 docker
-      yum install docker
-      /etc/sysconfig/docker
-  上传镜像
-      centos.tar
-      kubernetes-dashboard.tar
-      pod-infrastructure.tar
-  验证
-      curl http://192.168.1.100:5000/v2/_catalog
-
-5 配置 kubernets - master
-   package:
-     etcd
-     kubernetes-master
-     kubernetes-client
-   service:
-     kube-apiserver
-     kube-controller-manager
-     kube-scheduler
-     etcd
-   conf:
-     /etc/etcd/etcd.conf
-        6: ETCD_LISTEN_CLIENT_URLS="http://192.168.1.100:2379"
-     /etc/kubernetes/config
-       22: KUBE_MASTER="--master=http://192.168.1.100:8080"
-     /etc/kubernetes/apiserver
-        8: KUBE_API_ADDRESS="--insecure-bind-address=0.0.0.0"
-       17: KUBE_ETCD_SERVERS="--etcd-servers=http://192.168.1.100:2379"
-       23: 删除 ServiceAccount 参数
-     /etc/kubernetes/controller-manager
-     /etc/kubernetes/scheduler
-    验证
-     kubectl get cs
-     kubectl get csr
-     kubectl get node
-
-6 配置 kubernets - minion
-  package:
-     kubernetes-node 
-     docker 
-  service:
-     kubelet
-     kube-proxy
-     docker
-  conf:
-     /etc/sysconfig/docker
-        4: 添加参数 --insecure-registry=192.168.1.100:5000 --add-registry 192.168.1.100:5000
-     /etc/kubernetes/config
-       22: KUBE_MASTER="--master=http://192.168.1.100:8080"
-     /etc/kubernetes/kubelet
-        5: KUBELET_ADDRESS="--address=0.0.0.0"
-       11: KUBELET_HOSTNAME="--hostname-override=本机名称"
-       14: 添加 --kubeconfig=/etc/kubernetes/kubelet.kubeconfig 
-                --pod-infra-container-image=pod-infrastructure:latest
-     /etc/kubernetes/kubelet.kubeconfig
-apiVersion: v1
-kind: Config
-clusters:
-  - cluster:
-      server: http://192.168.1.100:8080                ###Master的IP，即自身IP
-    name: local
-contexts:
-  - context:
-      cluster: local
-    name: local
-current-context: local
-
-
-7 网络
-   master:
-     /etc/etcd/etcd.conf
+三.设置网络    //不需要搭建k8s就可以设置了
+1.master:
+  /etc/etcd/etcd.conf
      ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379"
 
-     etcdctl mk /atomic.io/network/config '{"Network": "10.254.0.0/16", "Backend": {"Type": "vxlan"}}'
+  systemctl restart etcd
 
-   minion:
-     package: flannel
-     /etc/sysconfig/flanneld
-     FLANNEL_ETCD_ENDPOINTS="http://192.168.1.100:2379"
+  etcdctl mk /atomic.io/network/config '{"Network": "10.254.0.0/16", "Backend": {"Type": "vxlan"}}'
+#注意,这里设置的网段,跟上面的一样,为什么要设置b类网络:
+#     每台node都可以有一个c类网络,上面运行着多个容器
+#     能够实现不同node上的容器进行通信,这样就能够打通所有容器间的网络
+
+2.master和node
+  安装flannel
+
+  /etc/sysconfig/flanneld
+     FLANNEL_ETCD_ENDPOINTS="http://主ip:2379"
   
-     systemctl restart flanneld docker
+  systemctl restart flanneld docker    //要先停用docker,用这条命令,自动先关闭docker
 
-8 创建容器，测试
-  kubectl create -f baseos.yaml
+四.创建容器测试
+  kubectl create -f baseos.yaml    //通过yml文件批量管理容器
   测试
      kubectl get pod -o wide
      kubectl exec -it test-os-3826630470-jc5j4 -- /bin/bash
   
-  kubectl create -f kube-dashboard.yaml
+  kubectl create -f kube-dashboard.yaml    //图形化
+
+###############################################################################
