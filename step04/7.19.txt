@@ -113,7 +113,7 @@ yarn节点管理
     bin/yarn node -list
 
 ###############################################################################
-nfsgw
+nfsgw: nfs server +  hdfs client
 
 通过nfs与hdfs客户端的交互,用户可以直接通过访问nfs访问hdfs集群
 
@@ -124,9 +124,9 @@ nfsgw
 #系统用户的uid和gid都小于1000
 
 2.NameNode修改配置文件:core-site.xml
-  name:   hadoop.proxyuser.代理用户.groups
+  name:   hadoop.proxyuser.代理用户.groups   //挂载点用户所使用的组
   value:  *
-  name:   hadoop.proxyuser.代理用户.hosts
+  name:   hadoop.proxyuser.代理用户.hosts    //挂载点主机地址
   value:  *
 
 3.停止集群所有服务
@@ -144,19 +144,21 @@ nfs主机配置
   卸载rpcbind,nfs-utils
   有各节点的主机名解析
   安装java环境
-2.修改配置文件:hdfs-site.xml
+
+2.设置nfs:hdfs-site.xml
   name:   nfs.exports.allowed.hosts
   value:  * rw
   name:   nfs.dump.dir    
   value:  /var/nfstmp
 #转储目录,顺序的写操作会随机达到NFS网关,这个目录用于临时存储无序的写操作,然后传递给hdfs客户端
 
-3.创建转储文件夹
+3.创建转储文件夹    
   mkdir /var/nfstmp
   chown nfsuser.nfsuser /var/nfstmp
+#转储目录的作用,hdfs client将文件存储到hdfs集群前需要对文件切块,所以需要先缓存好文件
 
 4.启动nfs服务
-  setfacl -m user:nfsuser:rwx /usr/local/hadoop/logs
+  setfacl -m user:nfsuser:rwx /usr/local/hadoop/logs     //能够记录nfsgw日志,其他程序也需要,所以设置acl即可
   sbin/hadoop-daemon.sh --script ./bin/hdfs start portmap
   sudo -u nfsuser ./sbin/hadoop-daemon.sh --script ./bin/hdfs start nfs3
 #portmap 提供端口号注册的机制(之前是rpcbind提供的)
@@ -164,13 +166,15 @@ nfs主机配置
 
 
 客户端挂载:
-  mount -t nfs -o vers=3,proto=tcp,noatime,nolock,sync,noacl ip:/ /mnt
+  mount -t nfs -o vers=3,proto=tcp,nolock,sync,noacl,noatime ip://mnt
 #vers=3     nfs只能使用v3版本
 #proto=tcp  仅使用TCP作为传输协议
-#noatime    禁止access time的时间更新,加快io性能
 #nolock     在客户端加锁,同一个客户端的多个进程访问同一个文件不冲突,保证了数据的顺序存储
 #lock       在服务器端枷锁,多个客户端的数据不会发生冲突
 #sync       内存数据实时写入磁盘
 #noacl      禁用acl扩展权限
+#noatime    禁止access time的时间更新,加快io性能   //linux有三种时间 atime :access time,访问时间
+																									 //								 mtime :modify time,内容修改的时间
+																									 //								 ctime :change time,元数据改变的时间(即权限等)
 
 ###############################################################################
