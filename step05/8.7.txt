@@ -16,7 +16,7 @@ time模块
 
 5.sleep(n)    
 
-6.strftime('%Y-%m-%d %H:%M:%S %a')    //按照特定格式显示时间,%a代表星期的缩写
+6.strftime('%Y-%m-%d %H:%M:%S %a')    //按特定格式输出 时间字符串,%a代表星期的缩写
 
 7.strptime('2019-01-01','%Y-%m-%d')   //将 时间字符串 转换成9元组
 
@@ -26,8 +26,13 @@ datatime模块
 1.t=datetime.datetime.now()    
 //t为datetime对象,属性:year,month,day,hour,minute,second,microsecond
 
-2.t.strftime('%Y-%m-%d %H:%M%S')   //将datatime对象以指定格式显示
+2.t.strftime('%Y-%m-%d %H:%M%S')   //将 datatime对象 转换成 时间字符串
 
-3.strptime('2019-01-01','%Y-%m-%d')      //将 时间字符串 转换成datatime对象
+3.datetime.datetime.strptime('2019-01-01','%Y-%m-%d')      //将 时间字符串 转换成datatime对象
+
+4.100天3小时之前的时间
+  days=datetime.timedelta(days=100,hours=3)
+  t=datetime.datetime.now()
+  t-days
 
 ###############################################################################
