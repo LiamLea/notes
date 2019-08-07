@@ -98,6 +98,8 @@ HDFS集群管理
     Decommissioned in process   //数据正在迁移
     Decommissioned     //数据迁移完成
 #只有数据迁移完成,才能down机下线
+  5.在需要停止的节点上执行:
+		/usr/local/hadoop/sbin/hadoop-daemon.sh stop datanode
 
 ###############################################################################
 yarn节点管理
