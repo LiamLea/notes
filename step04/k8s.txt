@@ -129,6 +129,8 @@ k8s 架构
 	      cluster: local
 	    name: local
 	current-context: local
+3.启动服务
+  kubelet kube-proxy docker
 
 三.设置网络    //不需要搭建k8s就可以设置了
 1.master:

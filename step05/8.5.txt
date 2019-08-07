@@ -18,7 +18,7 @@
   
 ftp关闭被动模式:
   ftp xxx
-  > passive-mode off
+  > passive
 
 wget下载ftp内容:
   wget --no-passive-ftp ftp://xx
