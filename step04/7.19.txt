@@ -121,6 +121,7 @@ nfsgw
 #代理用户的uid,gid,用户名必须都相同
   groupadd -g 800 nfsuser
   useradd -u 800 -g 800 -r -d /var/hadoop nfsuser
+#系统用户的uid和gid都小于1000
 
 2.NameNode修改配置文件:core-site.xml
   name:   hadoop.proxyuser.代理用户.groups
