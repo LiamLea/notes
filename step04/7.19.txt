@@ -50,7 +50,7 @@
     http://ip:8042/
 
 ###############################################################################
-HDFS的基本使用
+通过hadoop(即客户端)使用hdfs
   
 bin/hadoop fs -命令 ...      //hadoop为hadoop集群的管理命令
   如:bin/hadoop fs -ls /    
@@ -74,7 +74,7 @@ HDFS集群管理
   4.在新节点上执行启动命令
     sbin/hadoop-daemon.sh start datanode
   5.NameNode设置同步带宽
-    bin/hdfs dfsadmin -setBalancerBandwidth 500000000  //500M
+    bin/hdfs dfsadmin -setBalancerBandwidth 60000000  //50MB/s 千兆网卡的速率为123MB/s
   6.NamoNode同步数据
     sbin/start-balancer.sh
 #bin/hdfs dfsamin -report 查看状态
