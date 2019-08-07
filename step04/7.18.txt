@@ -111,7 +111,7 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/usr/local/hadoop/etc/hadoop"}
 三.启动dfs(在NameNode上操作)
 1.创建hadoop的数据根目录
 2.格式化数据根目录
-  bin/hdfs namenode --format
+  bin/hdfs namenode -format
 3.启动集群
   sbin/start-dfs.sh
 #验证角色:jps  //jvm process status
