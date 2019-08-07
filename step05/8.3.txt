@@ -127,9 +127,9 @@ if __name__=='__main__'
   str.rjust(10)		//居右
   str.upper()
   str.lower()
-  str.strip()           //去除两端的空白字符
+..str.strip()...........//去除两端的空白字符,能够去除换行符等
   str.lstrip()		//去除左端的空白字符
-  str.rstrip()
+..str.rstrip()..........//能够去除换行符等
   str.startswith('xx')  //如果以xx开头,返回True
   str.endswith('xx')	//如果以xx结尾,返回True
   str.replace('xx','yy')
