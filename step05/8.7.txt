@@ -41,11 +41,56 @@ datatime模块
 1.常见异常
   NameError              //没有声明或初始化对象
   IndexError
-  SyntaxErrorInterrupt  //用户中断
-  Keyboard
+  SyntaxError					  //语法错误
+  KeyboardInterrupt     //用户终端(按ctrl+c)
   EOFError              //读到EOF(按ctrl+d)
-  IOError		//输入/输出操作失败
+  IOError								//输入/输出操作失败
 
 2.处理异常
+  try:
+		...								//可能发生异常的程序,不会发生异常的不要放在里面
+  except xx:      		//多个异常:(xx1,xx2,..)
+		...								//捕获异常
+	else:								//不发生异常会执行
+		...
+  finally:						//无论如何都会执行
+		...
+  ...								  //继续执行下面的程序,除非上面指明退出(exit())
+
+3.触发异常(自己编写)
+如:
+	if n>200:
+		raise ValueError('n的值超过了200')
+
+或者使用 断言异常:
+
+	assert n<=200,'n的值超过了200'    //这里产生的异常是:AssertionError
+
+###############################################################################
+OS模块
+
+1.相关函数
+	getcwd()						//相当于pwd
+  listdir()     
+  listdir('xx')
+  mkdir('xx')
+  makedirs('xx')  		//相当于mkdir -p
+  chdir('xx')					//相当于cd xx
+	symlink('xx','yy')	//相当于 ln -s xx yy
+  remove('xx')
+  rmdir('xx')					//只能删除空目录
+
+	path.basename('/tmp/abc.txt') 	//返回文件名部分:abc.txt
+  path.dirname('/tmp/abc.txt')  	//返回路径部分:/tmp
+  path.abspath('.')  							//返回绝对路径:/tmp
+  path.split('/tmp/abc.txt')			//切割:('/tmp','abc.txt')
+  path.join('/tmp','abc.txt')			//拼接:/tmp/abc.txt
+
+	path.isabs('xx')		//是绝对路径吗
+	path.isfile('xx')		//存在并且是文件吗
+  path.ismount('xx')	//是挂在点吗
+  path.isdir('xx')		//存在并且是目录吗
+  path.islinke('xx')	//存在并且是链接吗
+  path.exists('xx')		//存在吗
 
 ###############################################################################
