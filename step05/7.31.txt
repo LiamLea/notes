@@ -96,9 +96,10 @@ zz'''
   print(str1,str2,sep='xxx')
 
 14.随机数模块:import random
-  choice()   //里面可以时字符串,列表等等
+  choice(xx)   //里面可以时字符串,列表等等
+  randint(0,9) //包括最后一个元素
 
-15.range()   //不包含最后一个数,默认从0开始
+15.range(xx)   //不包含最后一个数,默认从0开始
 
 16.列表解析
   [10+2 for i in range(5)]
