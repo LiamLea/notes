@@ -20,7 +20,7 @@ time模块
 
 4.9元组:localtime()   //tm_year,tm_mon,tm_mday,tm_hout,tm_min,tm_sec,tm_wday,tm_yday
 
-#上面的时间表示方式可以相互转换,且可以比较大小
+#time对象可以相互转换,且可以比较大小
 
 5.sleep(n)    
 
