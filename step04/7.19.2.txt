@@ -44,13 +44,13 @@ zookeeper
 #!/bin/bash
 
 function getzkstat(){
-  exec 2>/dev/null                    //将错误信息都扔掉
-  exec 8<>/dev/tcp/$1/2182            //将后面的文件设置为8号的输入和输出
+  exec 2>/dev/null                        //将错误信息都扔掉
+  exec 8<>/dev/tcp/$1/2182                //将后面的文件设置为8号的输入和输出
                                       //后面的文件表示一个socket,协议为tcp,主机名为$1,端口号为2182
-  echo stat >& 8                       //通过socket发送stat指令,获取集群的状态
+  echo stat >& 8                         //通过socket发送stat指令,获取集群的状态
   message=`cat <& 8 | grep -P "^Mode:"`
-  echo -e "$1\t${message:-Mode:NULL}" //如果message没有值,则输出Mode:NULL
-  exec 8<& -                           //将8号的输入关闭
+  echo -e "$1\t${message:-Mode:NULL}"    //如果message没有值,则输出Mode:NULL
+  exec 8<& -                             //将8号的输入关闭
 }
 for i in $@
 do
