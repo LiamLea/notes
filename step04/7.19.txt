@@ -174,7 +174,7 @@ nfs主机配置
 #sync       内存数据实时写入磁盘
 #noacl      禁用acl扩展权限
 #noatime    禁止access time的时间更新,加快io性能   //linux有三种时间 atime :access time,访问时间
-                                                   //								 mtime :modify time,内容修改的时间
-                                                   //								 ctime :change time,元数据改变的时间(即权限等)
+                                                   //                mtime :modify time,内容修改的时间
+                                                   //                ctime :change time,元数据改变的时间(即权限等)
 
 ###############################################################################
