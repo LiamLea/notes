@@ -68,7 +68,7 @@ wget下载ftp内容:
 
 4.打印字典某些key的value
   adict={'key1':'a','key2':'b','key3':'c'}
-  print('%(key1)s,%(key3)s' %adict
+  print('%(key1)s,%(key3)s' %adict)
 
 5.相关函数
   keys()
