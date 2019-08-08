@@ -126,3 +126,17 @@ hashlib模块
   m.hexdigest()     //与上面的结果一样
 
 ###############################################################################
+tarfile模块
+
+1.压缩
+  tar=tarfile.open('/tmp/xx.tar.gz','w:gz')   //已gz格式压缩,压缩后的文件名叫xx.tar.gz
+  tar.add('/etc/passwd')      //都是压缩的相对路径,即etc/passwd
+  tar.add('/home/student`')
+  tar.close()
+
+2.解压
+  tar=tarfile.open('/tmp/xx.tar.gz')
+  tar.extractall(path='解压路径')
+  tar.close()
+
+###############################################################################
