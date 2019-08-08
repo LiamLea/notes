@@ -77,8 +77,14 @@ kafaka通过zookeeper管理集群,所以要先搭好zookeeper集群
   broker.id=数字          //每个主机不同
   zookeeprt.connect=主机1:2181,主机2:2181   //可以多写几台
 
-2.所有主机启动kafkafu服务
+2.所有主机启动kafkaf服务
   bin/kafka-server-start.sh -daemon config/server.properties
+
+3.验证(需要用写好的程序进行验证)
+  jps
+
+(1)在某一个主机上创建一个topic
+   
 
 ###############################################################################
 hadoop的高可用集群(实现NameNode和ResourceManager的高可用
