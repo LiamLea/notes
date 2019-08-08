@@ -44,7 +44,7 @@ datatime模块
   SyntaxError           //语法错误
   KeyboardInterrupt     //用户终端(按ctrl+c)
   EOFError              //读到EOF(按ctrl+d)
-  IOError								//输入/输出操作失败
+  IOError               /输入/输出操作失败
 
 2.处理异常
   try:
