@@ -60,7 +60,7 @@ do
 done
 
 ###############################################################################
-kafka
+kafka(给程序用)
 
 分布式的消息系统,实现异步通信(相当于中介的身份),缓冲,解耦等功能
 kafaka通过zookeeper管理集群,所以要先搭好zookeeper集群
@@ -68,7 +68,7 @@ kafaka通过zookeeper管理集群,所以要先搭好zookeeper集群
 一.角色:
   producer    //生产者,负责发布消息
   consumer    //消费者,负责读取处理消息
-  topic       //消息类别
+  topic       //消息类别(包含一个或多个partion)
   broker      //一台kafka服务器就是一个broker
 
 二.部署kafka
@@ -84,15 +84,104 @@ kafaka通过zookeeper管理集群,所以要先搭好zookeeper集群
   jps
 
 (1)在某一个主机上创建一个topic
+  kafka/bin/kafka-topics.sh --create --partions 2 --replication-factor 2 --zoookeeper localhost:2181 --topic mymsg
+(2)生产者(负责发送消息)
+  kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic mymsg
+(3)消费者(负责接收和处理消息)
+  kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic mymsg
    
-
 ###############################################################################
 hadoop的高可用集群(实现NameNode和ResourceManager的高可用
 
-解决方案:需要让每一个DataNode都知道两个NameNode的位置
-         并把块信息和心跳包发送给Active和standby这两个NameNode
-         为了让Standby Node和Active Node保持同步,这两个NameNode都与JNS进程保持通信
-         每当Active Node更新了映射空间,就会将变更日志发给JNS,然后standby Node进行同步
+第一种解决方案:HDFS with NFS
+  两台namenode
+  将NameNode的数据存储到nfs或者ceph上,实现nfs的高可用即可
+
+第二种解决方案:HDFS with QJM
+  不需要共享存储,但需要让每一个DataNode都知道两个NameNode的位置
+  将多个NameNode加入到一个组内,datanode只需与该组交互即可
+  从而把块信息和心跳包发送给Active和standby这两个NameNode
+  为了让Standby Node和Active Node保持同步,这两个NameNode都与JNS(journal nodes)进程保持通信
+  每当Active Node更新了映射空间,就会将变更日志发给JNS,然后standby Node进行同步
 
 ###############################################################################
+部署hadoop高可用(利用zookeeper)
 
+一.环境准备(添加一台NameNode)
+  能够免密登录其他主机(且用同一对秘钥)
+  java
+  修改所有主机的/etc/hosts
+
+二.修改配置文件
+(1)hadoop-env.sh   //与之前一样
+(2)slaves          //与之前一样
+(3)mapred-site.xml  //与之前一样
+(4)core-site.xml
+  name:   fs.defaultFS          //指明namenode的位置
+  value:  hdfs://组名           //指向一个组
+  
+  name:   ha.zookeeper.quorum   //指定zookeeper集群
+  value:  主机1:2181,主机2:2181 //多写几台
+
+(5)hdfs-site.xml    //设置namenode的高可用
+
+#删除之前指定namenode和secondary namenode的配置
+  name:   dfs.nameservices
+  value:  组名
+
+  name:   dfs.ha.namenodes.组名
+  value:  nn1,nn2       //角色名,随便起
+
+#有几个角色写几个键值对
+  name:   dfs.namenode.rpc-address.组名.角色名  //指明角色对应的主机
+  value:  主机名:8020
+
+#有几个角色写几个键值对
+  name:   dfs.namenode.http-address.组名.角色名 //指明该角色对应的namenode
+  value:  主机名:50070
+
+  name:   dfs.namenode.shared.edits.dir       //部署JNS服务
+  value:  qjournal://主机1:8485;主机2:8485;主机3:8485
+
+  name:   dfs.journalnode.edits.dir           //定义JNS服务数据的存储目录
+  value:  /var/hadoop/journal
+
+  name:   dfs.client.failover.proxy.provider.组名  //部署hadoop高可用软件
+  value:  org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider
+
+  name:   dfs.ha.fencing.methos       //指定操作其他主机的方式(ssh)
+  value:  sshfence
+
+  name:   dfs.ha.fencing.ssh.private-key-files  //指明私钥文件
+  value:  /root/.ssh/id_rsa
+
+  name:   dfs.ha.automatic-failover.enabled     //设置自动实现故障转移
+  value:  true
+
+(6)yarn-site.xml        //设置resourcemanager的高可用
+
+#删除之前设置的resourcemanager
+
+  name:   yarn.resourcemanager.cluster-id   //声明组名
+  value:  yarn-ha
+
+  name:   yarn.resourcemanager.ha.rm-ids
+  value:  rm1,rm2                         //设置了两个角色
+
+#有几个角色写几个键值对
+  name:   yarn.resourcemanager.hostname.角色名  //指明角色对应的主机(实现高可用)
+  value:  主机名
+
+  name:   yarn.resourcemanager.ha.enabled     //开启resourcemanager的高可用
+  value:  true
+
+  name:   yarn.resourcemanager.recovery.enabled
+  value:  true                            //自动实现故障转移
+
+  name:   yarn.resourcemanager.store.class    //指明存储的类
+  value:  org.apache.hadoop.yarn.server.resourcemanager.recovery.ZKRMStateStore
+
+  name:   yarn.resourcemanager.zk-address   //使用zookeeper集群
+  value:  主机1:2181,主机2:2181             //多写几台
+
+###############################################################################

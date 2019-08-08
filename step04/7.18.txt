@@ -19,7 +19,7 @@
                 //与DataNode交互,读取和写入数据
 
   NameNode      //master节点
-                //管理数据块的映射空间和变更日志
+                //管理数据块的映射空间(fsimg)和变更日志(fsedits)
                 //配置副本策略
 
   DataNode      //存储实际的数据
