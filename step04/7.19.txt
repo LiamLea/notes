@@ -25,7 +25,7 @@
     <value>nn01</value>
   </property>
   <property>
-    <name>yarn.nodemanager.aux-services</name>    //指定使用哪个计算框架
+    <name>yarn.nodemanager.aux-services</name>    //指定使用哪个运算程序
     <value>名字</value>    //我们使用的框架是mapreduce_shuffle
   </property>
 </configuration>
@@ -74,7 +74,7 @@ HDFS集群管理
   4.在新节点上执行启动命令
     sbin/hadoop-daemon.sh start datanode
   5.NameNode设置同步带宽
-    bin/hdfs dfsadmin -setBalancerBandwidth 60000000  //50MB/s 千兆网卡的速率为123MB/s
+    bin/hdfs dfsadmin -setBalancerBandwidth 60000000  //60MB/s 千兆网卡的速率为125MB/s
   6.NamoNode同步数据
     sbin/start-balancer.sh
 #bin/hdfs dfsamin -report 查看状态
@@ -99,7 +99,7 @@ HDFS集群管理
     Decommissioned     //数据迁移完成
 #只有数据迁移完成,才能down机下线
   5.在需要停止的节点上执行:
-		/usr/local/hadoop/sbin/hadoop-daemon.sh stop datanode
+    /usr/local/hadoop/sbin/hadoop-daemon.sh stop datanode
 
 ###############################################################################
 yarn节点管理
@@ -174,7 +174,7 @@ nfs主机配置
 #sync       内存数据实时写入磁盘
 #noacl      禁用acl扩展权限
 #noatime    禁止access time的时间更新,加快io性能   //linux有三种时间 atime :access time,访问时间
-																									 //								 mtime :modify time,内容修改的时间
-																									 //								 ctime :change time,元数据改变的时间(即权限等)
+                                                   //								 mtime :modify time,内容修改的时间
+                                                   //								 ctime :change time,元数据改变的时间(即权限等)
 
 ###############################################################################

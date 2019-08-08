@@ -104,7 +104,7 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/usr/local/hadoop/etc/hadoop"}
 </configuration>
 
 4.slaves       //部署hdfs时,这个指明datanode
-	主机名1			 //部署yarn时,这个指明nodemanager
+  主机名1			 //部署yarn时,这个指明nodemanager
   主机名2
   ...
 
