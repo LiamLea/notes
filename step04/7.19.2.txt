@@ -62,13 +62,20 @@ done
 ###############################################################################
 kafka
 
-分布式的消息系统,实现异步通信(相当于中介的身份)
+分布式的消息系统,实现异步通信(相当于中介的身份),缓冲,解耦等功能
+kafaka通过zookeeper管理集群,所以要先搭好zookeeper集群
 
-部署kafka
+一.角色:
+  producer    //生产者,负责发布消息
+  consumer    //消费者,负责读取处理消息
+  topic       //消息类别
+  broker      //一台kafka服务器就是一个broker
 
-1.修改配置文件:server.properties
-  #broker.id
-  #zookeeprt.connect
+二.部署kafka
+
+1.所有主机修改配置文件:server.properties
+  broker.id=数字          //每个主机不同
+  zookeeprt.connect=主机1:2181,主机2:2181   //可以多写几台
 
 2.所有主机启动kafkafu服务
   bin/kafka-server-start.sh -daemon config/server.properties
