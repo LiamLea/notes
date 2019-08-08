@@ -80,3 +80,33 @@
   int8=functools.partial(int,base=8)
 
 ###############################################################################
+快速排序
+
+def qsort(seq):
+    if len(seq) < 2:
+        return seq
+    middle=seq[0]
+    smaller=[i for i in seq[1:] if i<middle]
+    larger=[i for i in seq[1:] if i>=middle]
+    return qsort(smaller)+[middle]+qsort(larger)
+
+###############################################################################
+生成器
+
+潜在可以提供很多数据
+不会立即生成全部数据,所以节省内存空间
+生成器对象可以迭代
+
+1.通过 生成器表达式 生成 生成器对象
+  (10+i for i in range(10))
+  ('hello' for i in range(100))
+
+2.通过函数,多次使用yeild语句 生成 生成器对象
+  def mygen():
+    yield 10
+    yield 'hello'
+    n=10*2
+    yield n
+  mg=mygen()    //mg就是一个生成器对象
+
+###############################################################################
