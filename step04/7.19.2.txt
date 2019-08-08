@@ -24,7 +24,9 @@ zookeeper
 
 2.所有主机修改配置文件:zoo.cfg
 #添加,如果是observer在后面声明
-  server.id号=主机名:2888:3888[:observer]
+#2888设置的是leader监听的端,3888是非leader监听的端口
+
+  server.id号=主机名:2888:3888[:observer]   
   ...
 
 3.根据配置文件中的datadir项创建数据目录:zookeeper
