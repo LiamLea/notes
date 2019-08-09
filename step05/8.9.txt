@@ -12,8 +12,25 @@ class 类名:
   def func1(self):    
     print('%s' %self.属性1)
 
+类名采用驼峰命名,第一个字母大写
 __init__是构造函数,在创建实例的时候自动调用
 所有方法的第一个参数必须是self,表示实例(可以用别的名字,java中是this)
 创建实例时,实例会自动作为第一个参数传入
+
+
+一.组合   //即将一个对象传入另一个对象中,就有了多级的对象
+  class Weapon:
+    def __init__(self,name,strength):
+      self.name=name
+      self.strength=100
+  
+  class GameRole:
+    def __init__(self,name,weapon):
+      self.name=name
+      self.weapon=weapon
+  
+  ji=Weapon('方天画戟',100)
+  lb=GameRole('吕布',ji)
+  print(lb.weapon.name)   //这里就有两级,输出的内容为"方天画戟"
 
 ###############################################################################
