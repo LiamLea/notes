@@ -73,7 +73,7 @@ wget下载ftp内容:
 5.相关函数
   keys()
   values()
-  items()
+  items()       //返回一个可迭代对象,每一个元素都是键值对,否则只能迭代key
   pop(key)
   update(dict)   //将另一个字典加上去
   get(key)        //若key不存在返回none(当需要判断key是否存在,用in即可)
