@@ -184,4 +184,13 @@ hadoop的高可用集群(实现NameNode和ResourceManager的高可用
   name:   yarn.resourcemanager.zk-address   //使用zookeeper集群
   value:  主机1:2181,主机2:2181             //多写几台
 
+三.进行部署
+
+1.清空所以的hadoop数据(确保有数据目录,且下面都是空的)
+
+2.同步配置文件到所以机器
+
+3.初始化zookeeper集群
+  hadoop/bin/hafs zkfc -formatZK
+
 ###############################################################################
