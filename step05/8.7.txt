@@ -90,7 +90,7 @@ OS模块
   remove('xx')
   rmdir('xx')         //只能删除空目录
   
-  path.basename('/tmp/abc.txt')   //返回文件名部分:abc.txt
+  path.basename('/tmp/abc.txt')   //返回基础部分:abc.txt(如果是目录就返回目录名)
   path.dirname('/tmp/abc.txt')    //返回路径部分:/tmp
   path.abspath('.')               //返回绝对路径:/tmp
   path.split('/tmp/abc.txt')      //切割:('/tmp','abc.txt')
