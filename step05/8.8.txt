@@ -150,8 +150,8 @@ tarfile模块
 #需要拼接后才能得到一个文件的绝对路径
 
 flist=[]
-for path,dir,file in list(os.walk('/etc/security')):
-  for i in file:
-    flist.append(os.path.join(path,i))
+for path,folders,files in list(os.walk('/etc/security')):
+  for file in files:
+    flist.append(os.path.join(path,file))    //如果要计算每个文件的md5值,用字典
 
 ###############################################################################
