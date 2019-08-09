@@ -6,7 +6,7 @@ DNS根域的正解和反解
     type master;      //如果为hint,文件就为named.ca,用来提示13根域服务器在哪
     file "root.zone";
   };
-  zone "1.168.192.in-addr.arpa" IN {    //ip要反过来写
+  zone "1.168.192.in-addr.arpa" IN {    //网络号反过来写
     type master;
     file "root.in-addr-arpa.zone";
   };
