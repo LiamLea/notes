@@ -133,8 +133,15 @@ output{
 
 1.装包
 2.创建配置文件:/etc/logstash/logstash.conf
+
 3.获取远程主机的日志文件:
-  远程主机:安装filebeat,修改配置文件     //注意配置document_type,则发送过来的日志就会加上标签
-  logstash:使用logstash-input-beats插件
+  远程主机:安装filebeat,修改配置文件:
+    paths:              //指定要发送的日志
+    document_type:      //指定发送的文档类型,便于logstash按标签处理
+    elasticsearch选项注释
+    配置logstash的主机
+
+4.logstash:使用logstash-input-beats插件
+  启动logstash
 
 ###############################################################################
