@@ -162,4 +162,12 @@ if __name__ == '__main__':
   session.query(映射类)  //返回一个实例的可迭代对象,结果就保存在实例的属性中
   session.query(类的属性1, ...)  //返回元组构成的查询集
 
+6.修改和查询
+  先查询到实例,然后进行修改后删除
+  qset=session.query(table1).filter(id=1)
+  item=qset.one()
+  item.name='修改值'
+
+  session.delete(item)  //删除该行记录
+
 ###############################################################################
