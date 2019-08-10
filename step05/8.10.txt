@@ -66,10 +66,16 @@ sort可以传入一个函数(即c++中的谓词), key=函数名
 PyMySQL模块
 
 1.操作数据库的步骤
-(1)建立连接:pymysql.connect(...)
+(1)建立连接:
+  conn=pymysql.connect(...)
 (2)创建操作数据库的游标(相当于操作文件时的文件对象)
+  cursor=conn.cursor()
 (3)通过游标执行sql语句
+  cursor.execute("sql语句")
 (4)如果涉及对数据库的修改,需要执行commit
+  conn.commit()
 (5)关闭游标,关闭连接
+  cursor.close()
+  conn.close()
 
 ###############################################################################
