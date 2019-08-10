@@ -6,7 +6,7 @@
   cat <&5           //从test.txt读入,只能读一次,还要使用需要重新关联
   exec 5>&-         //关闭关联,或者使用:exec 5<&-  
 
-2.利用文件进行网络通信
+2.利用文件进行网络通信(本质是新建了一个socket文件,用于网络通信)
   echo xx >/dev/tcp/ip地址或主机名/端口后  //即可利用tcp协议发送数据到该端口
 
 ###############################################################################
@@ -74,7 +74,7 @@ sort可以传入一个函数(即c++中的谓词), key=函数名
   工资表：id、员工ID、工资日、基本工资、奖金
 
 ###############################################################################
-PyMySQL模块
+pymysql模块
 
 1.操作数据库的步骤
 (1)建立连接:
@@ -113,4 +113,36 @@ PyMySQL模块
   data=(6,)
   cursor.execute(delete,data)
   
+###############################################################################
+sqlalchemy模块
+
+#能够访问任何关系数据库,只要修改引擎即可
+
+1.ORM:object relationship map,对象映射关系
+  实体类         关联到  表
+  类中的变量           关联到  表中的字段
+  类的实例             关联到  表的记录
+  其中的column类       关联到  表中的每个字段
+  其中的Interger类     关联到  int字段类型
+  其中的String类       关联到  varchar字段类型     
+
+2.操作数据库的步骤
+(1)定义引擎
+engine=create_engine(
+    'mysql+pymysql://root:123456@192.168.1.23/tedu1903?charset=utf8',
+    encoding='utf8',
+)
+(2)实例化基类
+Base=declarative_base()
+
+(3)定义实体类(即定义表)
+class Departments(Base):
+    __tablename__='departments'
+    dep_id=Column(Integer,primary_key=True)
+    dep_name=Column(String(20),unique=True)
+
+(4)执行数据库操作
+if __name__ == '__main__':
+    Base.metadata.create_all(engine)
+
 ###############################################################################
