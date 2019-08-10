@@ -80,8 +80,10 @@ PyMySQL模块
 
 2.增加数据
   insert='insert into table1 values(%s,%s)'
-  value=[(1,'a'),(2,'b')]
-  cursor.executemany(insert,value)   //第二个参数为可迭代对象
+  value1=(10,'c')
+  value2=[(1,'a'),(2,'b')]
+  cursor.execute(insert,value1)     //当只需要执行一次时
+  cursor.executemany(insert,value2)   //第二个参数为可迭代对象
 
 3.查询数据
   select='select * from table1'
@@ -89,5 +91,15 @@ PyMySQL模块
   cursor.fetchone()           //取出一条数据,取出后游标向下移动(类似于文件指针)
   cursor.fetchmany(2)         //取出2条数据
   cursor.fetchall()           //取出所有数据
+
+4.修改数据
+  update='update table1 set xx=%s where xx=%s'
+  data=('a','b')
+  cursor.execute(data)
+
+5.删除数据
+  delete='delete from table1 where id=%s'
+  data=(6,)
+  cursor.execute(delete,data)
   
 ###############################################################################
