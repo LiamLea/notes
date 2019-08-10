@@ -78,9 +78,16 @@ PyMySQL模块
   cursor.close()
   conn.close()
 
-2.批量插入
-  i='insert into table1 values(%s,%s)'
-  v=[(1,'a'),(2,'b')]
-  cursor.executemany(i,v)   //第二个参数为可迭代对象
+2.增加数据
+  insert='insert into table1 values(%s,%s)'
+  value=[(1,'a'),(2,'b')]
+  cursor.executemany(insert,value)   //第二个参数为可迭代对象
 
+3.查询数据
+  select='select * from table1'
+  cursor.execute(select)      //通过游标获得查询结果
+  cursor.fetchone()           //取出一条数据,取出后游标向下移动(类似于文件指针)
+  cursor.fetchmany(2)         //取出2条数据
+  cursor.fetchall()           //取出所有数据
+  
 ###############################################################################
