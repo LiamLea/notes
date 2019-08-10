@@ -78,4 +78,9 @@ PyMySQL模块
   cursor.close()
   conn.close()
 
+2.批量插入
+  i='insert into table1 values(%s,%s)'
+  v=[(1,'a'),(2,'b')]
+  cursor.executemany(i,v)   //第二个参数为可迭代对象
+
 ###############################################################################
