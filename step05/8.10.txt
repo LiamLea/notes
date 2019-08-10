@@ -14,7 +14,7 @@ python的官方模块文件站点:pypi.org
     trusted-host=pypi.douban.com
 
 #建议安装在虚拟环境下,即进入虚拟环境后进行安装
-#安装前要进入虚拟环境,不然找不到pip命令
+#python3的命令是:pip3
 
 3.在线安装
   pip install 模块名
