@@ -5,6 +5,8 @@
   bash     //会fork一个子进程执行,使用bash解释器
   ./       //会fork一个子进程执行,使用声明的解释器
 
+2. ~/.ssh/kown_hosts  里面存放的是对端传过来的公钥
+
 ###############################################################################
 多进程编程
 
@@ -96,5 +98,17 @@ wget模块
 
 1.下载
   wget.download(url,out='/tmp/aa')
+
+###############################################################################
+paramiko模块  //实现ssh功能
+
+1.使用
+  ssh=paramiko.SSHClient()                //创建SSHClient实例
+  ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy()  //接收秘钥,无需询问
+  ssh.connect(ip/host,username='xx',password='xx',port=xx)
+  result=ssh.exec_command(命令)   //返回一个元组:输入,输出和错误信息的类文件对象
+  out=result[1].read().decode()
+  err=result[2].read().decode()
+  ssh.close()
 
 ###############################################################################
