@@ -89,7 +89,7 @@ RESTful API调用
   }
 
 3.添加数据
- curl -XPUT http://xxx:9200/索引名/类型/id号 -d '键值类型'
+ curl -XPUT http://xxx:9200/索引名/类型/id号 -d '键值对(JSON格式)'
 #索引要提前创建
 
 4.修改数据
