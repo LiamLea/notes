@@ -56,11 +56,40 @@ windows系统不知道多进程,只支持多线程
 #target=MyClass(),也可以传递一个实例,这个实例有可调用方法(__call__)
 
 ###############################################################################
-urllib模块(包含4个子模块,常用的urllib.request和urllib.error)
+urllib模块
 
-1.获取指定url内容
-  html=urllib.request.urlopen(url)
-  data=url.read()    //当内容多时,每次读取4096,要保存的话就写入本地即可
+1.包含4个子模块
+  request     //用于发送request和获取request的结果
+  error       //包含了request时产生的异常,用于忽略错误,能够完成爬虫
+  parse       //用来解析和处理url
+  robots.txt  //用来解析页面的robots.txt文件
+
+2.获取指定url内容(from urllib import request)
+  html=request.urlopen(url)
+  data=html.read()      //返回一个字符串,包含所有的内容,readlines返回一个列表
+                        //当内容多时,每次读取4096,要保存的话就写入本地即可
+
+3.忽略HTTPError异常(from urllib import error)
+  try:
+    ...
+  except error.HTTPError:
+    pass
+
+4.模拟客户端(因为某些网站会拒绝相应的客户端)
+  header={'USER-Agent':'xx'}
+  robj=request.Request(url,headers=header)  //建立请求对象
+  html=request.urlopen(r)
+  data=html.read()
+
+5.url只允许一部分ascii字符,如果有其他字符需要编码
+
+  url='http://www.sougou,com/web?query=中国'
+  request.urlopen(url)  //出错
+  
+正确的是:
+
+  url='http://www.sougou/web?query='+request.quote('中国')
+  request.urlopen(url)
 
 ###############################################################################
 wget模块
