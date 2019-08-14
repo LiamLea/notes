@@ -49,17 +49,17 @@ requests是一个HTTP库，内部采用urllib3实现
 提供了使用某种方法(如：GET,POST)访问web的函数
 
 1.获取url资源,以str类型返回数据
-  html=requests.get(url)
-  html.text
+  reponse=requests.get(url)
+  reponse.text
 
 2.获取url资源，以bytes类型返回数据（如图片等）
-  html=requests.get(url)
-  html.content
+  reponse=requests.get(url)
+  reponse.content
 
 3.获取url资源，解析json格式，返回特定类型
-  html=requests.get(url)
-  html.encoding='utf8'  //注意url资源的编码，通过html.encoding可以查看现在的编码
-  html.json()           //将json格式转换为特定的数据类型
+  reponse=requests.get(url)
+  reponse.encoding='utf8'  //注意url资源的编码，通过html.encoding可以查看现在的编码
+  reponse.json()           //将json格式转换为特定的数据类型
 
 ###############################################################################
 requests+json的框架(调用其他软件提供的api,如：钉钉机器人，图灵机器人，zabbix)
@@ -72,7 +72,7 @@ headers={'xx':'yy'}   //根据软件的手册写
 
 data='...'
 
-html=requests.post(url,headers=headers,data=json.dumps(data))
-print(html.json())
+reponse=requests.post(url,headers=headers,data=json.dumps(data))
+print(reponse.json())
 
 ###############################################################################
