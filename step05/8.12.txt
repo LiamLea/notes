@@ -52,7 +52,7 @@ windows系统不知道多进程,只支持多线程
 ###############################################################################
 多线程编程(threading模块)
 
-  t=threading.Thread(target=函数名,args=(参数1,)) 
+  t=threading.Thread(target=函数名,args=(参数1,),kwargs={'key1':value1,'key2',balue2})
   t.start()
 #如果一个参数,不加括号,则会把字符串转换为元组,即每一个字符是一个元素,就会出错
 #target=MyClass(),也可以传递一个实例,这个实例有可调用方法(__call__)
@@ -78,7 +78,7 @@ urllib模块
     pass
 
 4.模拟客户端(因为某些网站会拒绝相应的客户端)
-  header={'USER-Agent':'xx'}
+  header={'User-Agent':'xx'}
   robj=request.Request(url,headers=header)  //建立请求对象
   html=request.urlopen(r)
   data=html.read()
