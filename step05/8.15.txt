@@ -16,4 +16,43 @@
     - name: [php,php-mysql]
       state:  installed
 
+3.pip安装指定版本的模块
+  pip install xx==版本号
+
+4.没有pip怎么安装python模块
+(1)首先获得模块的安装包  //可以在另一台有pip的机器上获取
+    pip download xx
+(2)解压该安装包并进行安装
+    python setup.py install   //setup是该安装包提供的
+
+###############################################################################
+自己编写ansible模块
+
+1.设置模块寻找目录：ANSIBLE_LIBRARY
+
+2.编写模块：xx.py
+
+from ansible.module_utils.basic import AnsibleModule
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            参数1=dict(required=True, type='str'),
+            参数2=dict(required=True, type='str')
+        )
+    )
+    ...
+    module.exit_json(changed=True)
+
+if __name__ == '__main__':
+    main()
+
+3.调用模块
+ansible hosts -m xx -a "参数1=... 参数2=..."
+
+#注意：
+#   ansible,在执行命令时，是把模块拷贝到远程执行的
+#远程如果没有python3就不支持中文
+#远程没有运行该程序的python模块也不能执行
+
 ###############################################################################
