@@ -76,3 +76,23 @@ reponse=requests.post(url,headers=headers,data=json.dumps(data))
 print(reponse.json())
 
 ###############################################################################
+zabbix使用脚本报警
+
+一.首先创建脚本：/usr/local/share/zabbix/alertscripts/xx
+#脚本要接收传递的参数
+#传递什么参数由zabbix进行配置
+
+二.添加媒介(media types)
+  create media type -> Name:xx -> type:Script -> Script name:绝对路径
+  -> Script parameters:{ALERT.MESSAGE}   
+#可以添加多个，脚本参数：
+#     {ALERT.MESSAGE}   //报警信息的内容
+#     {ALERT.SENDTO}    //接收方
+#     {ALERT.SUBJECT}   //主题
+#添加的顺序，就是传递给脚本位置参数的顺序
+
+三.将报警媒介与用户关联
+
+四.创建Action(与相关触发器关联）
+
+###############################################################################
