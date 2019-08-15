@@ -15,7 +15,7 @@ message['Subject']=Header('主题')
 二.本地发送邮件
 
 smtp=smtplib.SMTP('127.0.0.1')
-smtp.sendmail('发件人',['收件人1'],message.ad_bytes())
+smtp.sendmail('发件人',['收件人1'],message.as_bytes())
 
 三.网络发送邮件
 
