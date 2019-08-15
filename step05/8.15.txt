@@ -1,0 +1,19 @@
+###############################################################################
+补充
+
+1.编写yml时，vim的设置
+  autocmd FileType yaml setlocal sw=2 ts=2 et ai
+#sw=2   //shiftwidth=2,ctrl+t 添加一个sw大的缩进，ctrl+d 删除一个sw大的缩进
+#ts=2   //tabstop=2
+#et     //expandtab,用空格填充tab,重点是这一项
+#ai     //auto indent,自动退格对齐
+
+2.playbook
+#当需要多次执行某个模块时，可以使用with_items
+#或者有些模块支持列表（如：yum)
+#就可以写成：
+  yum:
+    - name: [php,php-mysql]
+      state:  installed
+
+###############################################################################
