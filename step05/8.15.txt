@@ -25,6 +25,33 @@
 (2)解压该安装包并进行安装
     python setup.py install   //setup是该安装包提供的
 
+5.命名的元组(本质还是元组，通过类的属性映射到元组的元素)
+  t=namedtuple('t',['x','y','z')   //创建了一个元组类t，只接收3项
+  p=t(1,2,3)   //p[0]等于p.x
+
+###############################################################################
+使用python操作ansible(利用ansible提供的python api)
+
+#查看ansible的python api文档，找到examples进行修改
+
+1.指定相关选项：    //即ansible --help中可以看到的选项
+  connection='xx'   //设置连接的方式，有3种：local,ssh,smart
+
+2.Dataloader用于将yml/json等文件转换成python的数据类型
+
+3.passwords用于保存各种密码
+
+4.inventory用于指定主机，可以直接列出各个主机，也可以指定主机清单文件
+
+5.variable_manager用于定义参数,如变量等
+
+6.play_source构建执行源,指定任务的name，hosts，remote_user，gather_facts,tasks等
+#gather_facts='no'，表示执行指令指令前不收集目标主机的信息
+
+7.创建play的实例
+
+8.创建任务队列管理器实例，用于调用play
+
 ###############################################################################
 自己编写ansible模块
 
