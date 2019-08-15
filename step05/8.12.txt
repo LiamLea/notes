@@ -7,6 +7,16 @@
 
 2. ~/.ssh/kown_hosts  里面存放的是对端传过来的公钥
 
+3.把bytes类型转换为list
+(1)首先转换为string
+  s=b.decode()   //默认使用utf8编码
+(2)以换行符对string进行切割
+  l=s.split(sep='\n')
+
+4.编写多线程程序
+#不要将多线程写入函数
+#而是编写简单的函数，然后用多线程执行
+
 ###############################################################################
 多进程编程
 
@@ -68,7 +78,7 @@ urllib模块
 
 2.获取指定url内容(from urllib import request)
   html=request.urlopen(url)
-  data=html.read()      //返回一个字符串,包含所有的内容,readlines返回一个列表
+  data=html.read()      //返回bytes类型数据,readlines返回一个列表
                         //当内容多时,每次读取4096,要保存的话就写入本地即可
 
 3.忽略HTTPError异常(from urllib import error)
