@@ -7,7 +7,7 @@ import smtplib
 
 一.准备邮件
 
-message=MIMEText('正文\r\n','plain','utf8')  //plain表示纯文本
+message=MIMEText('正文\r\n','plain','utf8')  //plain表示纯文本(在mime中定义的)
 message['From']=Header('发件人','utf8')
 message['To']=Header('收件人','utf8')
 message['Subject']=Header('主题')
