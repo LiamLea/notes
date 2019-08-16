@@ -61,3 +61,36 @@ work(工作区) -----------> stage(暂存区） -------------> 版本库(.git)
   git branch -d xx
 
 ###############################################################################
+搭建gitlab服务器
+
+1.利用docker启动gitlab
+  docker load -i xx.tar
+  docker run -d -h 主机名 --name 容器名 -p 443:443 -p 80:80 -p 22:22 --restart always  //开启自动启动
+  -v /srv/gitlab/config:/etc/gitlab 
+  -v /srv/gitlab/logs:/var/log/gitlab 
+  -v /srv/gitlab/data:/var/opt/gitlab gitlab_zh:latest
+
+2.在gitlab上配置
+  创建组(对应于一个开发团队) -> 创建用户(加入组中) -> 创建项目(授权相应用户为主程序员)
+
+3.配置免密上传代码
+#跟在github上配置一样，设置ssh公钥即可
+
+4.使用远程仓库
+#进行环境配置
+  git config --global user.name 'xx'
+  git config --global user.email 'xx'
+
+#三种情况
+（1）创建新的仓库
+  git clone git@...
+
+（2）已存在的文件夹
+  git init 
+  git remote add origin git@...
+
+（3）已存在的Git仓库
+  git remote rename origin old-origin
+  git remote add origin git@...
+
+###############################################################################
