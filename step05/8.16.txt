@@ -65,7 +65,8 @@ work(工作区) -----------> stage(暂存区） -------------> 版本库(.git)
 
 1.利用docker启动gitlab
   docker load -i xx.tar
-  docker run -d -h 主机名 --name 容器名 -p 443:443 -p 80:80 -p 22:22 --restart always  //开启自动启动
+  docker run -d -h 主机名 --name 容器名 -p 443:443 -p 80:80 -p 22:22 
+  --restart always                    //开机自动启动
   -v /srv/gitlab/config:/etc/gitlab 
   -v /srv/gitlab/logs:/var/log/gitlab 
   -v /srv/gitlab/data:/var/opt/gitlab gitlab_zh:latest
