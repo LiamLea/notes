@@ -6,3 +6,27 @@ dev(开发）---------------------------->  ———————————
 app(应用服务器）<------- jenkins <------ ——————————— 
 
 ###############################################################################
+Git使用
+
+SCM:software configuration management，如：git,svn
+
+               git add                     git commit
+work(工作区) -----------> stage(暂存区） -------------> 版本库(.git)
+
+暂存区在.git/index中
+
+1.进行环境配置   //会生成～/.gitconfig文件
+  git config --global user.name "xx"
+  git config --global user.examil "xx"
+  git config --global core.editor vim
+  git config --list
+
+2.创建版本库
+  git init 库名  //不管目录存不存在都不影响
+
+3.提交文件到stage
+  git add .
+#如果有不想添加的文件，通过创建并写入 .gitignore 文件排除
+#当使用.gitignore时要记得排除.gitignore文件本身
+
+###############################################################################
