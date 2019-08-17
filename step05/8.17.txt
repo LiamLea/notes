@@ -1,0 +1,13 @@
+###############################################################################
+Jenkins:实现CI,用于构建和测试各种项目
+
+1.安装jenkins并启动服务  //需要由java环境
+
+2.设置镜像源，并安装Git Parameter插件
+
+3.建立工程
+  新建Item -> 项目名，Freestyle project -> This project is parameterized ->
+  Git parameterized -> 参数名，Branch or Tag，origin/master -> Git ->
+  Git仓库地址，${参数名} -> Build with Parameters
+
+###############################################################################
