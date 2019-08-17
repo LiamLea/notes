@@ -6,8 +6,43 @@ Jenkins:实现CI,用于构建和测试各种项目
 2.设置镜像源，并安装Git Parameter插件
 
 3.建立工程
-  新建Item -> 项目名，Freestyle project -> This project is parameterized ->
-  Git parameterized -> 参数名，Branch or Tag，origin/master -> Git ->
-  Git仓库地址，${参数名} -> Build with Parameters
+
+(1)配置工程的基本信息
+  新建Item -> 项目名，Freestyle project
+
+(2)设置利用参数    
+#参数的值是根据构建时选择的值决定的,所以该参数名一般设为version
+
+  This project is parameterized ->Git parameterized -> 参数名
+  Branch or Tag       //选择参数的类型为分支或标签
+  origin/master       //默认值设为origin/master
+
+(3)选择源码的来源为Git
+  Git ->Git仓库地址
+  ${参数名}          //设置构建时构建哪个版本,默认所有版本都构建
+                     //此处的设置是构建当前参数对应的版本
+
+(4)设置子目录，即每个版本存放在一个目录内
+  Additional Behaviours -> check out to a sub-directory : xx-${参数名}
+
+(5)增加构建步骤    
+#先搭一个web网站，提供这些版本源码
+#mkdir -p /var/www/html/deploy/pkgs
+#chown -R jenkins.jenkins /var/www/html/deploy/
+
+增加构建步骤 -> execute shell
+  pkg_dir=/var/www/html/deploy/pkgs
+  cp -r myblog-${blogver} $pkg_dir  
+  cd $pkg_dir
+  rm -rf myblog-${blogver}/.git
+  tar czf myblog-${blogver}.tar.gz myblog-${blogver}
+  rm -rf myblog-${blogver}
+  md5sum myblog-${blogver}.tar.gz |  awk '{print $1}' > myblog-${blogver}.tar.gz.md5
+  cd ..
+  [ -f live_ver ] && cat live_ver > last_ver
+  echo ${blogver} > live_ver
+
+(6)构建项目
+  Build with Parameters -> 选择一个参数
 
 ###############################################################################
