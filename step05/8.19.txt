@@ -61,7 +61,8 @@ html
 
 5.<p></p>       //paragraph,段落,可以在里面插入各种子标签
 
-6.<div></div>   //division,分区,很重要，利用div对页面进行划分,内容都放入div中
+6.<div></div>   //division,分区,很重要，利用div对页面进行划分
+                //将整个页面划分为一个div,然后再在这个div中划分多个div
 
 7.<a href="xx" target="_blank"> </a>    
 #anchor,锚点,hyertext reference,超连接
