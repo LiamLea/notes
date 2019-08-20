@@ -36,6 +36,9 @@ html
   块级元素(block)           //独占一行，可以设置宽高，内外边距
   行级元素(inline)          //与其他行级元素共处一行，不可设置宽高，内外边距
   行内块元素(inline-block)  //与其他行内元素共处一行，可以设置宽高，内外边距
+                            //<b>xx</b>     bold,加粗
+                            //<i>xx</i>     italic,斜体字
+                            //<u>xx</u>     underline,下划线
 
 4.html文件结构
   <!DOCTYPE html>       //文件类型声明
