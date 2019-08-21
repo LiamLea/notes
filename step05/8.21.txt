@@ -14,3 +14,54 @@ MTV工作流程：
                 返回页面                   渲染                  返回结果
 
 ###############################################################################
+部署django
+
+1.安装(在虚拟环境中用pip安装)
+
+2.创建项目
+(1)手动创建
+  django-admin startproject 目录名
+
+(2)用pycharm创建  
+
+3.测试
+  python manage.py runserver
+
+4.项目文件说明
+
+项目名                        #项目的根目录          
+├── db.sqlite3                # 文件型数据库
+├── manage.py                 # 项目管理文件
+├── 项目名                    # 项目管理目录
+│   ├── __init__.py           # 项目初始化文件
+│   ├── settings.py           # 配置文件
+│   ├── urls.py               # URLConf路由文件
+│   └── wsgi.py               # 部署时的配置文件
+└── templates                 # 模板目录
+
+5.启动数据库，并创建一个库，给django用
+  create database dj1903 default charset utf8
+
+6.修改配置文件:settings.py
+  BASE_DIR                //指明项目所在的目录，不需要修改
+  ALLOWED_HOSTS=['*']     //设置所有主机均可访问
+  
+  DATABASES = {           //使用mysql数据库(最初设置的是sqlite3)，通过提示的网址复制格式
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dj1903',
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
+  }
+  
+  LANGUAGE_CODE = 'zh-hans'     //设置使用中文
+  TIME_ZONE = 'Asia/Shanghai' 
+  USE_TZ = False                //不使用标准时区
+
+6.启动django
+  python manage.py runserver 0:80    //所有网卡监听80端口
+
+###############################################################################
