@@ -72,7 +72,7 @@ MTV工作流程：
   python manage.py runserver 0:80    //所有网卡监听80端口
 
 7.在数据库中生成数据
-  python manage.py makemigrations   //如果对数据有改动，会迁移到相应的文件下
+  python manage.py makemigrations   //如果对数据有改动，会创建一个文件，用于操纵数据库
   python manage.py migrate          //将数据迁移到数据库
 
 8.创建管理员帐号
@@ -117,7 +117,7 @@ MTV工作流程：
     url(r'^(\d+)',views.函数2,name='xx')       //会把括号内的内容作为参数传给函数
   ]                                               
 
-(3)在 应用名/views 文件中编写函数
+(3)在 应用名/views 文件中编写函数(V)
   from django.shortcuts import render
   def 函数1(request):                //会传入请求到作为函数的参数
     return render(request,'网页名')   //会到templates目录中寻找该网页
@@ -125,6 +125,35 @@ MTV工作流程：
   def 函数2(request,variable):        //函数2会接收两个参数
     return render(request,'网页名',{'xx':variable})
 
-(4)在 templates 中创建网页
+(4)在 templates 中创建网页(T)
+
+###############################################################################
+模型设计(M)
+
+ORM:对象关系映射
+Object，python的对象
+Relationship，关系型数据库
+Mapper，映射
+
+表       <--------> python中的class
+字段     <--------> class中的属性
+行(记录) <--------> class的实例
+
+1.编写 应用名/models.py
+  from django.db import models
+  
+  class Question(models.Model):  # 父类是固定的
+      question_text = models.CharField(max_length=200)
+      pub_date = models.DateTimeField()
+  
+  class Choice(models.Model):
+      choice_text = models.CharField(max_length=100)
+      votes = models.IntegerField(default=0)
+      q = models.ForeignKey(Question)
+
+#说明：
+#模型没有明确给定主键，django将自动创建一个名为 id 的字段作为主键
+#实际创建的表名为 应用名_类名 且全部小写
+#设置了外键的字段名是 属性名_id  ,所以上面 q 对应的字段名为 q_id
 
 ###############################################################################
