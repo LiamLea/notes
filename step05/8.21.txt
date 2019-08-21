@@ -145,11 +145,15 @@ Mapper，映射
   class Question(models.Model):  # 父类是固定的
       question_text = models.CharField(max_length=200)
       pub_date = models.DateTimeField()
+      def __str__(self):            //能够在后台界面，简略显示某条记录时，显示的是该字符串
+        return self.question_text 
   
   class Choice(models.Model):
       choice_text = models.CharField(max_length=100)
       votes = models.IntegerField(default=0)
       q = models.ForeignKey(Question)
+      def __str__(self):
+        return "%s: %s" %(self.q,self.choice_text)  //这里的self.q会调用Question的str方法
 
 #说明：
 #模型没有明确给定主键，django将自动创建一个名为 id 的字段作为主键
@@ -159,5 +163,12 @@ Mapper，映射
 2.生成表
   python manage.py makemigrations
   python manage.py migrate
+
+3.注册模型到后台              //即可登录后台，进行表的操作
+  from django.contrib import admin
+  from .models import Question, Choice   //.表示当前包，模块名为models
+  
+  admin.site.register(Question)
+  admin.site.register(Choice)
 
 ###############################################################################
