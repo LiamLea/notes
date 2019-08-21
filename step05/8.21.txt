@@ -1,13 +1,20 @@
 ###############################################################################
 django(是python编写的web框架)
 
+核心组件：
+  用于创建模型的对象关系映射
+  管理界面
+  URL设计
+  模板语言
+  缓存系统
+
 MTV设计模式：
-  M:Model 数据库
-  T:Template 模板(网页)
-  V:View 视图(函数)
+  M:Model 模型，负责业务对象和数据库的映射关系
+  T:Template 模板，如何把网页展示给用户
+  V:View 视图，负责业务逻辑,依据模型数据创建的
 
 MTV工作流程：
-          访问                              调用                 crud
+          访问                              调用           调用数据模型存取数据
 ————————  ----> 服务器 ---> 路由系统URLConf ----> ————————————  ------>  ——————————
 | 客户端|                                         |V(视图函数)|          |M(数据库)|
 ————————  <-------------------- T(模板）<-------- ————————————  <------- ——————————
@@ -29,17 +36,17 @@ MTV工作流程：
 
 4.项目文件说明
 
-项目名                        #项目的根目录          
+项目名                        # 项目的根目录          
 ├── db.sqlite3                # 文件型数据库
 ├── manage.py                 # 项目管理文件
 ├── 项目名                    # 项目管理目录
-│   ├── __init__.py           # 项目初始化文件
+│   ├── __init__.py           # 告诉python这个目录应该被看做一个python包
 │   ├── settings.py           # 配置文件
-│   ├── urls.py               # URLConf路由文件
-│   └── wsgi.py               # 部署时的配置文件
+│   ├── urls.py               # URLconf路由文件
+│   └── wsgi.py               # 与WSGI兼容的web服务器入口，部署时的配置文件
 └── templates                 # 模板目录
 
-5.启动数据库，并创建一个库，给django用
+5.启动mysql数据库，并创建一个库，给django用
   create database dj1903 default charset utf8
 
 6.修改配置文件:settings.py
@@ -63,5 +70,48 @@ MTV工作流程：
 
 6.启动django
   python manage.py runserver 0:80    //所有网卡监听80端口
+
+7.在数据库中生成数据
+  python manage.py makemigrations   //如果对数据有改动，会迁移到相应的文件下
+  python manage.py migrate          //将数据迁移到数据库
+
+8.创建管理员帐号
+  python manage.py createsuperuser   //创建后登录 http://127.0.0.1/admin
+
+###############################################################################
+管理应用
+
+应用是一个web应用程序，可以创建在任何位置，习惯创建在项目根目录下
+一个应用对应一个目录
+一个项目可以包含多个应用
+一个应用可以运用到多个项目中
+
+1.创建应用
+  python manage.py startapp 应用名
+
+2.将应用部署到项目中,修改配置文件:settings.py
+  INSTALLED_APPS=[
+    ...
+    '应用名'
+  ]
+
+3.配置URLconf
+#如果将所有的url与函数的映射关系都放入 项目的urls.py 中会很乱
+#所以与该应用有关的url都交给该应用进行路由
+
+(1)修改配置文件：项目名/urls.py
+  from django.conf.urls import url, include
+  from django.contrib import admin
+  
+  urlpatterns = [
+      url(r'^admin/', admin.site.urls),
+      url(r'^polls/', include('polls.urls')),   //这里的应用是polls
+  ]
+
+(2)修改陪字文件：应用名/urls.py
+  from django.conf.urls import url
+  
+  urlpatterns = [
+  ]
 
 ###############################################################################
