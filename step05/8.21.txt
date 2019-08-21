@@ -108,7 +108,7 @@ MTV工作流程：
       url(r'^polls/', include('polls.urls')),   //这里的应用是polls
   ]
 
-(2)修改陪字文件：应用名/urls.py
+(2)修改陪字文件：应用名/urls.py       //这里应该是polls/urls.py
   from django.conf.urls import url
   
   urlpatterns = [
