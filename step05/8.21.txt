@@ -113,13 +113,17 @@ MTV工作流程：
   from . import views                 //函数在views中定义
   
   urlpatterns = [       //匹配过的前缀这里不会匹配,比如访问http://127.0.0.1/polls,就会匹配
-    url(r'^$',views.函数名，name='url名字'),    //url名字随便取
+    url(r'^$',views.函数1，name='url名字'),    //url名字随便取
+    url(r'^(\d+)',views.函数2,name='xx')       //会把括号内的内容作为参数传给函数
   ]                                               
 
 (3)在 应用名/views 文件中编写函数
   from django.shortcuts import render
-  def 函数名(request):                //会传入请求到作为函数的参数
+  def 函数1(request):                //会传入请求到作为函数的参数
     return render(request,'网页名')   //会到templates目录中寻找该网页
+
+  def 函数2(request,variable):        //函数2会接收两个参数
+    return render(request,'网页名',{'xx':variable})
 
 (4)在 templates 中创建网页
 
