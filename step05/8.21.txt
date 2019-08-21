@@ -108,10 +108,12 @@ MTV工作流程：
       url(r'^polls/', include('polls.urls')),   //这里的应用是polls
   ]
 
-(2)修改陪字文件：应用名/urls.py       //这里应该是polls/urls.py
+(2)修改配置文件：应用名/urls.py       //这里应该是polls/urls.py
   from django.conf.urls import url
+  from . import views                 //函数在views中定义
   
-  urlpatterns = [
-  ]
+  urlpatterns = [       //匹配过的前缀这里不会匹配,比如访问http://127.0.0.1/polls,就会匹配
+    url(r'^$',views.函数名，name='url名字'),    //url名字随便取
+  ]                                               
 
 ###############################################################################
