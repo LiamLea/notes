@@ -116,4 +116,11 @@ MTV工作流程：
     url(r'^$',views.函数名，name='url名字'),    //url名字随便取
   ]                                               
 
+(3)在 应用名/views 文件中编写函数
+  from django.shortcuts import render
+  def 函数名(request):                //会传入请求到作为函数的参数
+    return render(request,'网页名')   //会到templates目录中寻找该网页
+
+(4)在 templates 中创建网页
+
 ###############################################################################
