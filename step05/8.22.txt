@@ -1,0 +1,57 @@
+###############################################################################
+通过python shell操作模型
+
+1.python manage.py shell   //会自动设置好django的环境变量
+  
+2.导入类：from polls.models import Question,Choice
+
+3.添加数据
+(1)通过实例添加
+  q1=Question(question_text='xx',pub_date='xx')
+  q1.save()
+
+(2)通过objects管理器
+  Question.objects.create(question_text='xx',pub_date='xx')
+
+4.查询
+  qset1=Question.objects.all()
+  q1=Question.objects.get(条件)   //只能获取一个，其他的都会报错
+  qset1=Question.objects.filter(条件)
+#filter中的条件(双下划线)
+#id__exact=1 ---> id=1
+#id__gt=1    ---> id>1
+#id__gte=1   ---> id>=1
+#xx__contains='yy'  --->  xx字段内容包含yy的记录
+#xx__startswith='yy' ---> xx字段以yy开头的记录 
+
+5.修改
+  q=Question.objects.get(条件)
+  q.xx=yy
+  q.save()
+
+6.删除
+  q=Question.objects.get(条件)
+  q.delete()
+
+###############################################################################
+修改视图函数
+
+1.修改函数
+  from .models import Question   //导入Question模型
+  
+  def index(request):
+    questions=Question.objects.order_by('-xx')  //取出所有内容，且根据xx字段降序排列
+    return render(request,'index.html',{'questions':questions})  //传递参数questions
+
+2.修改模板
+  {% for question in questions %}
+      <p>
+          {{ forloop.counter }}.
+          <a href="{% url 'url的名字' question.id %}" target="_blank">  //将id作为参数穿过去
+              {{ question.question_text }}
+          </a>
+          {{ question.pub_date }}
+      </p>
+  {% endfor %}
+
+###############################################################################
