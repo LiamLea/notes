@@ -1,0 +1,35 @@
+###############################################################################
+ansible动态主机清单
+
+1.创建ansible.cfg文件
+  [defaults]
+  inventory = xx.py
+  remote_user=root
+  host_key_checking=False
+
+2.创建动态主机脚本:xx.py
+#输出格式如下：
+#{
+#    "组1": {"hosts": ['主机1', '主机2']},
+#    "组2": {"hosts": ['主机3', '主机4']},
+#}
+#
+  #!指定python解释器
+  ... ...
+  if __name__ == '__main__':
+      ... ...
+      result = {}
+      for group, ip in qset:
+          if group not in result:
+              result[group] = {}  # {'dbservers': {}}
+              result[group]['hosts'] = []  # {'dbservers': {'hosts': []}}
+          result[group]['hosts'].append(ip)
+      print(json.dumps(result))
+
+3.赋予动态主机清单执行权限
+  chmod +x xx.py
+
+4.测试
+  ansible all -m ping 
+
+###############################################################################
