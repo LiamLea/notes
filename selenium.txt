@@ -34,12 +34,12 @@ selenium基础
   browser.get(url)
 
 3.定位元素(一定要唯一)：  
-（1）通过id：          browser.find_element_by_id('xx')
-（2）通过name：    browser.find_element_by_name('xx')
-（3）通过class：      browser.find_element_by_class_name('xx')
-（4）通过超链接标签的内容：       browser.find_element_by_link_text('xx')      
-（5）通过超连接标签的部分内容： browser.find_element_by_partial_link_text('xx')
-（6）通过标签名：   browser.find_element_by_tag_name('xx')
+（1）通过id：	browser.find_element_by_id('xx')
+（2）通过name：	browser.find_element_by_name('xx')
+（3）通过class：	browser.find_element_by_class_name('xx')
+（4）通过超链接标签的内容：	browser.find_element_by_link_text('xx')      
+（5）通过超连接标签的部分内容：browser.find_element_by_partial_link_text('xx')
+（6）通过标签名：	browser.find_element_by_tag_name('xx')
 
 4.操作元素
 （1）send_keys('xx')                 //网元素内输入内容
