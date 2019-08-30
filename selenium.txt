@@ -42,15 +42,15 @@ selenium基础
 （6）通过标签名：	browser.find_element_by_tag_name('xx')
 
 4.操作元素
-（1）send_keys('xx')                 //网元素内输入内容
-（2）click()                              //点击相应元素
-（3）clear()                             //清空元素的内容
-（4）back()                             //后退页面
-（5）maximize_window()        //最大化窗口
-（6）submit                           //提交表单
+（1）send_keys('xx')		//网元素内输入内容
+（2）click()		//点击相应元素
+（3）clear()		//清空元素的内容
+（4）back()		//后退页面
+（5）maximize_window()	//最大化窗口
+（6）submit		//提交表单
 
 5.元素的属性：
-（1）tag_name                       //标签名
-（2）text                                //文本内容
+（1）tag_name		//标签名
+（2）text			//文本内容
 
 ###############################################################################
