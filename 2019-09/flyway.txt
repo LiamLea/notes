@@ -4,6 +4,13 @@
 1.flyway工作方式：
   从任何一个版本升级到最新的版本，升级的依据是自己编写的sql脚本
 
+2.migrate工作原理：
+  flyway每次执行migrate时，会检测数据库中的flyway_shcema_history
+  如果没有，会自动创建一张新的flyway_shcema_history表
+  如果有，flyway会逐一对比flyway_schema_history表中已存在的版本记录，
+    如果有未应用的migrations，flyway会获取这些migrations并按次序应用到数据库中
+    否则不需要做任何事
+
 2.flyway对sql脚本的命令要求： 版本号__版本描述.sql
 （1）版本号与版本描述之间，使用两个下划线
 （2）版本描述之间使用一个下划线分隔单词
