@@ -17,3 +17,20 @@
 （3）版本号必须唯一
 
 ###############################################################################
+flyway的使用
+
+1.修改 flyway-xx/conf/flayway.conf:
+  flyway.url=jdbc:mysql://地址/数据库名?参数		//设置数据库的驱动，即使用哪个数据库
+  flyway.user=xx					//设置数据库的用户
+  flyway.passowrd=xx				//设置数据库的密码
+
+2.执行flyway命令    
+#默认读取的是 flyway-xx/conf/flayway.conf 的配置文件，如果需要使用其他配置文件，使用-configFiles=xx指定
+#执行的sql脚本是在 flyway-xx/sql/ 下面和下面的文件夹中寻找
+
+（1）flyway migrate 			//执行sql脚本，将数据移入数据库
+（2）flyway clean			//清空数据库
+（3）flyway info			//查看数据库的情况和sql脚本执行的情况
+（4）flyway baseline			//在已有表的数据库中创建flyway_shcema_history表，然后再执行其他操作
+
+###############################################################################
