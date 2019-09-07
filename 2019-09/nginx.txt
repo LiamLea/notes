@@ -1,10 +1,24 @@
 ###############################################################################
 proxy_set_header Host $http_host;
 
+原http请求的Header中的Host字段也放到转发的请求里。
+如果不加这一行的话，Host字段为$proxy_host
+设置后 后端服务器可以通过 Host 头得知用户访问的真正的域名，能够实现动态拼接url
+
 proxy_set_header 允许重新定义或者添加发往后端服务器的请求头
-Host			的含义是表明请求的主机名
+Host			的含义是表明被请求的主机名
 X_Forward_For		字段表示该条http请求是有谁发起的
 $http_host		当前的主机
 $proxy_host		转发到的主机(默认请求头中的主机会被修改为转发到的主机）
+
+配置 nginx 代理服务后
+不设置时
+    请求头中的Host 是 proxy_pass 后面的值，即 $proxy_host 的值
+设置 proxy_set_header Host $http_host; 时
+    请求头中的 Host 包含浏览器请求的 IP 和端口
+设置 proxy_set_header Host $host；时
+    请求头中的 Host 是 $host 的值，没有端口信息
+设置 proxy_set_header Host $host:$proxy_port ；时
+    请求头中的Host 是 $host:$proxy_port 的值
 
 ###############################################################################
