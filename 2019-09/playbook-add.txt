@@ -24,6 +24,7 @@ roles
 
 3.roles的搜索路径在ansible.cfg中定义：
   如：roles_path = roles:/opt/dire/purist/ansible:/opt/dire/kolla-ansible/ansible/roles:.
+#在此路径下搜索相应的路径
 
 4.playbook调用角色的三种方法
 
