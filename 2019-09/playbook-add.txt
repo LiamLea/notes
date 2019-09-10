@@ -1,0 +1,48 @@
+###############################################################################
+roles
+
+1.基本概念
+  一个角色，有自己的tasks,handlers等
+
+2.角色的目录结构（下面的目录不是必须的）
+
+  角色名/
+  ├── files/			//存放由copy或script模块等调用的文件
+  │      
+  ├── templates/			//存放模板文件的目录
+  │
+  ├── vars/			//存放变量的目录，至少包含一个main.yml
+  │
+  ├── tasks/			//至少包含一个main.yml，其他文件需要在此文件中用include包含
+  │      └── main.yml   
+  │		
+  ├── handlers/			//至少包含一个main.yml   
+  │		
+  ├── meta/			//定义当前角色的特殊设定及其依赖关系,至少包含一个main.yml
+  │
+  └── default/			//设定默认变量时使用此目录中的main.yml文件
+
+3.roles的搜索路径在ansible.cfg中定义：
+  如：roles_path = roles:/opt/dire/purist/ansible:/opt/dire/kolla-ansible/ansible/roles:.
+
+4.playbook调用角色的三种方法
+
+（1）直接调用：
+  - hosts: websrvs
+    remote_user: root
+    roles:
+      - mysql
+      - memcached
+      - nginx
+
+（2）传递变量给role：
+  - hosts: 
+    remote_user:
+    roles:
+      - { role: nginx, username: nginx } 		//role用于指定角色名称；后续的k/v用于传递变量给角色
+
+（3）基于条件实现role调用：
+    roles:
+      - { role: nginx, when: "ansible_distribution_major_version == '7' " }
+
+###############################################################################
