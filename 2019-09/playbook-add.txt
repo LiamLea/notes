@@ -1,4 +1,19 @@
 ###############################################################################
+facts
+
+在使用 Ansible 对远程主机执行任何一个 playbook 之前，总会先通过 setup 模块获取 facts，
+并暂存在内存中，直至该 playbook 执行结束
+
+有时候又需要使用 facts 中的内容，这时候可以设置 facts 的缓存，在需要的时候直接读取缓存进行引用
+
+Ansible 的配置文件中可以修改 gathering 的值为 smart、implicit 或者 explicit。
+  smart 表示默认收集 facts，但 facts 已有的情况下不会收集，即使用缓存 facts；
+  implicit 表示默认收集 facts，要禁止收集，必须使用 gather_facts: False；
+  explicit 则表示默认不收集，要显式收集，必须使用 gather_facts: Ture
+
+Ansible 支持两种 facts 缓存：redis 和 jsonfile
+
+###############################################################################
 roles
 
 1.基本概念
