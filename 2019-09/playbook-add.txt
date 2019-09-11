@@ -47,3 +47,10 @@ roles
       - { role: nginx, when: "ansible_distribution_major_version == '7' " }
 
 ###############################################################################
+ansible-glaxy命令（提供别人写好的role的网站）
+
+ansible-glaxy list			//列出存在的角色，搜索路径在ansible.cfg中定义了
+ansible-glaxy install 角色名		//从网站获得角色，安装在~/.ansible/roles/目录下
+ansible-glaxy remove 角色名
+
+###############################################################################
