@@ -9,6 +9,24 @@
 
 3.ansible-doc -s 模块名	//s:snippet，显示该模块的参数及解释
 
+4.调试模块：debug
+  ansible all -m debug -a 'msg={{xx}}'
+
+5.内置变量
+  {{groups}}			//所有组的信息
+  {{group_names}}			//当前主机所在的组
+  {{inventory_hostname}}		//当前主机的主机名
+  {{inventory_hostname_short}}		//当前主机的主机名的第一部分
+  {{play_hosts}}			//当前playbook运行的主机信息
+  {{inventory_dir}}			//当前playbook使用的inventory目录
+  {{hostvars[xx][ansible_hostname]}}	//获取xx主机的ansible_hostname的变量
+
+6.变量的主要来源：
+  内置变量
+  facts中的变量
+  inventory中定义的变量
+  外部指定的变量
+
 ###############################################################################
 facts
 
@@ -46,7 +64,7 @@ roles
   │		
   ├── meta/			//定义当前角色的特殊设定及其依赖关系,至少包含一个main.yml
   │
-  └── default/			//设定默认变量时使用此目录中的main.yml文件
+  └── default/			//设定默认变量时使用此目录中的main.yml文件，当使用变量时，其他地方找不到，最后会在此main.yml中寻找
 
 3.roles的搜索路径在ansible.cfg中定义：
   如：roles_path = roles:/opt/dire/purist/ansible:/opt/dire/kolla-ansible/ansible/roles:.
