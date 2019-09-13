@@ -27,6 +27,35 @@
   inventory中定义的变量
   外部指定的变量
 
+7.变量的优先级：
+  -e > playbook里定义的 > 主机清单文件私有的 > 主机清单文件共有的
+
+8.模块的搜索路径（在ansible.cfg中定义）
+  library=xx
+
+9.Action插件与模块一起执行PlayBook任务所需的操作（插件的搜索路径在ansible.cfg中定义）
+  action_plugins=xx
+
+10.inventory指定一个目录（在ansible.cfg中设置）
+  inventory=xx				//会去xx目录下寻找主机清单文件
+  inventory_ignore_extensions= .bak, .ini, .conf	//会忽略xx目录下以这些结尾的文件
+  
+      xx
+       │
+       │—— 文件1		//在里面可设置清单信息（最终的主机信息，会把所有文件信息结合起来）
+       │       
+       │—— 文件2		//在里面可设置清单信息
+       │
+       │—— host_vars		//设置各主机的变量，文件名必须为主机名			
+       │           │
+       │           │—  主机名	//在里面定义该主机的变量
+       │           └──  ... ...
+       │
+       │—— group_vars	//设置各组的变量，文件名必须为组名
+                    │
+                    │—  主机名	//在里面定义该组的变量
+                    └──  ... ...
+
 ###############################################################################
 facts
 
@@ -51,14 +80,15 @@ roles
 2.角色的目录结构（下面的目录不是必须的）
 
   角色名/
+  │
+  ├── tasks/			//至少包含一个main.yml和具体的任务文件，用于说明调用哪些任务和调用的顺序
+  │      └── main.yml   		
+  │
   ├── files/			//存放由copy或script模块等调用的文件
   │      
   ├── templates/			//存放模板文件的目录
   │
   ├── vars/			//存放变量的目录，至少包含一个main.yml
-  │
-  ├── tasks/			//至少包含一个main.yml，其他文件需要在此文件中用include包含
-  │      └── main.yml   
   │		
   ├── handlers/			//至少包含一个main.yml   
   │		
@@ -89,6 +119,9 @@ roles
 （3）基于条件实现role调用：
     roles:
       - { role: nginx, when: "ansible_distribution_major_version == '7' " }
+
+5.在一个角色中调用另一个角色的某个任务
+  - include: roles/角色名/tasks/任务文件的任务
 
 ###############################################################################
 ansible-glaxy命令（提供别人写好的role的网站）
