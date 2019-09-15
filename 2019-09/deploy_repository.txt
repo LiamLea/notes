@@ -1,0 +1,10 @@
+1.首先导入环境变量（bootrc)
+2.解压所有的tar包
+3.apt/sit.sh
+  设置安装源，并安装python-pip,docker-ce,并启动docker
+4.server/sit.sh -> util.sh
+(1)spawn_network
+(2)set_env
+(3)install_docker_compose
+(4)up_servers
+(5)deploy_docker_certs
