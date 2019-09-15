@@ -26,6 +26,10 @@
   facts中的变量
   inventory中定义的变量
   外部指定的变量
+  与执行的playbook在同一目录下的变量目录（如：host_vars，group_vars）
+
+注意：host_vars目录下的变量文件必须为主机名
+          group_vars目录下的变量文件必须为组名
 
 7.变量的优先级：
   -e > playbook里定义的 > 主机清单文件私有的 > 主机清单文件共有的
