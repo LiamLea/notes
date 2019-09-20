@@ -1,0 +1,35 @@
+###############################################################################
+nexus
+
+1.online 
+  If checked, the repository accepts incoming requests   //如果选中，仓库接受传入的请求
+
+2.Strict Content Type Validation
+  验证上传的内容类型是否符合要求
+
+3.deployment policy
+  Allow redeploy     //客户端可以将组件部署到此存储库，并在后续部署中覆盖相同的组件
+
+###############################################################################
+harbor
+
+1.修改配置文件（harbor.yml)
+  将http注释掉，使用https
+
+2.创建私钥，把ca.crt给客户端即可访问harbor
+
+3.上传镜像
+  首先要标记镜像：仓库名/项目名/镜像名:版本
+  在harbor中创建相应的项目
+  docker push xx进行上传
+
+4.命令行访问harbor
+  curl -u "账号:密码" -XGET "https://ip地址/api/projects?" --insecure
+  curl -u "账号:密码" -XGET "https://ip地址/api/projects?project_name=xx" --insecure
+* curl -u "账号:密码" -XGET "https://ip地址/api/search?" --insecure
+  curl -u "账号:密码" -XGET "https://ip地址/api/search?q=xx" --insecure
+* curl -u "账号:密码" -XGET "https://ip地址/api/repositories/仓库名%2F镜像名/tags" --insecure
+  curl -u "账号:密码" -XPOST -H "Content-Type: application/json" "https://ip地址/api/projects" -d '{"project_name":"仓库名","public":1}' --insecure   //创建仓库
+
+
+###############################################################################
