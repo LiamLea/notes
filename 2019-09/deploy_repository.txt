@@ -8,3 +8,12 @@
 (3)install_docker_compose
 (4)up_servers
 (5)deploy_docker_certs
+
+
+kolla@nexus:~$ sudo mkdir /opt/dire
+kolla@nexus:~$ sudo tar -xf boot.tar.gz 
+kolla@nexus:~$ sudo mv ~/packages/ /opt/dire/
+kolla@nexus:~$ sudo mv ~/boot /opt/dire/
+kolla@nexus:~$ sudo vim /opt/dire/boot/tools/bootrc
+kolla@nexus:~$ cd /opt/dire/boot/
+kolla@nexus:/opt/dire/boot$ sudo bash tools/deploy.sh 
