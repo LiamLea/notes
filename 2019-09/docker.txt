@@ -4,10 +4,24 @@
 1.查看容器与真机绑定的端口号
   docker port xx		//xx为容器ip
 
-2.查看容器使用的外部存储
-  docker inspect xx		//查看   "Mounts":  这一项 
+2.查看容器使用的存储卷
+  docker inspect -f {{.Mounts}} xx		
 
 3.启动容器时利用 --net=xx 指定使用的网络模式
+
+4.如果使用虚拟交换机，虚拟网卡会创建一对，一个在虚拟机中，一个在虚拟交换机上
+
+5.如果虚拟机使用nat桥，可以在宿主机上查看nat的规则：iptables -t nat -vnL
+
+6.桥接模式和nat模式区别：
+  都是bridge模式
+  桥接模式不能与不同网段的通信(需要虚拟一个路由器），nat可以
+
+7.有两种存储卷
+（1）Dokcer-managed volume（由docker自动设置宿主机目录，目录为/var/lib/docker/volumes/容器id/_data)
+  -v 容器目录
+（2）Bind-mount volume
+  -v 宿主机目录:容器目录
 
 ###############################################################################
 基础
@@ -52,15 +66,21 @@ docker镜像
 ###############################################################################
 docker网络模式
 
-1.bridge模式
-  有一个虚拟交换机dokcer0，所有的容器都与docker0相连，通过docker0路由出去
+1.bridge模式（是一个nat桥）
+  有一个虚拟交换机dokcer0，所有的容器都与docker0相连，通过宿主机路由出去
+
+#修改bridge所在的网段：vim /etc/docker/daemon.json
+  {
+    "bip": "192.168.0.11/24"           //指定docker0桥的ip地址和其掩码
+  }
 
 2.host模式
-  如果启动容器使用host模式，那么该容器不会获得一个独立的Network Namespace，而是和宿主机共有一个
-  容器不会虚拟出自己的网卡，配置自己的ip等，而是使用宿舍机的ip和端口，其他的如文件系统还是隔离的
+  新创建的容器与宿主机共享一个netns
+  --network host
 
 3.container模式
-  这个模式指定新创建的容器和已经存在的一个容器共享一个 Network Namespace
+  新创建的容器和已经存在的一个容器共享一个netns
+  --network container:xx         //xx为已经存在的容器的名字
 
 4.none模式
   使用none模式，Docker容器拥有自己的Network Namespace，但是，并不为Docker容器进行任何网络配置。
@@ -73,8 +93,19 @@ docker网络模式
             获取完了后，会通过eth1进行通信
   工作原理：通过隧道的方式，源地址和目标地址不变
             再封装一层四层和三层报文，源地址为源宿主机地址，目标地址为目标宿主机地址
-            然后再进行二层等报文的封装
+            然后再进行二层等报文的封装779
 
 6.macvlan模式（实现容器跨主机通信）
+
+7.修改docker进程监听的端口，可以连接远程的docker服务端
+#vim /etc/dokcer/daemon.json
+  {
+    "hosts": ["tcp://0.0.0.0:2222","unix:///var/run/dokcer.sock"]         //默认只监听本机的docker.sock套接字
+  }
+
+  docker -H xx:2222 ps
+
+8.创建docker网络
+  docker network create -d 驱动 --subnet "xx" --gateway "xx" 网络的名字
 
 ###############################################################################
