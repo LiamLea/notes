@@ -95,7 +95,10 @@ docker网络模式
             再封装一层四层和三层报文，源地址为源宿主机地址，目标地址为目标宿主机地址
             然后再进行二层等报文的封装779
 
-6.macvlan模式（实现容器跨主机通信）
+6.macvlan模式（一定要允许混杂模式，如果是vm：真机 -> 虚拟交换机 -> 允许混杂模式）
+  docker network create -d macvlan --subnet=10.0.36.0/24 \
+  --ip-range=10.0.36.115/32 --gateway=10.0.36.254  \
+  -o parent=ens34 xx
 
 7.修改docker进程监听的端口，可以连接远程的docker服务端
 #vim /etc/dokcer/daemon.json
@@ -110,6 +113,8 @@ docker网络模式
 
 ###############################################################################
 macvlan通信     //子网掩码越长，路由优先级越高
+
+#这个方法只能解决宿主机和容器通信的问题，所以没什么用
 
 1.创建macvlan网络
   docker  network create -d macvlan --subnet 10.0.36.0/24 \
