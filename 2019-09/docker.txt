@@ -109,3 +109,19 @@ docker网络模式
   docker network create -d 驱动 --subnet "xx" --gateway "xx" 网络的名字
 
 ###############################################################################
+macvlan通信     //子网掩码越长，路由优先级越高
+
+1.创建macvlan网络
+  docker  network create -d macvlan --subnet 10.0.36.0/24 \
+  --ip-range 10.0.36.192/27 --aux-address 'host=10.0.36.223' \         //aux-address就是排除的ip地址，即不会进行分配
+  --gateway 10.0.36.254  -o parent=ens34 mynet
+
+2.创建一个新的macvlan接口，用于连接host和container
+  ip link add mynet-shim link ens34 type macvlan mode bridge     
+  ip addr add 10.0.36.223/32 dev mynet-shim
+  ip link set mynet-shim up
+
+3.添加路由信息
+  ip route add 10.0.36.192/27 dev mynet-shim
+
+###############################################################################
