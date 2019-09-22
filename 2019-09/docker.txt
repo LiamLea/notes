@@ -96,7 +96,9 @@ docker网络模式
             然后再进行二层等报文的封装779
 
 6.macvlan模式（一定要允许混杂模式，如果是vm：真机 -> 虚拟交换机 -> 允许混杂模式）
-  docker network create -d macvlan --subnet=10.0.36.0/24 \
+  允许在同一个物理网卡上配置多个 MAC 地址，即多个 interface，每个 interface 可以配置自己的 IP
+  一个网卡只能用于一个macvlan网络（不能用于其他，也不能有ip），一个macvlan网络可以分配多个ip地址
+docker network create -d macvlan --subnet=10.0.36.0/24 \
   --ip-range=10.0.36.115/32 --gateway=10.0.36.254  \
   -o parent=ens34 xx
 
