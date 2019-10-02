@@ -1,0 +1,260 @@
+###############################################################################
+neutron中的三个网桥
+
+1.br-ex（external）
+  连接外部网络的网桥，会与一个网卡绑定，由于外出的出口
+
+2.br-int（integration)
+  集成网桥，所有 instance 的虚拟网卡和其他虚拟网络设备都将连接到该网桥
+
+3.br-tun（tunnel）
+  隧道网桥，基于隧道技术的 VxLAN 和 GRE 网络将使用该网桥进行通信
+
+注意：计算节点上也有 br-int 和 br-tun，但没有 br-ex
+          所以，有br-ex网桥的节点上，要多一张网卡，用于对外连接
+
+###############################################################################
+neutron（部署在controller-node,compute-node和network-node上，服务类型：network）
+
+在controller-node上操作
+
+1.对数据库操作
+  创建名为neutron的数据库和用户，neutron用户有neutron数据库的权限
+
+2.在keystone中创建neutron用户，并授权具有service的管理员权限
+  source admin-openrc.sh
+  openstack user create --password-prompt neutron
+  openstack role add --project service --user neutron admin
+
+3.在keystone创建neutron服务和相应的endpoint
+  openstack service create --name neutron --description 'xx' network
+  openstack endpoint create \
+  --publicurl http://xx:9696 \
+  --internalurl http://xx:9696 \
+  --adminurl http://xx:9696 \
+  --region RegionOne \
+  network
+
+4.安装neutron组件
+  openstack-neutron
+  openstack-neutron-ml2           //二层交换的一个插件
+  python-neutronclientwhich     //neutron的客户端
+
+5.配置neutron
+（1）/etc/neutron/neutron.conf
+  [DEFAULT]
+  verbose=True
+  rpc_backend=rabbit
+  auth_strategy=keystone
+  core_plugin=ml2
+  service_plugins=router
+  allow_overlapping_ips=True
+  notify_nova_on_port_status_changes=True
+  notify_nova_on_port_data_changes=True
+
+  [oslo_messaging_rabbit]
+  rabbit_host=xx
+  rabbit_userid=xx
+  rabbit_password=xx
+
+  [database]
+  connection=mysql://neutron:xx@xx//neutron
+
+  [keystone_authtoken]                //配置keystone的信息
+  auth_uri=http://xx:5000
+  auth_uri=http://xx:35357
+  auth_plugin=password
+  project_domain_id=default
+  user_domain_id=default
+  project_name=service
+  username=glance
+  password=xx
+
+  [nova]
+  auth_url=http://xx:35357
+  auth_plugin=password
+  project_domain_id=default
+  user_domain_id=default
+  region_name=RegionOne
+  project_name=service
+  username=nova
+  password=xx
+
+（2）/etc/neutron/plugins/ml2/ml2_conf.ini
+  [ml2]
+  type_drivers=flat,gre,vxlan
+  tenant_network_types=gre
+  mechanism_drivers=openvseitch
+
+  [ml2_type_gre]
+  tunnel_id_ranges=1:1000
+
+  [securitygroup]
+  enable_security_group=True
+  enable_ipset=True
+  firewall_driver=neutron.agent.linux.iptables_firewall,OVSHybridIptablesFirewallDriver
+
+#ln -s /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini
+
+6.配置nova：/etc/nova/nova.conf
+#添加相应的配置项目
+  [DEFAULT]
+  network_api_class=nova.network.neutronv2.api.API
+  security_group_api=neutron
+  linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
+  firewall_driver=nova.virt.firewall.NoopFirewallDriver
+
+  [neutron]
+  url=http://xx:9696
+  auth_strategy=keystone
+  admin_auth_url=http://controller:35357/v2.0
+  admin_tenant_name=service
+  admin_username=neutron
+  admin_password=xx
+
+7.初始化neutron数据库
+  su -c 'neutron-db-manage  --config-file /etc/neutron/neutron.conf \
+  --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head' neutron
+
+8.重启nova服务：openstack-nova-api.service，openstack-nova-scheduler.service，openstack-nova-conductor.service
+
+8.启动neutron服务：neutron-server.service
+
+9.验证安装了哪些插件
+  source admin-openrc.sh
+  neutron ext-list
+
+###############################################################################
+在network-node上操作
+
+1.修改系统网络参数：/etc/sysctl.conf
+  net.ipv4.ip_forward=1
+  net.ipv4.conf.all.rp_filter=0             //关闭反向路径过滤
+  net.ipv4.conf.default.rp_filter=0
+#sysctl -p
+
+2.安装neutron组件
+  openstack-neutron
+  openstack-neutron-ml2
+  openstack-neutron-openvswitch
+
+3.修改neutron配置：/etc/neutron/neutron.conf
+
+###############################################################################
+在compute-node上的操作
+
+1.修改系统网络参数：/etc/sysctl.conf
+  net.ipv4.conf.all.rp_filter=0
+  net.ipv4.conf.default.rp_filter=0
+  net.bridge.bridge-nf-call-iptables=1
+  net.bridge.bridge-nf-call-ip6tables=1
+#sysctl -p
+
+2.安装neutron组件
+  openstack-neutron
+  openstack-neutron-ml2
+  openstack-neutron-openvswitch
+
+3.修改neutron配置：
+（1）/etc/neutron/neutron.conf
+  [DEFAULT]
+  verbose=True
+  rpc_backend=rabbit
+  auth_strategy=keystone
+  core_plugin=ml2
+  service_plugins=router
+  allow_overlapping_ips=True
+
+  [oslo_messaging_rabbit]
+  rabbit_host=xx
+  rabbit_userid=xx
+  rabbit_password=xx
+
+  [keystone_authtoken]                //配置keystone的信息
+  auth_uri=http://xx:5000
+  auth_uri=http://xx:35357
+  auth_plugin=password
+  project_domain_id=default
+  user_domain_id=default
+  project_name=service
+  username=glance
+  password=xx
+
+（2）/etc/neutron/plugins/ml2/ml2_conf.ini
+  [ml2]
+  type_drivers=flat,gre,vxlan
+  tenant_network_types=gre
+  mechanism_drivers=openvseitch
+
+  [ml2_type_gre]
+  tunnel_id_ranges=1:1000
+
+  [securitygroup]
+  enable_security_group=True
+  enable_ipset=True
+  firewall_driver=neutron.agent.linux.iptables_firewall,OVSHybridIptablesFirewallDriver
+
+  [ovs]
+  local_ip=xx
+  
+  [agent]
+  tunnel_types=gre
+
+#ln -s /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini
+
+4.配置nova：/etc/nova/nova.conf
+#添加相应的配置项目
+  [DEFAULT]
+  network_api_class=nova.network.neutronv2.api.API
+  security_group_api=neutron
+  linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
+  firewall_driver=nova.virt.firewall.NoopFirewallDriver
+
+  [neutron]
+  url=http://xx:9696
+  auth_strategy=keystone
+  admin_auth_url=http://controller:35357/v2.0
+  admin_tenant_name=service
+  admin_username=neutron
+  admin_password=xx
+
+5.修改openvswitch-agent服务的启动文件
+  sed -i 's,pulgins/openvswitch/ovs_neutron_plugin.ini,plugin.ini,g' /usr/lib/systemd/system/neutron-openvswitch-agent.service
+
+6.启动服务
+  openvswitch.service
+  openstack-nova-compute.service
+  neutron-openvswitch-agent.service
+
+###############################################################################
+创建网络
+
+1.创建ext网络（external)
+  source admin-openrc.sh
+  neutron net-create --router:external --privider:physical_network external --provider:network_type flat  ext-net
+
+2.创建ext网络的子网
+  neutron subnet-create ext-net 网段 \
+  --name ext-subnet \
+  --allocation-pool start=ip地址，end=ip地址 \
+  --disable-dhcp --gateway xx 
+#这里的网段，是根据网络节点没有配置ip的网卡所在的网段设置的
+
+3.创建租户网络
+  source demo-openrc.sh
+  neutron net-create demo-net
+
+4.创建租户网络的子网
+  neutron subnet-create demo-net 网段 \
+  --name demo-subnet \
+  --dns-nameserver xx --gateway xx 
+#这里的网段随便写，只要与现有的不冲突即可
+
+5.创建路由器
+  neutron router-create demo-router
+  neutron router-interface-add demo-router demo-subnet     //将租户网路与路由器相连
+  neutron router-interface-add router-gateway-set demo-router ext-net
+
+6.设置安全组
+
+###############################################################################

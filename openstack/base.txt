@@ -1,4 +1,15 @@
 ###############################################################################
+基础
+
+1.网络节点至少需要两张网卡：一张用于内部通信，一张用于连接外网
+2.基础架构：
+    controller-node：keystone，nova，glance，cinder，neutron，swift，horizon，rabbitmq，mariadb
+    compute-node：nova，qemu，neutron，openVSwitch
+    network-node：neutron，openVSwitch
+    block-node：cinder
+    object-node：swift
+
+###############################################################################
 
 1.新了解的组件：
   ceilometer被一分为四
@@ -12,18 +23,10 @@
   fluentd，负责日志的收集，存储和查询
 
 ###############################################################################
-neutron中的三个网桥
+基础组件（安装在controller-node上）
 
-1.br-ex（external）
-  连接外部网络的网桥，会与一个网卡绑定，由于外出的出口
+1.mariadb
 
-2.br-int（integration)
-  集成网桥，所有 instance 的虚拟网卡和其他虚拟网络设备都将连接到该网桥
-
-3.br-tun（tunnel）
-  隧道网桥，基于隧道技术的 VxLAN 和 GRE 网络将使用该网桥进行通信
-
-注意：计算节点上也有 br-int 和 br-tun，但没有 br-ex
-          所以，有br-ex网桥的节点上，要多一张网卡，用于对外连接
+2.rabbitmq
 
 ###############################################################################
