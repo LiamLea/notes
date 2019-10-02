@@ -1,0 +1,60 @@
+###############################################################################
+glance（部署在controller-node上，服务类型：image）
+
+1.对数据库操作
+  创建名为glance的数据库和用户，glance用户有glance数据库的权限
+
+2.在keystone中创建glance用户，并授权具有service的管理员权限
+  source admin-openrc.sh
+  openstack user create --password-prompt glance
+  openstack role add --project service --user glance admin      //admin是之前创建的角色
+
+3.在keystone中创建glance服务和相应的endpoint
+  openstack service create --name glance --description 'xx' image
+  openstack endpoint create \
+  --publicurl http://xx:9292 \
+  --internalurl http://xx:9292 \
+  --adminurl http://xx:9292 \
+  --region RegionOne \
+  image
+
+4.安装glance组件
+
+5.配置glance
+(1) vim /etc/glance/glance-api.conf
+  [DEFAULT]
+  verbose=True
+  notification_driver=noop
+
+  [database]
+  connection=mysql://xx:xx@xx/glance
+
+  [keystone_authtoken]
+  auth_uri=http://xx:5000
+  auth_uri=http://xx:35357
+  auth_plugin=password
+  project_domain_id=default
+  user_domain_id=default
+  project_name=service
+  username=glance
+  password=xx
+
+  [paste_deploy]
+  flavor=keystone
+
+  [glance_store]            //设置存储镜像的位置，这里是文件方式存储
+  default_store=file
+  filesystem_store_datadir=/var/lib/glance/images/
+
+(2) vim /etc/glance/glance-registry.conf        //和上面的配置一样
+
+6.初始化glance数据库
+  su -c 'glance-manage db_sync' glance
+
+7.启动glance服务：openstack-glance-api.service 和 openstack-glance-registry.service
+
+8.上传镜像
+  glance image-create --name 'xx' --file xx.img --disk-format xx --container-format bare --visibilty public --progress
+  openstack image list
+
+###############################################################################
