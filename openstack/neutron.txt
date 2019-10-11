@@ -40,8 +40,7 @@ neutron（部署在controller-node,compute-node和network-node上，服务类型
   openstack-neutron-ml2           //二层交换的一个插件
   python-neutronclientwhich     //neutron的客户端
 
-5.配置neutron
-（1）/etc/neutron/neutron.conf
+5.配置neutron：/etc/neutron/neutron.conf
   [DEFAULT]
   verbose=True
   rpc_backend=rabbit
@@ -80,7 +79,7 @@ neutron（部署在controller-node,compute-node和network-node上，服务类型
   username=nova
   password=xx
 
-（2）/etc/neutron/plugins/ml2/ml2_conf.ini
+6.配置ml2插件：/etc/neutron/plugins/ml2/ml2_conf.ini
   [ml2]
   type_drivers=flat,gre,vxlan
   tenant_network_types=gre
@@ -96,7 +95,7 @@ neutron（部署在controller-node,compute-node和network-node上，服务类型
 
 #ln -s /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini
 
-6.配置nova：/etc/nova/nova.conf
+7.配置nova：/etc/nova/nova.conf
 #添加相应的配置项目
   [DEFAULT]
   network_api_class=nova.network.neutronv2.api.API
@@ -112,15 +111,15 @@ neutron（部署在controller-node,compute-node和network-node上，服务类型
   admin_username=neutron
   admin_password=xx
 
-7.初始化neutron数据库
+8.初始化neutron数据库
   su -c 'neutron-db-manage  --config-file /etc/neutron/neutron.conf \
   --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head' neutron
 
-8.重启nova服务：openstack-nova-api.service，openstack-nova-scheduler.service，openstack-nova-conductor.service
+9.重启nova服务：openstack-nova-api.service，openstack-nova-scheduler.service，openstack-nova-conductor.service
 
-8.启动neutron服务：neutron-server.service
+10.启动neutron服务：neutron-server.service
 
-9.验证安装了哪些插件
+11.验证安装了哪些插件
   source admin-openrc.sh
   neutron ext-list
 
@@ -139,6 +138,116 @@ neutron（部署在controller-node,compute-node和network-node上，服务类型
   openstack-neutron-openvswitch
 
 3.修改neutron配置：/etc/neutron/neutron.conf
+ [DEFAULT]
+  verbose=True
+  rpc_backend=rabbit
+  auth_strategy=keystone
+  core_plugin=ml2
+  service_plugins=router
+  allow_overlapping_ips=True
+
+  [oslo_messaging_rabbit]
+  rabbit_host=xx
+  rabbit_userid=xx
+  rabbit_password=xx
+
+
+  [keystone_authtoken]                //配置keystone的信息
+  auth_uri=http://xx:5000
+  auth_uri=http://xx:35357
+  auth_plugin=password
+  project_domain_id=default
+  user_domain_id=default
+  project_name=service
+  username=glance
+  password=xx
+
+4.配置ml2插件：/etc/neutron/plugins/ml2/ml2_conf.ini
+  [ml2]
+  type_drivers=flat,gre,vxlan
+  tenant_network_types=gre
+  mechanism_drivers=openvseitch
+
+  [ml2_type_flat]
+  flat_networks=external
+
+  [ml2_type_gre]
+  tunnel_id_ranges=1:1000
+
+  [securitygroup]
+  enable_security_group=True
+  enable_ipset=True
+  firewall_driver=neutron.agent.linux.iptables_firewall,OVSHybridIptablesFirewallDriver
+
+  [ovs]
+  local_ip=xx
+  bridge_mappings=external:br-ex
+
+  [agent]
+  tunnel_types=gre
+
+#ln -s /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini
+
+5.配置ml3插件：/etc/neutron/l3_agent.ini
+  [DEFAULT]
+  verbose=True
+  rpc_backend=rabbit
+  auth_strategy=keystone
+  core_plugin=ml2
+  service_plugins=router
+  allow_overlapping_ips=True
+
+6.配置dhcp插件：/etc/neutron/dhcp_agent.ini
+  verbose=True
+  interface_driver=neutron.agent.linux.interface.OVSInterfaceDriver
+  dhcp_driver=neutron.agent.linux.dhcp.Dnsmasq
+  dhcp_delete_namespaces=True
+  dnsmasq_config_file=/etc/neutron/dnsmasq-neutron.conf
+
+7.创建dnsmasq-neutron.conf
+  dhcp-option-force=26,1454
+
+8.配置元数据插件：/etc/neutron/metadata_agent.ini
+  [DEFAULT]
+  verbose=True
+  auth_uri=http://xx:5000
+  auth_uri=http://xx:35357
+  auth_region-RegionOne
+  auth_plugin=password
+  project_domain_id=default
+  user_domain_id=default
+  project_name=service
+  username=neutron
+  password=xx
+  nova_metadata_ip=xx         //控制节点ip
+  metadata_proxy_shared_secret=xx
+
+9.配置nova.conf（在controller-node上配置）
+#增加内容
+  [neutron]
+  service_metadata_proxy=True
+  metadata_proxy_shared_secret=xx      //与上面一致
+
+10.重启nova服务
+  openstack-nova-api.service
+  openstack-nova-scheduler.service
+  openstack-nova-conductor.service
+
+11.启动openvswitch服务
+
+12.创建虚拟交换机
+  ovs-ctl add-br br-ex
+
+13.添加网卡到虚拟交换机
+  ovs-ctl add-port br-ex 网卡名
+
+14.启动服务
+  sed -i 's,pulgins/openvswitch/ovs_neutron_plugin.ini,plugin.ini,g' /usr/lib/systemd/system/neutron-openvswitch-agent.service
+  neutron-openvswitch-agent.service
+  neutron-l3-agent.service
+  neutron-dhcp-agent.service
+  neutron-metadata-agent.service
+  neutron-ovs-cleanup.service
 
 ###############################################################################
 在compute-node上的操作

@@ -145,3 +145,15 @@ keystone（安装在controller-node上，服务类型：identity）
   source admin-openrc.sh
 
 ###############################################################################
+配置文件
+
+1./usr/share/keystone/keystone-dist-paste.ini
+  应用配置文件，定义哪些模块需要加载，请求要经过哪些过滤器过滤
+
+2./etc/keystone/logging.conf
+  日志组件配置文件，定义日志的级别和格式等
+
+3./etc/openstack/policy.json
+  定义keystone内部模块的访问鉴权配置
+
+###############################################################################

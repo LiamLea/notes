@@ -1,0 +1,160 @@
+###############################################################################
+cinder安装
+
+一.在controller-node上操作
+
+1.创建名为cinder的数据库和用户
+
+2.在keystone中创建cinder用户，并授予具有service项目的管理员权限
+  source /root/admin-openrc.sh
+  openstack user create --password-prompt cinder
+  openstack role add --project service --user cinder admin
+
+3.在keystone中创建volume服务，并创建相应的endpoint
+  openstack service create --name cinder \
+  --description "OpenStack Block Storage" volume
+
+  openstack service create --name cinderv2 \
+  --description "OpenStack Block Storage" volumev2
+
+  openstack endpoint create \
+  --publicurl http://controller:8776/v2/%\(tenant_id\)s \
+  --internalurl http://controller:8776/v2/%\(tenant_id\)s \
+  --adminurl http://controller:8776/v2/%\(tenant_id\)s \
+  --region RegionOne \
+  volume
+
+  openstack endpoint create \
+  --publicurl http://controller:8776/v2/%\(tenant_id\)s \
+  --internalurl http://controller:8776/v2/%\(tenant_id\)s \
+  --adminurl http://controller:8776/v2/%\(tenant_id\)s \
+  --region RegionOne \
+  volumev2
+ 
+3.安装cinder组件
+  openstack-cinder python-cinderclient python-oslo-db
+
+4.修改配置文件：/etc/cinder/cinder.conf
+chown -R cinder:cinder /etc/cinder/cinder.conf
+
+  [DEFAULT]
+  verbose = True
+  rpc_backend = rabbit
+  auth_strategy = keystone
+  my_ip = xx
+
+  [database]
+  connection = mysql://cinder:xx@xx/cinder
+
+  [oslo_messaging_rabbit]
+  rabbit_host = xx
+  rabbit_userid = xx
+  rabbit_password = xx
+
+  [keystone_authtoken]
+  auth_uri = http://xx:5000
+  auth_url = http://xx:35357
+  auth_plugin = password
+  project_domain_id = default
+  user_domain_id = default
+  project_name = service
+  username = cinder
+  password = xx
+
+  [oslo_concurrency]
+  lock_path = /var/lock/cinder
+
+5.数据初始化
+  su -c "cinder-manage db sync" cinder
+
+6.启动服务
+  openstack-cinder-api.service 
+  openstack-cinder-scheduler.service
+
+二.在block-node-01上操作
+
+1.安装支持包：qemu  lvm2 
+
+2.启动服务
+   lvm2-lvmetad.service
+
+3.创建逻辑卷
+
+4.修改lvm服务配置：/etc/lvm/lvm.conf 
+  devices {
+    filter = [ "a/sda/", "a/sdb/", "r/.*/"]
+  }
+
+5.重启lvm服务
+
+6.安装cinder组件：openstack-cinder targetcli python-oslo-db python-oslo-log MySQL-python
+
+7.配置cinder：/etc/cinder/cinder.conf
+
+  [DEFAULT]
+  rpc_backend = rabbit
+  auth_strategy = keystone
+  my_ip = xx
+  enabled_backends = lvm
+  glance_host = xx
+  verbose = True
+
+  [oslo_messaging_rabbit]
+  rabbit_host = xx
+  rabbit_userid = xx
+  rabbit_password = xx
+
+  [database]
+  connection = mysql://cinder:xx@xx/cinder
+
+  [keystone_authtoken]
+  auth_uri = http://xx:5000
+  auth_url = http://xx:35357
+  auth_plugin = password
+  project_domain_id = default
+  user_domain_id = default
+  project_name = service
+  username = cinder
+  password = xx
+
+  [lvm]
+  volume_driver = cinder.volume.drivers.lvm.LVMVolumeDriver
+  volume_group = xx          //卷组名
+  iscsi_protocol = iscsi
+  iscsi_helper = lioadm
+
+  [oslo_concurrency]
+  lock_path = /var/lock/cinder
+
+8.创建文件夹
+  mkdir -p /var/lock/cinder
+  chown cinder:cinder /var/lock/cinder
+
+9.启动cinder服务
+  openstack-cinder-volume.service 
+  target.service
+ 
+10.验证
+  echo "export OS_VOLUME_API_VERSION=2" | tee -a admin-openrc.sh demo-openrc.sh
+  source /root/admin-openrc.sh
+  cinder service-list
+  
+  cinder create --name demo-volume1 1
+  cinder list
+
+###############################################################################
+cinder架构
+
+1.cinder-api
+  负责接收和处理Rest请求，并将请求放入rabbitmq队列
+
+2.cinder-scheduler
+  处理rabbitmq队列中的任务，并根据预定策略选择合适的volume service节点来执行任务
+
+3.cinder-volume
+  该服务运行在存储节点上，每个存储节点都有一个volume service，若干个这样的存储节点联合起来可以构成一个存储资源池
+
+4.volume provider
+  用来连接不同类型和型号的存储
+
+###############################################################################
