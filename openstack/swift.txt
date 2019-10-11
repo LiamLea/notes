@@ -1,0 +1,259 @@
+###############################################################################
+swift安装
+
+一.在controller-node上操作
+
+1.在keystone中创建swift账号，并赋予service项目的管理员权限
+  source /root/admin-openrc.sh
+  openstack user create --password-prompt swift
+  openstack role add --project service --user swift admin
+
+2.创建object_store服务和相应的endpoint
+  openstack service create --name swift \
+  --description "OpenStack Object Storage" object-store
+
+  openstack endpoint create \
+  --publicurl 'http://controller:8080/v1/AUTH_%(tenant_id)s' \
+  --internalurl 'http://controller:8080/v1/AUTH_%(tenant_id)s' \
+  --adminurl http://controller:8080 \
+  --region RegionOne \
+  object-store
+
+3.安装swift组件
+  openstack-swift-proxy python-swiftclient python-keystoneclient  python-keystonemiddleware memcached
+
+4.下载配置文件模板
+  curl -o /etc/swift/proxy-server.conf \
+  https://git.openstack.org/cgit/openstack/swift/plain/etc/proxy-server.conf-sample?h=stable/kilo
+
+5.修改配置文件：/etc/swift/proxy-server.conf
+
+  [DEFAULT]
+  bind_port = 8080
+  user = swift
+  swift_dir = /etc/swift
+
+  [pipeline:main]
+  pipeline = catch_errors gatekeeper healthcheck proxy-logging cache container_sync bulk ratelimit authtoken keystoneauth container-quotas account-quotas slo dlo proxy-logging proxy-server
+
+  [app:proxy-server]
+  use = egg:swift#proxy
+  account_autocreate = true
+
+  [filter:keystoneauth]
+  use = egg:swift#keystoneauth
+  operator_roles = admin,user
+
+  [filter:healthcheck]
+  use = egg:swift#healthcheck
+
+  [filter:authtoken]
+  paste.filter_factory = keystonemiddleware.auth_token:filter_factory
+  auth_uri = http://xx:5000
+  auth_url = http://xx:35357
+  auth_plugin = password
+  project_domain_id = default
+  user_domain_id = default
+  project_name = service
+  username = swift
+  password = xx
+  delay_auth_decision = true
+
+  [filter:cache]
+  memcache_servers = 127.0.0.1:11211
+
+二.在obejct-node-01上操作
+
+1.安装系统组件：xfsprogs rsync
+
+2.格式化磁盘
+  fdisk /dev/sdb
+  fdisk /dev/sdc
+  mkfs.xfs /dev/sdb1
+  mkfs.xfs /dev/sdc1
+
+3.创建文件夹
+  mkdir -p /srv/node/sdb1
+  mkdir -p /srv/node/sdc1
+
+4.修改配置文件：/etc/fstab
+  /dev/sdb1 /srv/node/sdb1 xfs noatime,nodiratime,nobarrier,logbufs=8 0 2
+  /dev/sdc1 /srv/node/sdc1 xfs noatime,nodiratime,nobarrier,logbufs=8 0 2
+
+5.挂载磁盘到文件夹
+  mount /srv/node/sdb1
+  mount /srv/node/sdc1
+
+6.修改文件同步服务：/etc/rsyncd.conf
+
+  uid = swift
+  gid = swift
+  log file = /var/log/rsyncd.log
+  pid file = /var/run/rsyncd.pid
+  address = MANAGEMENT_INTERFACE_IP_ADDRESS
+
+  [account]
+  max connections = 2
+  path = /srv/node/
+  read only = false
+  lock file = /var/lock/account.lock
+
+  [container]
+  max connections = 2
+  path = /srv/node/
+  read only = false
+  lock file = /var/lock/container.lock
+
+  [object]
+  max connections = 2
+  path = /srv/node/
+  read only = false
+  lock file = /var/lock/object.lock
+
+7.启动文件同步服务：rsyncd.service
+
+8.安装swift组件
+  openstack-swift-account 
+  openstack-swift-container 
+  openstack-swift-object
+
+9.下载swift配置文件模板
+curl -o /etc/swift/account-server.conf \
+https://git.openstack.org/cgit/openstack/swift/plain/etc/account-server.conf-sample?h=stable/kilo
+curl -o /etc/swift/container-server.conf \
+https://git.openstack.org/cgit/openstack/swift/plain/etc/containerserver.conf-sample?h=stable/kilo
+curl -o /etc/swift/object-server.conf \
+https://git.openstack.org/cgit/openstack/swift/plain/etc/object-server.conf-sample?h=stable/kilo
+curl -o /etc/swift/container-reconciler.conf \
+https://git.openstack.org/cgit/openstack/swift/plain/etc/containerreconciler.conf-sample?h=stable/kilo
+curl -o /etc/swift/object-expirer.conf \
+https://git.openstack.org/cgit/openstack/swift/plain/etc/object-expirer.conf-sample?h=stable/kilo
+curl -o /etc/swift/swift.conf \
+https://git.openstack.org/cgit/openstack/swift/plain/etc/swift.conf-sample?h=stable/kilo
+
+10.配置swift：/etc/swift/account-server.conf
+
+  [DEFAULT]
+  bind_ip = 本机IP
+  bind_port = 6002
+  user = swift
+  swift_dir = /etc/swift
+  devices = /srv/node
+
+  [pipeline:main]
+  pipeline = healthcheck recon account-server
+
+  [filter:healthcheck]
+  use = egg:swift#healthcheck
+
+  [filter:recon]
+  use = egg:swift#recon
+  recon_cache_path = /var/cache/swift
+
+11.配置swift：/etc/swift/container-server.conf
+
+  [DEFAULT]
+  bind_ip = 本机IP
+  bind_port = 6001
+  user = swift
+  swift_dir = /etc/swift
+  devices = /srv/node
+
+  [pipeline:main]
+  pipeline = healthcheck recon container-server
+
+  [filter:healthcheck]
+  use = egg:swift#healthcheck
+
+  [filter:recon]
+  use = egg:swift#recon
+  recon_cache_path = /var/cache/swift
+
+12.配置swift：/etc/swift/object-server.conf
+
+  [DEFAULT]
+  bind_ip = 本机IP
+  bind_port = 6000
+  user = swift
+  swift_dir = /etc/swift
+  devices = /srv/node
+
+  [pipeline:main]
+  pipeline = healthcheck recon object-server
+
+  [filter:healthcheck]
+  use = egg:swift#healthcheck
+
+  [filter:recon]
+  use = egg:swift#recon
+  recon_cache_path = /var/cache/swift
+  recon_lock_path = /var/lock
+
+12.配置swift：/etc/swift/swift.conf
+备注：HASH_PATH_SUFFIX 和 HASH_PATH_PREFIX 分别用openssl rand -hex 10命令生成。
+
+  [swift-hash]
+  swift_hash_path_suffix = HASH_PATH_SUFFIX
+  swift_hash_path_prefix = HASH_PATH_PREFIX
+
+  [storage-policy:0]
+  name = Policy-0
+  default = yes
+
+13.文件夹授权
+  chown -R swift:swift /srv/node
+  mkdir -p /var/cache/swift
+  chown -R swift:swift /var/cache/swift
+  chown -R swift:swift /etc/swift
+ 
+三.在object-node-02上操作
+  跟node-01一样
+
+四.在controller-node上操作
+1.创建帐号环（accounting ring）
+  swift-ring-builder account.builder create 10 3 1
+  swift-ring-builder account.builder add r1z1-192.168.1.34:6002/sdb1 100
+  swift-ring-builder account.builder add r1z1-192.168.1.34:6002/sdc1 100
+  swift-ring-builder account.builder add r1z2-192.168.1.35:6002/sdb1 100
+  swift-ring-builder account.builder add r1z2-192.168.1.35:6002/sdc1 100
+  swift-ring-builder account.builder
+  swift-ring-builder account.builder rebalance
+
+2.创建容器环（container ring）
+  swift-ring-builder container.builder create 10 3 1
+  swift-ring-builder container.builder create 10 3 1
+  swift-ring-builder container.builder add r1z1-192.168.1.34:6001/sdb1 100
+  swift-ring-builder container.builder add r1z1-192.168.1.34:6001/sdc1 100
+  swift-ring-builder container.builder add r1z2-192.168.1.35:6001/sdb1 100
+  swift-ring-builder container.builder add r1z2-192.168.1.35:6001/sdc1 100
+  swift-ring-builder container.builder
+  swift-ring-builder container.builder rebalance
+
+3.创建对象环（object ring）
+  swift-ring-builder object.builder create 10 3 1
+  swift-ring-builder object.builder create 10 3 1
+  swift-ring-builder object.builder add r1z1-192.168.1.34:6000/sdb1 100
+  swift-ring-builder object.builder add r1z1-192.168.1.34:6000/sdc1 100
+  swift-ring-builder object.builder add r1z2-192.168.1.35:6000/sdb1 100
+  swift-ring-builder object.builder add r1z2-192.168.1.35:6000/sdc1 100
+  swift-ring-builder object.builder
+  swift-ring-builder object.builder rebalance
+
+4.启动服务
+  openstack-swift-account.service                    
+  openstack-swift-account-auditor.service
+  openstack-swift-account-reaper.service        
+  openstack-swift-account-replicator.service
+
+  openstack-swift-container.service 
+  openstack-swift-container-auditor.service 
+  openstack-swift-container-replicator.service 
+  openstack-swift-container-updater.service
+
+  openstack-swift-object.service 
+  openstack-swift-object-auditor.service 
+  openstack-swift-object-replicator.service 
+  openstack-swift-object-updater.service
+
+
+###############################################################################

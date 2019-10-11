@@ -1,0 +1,24 @@
+###############################################################################
+
+1.安装openstack-dashboard
+
+2.修改配置文件：/etc/openstack-dashboard/local_settings
+  import sys
+  reload(sys)
+  sys.setdefaultencoding('utf8')
+  OPENSTACK_HOST='xx'        //xx为所在的ip地址
+  ALLOWED_HOSTS=['*']
+  CACHES={
+    'default':{
+    'BACKEND':'django.core.cache.backends.memcached.MemcachedCache',
+    'LOCATION':'127.0.0.1:11211',       //这个为memcached的地址
+    }
+  }
+  OPENSTACK_KEYSTONE_DEFAULT_ROLE="user"
+  TIME_ZONE="Asia/Shanghai"
+
+3.系统权限配置
+  chown -R apache:apache /usr/share/openstack-dashboard/static
+  systemctl restart httpd memcached
+
+###############################################################################
