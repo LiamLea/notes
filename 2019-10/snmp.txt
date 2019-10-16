@@ -1,0 +1,72 @@
+###############################################################################
+基础概念
+
+1.mib：management information base，管理信息库
+
+2.oid：object identity，对象标识符（树状结构）
+  用来标识系统内的各种资源（即监控点），是一棵树
+
+3.community：共同体名 
+  就是口令，用于访问snmp存放数据的mib
+  有两种权限划分：只读 和 读写
+如：rocommunity xx	     //只要口令是xx，都是只读共同体  
+
+4.v3三种安全级别（认证即对身份进行认证，加密即对信息进行加密，就不需要共同体名了）
+  noAuthNoPriv           //不认证也不加密
+  authNoPriv               //认证但是不加密
+  authPriv                   //既认证又加密
+
+5.v2c和v3的区别
+  v2c      //明文传输，团体名进行安全机制管理，简单
+  v3       //基于用户的安全模型（认证和加密），开销大
+
+6.USM：user-based security model
+
+###############################################################################
+配置
+
+1.注释com2sec和access
+
+2.配置视图
+  view  systemview  included   .1        //可以查看所有的oid
+
+3.配置共同体
+  rocommunity  xx  [xx1]  [xx2]            //xx为共同体名
+                                                         //xx1为可以访问的主机地址，默认都可以
+                                                         //xx2为oid，用于限制可以访问的oid，默认都可以访问
+4.v3的配置，前面的都相同
+（1）注释group部分，即禁用v1和v2c
+（2）添加一行：
+  group   notConfigGroup   usm   notConfigUser
+
+5.创建用户（仅限于v3）
+  createUser  '用户名'  MD5  'xx1'  DES 'xx2'    //创建用户，认证码为xx1，加密方式为MD5，密码为xx2，加密方式为DES        
+  rouser 用户名                                           //指定该用户为只读权限
+
+6.重启服务
+
+7.验证
+  snmpwalk -v 3 -u 用户名 -a MD5 -A 认证码 -x DES -X 密码 ip地址 oid
+
+###############################################################################
+常用指令
+
+1.查看所有oid 或 某个oid以下的oid
+  snmpwalk  [options]  ip地址  [oid]         
+
+2.查看某个oid具体的值
+  snmpget [options] ip地址 [oid]
+
+options:
+  -v                        //version，指定snmp的版本（1 | 2c | 3）
+  -c                        //community，指定使用的团体名
+  -l                         //level，指定安全等级（noAuthNoPriv | authNoPriv | authPriv）
+
+#v1和v2c常用的：
+  snmpwalk -v 2c -c public localhost
+  snmpget -v 2c -c public localhost xx
+
+#v3常用的：
+  snmpwalk -v 3 -l authPriv -u 用户名 -a MD5 -A 认证码 -x DES -X 密码 ip地址 oid 
+
+###############################################################################
