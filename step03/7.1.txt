@@ -82,7 +82,8 @@ AIDE(advanced intrusion detection environment)入侵检测系统
       -sT  //TCP 连接扫描(全开)
       -sU  //UDP扫描
       -sP  //ICMP扫描
-      -A   //对目标系统全面分析
+      -sA  //利用ACK包扫描，能够判断出是否有防火墙负责
+      -A   //对目标系统全面分析（不包括udp端口）
     选项:
       -p 端口1-端口2    //扫描指定范围内的端口,或者用逗号间隔不连续的
 
