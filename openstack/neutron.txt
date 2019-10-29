@@ -1,17 +1,149 @@
 ###############################################################################
+基础
+
+1.虚拟化网络组件的实现方式
+  网卡：openvswitch
+  防火墙：iptables
+  交换机：openvswitch，linux bridge
+  路由器：linux ip协议栈，iptables
+  负载均衡器：haproxy
+
+2.网络分类
+（1）provider network
+  提供者网络，管理员创建的和物理网络有直接映射关系的虚拟网络（可选的类型：flat，vlan，gre，vxlan）
+（2）project network
+  租户网络，普通租户用户创建的虚拟网络（可选的类型：local，flat，vlan，gre，vxlan）
+
+3.网络类型
+
+（1）local
+  只允许在本服务器内通信的虚拟网络，用于单节点上的测试
+
+（2）flat
+  所有租户都在一个网络里，没有进行网络隔离
+  一般只用于提供者网络
+命令：
+  neutron net-create 网络名 \
+  --provider:network_type flat \
+  --provider:physical_network 物理网络名
+
+（3）vlan
+  基于物理vlan网络实现的虚拟网络
+  一般只用于提供者网络
+命令：
+  neutron net-create 网络名 \
+  --provider:network_type vlan \
+  --provider:physical_network 物理网络  \
+  --provider:segmentation_id vlan的id号
+
+（4）gre
+  是L3层的隧道技术
+  本质是在隧道的两端的L4层建立UDP连接 传输重新包装的L3层包头
+  gre封装的数据包基于 ip路由表 进行路由的
+  一般只适用于租户网络
+
+4.网络种类
+（1）管理网络
+  用于openstack各组件间的内部通信
+（2）数据网络
+  用于云部署中虚拟数据之间的通信
+（3）外部网络
+  公共网络，外部可以访问的网络
+（4）api网络
+
+5.命名规则（q：quantum，原来的网络组件名为quantum）
+  tap-xxx：虚拟的网络接口
+  qvo：veth pair openvswitch side（在openvswitch上的虚拟端口，跟对应的端口是连接的，相当于虚拟网线）
+  qvb：veth pair bridge side
+  qbr：bridge
+  qr：l3 agent managed port，router side
+  qg：l3 agent managed port，gateway side
+
+###############################################################################
+neutron架构
+
+1.neutron server
+  包含守护进程neutron-server和各种插件
+  提供api接口，并把对api的调用请求传给相应的插件进行处理
+
+2.neutron L2 agent
+  为虚拟网络提供 二层 交换服务，通过特定的插件（neutron-*-agent）来实现
+
+3.neutron-dhcp-agent
+  为虚拟机提供dhcp服务
+#有几个租户网络，在network节点上就有几个dnsmasq进程
+#dnsmasq进程用于提供dns和dhcp服务
+
+4.neutron-l3-agent
+  为虚拟机访问外部网络提供 三层 转发服务
+  包括路由、浮动ip分配、地址转换和安全组管理（通过iptables实现安全组、路由以及地址转换）
+
+5.架构
+  controller-node：neutron-server和一些核心插件
+  network-node：L2 agent，L3agent，DHCP agent和一些其他的插件
+  compute-node：L2 agent
+这三种节点都与mq相连
+
+###############################################################################
 neutron中的三个网桥
 
 1.br-ex（external）
-  连接外部网络的网桥，会与一个网卡绑定，由于外出的出口
+  连接外部网络的网桥，会与一个网卡绑定，作为外出的出口
 
 2.br-int（integration)
-  集成网桥，所有 instance 的虚拟网卡和其他虚拟网络设备都将连接到该网桥
+  集成网桥，每个compute-node上都有一个，该节点的vm都连接到该虚拟机上
+  所有 instance 的虚拟网卡和其他虚拟网络设备都将连接到该网桥
 
 3.br-tun（tunnel）
   隧道网桥，基于隧道技术的 VxLAN 和 GRE 网络将使用该网桥进行通信
+  通过隧道的方式将所有的compute-node和network-node联通起来
+  从而能够使所有的br-int能够相互通信，所有的br-int就组成一个大的虚拟交换机
+
+  compute-node1        compute-node2
+    br-tun ———————— br-tun
+         \                                /
+           \                            /         
+             \ network-node /
+                   br-tun 
 
 注意：计算节点上也有 br-int 和 br-tun，但没有 br-ex
           所以，有br-ex网桥的节点上，要多一张网卡，用于对外连接
+
+###############################################################################
+neutron运行机制
+
+1.vm数据包外出的流程
+  vm（eth0）
+        |
+  tapxxx（虚拟网卡，运行虚拟机时才会生成）
+        |
+  qbrxxx（虚拟交换机，这里的虚拟交换机是用于实现安全组的功能的）
+        |（qvbxxx）
+        |
+        |（通过veth pair相连接）
+        |
+        |（qvoxxx）
+   br-int（openvswitch虚拟交换机）
+        |
+   br-tun（本机的br-tun交换机）
+        |
+   br-tun（network-node上的br-tun交换机，因为要外出，所以必须去往br-ex交换机）
+        |
+   br-int（network-node上的br-int交换机）
+        |（注意：这个虚拟交换机上，有多个虚拟网卡tap-xxx，分别连接dhcp命名空间的设备，路由命名空间的qrxxx）
+        |
+        |
+     qrxxx（路由设备，和qgxxx在同一个命名空间中）
+        |
+     qgxxx（网关设备）
+        |
+        |
+        |（这个交换机上有一个虚拟网卡tap-xxx，用于连接路由命名空间的qgxxx）
+    br-ex
+        |（通过物理网卡eth0外出）
+        |
+        |
+     外网
 
 ###############################################################################
 neutron（部署在controller-node,compute-node和network-node上，服务类型：network）
