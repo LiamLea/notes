@@ -1,0 +1,30 @@
+###############################################################################
+alpine镜像
+
+1.装包命令：apk
+  apk update             //加载包源
+  apk search xx          //搜索含有关键字xx的软件包
+  apk add xx              //安装xx软件包
+                                 //（/var/cache/apk/、/var/lib/apk/ 、/etc/apk/cache/）
+
+2.仓库地址：/etc/apk/repositories
+
+3.注意包的名称：
+  xx-devel  ->  xx-dev
+
+###############################################################################
+debian镜像
+
+1.装包命令：apt-get
+  apt-get update           //加载包源（安装包之前必须加载，否则无法安装）
+  apt-cache search xx    //搜索含有关键字xx的软件包
+  apt-get install xx         //安装xx软件包
+  apt-get clean              //清除缓存（缓存目录：/var/cache/apt/archives/）
+                                    //（/var/lib/apt/lists)
+
+2.仓库地址：/etc/apt/sources.list
+
+3.安装软件包失败时，需要修复，否则无法安装其他的包，修复命令：
+  apt-get -f install
+
+###############################################################################
