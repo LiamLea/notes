@@ -1,0 +1,69 @@
+###############################################################################
+基础
+
+1.概念
+  docker-compose是单机的容器编排工具
+
+2.文件名
+  docker-compose.yml
+
+3.命令
+  docker-compose up            //创建并启动容器，-d，表示在后台启动
+  docker-compose ps 
+  docker-compose start         //启动容器
+  docker-compose stop
+
+###############################################################################
+使用
+
+一.格式
+version: "3"                   //一般不用改
+
+services: 
+  xx1:                              //容器名
+    选项
+    ... ...
+
+networks:                     //创建网络
+  xx1:                            //网络名为：目录名_xx1
+    driver: xx                  //driver可以为bridge，macvlan，overlay，host等
+  xx2:
+    external:
+      name: xx                //则xx2就代表xx这个网络
+
+二.选项
+
+1.指定镜像（或者build一个镜像）
+  image: xx                 
+
+2.生成一个镜像
+  build: 
+    context: xx            //指定dockerfile所在目录
+    dockerfile: xx        //指定dockerfile文件名
+
+3.指定端口映射
+  ports:
+    - xx:xx                   
+
+4.指定存储卷映射
+  volumes:
+    - xx:xx                   
+
+5.指定使用的网络
+  networks: 
+    - xx           
+
+6.指定依赖的容器
+  depends_on: 
+    - xx
+
+7.设置环境变量
+  environment:
+    xx: xx
+
+8.设置dns服务器
+  dns:
+    - 114.114.114.114
+    - 8.8.8.8           
+
+###############################################################################

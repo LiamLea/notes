@@ -1,0 +1,21 @@
+###############################################################################
+基础
+
+1.docker registry必须要设置为https协议（因为docker默认使用的就是https协议）
+  如果registry设置为http协议，docker使用时需标记该registry为非安全的仓库
+
+2.设置insecure-registries
+  这里设置的名称 必须 与标签中设置的服务器名称要一致
+
+###############################################################################
+registry分类
+
+1.sponsor registry        //第三方registry，供客户和docker社区使用
+
+2.Mirror registry           //第三方registry，只让客户使用
+
+3.Vendor registry          //由发布docker镜像的供应商提供的registry
+
+4.Private registry            
+
+###############################################################################
