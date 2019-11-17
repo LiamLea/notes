@@ -19,6 +19,7 @@ debian镜像
   apt-get update           //加载包源（安装包之前必须加载，否则无法安装）
   apt-cache search xx    //搜索含有关键字xx的软件包
   apt-get install xx         //安装xx软件包
+  apt-get autoremove    //删除为了满足其他软件包的依赖而安装的，但现在不再需要的软件包
   apt-get clean              //清除缓存（缓存目录：/var/cache/apt/archives/）
                                     //（/var/lib/apt/lists)
 
@@ -26,5 +27,8 @@ debian镜像
 
 3.安装软件包失败时，需要修复，否则无法安装其他的包，修复命令：
   apt-get -f install
+
+4.添加不安全的deb源后，安装软件时，需要写成如下形式：
+  apt-get -y install xx --allow-unauthenticated
 
 ###############################################################################

@@ -43,16 +43,15 @@ k8s 架构
 相关服务:
   kube-apiserver              //是整个集群对外的接口
   kube-scheduler 	      //负责调度资源
-  kube-controller-manager     //负责容器编排
+  kube-controller-manager     //用于监控控制器，控制器用于监控容器
   etcd			      //负责数据的持久化存储
 
 2.一群Node节点
 
 相关组件:
-  pod                        //是kubernetes最基本的操作单元,一个pod是一个进程,内部封装了多个紧密相关的容器
+  pod                         //是kubernetes最基本的操作单元,一个pod是一个进程,内部封装了多个紧密相关的容器
   Docker		     //用于创建容器
   kubelet    		     //负责监视pod
-  kube-proxy                 //负责为pod对象提供代理
   fluentd		     //负责日志收集,存储和查询
 
 ###############################################################################
