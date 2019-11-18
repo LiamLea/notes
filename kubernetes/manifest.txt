@@ -31,6 +31,19 @@
     labels: 键值对
     annotations: xx
   spec:                                              //定义期望的状态（desired state）
+	containers:
+		name：
+		image:
+		imagePullPolicy:							//Always，Never，IfNotPresent
+		ports:
+			name:									//给该端口取个名
+			containerPort:							//声明要暴露的端口
+		livenessProbe:								//存活探测
+		readinessProbe:								//就绪探测
+		lifecycle:									//设置postStart和preStop操作
+	nodeSelector:									//设置标签选择器，选择出符合要求的node
+	nodeName:										//指定该pod运行在哪个node节点上
+	restartPolicy:									//设置重启策略：Always，Never，OnFailure
   status:                                            //当前状态，本字段有kubernetes集群维护，会与spec定义的无限接近
 
 3.查看如何书写清单
@@ -60,8 +73,12 @@ spec:
 
 5.根据清单创建资源
   kubectl create -f xx
+或kubectl apply -f xx        //可以实现更新，修改清单后，再执行一次即可更新
 
 6.删除某个文件清单创建的资源
   kubectl delete -f xx
+  
+7.动态修改资源清单
+  kubectl edit TYPE NAME				//注意只有某些选项是可以修改的
 
 ###############################################################################
