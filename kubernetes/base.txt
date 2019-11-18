@@ -44,7 +44,7 @@
                                                     //比如pod1需要访问pod2，请求会被交给docker的网关，然后根据iptables的规则进行转发，则这里的iptables规则提供的就是service服务
   label selector                               //用于管理大量的pod，通过pod的元数据（即给容器打上label），对pod进行管理
 #许多资源支持内嵌字段定义其使用的标签选择器：
-#  matchLabel:                                  //直接使用键值对对标签过滤
+#  matchLabels:                                  //直接使用键值对对标签过滤
 #  matchExpressions: {key:"KEY",operator:"OPERATOR",values:[VAL1,VAL2,...]     //基于给定的表达式对标签过滤
 #OPERATOR可以为: 
 #  In，NotIn                                  //values列表必须为非空

@@ -7,14 +7,14 @@
   Failed
   Succeed
   Unkown               //kubelet出故障可能导致这个问题
-（2）创建pod
+（2）创建自主式pod
   请求 -> apiserver（将请求的目标状态保存在etcd） -> scheduler（将调度结果更新到在etcd中） -> apiserver -> 指定node的kubelet（获取任务清单）-> 创建资源 -> apiserver（成功后）-> etcd更新信息
 （3）Pod生命周期中的重要行为
   初始化容器
   postStart（容器启动后立即执行的操作，注意：操作是在容器的启动命令后进行的）
   容器探测：
     liveness         //用于探测容器是否存活，当发现不存活，会根据restartPolicy判断是否重启该pod
-    readiness      //用于探测容器能否提供相应服务
+    readiness      	//用于探测容器能否提供相应服务
   preStop（容器接收到terminated信号后，立即执行的操作，这个期间有个缓冲的时间，不是立即结束的） 
 
 2.livenessProbe和readinessProbe有三种探针
@@ -26,5 +26,99 @@
   exec
   httpGet                  //用于请求某种资源
   tcpSocket               //发起一些tcp请求
+
+###############################################################################
+pod控制器
+
+1.类型
+  ReplicaSet				//用于创建pod的副本，并且控制pod副本的数量达到要求
+  
+  Deployment				//工作在ReplicaSet之上，功能更强大
+							//三层架构：
+							//	Deployment控制ReplicaSet（可能有多个）
+							//	ReplicaSet控制pods
+							//查看pods的详细信息时，显示的控制器也是ReplicaSet
+							
+  DaemonSet					//确保符合条件的node上只运行指定pod的一个副本
+  
+  Job						//只要指定pod完成特定任务后退出，即不会再重启pod
+  
+  Cronjob					//周期性运行
+  
+  StatefulSet				//管理有状态的pod
+  
+2.ReplicaSet
+
+（1）查看如何编写ReplicaSet的资源清单
+  kubectl explain xx
+  
+（2）ReplicaSet清单的主要内容
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadate:
+  name: xx
+  namespace: default
+spec:
+  replicas: xx
+  selector:                         //有两种选择器：matchLabels，matchExpressions
+	matchLabels:
+	  xx1: xx
+	  xx2: xx
+  template:							//用来定义pod的模板（跟pod的清单基本上一样）
+	metadata:						//不用指定pod的名字，因为会以 "控制器名-xx" 来命名pod
+	  labels:						//这里的标签一定要符合上面的selector的要求
+		xx1: xx
+		xx2: xx 
+	spec:
+	  containers:
+	  - name: xx
+		image: xx
+		
+3.Deployment
+
+（1）有两种更新策略（strategy）
+  Recreate				//删一个，建一个
+  RollingUpdate			//根据定义的最大多出数量和最少不可获得数量进行相应的操作
+						//比如：最少不可获得的数量为1，就需要先创建一个，再删除一个，保证最少不可获得的数量为1
+  
+（2）更新的原理
+  会创建新的ReplicaSet来控制更新后的pods
+  原来的ReplicaSet不会删除，可以方便回滚（回滚即使得相应的ReplicaSet开始工作，使其它的不工作）
+  默认保留的ReplcaSet数量为10
+  
+（3）Deployment清单的主要内容
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xx
+  namespace: default
+spec:
+  replicas: xx
+  selector:
+	matchLabels:
+	  xx1: xx
+	  xx2: xx
+  strategy: 						//指定更新策略
+	type: xx
+	rollingUpdate:					//当更新策略为RollingUpdate（默认的策略），这项才有效
+	  maxSurge: xx					//最大多出的数量
+	  maxUnavailable: xx			//最少不可获得数量
+  template:
+	metadata:				//pod的名字：Deployment控制器的名字-xx-xx（其中Deployment控制器的名字-xx为生成的ReplicaSet控制器的名字）
+	  labels:
+		xx1: xx
+		xx2: xx
+	spec:
+	  containers:
+	  - name: xx
+		images: xx
+		
+（4）回滚
+  kubectl rollout history TYPE NAME			//查看有多少个版本，和版本号
+  kubectl get rs -l xx1=xx -o wide          //查看每个版本具体的ReplicaSet
+  kubectl rollout undo TYPE NAME			//默认回滚到上一个版本
+											// --to-revision=版本号，回滚到指定版本
 
 ###############################################################################
