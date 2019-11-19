@@ -28,9 +28,8 @@
   tcpSocket               //发起一些tcp请求
 
 ###############################################################################
-pod控制器
+pod控制器类型
 
-1.类型
   ReplicaSet				//用于创建pod的副本，并且控制pod副本的数量达到要求
   
   Deployment				//工作在ReplicaSet之上，功能更强大
@@ -39,15 +38,16 @@ pod控制器
 							//	ReplicaSet控制pods
 							//查看pods的详细信息时，显示的控制器也是ReplicaSet
 							
-  DaemonSet					//确保符合条件的node上只运行指定pod的一个副本
+  DaemonSet					//确保符合条件的node上只运行指定pod的一个副本 
   
   Job						//只要指定pod完成特定任务后退出，即不会再重启pod
   
   Cronjob					//周期性运行
   
   StatefulSet				//管理有状态的pod
-  
-2.ReplicaSet
+
+###############################################################################  
+ReplicaSet
 
 （1）查看如何编写ReplicaSet的资源清单
   kubectl explain xx
@@ -74,8 +74,9 @@ spec:
 	  containers:
 	  - name: xx
 		image: xx
-		
-3.Deployment
+
+###############################################################################	
+Deployment
 
 （1）有两种更新策略（strategy）
   Recreate				//删一个，建一个
@@ -120,5 +121,33 @@ spec:
   kubectl get rs -l xx1=xx -o wide          //查看每个版本具体的ReplicaSet
   kubectl rollout undo TYPE NAME			//默认回滚到上一个版本
 											// --to-revision=版本号，回滚到指定版本
+
+###############################################################################
+DaemonSet（两种更新策略：OnDelete和RollingUpdate，只能先删再更新）
+
+（1）DaemonSet清单的主要内容
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: xx
+  namespace: default
+spec:
+  selector:
+	matchLabels:
+	  xx1: xx
+	  xx2: xx
+  template:
+    metadata:
+	  labels:
+		xxx
+		1: xx
+		xx2: xx
+	spec:
+	  containers:
+	  - name: xx
+		image: xx
+		env:
+		- name: 变量名
+		  value: 变量值
 
 ###############################################################################

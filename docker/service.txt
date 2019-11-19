@@ -1,0 +1,56 @@
+###############################################################################
+service基础
+
+1.service三种工作模式
+
+（1）userspace（效率低）
+请求 -> service（iptables，即内核空间） -> 本机的kube-proxy（即用户空间） -> service（iptables） -> 相应pod
+
+（2）iptables
+请求 -> service（ipatbles） -> 相应pod
+
+（3）ipvs
+请求 -> ipvs -> 相应pod
+
+2.service四种类型
+
+（1）ClusterIP（默认）
+  将容器端口与service端口绑定
+  随机分配一个地址，通过coreDNS组件对域名进行解析，仅用于集群内通信，
+  可以固定该ip
+ 
+（2）NodePort
+  将容器端口与service端口绑定，service端口与node（即宿主机）上的端口绑定
+
+（3）LoadBalancer
+  用于在云上虚拟一个负载均衡器，进行调度
+
+（4）ExternalName
+  能够使得集群内的pod能够与外界联系，这种类型的service就充当这个外出的桥梁
+  即，集群内的pod，需要将请求先发送到service，service为其做代理外出取得数据，然后返回给pod
+  像使用集群内部的资源一样，使用集群外部的资源
+  
+3.headless service
+  无头setvice，即该service没有ClusterIP，当解析该service的域名时，解析结果直接返回后端的pod的ip
+
+###############################################################################
+service清单
+
+apiVersion: v1
+kind: service
+metadata:
+  name: xx
+  namespace: default
+spec:
+  selector:
+    xx1: xx
+	xx2: xx
+  type: NodePort       
+  clusterIP: xx          //固定service的ip，可以设为None，则这个service即为无头service，type这项要去掉
+  ports:
+  - port: xx			 //service上端口
+    targetPort: xx		 //容器上端口
+	nodePort: xx          //当类型为NodePort时，才需要这一项
+
+
+###############################################################################
