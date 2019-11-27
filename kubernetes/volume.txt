@@ -1,0 +1,93 @@
+###############################################################################
+基础概念
+
+1.在kubernetes中，存储卷是针对pod而言的，而不是container
+
+2.存储卷种类
+
+（1）emptyDir
+	在节点上创建，当pod删除，该存储卷也会被删除
+	
+（2）hostPath
+	在pod所在节点上创建，当pod删除时，该存储卷不会被删除
+	当节点宕机了，pod就会调度到另一个节点上，数据就会丢失（可以利用nfs解决这种情况）
+	
+（3）nfs
+	使用nfs服务器提供的目录
+	
+（4）persistentVolumeClaim
+
+3.pvc
+  persistent volume claim，是一种资源
+  是一个抽象的概念，根据设定的条件，绑定相应的pv资源（和pv是一一对应的关系）
+
+4.pv
+  persistent volume，是一种资源
+  是后端存储空间的映射
+
+###############################################################################
+创建一个自主式pod，使用emptyDir存储卷
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: xx
+  labels:
+    xx: xx
+spec:
+  containers:
+  - name: xx
+    image: xx
+	volumeMounts:			//存储卷属于pod，容器需要挂载存储卷才能使用
+	- name: xx				//已经存在的存储卷的名字
+	  mountPath: xx			//挂载点
+  volumes:					//创建存储卷
+  - name: xx
+    emptyDir: {}			//empty是对象（即字典），{}表示为空，即使用默认值
+
+###############################################################################
+创建一个自主式pod，使用hostPath存储卷
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: xx
+  labels:
+    xx: xx
+spec:
+  containers:
+  - name: xx
+    image: xx
+	volumeMounts:
+	- name: xx				//使用的已存在的存储卷的名字
+	  mountPath: xx			//挂载点
+  volumes:
+  - name: xx
+	hostPath:
+	  path: xx				//节点上的路径
+	  type: xx				//有多种类型，其中DirectoryOrCreate，表示path是一个目录，如果该目录不能存在则创建
+	
+
+###############################################################################
+创建一个自主式pod，使用nfs存储卷
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: xx
+  labels:
+    xx: xx
+spec:
+  containers:
+  - name: xx
+    image: xx
+	volumeMounts:
+	- name: xx				//使用的已存在的存储卷的名字
+	  mountPath: xx			//挂载点
+  volumes:
+  - name: xx
+	nfs:
+	  path: xx
+	  server: xx			//ip地址
+	  
+###############################################################################
