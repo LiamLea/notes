@@ -37,7 +37,7 @@ service基础
 service清单
 
 apiVersion: v1
-kind: service
+kind: Service
 metadata:
   name: xx
   namespace: default
@@ -50,7 +50,7 @@ spec:
   ports:
   - port: xx			 //service上端口
     targetPort: xx		 //容器上端口
-	nodePort: xx          //当类型为NodePort时，才需要这一项
+	nodePort: xx         //当类型为NodePort时，才需要这一项
 
 
 ###############################################################################

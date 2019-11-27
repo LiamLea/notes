@@ -1,15 +1,12 @@
 ###############################################################################
-基础
+基础架构（master/node架构，master一般设为3个）
 
-1.基础架构
-  master/node架构                     //master一般设为3个
-
-2.master核心组件
+1.master核心组件
   api server                         //是整个集群对外的接口
   scheduler 	                     //负责调度资源
   controller-manager                 //用于监控控制器，控制器有多种，某类控制器用于监控pod（即容器） 
 
-3.node核心组件
+2.node核心组件
   kubelet                            //管理pod，接收和执行master的任务
   docker                             //容器引擎
   kube-proxy                         //管理service，当service发生变化或与service相关联的pod发生变化，kube-proxy都会修改iptables规则
@@ -17,23 +14,34 @@
                                      //每个pod发生地址改变后，变化后的结果保存在api server中，然后api server会通知kube-proxy
                                      //kube-proxy会修改该kube-proxy所在节点的iptables规则
 
-4.存储组件（一般放在master上）
+3.存储组件（一般放在master上）
   etcd                               //master的共享存储，存储组件的运行状态
+  
+4.核心附件
 
-5.DNS组件（一般放在master上）
-  coredns                            //每当添加一个资源或者修改资源，都会更新dns记录，使得能够通过域名解析到相应资源
-									 //资源的域名：NAME.NAMESPACE.DOAMIN
-									 //默认的DOMAIN为svc.cluster.local
+（1）coredns                         
+  每当添加一个资源或者修改资源，都会更新dns记录，使得能够通过域名解析到相应资源
+  资源的域名：NAME.NAMESPACE.DOAMIN
+  默认的DOMAIN为svc.cluster.local
+  
+（2）heapster
 
-6.网络组件（有很多，选择其中一个即可）
+（3）dashboard
+
+（4）ingress controller
+
+5.网络组件（有很多，选择其中一个即可）
   flannel                            //网络配置
   calico                             //网络配置，网络策略（网络策略可以用来设置隔离pod的策略）
   canel                              //将flannel和calico结合起来（flannel提供网络配置，calico提供网络策略）
 
-7.基础概念
+###############################################################################
+基础概念
+
   pod                               //是kubernetes最基本的操作单元,一个pod是一个进程,内部封装了多个紧密相关的容器
                                     //类似一个虚拟机，里面的容器共享net、UTS、ipc命令空间（user、mnt、pid相互隔离）
-                                    //同一个pod里的容器能共享同一存储卷（类似虚拟机的磁盘）
+                                    //同一个pod里的容器能共享存储卷（类似虚拟机的磁盘）
+									//为什么能够实现上面两种特性：pod有一个基础架构容器（叫pause，是不启动的，其他容器就可以使用其存储卷、网络名称空间等）
                                     //一般一个pod只放一个容器
                                     //一个pod里的所有容器只能运行在一个node上
 #有两种类型：
