@@ -1,0 +1,23 @@
+###############################################################################
+基础概念
+
+1.domian
+  一组server的集合，至少包含一个administration server
+  可选的包含managed server和cluster
+  
+2.server
+  是类weblogic.Server的一个实例
+  
+3.administration server
+  是一个domain中的管理者，负责管理其他server
+  
+4.managed server
+  是一个domain中被管理的server
+  功能就是：执行具体的业务逻辑
+  
+5.as（administration server）的功能（通过JMX实现这些功能的）
+  提供该domain内的所有server的配置
+  记录server的重要日志
+  监控ms（managed server）
+
+###############################################################################

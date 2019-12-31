@@ -138,7 +138,7 @@
 #当时windows等系统，\n 需要替换为 \r\n
 
 22.printf 
-（1）相当于 echo -n -e
+（1）类似 echo -n -e，但是功能更多
 （2）printf "%016x" val
 	16 —— 字宽为16
 	0 —— 不足的用0补齐
@@ -147,5 +147,75 @@
 	\数字        //表示后面的数字是八进制，然后进行转换
 	\x数字       //表示后面的数字是十六进制，然后进行转换
 #如果后面的数字太大，只取能够转换成ascii的数字值，其余的不做转换
+
+23.sysrq（system request）
+（1）功能
+  可以在系统出现故障的时候协助恢复和调试系统，只要系统还能响应键盘的按键中断
+（2）开启sysrq功能
+  echo 1 > /proc/sys/kernel/sysrq
+（3）使用sysrq功能（信息默认会输出到/var/log/messages，可以调整打印级别，使得信息输出到终端）
+  echo h > /proc/sysrq-trigger				//查看帮助
+  echo f > /proc/sysrq-trigger				//人为触发OOM killer
+（4）调整内核打印的级别设置 
+  cat /proc/sys/kernel/printk				//有四个值（数值越小，优先级越高）
+#console_loglevel							//控制台日志级别，优先级高于它的信息都会被打印至控制台
+#default_message_loglevel					//用该优先级打印没有优先级的消息（将该值改的小于console_loglevel，sysrq-trigger的输入信息就会到控制台）
+#minimum_console_loglevel					//控制台日志最高可以设置成该优先级，如：printk("<6>Hello, world!\n"); 所以尖括号中最小可以设置为该选项指定的值
+#default_console_loglevel					//控制台日志级别的缺省值，如：printk("Hello, world!\n"); 所以该消息的级别为该选项设置的默认值
+
+24.overcommit不会触发oom killer
+#虚拟内存：是进程使用mmap等命令动态获取的内存，并没有与物理内存一一对应，当程序第一次试图访问该虚拟内存时，才会与物理内存建立对应关系
+#overcommit：分配的虚拟内存 > 实际的物理内存
+
+25.yaml语法补充
+
+（1）当使用{{var}}变量时，需要给整行加上引号，否则会产生歧义（因为以花括号开头，playbook会认为这是一个字典类型）
+  如：
+	key: {{var}}/2		//这种写法是错误的
+	key: "{{var}}/2"  
+  
+（2）yaml有其他数据类型（json只有字符串类型）
+  如：
+	key: 1		//这里的key值类型是整型（如果需要计算，要用到过滤器）
+	key: '1'	//这里的key值类型是字符串
+  
+27.VIRT and RES
+  VIRT：virtual memory，指该进程申请到的内存
+  RES：resident memory，指该进程实际消耗的物理内存
+  
+28.docker启动报错，排错：
+  dockerd --debug
+  
+29."cannot allocate memory"，可能的原因：
+（1）物理内存不足				//free -h
+（2）虚拟内存分配达到上限		//cat /proc/sys/vm/max_map_count
+（3）打开的文件描述符达到上限	//ulimit -n
+（4）进程过多					//ulimit -u
+								//cat /proc/sys/kernel/pid_max
+（5）线程过多					//cat /proc/sys/kernel/thereads_max	
+
+30.制作docker镜像需要考虑的问题：
+（1）基础镜像
+（2）镜像时间
+（3）启动的用户和挂载的目录的权限
+（4）分层，当用到同样的环境，可以先制作一层	
+（5）僵尸进程问题
+    容器内的孤儿进程会交给容器内pid为1的进程，如果该进程不回收子进程，则就会出现僵尸进程
+  解决：让bash进程为pid为1的进程，或者docker run --init ...
+#注意用bash解决的话，最好写入脚本，不然用bash -c可能pid为1的进程不是bash
+ 
+31.如何man一个命令的子命令
+  whatis 子命令    //然后根据查询出来的结果man
+
+32./var/run和/var/lib
+  /var/run：存放描述应用程序或系统的信息（如：pid）
+  /var/lib：存放应用程序或系统有关的状态信息  
+  
+33.利用awk给一组数据加标题
+（1）利用自带标题
+  awk 'NR==1{print};/xx/{print}' xx
+  
+（2）自己设置标题
+  awk 'BEGIN{print "title1 title2"}/xx/{print}' xx
 
 ###############################################################################

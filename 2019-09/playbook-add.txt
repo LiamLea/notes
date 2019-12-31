@@ -2,7 +2,7 @@
 补充
 
 1.meta: flush_handlers
-  表示立即执行前面已经完成的task对应的hander，而不是等所有tasks执行完后，才执行handers
+  表示立即执行前面已经完成的task对应的handler，而不是等所有tasks执行完后，才执行handers
 
 2.后导入的变量优先级更高
   所有-e导入的变量的优先级更高
@@ -10,55 +10,13 @@
 3.ansible-doc -s 模块名	//s:snippet，显示该模块的参数及解释
 
 4.调试模块：debug
-  ansible all -m debug -a 'msg={{xx}}'
-
-5.内置变量
-  {{groups}}			//所有组的信息
-  {{group_names}}			//当前主机所在的组
-  {{inventory_hostname}}		//当前主机的主机名
-  {{inventory_hostname_short}}		//当前主机的主机名的第一部分
-  {{play_hosts}}			//当前playbook运行的主机信息
-  {{inventory_dir}}			//当前playbook使用的inventory目录
-  {{hostvars[xx][ansible_hostname]}}	//获取xx主机的ansible_hostname的变量
-
-6.变量的主要来源：
-  内置变量
-  facts中的变量
-  inventory中定义的变量
-  外部指定的变量
-  与执行的playbook在同一目录下的变量目录（如：host_vars，group_vars）
-
-注意：host_vars目录下的变量文件必须为主机名
-      group_vars目录下的变量文件必须为组名
-
-7.变量的优先级：
-  -e > playbook里定义的 > 主机清单文件私有的 > 主机清单文件共有的
+  ansible all -m debug -a 'msg={{xx}}'   //可以查看该变量有什么具体内容（重点：内容中可能还包含变量）
 
 8.模块的搜索路径（在ansible.cfg中定义）
   library=xx
 
 9.Action插件与模块一起执行PlayBook任务所需的操作（插件的搜索路径在ansible.cfg中定义）
   action_plugins=xx
-
-10.inventory指定一个目录（在ansible.cfg中设置）
-  inventory=xx				//会去xx目录下寻找主机清单文件
-  inventory_ignore_extensions= .bak, .ini, .conf	//会忽略xx目录下以这些结尾的文件
-  
-      xx
-       │
-       │—— 文件1		//在里面可设置清单信息（最终的主机信息，会把所有文件信息结合起来）
-       │       
-       │—— 文件2		//在里面可设置清单信息
-       │
-       │—— host_vars		//设置各主机的变量，文件名必须为主机名			
-       │           │
-       │           │—  主机名	//在里面定义该主机的变量
-       │           └──  ... ...
-       │
-       │—— group_vars	//设置各组的变量，文件名必须为组名
-                    │
-                    │—  主机名	//在里面定义该组的变量
-                    └──  ... ...
 					
 11.block将多个任务整合成一个任务，从而实现某个条件成立时，能执行多个任务
    rescue与block连用，当block中的任务执行失败时，会执行rescue中的任务
@@ -83,19 +41,109 @@
 		state: xx
 	when: 2>1
 	rescue：
-	  - service:
-		  name: xx
-		  state: xx
-	  - debug:
-		  msg: "xx"
+	- service:
+	    name: xx
+		state: xx
+	- debug:
+		msg: "xx"
 		  
 12.当when中使用了or时，记得加括号 
 比如：
 	when: A or B and C       //只要A为真就不会判断后面
 	when: (A or B) and C     //只有当A或B有一个为真且C为真，条件才成立
 	
-13.when使用的表达式是原生的jinja2表达式，所以不需要加双括号
-	
+13.when补充
+（1）when使用的表达式是原生的jinja2表达式，所以变量不需要加双括号
+  
+（2）when: xx is definded    //undefined
+  
+（3）注意下面两种情况的区别
+  include*
+  when: xx
+  
+  import*
+  when: xx
+
+14.include*和import*的比较
+
+（1）include*				//动态加载，动态的好处就是可以在循环中多次加载执行
+  include: xx				//当加载play列表时，这是一个play，之后会摒弃该模块
+  include_tasks: xx			//是一个task
+  include_role: xx			//是一个task
+  include_vars: xx			//是一个task
+  
+（2）import*				//静态加载
+  import_playbook: xx		//是一个play
+  import_tasks: xx			//是一个task
+  import_role: xx			//是一个task
+
+
+（3）本质区别
+
+  include*在被遇到时，才会处理，属于动态的加载
+  import*在预处理时，就会被处理，属于静态的加载
+  
+（4）使用区别
+
+		动态（include*）								静态（import*）
+能够应用到循环中，没循环一次，会include一次
+task选项（如when）不会被应用到子任务			对于静态的加载，task选项会被应用到子任务
+不能在里面触发外面的handler						不能从外面触发里面的handler
+
+15.在playbook中注意单双引号的区别
+
+###############################################################################
+模块补充
+
+1.stat				//用于获得该文件的信息，包括是否存在，是什么类型
+stat:
+  path: xx
+  register: xx		//返回的是一组变量（xx.stat）
+					//xx.stat.exists返回一个bool值，判断该文件是否存在，当不存在时也只有这个变量
+					//xx.stat.isdir返回一个bool值，判断该文件是否是个目录
+
+2.file				//用于对文件进行操作（创建，修改属性等等）
+file: 
+  path: xx			//指明文件
+  state: xx			//dirctory（创建目录），touch（创建文件），ansent（删除文件）
+					//如果文件已存在，则不会覆盖
+  owner: xx
+  group: xx
+  mode: 0xx			//必须已0开始，后面的xx才表示八进制数
+
+3.user
+user:
+  name: xx
+  state: xx			//present和absent
+
+4.fail
+fail: msg="xx"		//已失败的形式退出playbook
+
+5.meta
+meta: end_host		//已成功的形式退出playbook（2.8版本才支持）
+					//不要用end_play，会退出所有主机的playbook
+					
+6.unarchive
+unarchive:
+  src: xx			//压缩包（如果没有remote_src，表示压缩包在部署机上），可以为网络路径（解压后压缩包不会被保留）
+  dest: xx			//目录
+  remote_src: yes	//表示压缩在目标主机上
+
+###############################################################################
+资源清单
+
+1.使用多个清单来源
+
+（1）修改ansible.cfg（指定清单目录）
+
+  inventory=xx			//指向一个目录
+  
+（2）在清单目录下创建清单文件
+
+  文件名随便取
+  读取文件时，会按照文件名的字母顺序进行读取
+  将所有的内容进行合并，重复的内容会被后读取的覆盖
+
 ###############################################################################
 facts
 
@@ -112,6 +160,48 @@ Ansible 的配置文件中可以修改 gathering 的值为 smart、implicit 或�
 Ansible 支持两种 facts 缓存：redis 和 jsonfile
 
 ###############################################################################
+变量
+
+1.变量来源
+（1）清单文件
+（2）playbook内
+（3）include的文件或roles
+（4）主机的Facts（ansible_facts.xx）
+（5）special variable（即内置变量，不能被覆盖）
+  常用的有：
+	{{groups}}								//所有组的信息
+	{{group_names}}							//当前主机所在的组
+	{{inventory_hostname}}					//当前主机的主机名
+	{{inventory_hostname_short}}			//当前主机的主机名的第一部分
+	{{hostvars[主机名][xx]}}				//可以获得其他主机的变量，xx为主机名
+	{{hostvars[xx][ansible_facts][xxx]}}	//所以需要有facts缓存，或者在此playbook中之前已与该主机进行过通信
+	
+
+2.管理主机变量和组变量
+
+（1）通过host_vars目录管理主机变量
+
+	文件名（可以以.yml，.yaml或.json结尾） 	 —— 主机名
+	文件内容 								 —— 该主机的变量
+	目录名									 —— 主机名
+	目录下的文件的内容（按字典顺序读取文件） —— 该主机的变量
+  
+（2）通过group_vars目录管理组变量
+
+	文件名（可以以.yml，.yaml或.json结尾） 	——	组名
+	文件内容								——	该组的变量
+	目录名									——	组名
+	目录下的文件的内容（按字典顺序读取文件）——	该组的变量
+
+（3）host_vars和group_vars目录的搜索路径
+	清单文件的所在目录
+	playbook文件的工作目录（比如：当import_playbook时，被import的playbook所在的目录也会被搜索）
+	
+2.变量的优先级
+  -e > playbook里定义的 > host > child group > parent group > all group
+  -e > role的vars目录下定义的变量 > playbook里等定义的 > role的default目录下定义的变量
+
+###############################################################################
 roles
 
 1.基本概念
@@ -126,15 +216,15 @@ roles
   │
   ├── files/			//存放由copy或script模块等调用的文件
   │      
-  ├── templates/			//存放模板文件的目录
+  ├── templates/		//存放模板文件的目录
   │
-  ├── vars/			//存放变量的目录，至少包含一个main.yml
+  ├── vars/				//存放变量的目录，至少包含一个main.yml
   │		
   ├── handlers/			//至少包含一个main.yml   
   │		
-  ├── meta/			//定义当前角色的特殊设定及其依赖关系,至少包含一个main.yml
+  ├── meta/				//定义当前角色的特殊设定及其依赖关系,至少包含一个main.yml
   │
-  └── default/			//设定默认变量时使用此目录中的main.yml文件，当使用变量时，其他地方找不到，最后会在此main.yml中寻找
+  └── defaults/			//设定默认变量时使用此目录中的main.yml文件，当使用变量时，其他地方找不到，最后会在此main.yml中寻找
 
 3.roles的搜索路径在ansible.cfg中定义：
   如：roles_path = roles:/opt/dire/purist/ansible:/opt/dire/kolla-ansible/ansible/roles:.

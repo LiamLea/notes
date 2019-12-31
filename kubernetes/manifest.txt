@@ -11,7 +11,7 @@
   ConfigMap，Secret，DownwardAPI
 
 4.集群级资源
-  Namespace，Node，ClusterRole，RoleBinding，ClusterRoleBinding
+  Namespace，PersistentVolume，Node，ClusterRole，RoleBinding，ClusterRoleBinding
 
 5.元数据型资源
   HPA，PodTemplate，LimitRange

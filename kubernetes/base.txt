@@ -15,7 +15,7 @@
                                      //kube-proxy会修改该kube-proxy所在节点的iptables规则
 
 3.存储组件（一般放在master上）
-  etcd                               //master的共享存储，存储组件的运行状态
+  etcd                               //master的共享存储，存储k8s的资源
   
 4.核心附件
 
@@ -23,6 +23,8 @@
   每当添加一个资源或者修改资源，都会更新dns记录，使得能够通过域名解析到相应资源
   资源的域名：NAME.NAMESPACE.DOAMIN
   默认的DOMAIN为svc.cluster.local
+#pod的域名有点特殊需要跟上service的名称：
+#	NAME.SERVICE_NAME.NAMESPACE.DOMAIN
   
 （2）heapster
 
@@ -41,7 +43,7 @@
   pod                               //是kubernetes最基本的操作单元,一个pod是一个进程,内部封装了多个紧密相关的容器
                                     //类似一个虚拟机，里面的容器共享net、UTS、ipc命令空间（user、mnt、pid相互隔离）
                                     //同一个pod里的容器能共享存储卷（类似虚拟机的磁盘）
-									//为什么能够实现上面两种特性：pod有一个基础架构容器（叫pause，是不启动的，其他容器就可以使用其存储卷、网络名称空间等）
+									//为什么能够实现上面两种特性：每个pod中有一个基础架构容器（叫pause，其他容器共享该容器的net，UTS，ipc空间和存储卷等）
                                     //一般一个pod只放一个容器
                                     //一个pod里的所有容器只能运行在一个node上
 #有两种类型：

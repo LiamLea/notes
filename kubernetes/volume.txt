@@ -2,6 +2,8 @@
 基础概念
 
 1.在kubernetes中，存储卷是针对pod而言的，而不是container
+  首先需要创建存储卷，即给基础架构容器创建存储卷
+  然后容器需要挂载存储卷，即使用基础架构容器的存储卷
 
 2.存储卷种类
 
@@ -15,15 +17,32 @@
 （3）nfs
 	使用nfs服务器提供的目录
 	
-（4）persistentVolumeClaim
+（4）PersistentVolumeClaim（是一种资源）
+
+（5）ConfigMap（是一种资源）
+
+	相当于配置中心，使得配置文件与镜像解耦
+	挂载configMap类型的存储卷，则该configMap中的键名就是文件名，键值就是文件内容
+	比如，configMap中一个键值对为 aa=bb，则会在容器内的挂载目录下生成名为aa的文件，文件的内容为bb
+
+（6）Secret（是一种资源）
+
+	与ConfigMap类似，只不过ConfigMap是明文的，Secret是加密的
+    有三类Secret：
+		docker-registry				//用于设置私有仓库的账号密码
+		generic
+		tls							//用于存放证书和私钥
 
 3.pvc
   persistent volume claim，是一种资源
   是一个抽象的概念，根据设定的条件，绑定相应的pv资源（和pv是一一对应的关系）
 
-4.pv
+4.pv（是集群级别的资源，不属于某个名称空间，所有名称都可以用）
   persistent volume，是一种资源
-  是后端存储空间的映射
+  是存储卷，映射到指定的后端存储空间（能够映射各种存储空间）
+  
+5.StorageClass
+  对后端存储进行分类，当pvc需要存储资源时，从特定分类中，动态分配存储卷   //pv是静态的
 
 ###############################################################################
 创建一个自主式pod，使用emptyDir存储卷
@@ -90,4 +109,141 @@ spec:
 	  path: xx
 	  server: xx			//ip地址
 	  
+###############################################################################
+创建pv资源
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: xx
+  labels: 
+    xx: xx
+spec:
+  nfs:										//这里指明存储空间的类型，这里用的是nfs
+    path: xx
+	server: xx
+  accessModes: ["RWX","RWO"]  				//一共由三种模式，RWX（ReadWriteMant，能被多个节点以读写方式挂载），RWO（ReadWriteOnce，只能被一个节点以读写方式挂载），ROX（ReadOnlyMany）
+  capacity:
+    storage: xx								//指定允许的容量（单位：Ki，Mi，Gi，...）
+  persistentvolumeReclaimPolicy: Retain  	//指定当pvc与pv解除绑定，pv的回收策略，默认是Retain，即保留pv里的数据
+	
+---											//这个是分隔符，下面可以定义其他资源
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: xx
+  labels: 
+    xx: xx
+spec:
+  rbd:										//这里指明存储空间的类型，这里用的是rbd
+    image: xx
+	... ...
+  accessModes: ["RWX"]
+  capacity:
+    storage: xx
+	
+###############################################################################
+创建pvc资源
+
+apiVersion: v1
+kind: persistentVolumeClaim
+metadata:
+  name: xx
+  namespace: default				//需要与pod在同一名称空间中
+spec:
+  accessMode: ["RWX"]				//必须是pv定义的accessMode的子集
+  resources:
+    requests: 
+	  storage: xx					//单位（Ki，Mi，Gi，...）
+  selector:							//如果不用标签选择器进行选择，会根据要求自动选择符合要求的pv进行绑定
+    matchLabels:
+	  xx1: xx
+	  xx2: xx
+
+###############################################################################
+创建一个自主式pod，使用persistentVolume存储卷
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: xx
+  namespace: default
+spec:
+  containers:
+  - name: xx
+    image: xx
+	VolumeMounts:
+	- name: xx
+	  mountPath: xx
+	volumes:
+	- name: xx
+	  persistenVolumeClaim:
+	    claimName: xx				//指定已经存在的pvc的名字
+
+###############################################################################
+创建ConfigMap资源
+
+kubectl create configmap named xx --from-file=文件路径     //文件名就是键，文件内容就是值
+								  --from-file=xx=文件路径	//xx就是键，文件内容就是值
+								  --from-literal=xx1=xx2   //xx1就是键，xx2就是值
+
+###############################################################################
+将ConfigMap中的配置注入pod
+
+1.通过env的方式
+apiVersion: v1
+kind: Pod
+metadata:
+  name: xx
+  namespace: default
+  labels:
+    xx1: xx
+	xx2: xx
+spec:
+  containers:
+  - name: xx
+    image: xx
+	env:
+	- name: xx				//这里的xx为 新的环境变量的名字
+	  valueFrom:
+	    configMapKeyRef:
+		  name: xx			//这里的xx为 某个configMap的名字
+		  key: xx			//这里的xx为 该configMap种的某个键名
+		  
+2.使用存储卷的方式
+apiVersion: v1
+kind: Pod
+metadata:
+  name: xx
+  namespace: default
+  labels:
+    xx1: xx
+	xx2: xx
+spec:
+  containers:
+  - name: xx
+    image: xx
+	volumeMounts:
+	- name: xx				//xx为存储卷的名字
+	  mountPath: xx			//xx为挂载路径
+  volumes:					//创建存储卷
+  - name: xx				//xx为该存储卷取名字
+    configMap:				//存储卷的类型为configMap
+	  name: xx				//xx为已经存在的configMap的名字
+	  
+#注意：挂载configMap后
+#键名就是文件名
+#键值就是文件的内容
+
+###############################################################################
+创建Secret资源
+
+kubectl create secret 类型 名字 --from-file=文件路径     //文件名就是键，文件内容就是值
+								--from-file=xx=文件路径	//xx就是键，文件内容就是值
+								--from-literal=xx1=xx2   //xx1就是键，xx2就是值
+
+查看某个secret的具体内容
+kubectl describe secret xx
+
 ###############################################################################
