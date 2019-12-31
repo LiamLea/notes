@@ -1,0 +1,106 @@
+###############################################################################
+补充
+
+1.zabbix agent的扩展（userparameter）
+  使用的用户是zabbix，所以如果命令需要更好的权限，则无法显示，如：
+  ss -tulnp中的p需要更好权限才能显示出来
+解决：
+（1）修改配置文件中的AllowRoot选项，以root权限运行zabbix
+（2）设置sudo提权，在脚本中使用sudo从而获取root权限
+
+2.使用userparameter时
+  Userparameter=xx[*],xx		//如果后面用到awk，则其中的变量$1需要表示成$$1
+								//因为$1表示传入的第一个参数
+								
+3.auto registration
+  会匹配所有，从最早创建的开始匹配
+  AutoRegistration执行的条件：
+（1）当不知道的主机请求checks
+（2）HostMetadata变化了
+#auto registration变化了，不会影响
+  
+
+###############################################################################
+宏
+
+一.用户自定义宏
+
+1.表示：{$MACRO}
+
+2.有三个范围：
+  global level
+  template level
+  host level
+
+3.特殊用法：
+  {$MACRO:xx}		//定义一个上下文
+比如：
+  定义以下宏：
+	{$LOW_SPACE_LIMIT} = 10				
+	{$LOW_SPACE_LIMIT:/home} = 20		
+	{$LOW_SPACE_LIMIT:/tmp} = 30
+  使用：
+	{host:vfs.fs.size[{#FSNAME},pfree].last()}<{$LOW_SPACE_LIMIT:"{#FSNAME}"}
+#当FSNAME为/home，则变量结果为20
+#当FSNAME为/tmp，则变量结果为30
+#当FANAME为其他内容时，则变量结果都为10
+
+二.系统内置宏
+
+1.表示：{MACRO}
+
+参考：https://www.zabbix.com/documentation/4.4/manual/appendix/macros/supported_by_location
+
+三.LLD函数中的宏
+
+1.表示：{#MACRO}
+
+四.宏函数
+
+1.表示：{<macro>.<func>(<params>)}
+
+2.函数：
+  regsub(<pattern>,<output>)
+  iregsub(<pattern>,<output>)	//忽略大小写
+  
+3.举例：
+  {{ITEM.VALUE}.regsub("^([0-9]+)",problem:\1)				//ITEM.VALUE=123 Long line
+															//输出：problem:123
+  {{ITEM.VALUE}.regsub("(^[0-9]+)",\0)}						//输出：123 Long line
+  
+  {{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}					//IFALIAS=customername_1
+															//输出：customername
+  {$MACRO:"{{#IFALIAS}.regsub(\"(.*)_([0-9]+)\", \1)}"}		//输出：{$MACRO:"customername"}
+  
+###############################################################################
+LLD（low-level discovery）
+
+一.概述
+1.discovery key
+  返回一个json格式的列表
+  列表中是多个键值对（{#MACRO:VALUE}）
+#如果返回的是普通的json格式
+#可以在LLD macros中，设置相应的宏
+#如：{#FSNAME} = $.fsname
+  
+2.利用宏（macro）创建原型（prototype）
+
+3.获得宏（macro）的值后，会替代原型（prototype）中的宏，创建实体（entity）
+
+二.配置
+
+1.创建discovery rule，有四个模块
+  Discovery rule		//指定用于发现的key
+  Processing			//对发现数据进行处理
+  LLD macros			//可以设置后面创建原型需要的宏
+						//如：{#NAME} = xx			,则就会多出来一个宏
+						//	  {#FSNAME} = $.fs.name
+						//参考：https://www.zabbix.com/documentation/4.4/manual/appendix/preprocessing/jsonpath_functionality
+  Filters				//过滤发现的数据
+  
+2.创建Item prototypes
+  需要指定一个已经存在的key，可以通过宏进行参数传递
+  
+3.还可以创建其他的prototypes（trigger，graph，host）
+  
+###############################################################################
