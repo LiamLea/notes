@@ -18,7 +18,26 @@
 （1）当不知道的主机请求checks
 （2）HostMetadata变化了
 #auto registration变化了，不会影响
+
+4.基础概念
+
+（1）history
+  每个指标，每次采集获得的值，所有history占用的空间：days * ( items / refresh rate) * 24 * 3600 * bytes
+#days：保存的天数
+#items：item数量
+#refresh rate：采集周期（一般为1分钟）
+#bytes：保存一个值的字节数，取决于存储引擎（一般为90字节）
   
+（2）trends
+  每个小时的平均值，所有trends占用的空间：days * (items/3600) * 24 * 3600 * bytes
+  
+（3）events
+  有以下几种类型：
+	trigger events				//当告警的状态切换就是一个事件（如：OK -> PROBLEM）
+	discovery events			//当有主机和服务被检测到时
+	auto registration events	//当客户端主动注册时
+	internal events				//当item或lld规则变成unsupported状态，或者trigger变为unknown状态
+	
 
 ###############################################################################
 宏

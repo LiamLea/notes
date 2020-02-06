@@ -21,3 +21,28 @@
   监控ms（managed server）
 
 ###############################################################################
+基本操作
+
+1.启动weblogic
+
+（1）进入某个域的文件夹下
+  /home/oracle/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain
+
+（2）启动weblogic
+  nohub ./bin/startWeblogic.sh &	//需要等好几分钟才能启动起来
+  
+2.创建managed server
+
+（1）访问控制台：http://xx:7001
+  环境 -> 服务器 -> 新建 -> 设置服务器名称和监听端口
+
+（2）设置免密启动
+  mkdir ./servers/xx/security		//在被管服务器的目录下创建security目录
+  vim ./servers/xx/security/boot.properties
+#username=xx
+#password=xx
+
+（3）启动managed server
+  nohup ./bin/startManagedWeblogic.sh 服务器名 http://xx:7001 &
+  
+###############################################################################
