@@ -73,6 +73,14 @@
   
 3.ulimit -u
   一个用户最多能同时打开的进程数
+  
+4.进程的运行参数
+  /proc/xx/cmdline
+  /proc/xx/comm
+  /proc/xx/exe
+  /proc/xx/cwd
+  /proc/xx/fd/
+  /proc/xx/environ
 
 #############################################################################
 网络参数

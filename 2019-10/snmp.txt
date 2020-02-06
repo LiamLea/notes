@@ -12,9 +12,9 @@
 如：rocommunity xx	     //只要口令是xx，都是只读共同体  
 
 4.v3三种安全级别（认证即对身份进行认证，加密即对信息进行加密，就不需要共同体名了）
-  noAuthNoPriv           //不认证也不加密
-  authNoPriv               //认证但是不加密
-  authPriv                   //既认证又加密
+  noAuthNoPriv           //不认证（authentication）也不加密（privicy）
+  authNoPriv             //认证但是不加密
+  authPriv               //既认证又加密
 
 5.v2c和v3的区别
   v2c      //明文传输，团体名进行安全机制管理，简单

@@ -99,11 +99,11 @@ maven命令
 
 5.mvn package               //执行打包,在target目录下生成jar包
 
-6.mvn install               //将此maven项目安装到本地仓库中,就可以被依赖
+6.mvn install               //在package基础上，同时把打好的可执行jar包（war包或其它形式的包）布署到本地maven仓库
 
 7.mvn sit                   //生成站点
 
-8.mvn deploy                //进行部署,需要在配置文件进行相关配置，不建议使用
+8.mvn deploy                //在package基础上，同时把打好的可执行jar包（war包或其它形式的包）布署到本地maven仓库和远程maven私服仓库
 
 #一般这样使用：将代码打包，然后部署jar包或war包
 

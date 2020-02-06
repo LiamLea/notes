@@ -217,5 +217,34 @@
   
 （2）自己设置标题
   awk 'BEGIN{print "title1 title2"}/xx/{print}' xx
+  
+33.WAL：write-ahead logging 
+  预写日志，更改首先记录在日志中（日志存储在稳定的存储上），然后再将更改写入数据库
 
+34.以指定用户身份执行命令
+（1）且获得该用户的环境变量
+  su - 用户名 -c 命令
+  
+（2）使用原用户的环境变量
+  su 用户 -c 命令
+  
+35.find 去除指定目录
+  find / -path '/tmp' -prune -o -iname 'test*' | grep -v '/tmp'
+  
+#跳过/tmp目录，这个执行的结果为false
+#-o or
+
+36.调试iptables
+（1）开启内核功能
+	modprobe nf_log_ipv4
+	sysctl net.netfilter.nf_log.2=nf_log_ipv4
+	
+（2）添加跟踪规则（只能在raw表中添加）
+	iptables -t raw -A PREROUTING xx(这里填需要跟踪的包的条件) -j TRACE
+	iptables -t raw -A OUTPUT xx(比如：-s 1.1.1.1) -j TRACE
+
+（3）查看日志：/var/log/messages
+
+37.docker的端口映射，需要开启主机的ip转发功能
+  
 ###############################################################################

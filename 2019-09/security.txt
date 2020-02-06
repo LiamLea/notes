@@ -124,6 +124,9 @@ openssl（配置文件：/etc/pki/tls/openssl.cnf）
 			   -CAcreateserial \			//当序列号文件不存在则自动创建，如果在openssl的配置的目录下找不到serial文件，该命令就会报错
 			   -days 3650 -out xx
 
+3.查看证书内容
+  openssl x509 -in xx -text
+
 ###############################################################################
 认证机制
 
@@ -134,5 +137,18 @@ openssl（配置文件：/etc/pki/tls/openssl.cnf）
            ----发送用户名----------------->
 client     <---发送chanllenge（生成的随机数），server会根据用户名从SAM文件中取得密码的hash值，然后与chanllenge值计算，生成chanllenge1，保存在本地--
            ----输入密码，然后利用该密码的hash值和chanllenge计算出reponse发送给server，与chanllenge1比较，如果相同，则认证成功------>
+
+2.域认证体系——kerbroes
+（1）kerberos是一种网络认证协议，需要第三方服务
+（2）域认证所参与的三个角色：
+  client
+  server
+  KDC（key distribution center，密钥分发中心，部署在域控制器上）	
+#KDC就是第三方服务，用于保证client和server端安全通信
+#比证书认证更加复杂
+		   
+###############################################################################
+
+
 
 ###############################################################################
