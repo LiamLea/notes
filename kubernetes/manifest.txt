@@ -32,15 +32,15 @@
     annotations: xx
   spec:                                              //定义期望的状态（desired state）
 	containers:
-		name：
-		image:
-		imagePullPolicy:							//Always，Never，IfNotPresent
-		ports:
-			name:									//给该端口取个名
-			containerPort:							//声明要暴露的端口
-		livenessProbe:								//存活探测
-		readinessProbe:								//就绪探测
-		lifecycle:									//设置postStart和preStop操作
+	- name：
+	  image:
+	  imagePullPolicy:							//Always，Never，IfNotPresent
+	  ports:
+		name:									//给该端口取个名
+		containerPort:							//声明要暴露的端口
+	  livenessProbe:								//存活探测
+	  readinessProbe:								//就绪探测
+	  lifecycle:									//设置postStart和preStop操作
 	nodeSelector:									//设置标签选择器，选择出符合要求的node
 	nodeName:										//指定该pod运行在哪个node节点上
 	restartPolicy:									//设置重启策略：Always，Never，OnFailure
