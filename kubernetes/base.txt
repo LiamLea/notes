@@ -94,7 +94,7 @@ kubectl（apiserver的客户端程序，是k8s集群的管理入口）
 
 4.在某个pod执行指令                                                                   
   kubectl exec NAME -c xx [-it] -- 命令                  //NAME：pod名称
-                                                                           //-c 指明该pod中具体的容器，当pod中有多个容器时使用
+                                                         //-c 指明该pod中具体的容器，当pod中有多个容器时使用
 
 二.创建service（为pods提供固定访问点，之后，就可以直接访问该service，从而访问到相应的pod，因为pod的地址可能变化）
   kubectl expose TYPE NAME \              //TYPE：控制器的类型，NAME：控制器名字必须是已存在的
@@ -110,9 +110,10 @@ kubectl（apiserver的客户端程序，是k8s集群的管理入口）
 3.kubectl get ns                  //获取集群已有的名称空间
 
 4.kubectl get pods 
-                   -n xx              //-n指明名称空间，不加-n，默认是default名称空间
-                   -o wide          //-o指明输出格式，wide输出扩展信息，包括该pod在哪个节点上
-                   -l xx=xx        //过滤含有xx这个标签且标签值为xx的pods，也可以-l xx直接过滤含有xx标签的pods  
+				   --all-nampspace	 	//获取所有命名空间下的pod
+                   -n xx              	//-n指明名称空间，不加-n，默认是default名称空间
+                   -o wide          	//-o指明输出格式，wide输出扩展信息，包括该pod在哪个节点上
+                   -l xx=xx        		//过滤含有xx这个标签且标签值为xx的pods，也可以-l xx直接过滤含有xx标签的pods  
 #标签有两种关系判断：
 #  等值关系：=    !=
 #  集合关系：KEY in (VALUE1,VALUE2,...)   
