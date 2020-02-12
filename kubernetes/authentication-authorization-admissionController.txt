@@ -2,14 +2,15 @@
 authentication（认证）
 
 1.认证
-  访问k8s集群需要先经过apiServer的认证，因此需要一个账号
+  访问k8s集群需要先经过apiServer的认证
+  因此需要一个 账号 和 密码（即令牌）
 
 有两类账号：
   UserAccount，用户访问使用的账号
   ServiceAccount，内部服务访问使用的账号
   
-#每个namespace中都有一个Secret资源，存储的是token
-#该名称空间内的pod都会挂载该Secret，从而能够访问apiServer
+#每个namespace中都有一个Secret资源，存储的是token，用于认证
+#该名称空间内的pod都会挂载该Secret，从而能够通过apiServer的认证
 
 #ServiceAccount可以绑定docker-registry类型的secrets
 #从而可以指定其他到其他仓库
