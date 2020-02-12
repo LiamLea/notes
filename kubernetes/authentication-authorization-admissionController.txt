@@ -1,22 +1,82 @@
 ###############################################################################
 authentication（认证）
 
-1.认证：访问k8s集群需要先经过认证，即需要一个账号
+1.认证
+  访问k8s集群需要先经过apiServer的认证，因此需要一个账号
 
 有两类账号：
-  userAccount，用户访问使用的账号
-  serviceAccount，内部服务访问使用的账号，
-#每个namespace中都有一个secret资源，存储的是token
-#该名称空间内的pod都会挂载该secret，从而能够访问apiServer
+  UserAccount，用户访问使用的账号
+  ServiceAccount，内部服务访问使用的账号
+  
+#每个namespace中都有一个Secret资源，存储的是token
+#该名称空间内的pod都会挂载该Secret，从而能够访问apiServer
+
+#ServiceAccount可以绑定docker-registry类型的secrets
+#从而可以指定其他到其他仓库
 
 2.创建serviceaccount
   kubectl create serviceaccount 账号名
   
+#创建ServiceAccount资源后，会自动生成一个用于 认证 的Secret，并与该ServiceAccount绑定
+  
 3.指定pod使用哪个账号
-  pods.spec.serviceAcountName
+  spec.ServiceAcountName
+  
+#pod使用指定ServiceAccount，会挂载相应的Secret
 
 ###############################################################################
 authorization（授权）
+
+1.常用的授权插件：
+  Node
+  ABAC：attribute-based access control
+  RBAC：role-based access control			//k8s采用的是RBAC
+  Webhook
+
+2.k8s上角色有两个级别
+  集群级别
+  名称空间级别
+  
+3.相关资源
+  Role					//属于某个命名空间的role
+  RoleBinding			//用于将某个role（包括ClusterRole）与某个命名空间绑定
+  ClusterRole			//属于集群的role
+  ClusterRoleBinding	//用于将某个ClusterRole与集群绑定
+  
+#最常用的方式：
+#	创建一个ClusterRole，然后使用RoleBinding 在 某个命名空间中 将 角色 与 某个账号 绑定
+#	好处是，不需要在每个命名空间中再额外创建role
+
+4.定义角色
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRole		//ClusterRole不需要指定namespace
+  metadata:
+    name: xx		
+  rules:
+  - apiGroups:
+    - xx				//指定api群组，如果是核心组，就填：""
+    resources:			//指定资源类型
+	- xx				//比如：pods
+	verbs:				//指定允许的操作
+	- xx				//比如：get,list,watch
+
+5.将角色与账号（包括UserAccount和ServieAccount）绑定
+  apiVersion：rbac.authorazation.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    name: xx
+	namespace: xx							//指定在哪个命名空间中绑定
+  roleRef:									//指定需要绑定的role
+    apiGroup: rbac.authorization.k8s.io
+	kind: ClusterRole
+	name: xx
+  subjects:									//指定需要绑定的账号
+  - apiGroup: rbac.authorization.k8s.io
+    kind: ServiceAccount					//还可以填User和Group
+	name: xx
+
+###############################################################################
+admissionController（准入控制）
 
 
 

@@ -29,6 +29,7 @@ service基础
   能够使得集群内的pod能够与外界联系，这种类型的service就充当这个外出的桥梁
   即，集群内的pod，需要将请求先发送到service，service为其做代理外出取得数据，然后返回给pod
   像使用集群内部的资源一样，使用集群外部的资源
+#作用：路由外出的请求（提高了灵活性）
   
 3.headless service
   无头setvice，即该service没有ClusterIP，当解析该service的域名时，解析结果直接返回后端的pod的ip
@@ -52,5 +53,17 @@ spec:
     targetPort: xx		 //容器上端口
 	nodePort: xx         //当类型为NodePort时，才需要这一项
 
+###############################################################################
+创建ExternalName类型的service
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: xx
+  namespace: xx
+spec:
+  type: ExternalName
+  externalName: xx			//这里要填域名，不能填ip
+							//内部的服务服务，访问上面的name时，就会路由到该域名
 
 ###############################################################################
