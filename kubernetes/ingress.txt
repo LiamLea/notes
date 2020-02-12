@@ -8,7 +8,7 @@ ingress会关联相应的service，从而能够知道 有哪些pod和pod与servi
 ingress会将后端pod的信息注入到ingress controller配置中
 
 整个流程：
-  外部流量 -> service -> ingress controller -> 后端pod（这里pod由service分类）
+  外部（或内部）流量 -> service -> ingress controller -> 后端pod（这里pod由service分类）
 
 ###############################################################################
 
@@ -36,7 +36,7 @@ metadata:
 	kubernetes.io/ingress.class: "nginx"		//不能省略，指明使用的ingress是nginx
 spec:
   rules:
-  - host: xx				//当通过虚拟主机转发请求时，才需要设置这一项
+  - host: xx				//流量的目标主机，不设置这一项，匹配所有请求继续进行规则判断
 	http:
 	  paths:
 	  - path: xx			//根据url，转发请求

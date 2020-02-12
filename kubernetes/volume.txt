@@ -32,6 +32,8 @@
 		docker-registry				//用于设置私有仓库的账号密码
 		generic
 		tls							//用于存放证书和私钥
+		
+#可以通过kubectl create secret 类型 ... --dry-run -o yaml	生成相应配置文件模板或者直接创建
 
 3.pvc
   persistent volume claim，是一种资源

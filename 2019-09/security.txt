@@ -119,7 +119,7 @@ openssl（配置文件：/etc/pki/tls/openssl.cnf）
 #CN（Common Name）一定要和访问的域名设置成一样
 
 （2）签署证书请求文件，生成数字证书
-  openssl x509 -req -in xx \
+  openssl x509 -req -in xx \				//-req -in 后面跟请求文件
 			   -CA xx -CAkey xx \
 			   -CAcreateserial \			//当序列号文件不存在则自动创建，如果在openssl的配置的目录下找不到serial文件，该命令就会报错
 			   -days 3650 -out xx
