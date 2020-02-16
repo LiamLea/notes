@@ -33,6 +33,14 @@ service基础
   
 3.headless service
   无头setvice，即该service没有ClusterIP，当解析该service的域名时，解析结果直接返回后端的pod的ip
+  用于和StatefulSet控制器结合使用
+
+4.service的FQDN			//在k8s集群内，利用FQDN访问service
+
+  SERVICENAME.NAMESPACE.svc.CLUSTERNAME		//CLUSTERNAME可以通过kubeadm-config.yaml配置文件查看到
+  
+##可以简写成：SERVICENAME.NAMESPACE
+##到在同一个namespace中，可以简写成：NAMESPACE
 
 ###############################################################################
 service清单

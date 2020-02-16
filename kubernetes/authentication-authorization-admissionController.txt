@@ -80,5 +80,21 @@ authorization（授权）
 admissionController（准入控制）
 
 
+###############################################################################
+demo：使得某个Pod有权限管理整个k8s集群
 
+比如：使用某个有权限的serviceaccount的token即可登录到dashboard
+      （启动dashboard这个pod时不必指定serviceaccount）
+
+1.首先创建一个serviceaccount
+  kubectl create serviceaccount xx -n xx
+  
+2.绑定cluster-admin这个角色（这个角色是创建集群时生成的，所以不需要额外创建角色了）
+  kubectl create clusterrolebinding xx \
+		  --clusterrole=cluster-admin \
+		  --serviceaccount=命名空间:xx \
+	
+3.获取该serviceaccount的secret，从而获取token
+  利用该token即可登录dashboard
+							
 ###############################################################################

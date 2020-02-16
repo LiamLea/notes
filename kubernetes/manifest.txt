@@ -24,7 +24,7 @@
 
 2.清单主要内容
   apiVersion: group/version                 //通过kubectl api-versions可以查看
-  kind: 资源类别
+  kind: Pod
   metadata：
     name: xx
     namspace: xx
@@ -44,7 +44,7 @@
 	nodeSelector:									//设置标签选择器，选择出符合要求的node
 	nodeName:										//指定该pod运行在哪个node节点上
 	restartPolicy:									//设置重启策略：Always，Never，OnFailure
-  status:                                            //当前状态，本字段有kubernetes集群维护，会与spec定义的无限接近
+  status:                                            //当前状态，本字段由kubernetes集群维护，会与spec定义的无限接近
 
 3.查看如何书写清单
 （1）查看某种资源的一级字段
