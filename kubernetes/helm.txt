@@ -23,7 +23,7 @@
 使用
 
 1.初始化helm（即生成tiller服务端）
-  helm init --service-aacount tiller
+  helm init --service-account tiller
 
 2.检测是否可用
   helm version			//会列出client端和server端的版本信息

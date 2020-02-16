@@ -78,9 +78,37 @@
   通过iptables规则        //pod与service之间的通信
 
 ###############################################################################
+进阶操作
+
+1.kubectl api-versions		//列出所有可用的apiVersion
+
+（1）apiVersion的结构
+
+	group/verison	
+#特列是核心群组中的：v1
+
+（2）url中的路径
+
+	apis/GROUP/VERSION/RESOURCE	
+#比如：apis/apps/v1/namespaces/default/deployment
+#列出default命名空间中的所有deployment控制器
+
+#特列：核心群组
+#比如：api/v1/namespace
+#列出所有的命令空间
+
+2.在某台master上开启代理
+  kubectl proxy --address="0.0.0.0" --port=8080 --accept-hosts='^.*' --accept-paths='^.*'
+
+#之后就可以利用url获得相关资源
+#比如：
+#	curl 127.0.0.1:8080/api/v1/namespaces
+
+###############################################################################
 kubectl（apiserver的客户端程序，是k8s集群的管理入口）
 
 一.管理pods
+
 1.创建pods
   kubectl run NAME \
             --image=xx \                  //NAME为给pod控制器的名字
@@ -95,8 +123,8 @@ kubectl（apiserver的客户端程序，是k8s集群的管理入口）
   kubectl set image deployment 控制器名 容器名=新的镜像名          //容器名可以通过kubectl describe pod xx查看 
 
 4.在某个pod执行指令                                                                   
-  kubectl exec NAME -c xx [-it] -- 命令                  //NAME：pod名称
-                                                         //-c 指明该pod中具体的容器，当pod中有多个容器时使用
+  kubectl exec NAME [-c xx] [-it] -- 命令       //NAME：pod名称
+                                                //-c 指明该pod中具体的容器，当pod中有多个容器时使用
 
 二.创建service（为pods提供固定访问点，之后，就可以直接访问该service，从而访问到相应的pod，因为pod的地址可能变化）
   kubectl expose TYPE NAME \              //TYPE：控制器的类型，NAME：控制器名字必须是已存在的
@@ -125,23 +153,6 @@ kubectl（apiserver的客户端程序，是k8s集群的管理入口）
 5.kubectl get svc               //svc：services
 
 6.kubectl describe TYPE NAME      //TYPE：资源类型，NAME：资源名称，查看某个资源的详细信息
-
-7.kubectl api-versions		//列出所有可用的apiVersion
-
-（1）apiVersion的结构
-
-	group/verison	
-#特列是核心群组中的：v1
-
-（2）url中的路径
-
-	apis/GROUP/VERSION/RESOURCE	
-#比如：apis/apps/v1/namespaces/default/deployment
-#列出default命名空间中的所有deployment控制器
-
-#特列：核心群组
-#比如：api/v1/namespace
-#列出所有的命令空间
 
 四.管理标签
 1.kubectl label TYPE NAME xx1=xx ... xxn=xx       //给某个资源打标签
