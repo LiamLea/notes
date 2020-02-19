@@ -229,6 +229,11 @@ spec:
 	volumeMounts:
 	- name: xx				//xx为存储卷的名字
 	  mountPath: xx			//xx为挂载路径
+	  subPath: xx			//用于帮助判断mountPath指定的文件还是目录
+							//当subPath和mountPath的最后相同时，则mounPath为文件
+							//比如：mountPath为/tmp/test，subPath为test，则/tmp/test就是文件，挂载路径就是/tmp/test
+							//当subPath和mountPath的最后不相同时，则mountPath为目录
+							//比如：mountPath为/tmp/test，subPath为test，则/tmp/test就是目录，挂载路径就是/tmp/test/test
   volumes:					//创建存储卷
   - name: xx				//xx为该存储卷取名字
     configMap:				//存储卷的类型为configMap
@@ -246,6 +251,13 @@ kubectl create secret 类型 名字 --from-file=文件路径     //文件名就�
 								--from-literal=xx1=xx2   //xx1就是键，xx2就是值
 
 查看某个secret的具体内容
-kubectl describe secret xx
+
+（1）获取secret的数据
+
+	kubectl get secret xx -o yaml
+	
+（2）解码数据
+
+	echo 数据 | base64 --decode
 
 ###############################################################################

@@ -33,7 +33,8 @@ metadata:
   name: xx
   namespace: xx         //跟后端的pod在同一个名称空间中，而不是ingress-nginx
   annotations: 
-	kubernetes.io/ingress.class: "nginx"		//不能省略，指明使用的ingress是nginx
+	kubernetes.io/ingress.class: "nginx"		//不能省略，指明使用nginx实现的ingress
+	kubernetes.io/tls-acme: "false"				//指明是否使用tls认证
 spec:
   rules:
   - host: xx				//流量的目标主机，不设置这一项，匹配所有请求继续进行规则判断

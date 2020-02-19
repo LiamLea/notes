@@ -19,6 +19,13 @@
 （2）tiller
   服务端，接收helm发来的charts和config，合并生成release
   
+5.chart目录结构
+  Chart.yaml				//该chart的描述文件,包括ico地址,版本信息等
+  templates					//存放k8s模板文件目录
+  values.yaml				//给模板文件使用的变量
+  requirements.yaml			//指明该chart依赖哪些chart
+  charts					//存放依赖的chart的目录
+  
 ###############################################################################
 使用
 
@@ -39,8 +46,27 @@
   hel package chart路径		//打包本地的chart文件
 
 5.release管理
-  helm install --name xx xx1	//为chart名或者本地chart的路径
+  helm install --name xx xx1	//xx1为chart名或者本地chart的路径
+  helm status xx				//查看已安装的release的信息（包括service信息等）
   helm list						//列出已安装的release
-  helm delete xx
+  helm delete xx --purge
+  helm upgrade xx xx1			//xx1为chart名或者本地chart的路径
+
+###############################################################################
+helm模板语法
+
+1.模板引用方式
+  {{ .OBJECT.Name }}		//通过双括号注入,小数点开头表示从最顶层命名空间引用.
+
+2.helm内置对象
+  Release					//release相关属性
+  Chart						//Chart.yaml文件中定义的内容
+  Values					//values.yaml文件中定义的内容
+  
+###############################################################################
+自定义chart
+
+1.创建chart
+  helm create xx
 
 ###############################################################################

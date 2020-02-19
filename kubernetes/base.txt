@@ -26,11 +26,17 @@
 #pod的域名有点特殊需要跟上service的名称：
 #	NAME.SERVICE_NAME.NAMESPACE.DOMAIN
   
-（2）heapster
+（2）metrics-server
+  用于获取k8s集群中的一些指标数据（比如：cpu和内存的使用量）
 
 （3）dashboard
 
 （4）ingress controller
+
+（5）fluentd
+  用于采集集群内个资源的日志
+  k8s的所有日志都在：/var/log/containers
+  fluentd通过DaemonSet方式部署，挂载/var/log/containers目录，即可采集所有日志
 
 5.网络组件（有很多，选择其中一个即可）
   flannel                            //网络配置
@@ -103,6 +109,9 @@
 #之后就可以利用url获得相关资源
 #比如：
 #	curl 127.0.0.1:8080/api/v1/namespaces
+
+3.运行测试镜像（cirros，里面的工具比较多）
+  kubectl run xx --image=cirros --rm -it -- /bin/bash
 
 ###############################################################################
 kubectl（apiserver的客户端程序，是k8s集群的管理入口）
