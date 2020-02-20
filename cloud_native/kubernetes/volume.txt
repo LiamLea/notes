@@ -17,15 +17,15 @@
 （3）nfs
 	使用nfs服务器提供的目录
 	
-（4）PersistentVolumeClaim（是一种资源）
+（4）PersistentVolumeClaim
 
-（5）ConfigMap（是一种资源）
+（5）ConfigMap（挂载时需要特别注意）
 
-	相当于配置中心，使得配置文件与镜像解耦
 	挂载configMap类型的存储卷，则该configMap中的键名就是文件名，键值就是文件内容
+	
 	比如，configMap中一个键值对为 aa=bb，则会在容器内的挂载目录下生成名为aa的文件，文件的内容为bb
 
-（6）Secret（是一种资源）
+（6）Secret
 
 	与ConfigMap类似，只不过ConfigMap是明文的，Secret是加密的
     有三类Secret：
@@ -43,8 +43,27 @@
   persistent volume，是一种资源
   是存储卷，映射到指定的后端存储空间（能够映射各种存储空间）
   
-5.StorageClass
-  对后端存储进行分类，当pvc需要存储资源时，从特定分类中，动态分配存储卷   //pv是静态的
+5.StorageClass（动态pv）
+
+  当创建pvc后，会自动生成pv与之绑定
+
+  自动创建的 PV 以${namespace}-${pvcName}-${pvName}这样的命名格式创建在 NFS 服务器上的共享数据目录中
+  
+  而当这个PV被回收后会以archieved-${namespace}-${pvcName}-${pvName}这样的命名格式存在 NFS 服务器上
+
+
+6.mountPath和subPath（注意！！！！！）
+
+  mount操作 是将 volume 挂载 进容器内，所以volume中的内容会覆盖容器中的内容
+
+  mounPath	指定容器内的挂载点
+  subPath	指定volume中的路径，如果没有则创建
+  
+#没有subPath，则将volume挂载到挂载点上
+#有subPath，则将volume中的某个路径挂载到挂载点上
+  
+#比如：mountPath为/tmp/test，subPath没设置，则将volume挂载到/tmp/test上
+#比如：mountPath为/tmp/test，subPath为test，则把volume/test挂载到/tmp/test上
 
 ###############################################################################
 创建一个自主式pod，使用emptyDir存储卷
@@ -124,7 +143,7 @@ spec:
   nfs:										//这里指明存储空间的类型，这里用的是nfs
     path: xx
 	server: xx
-  accessModes: ["ReadWriteMant","ReadWriteOnce"]  				//一共由三种模式，（ReadWriteMany，能被多个节点以读写方式挂载）,（ReadWriteOnce，只能被一个节点以读写方式挂载），（ReadOnlyMany）
+  accessModes: ["ReadWriteMant","ReadWriteOnce"]  	//一共由三种模式，（ReadWriteMany，能被多个节点以读写方式挂载）,（ReadWriteOnce，只能被一个节点以读写方式挂载），（ReadOnlyMany）
   capacity:
     storage: xx								//指定允许的容量（单位：Ki，Mi，Gi，...）
   persistentvolumeReclaimPolicy: Retain  	//指定当pvc与pv解除绑定，pv的回收策略，默认是Retain，即保留pv里的数据
@@ -175,7 +194,7 @@ spec:
   containers:
   - name: xx
     image: xx
-	VolumeMounts:
+	volumeMounts:
 	- name: xx
 	  mountPath: xx
 	volumes:
@@ -186,9 +205,24 @@ spec:
 ###############################################################################
 创建ConfigMap资源
 
-kubectl create configmap named xx --from-file=文件路径     //文件名就是键，文件内容就是值
-								  --from-file=xx=文件路径	//xx就是键，文件内容就是值
-								  --from-literal=xx1=xx2   //xx1就是键，xx2就是值
+kubectl create configmap xx --from-file=文件路径     //文件名就是键，文件内容就是值
+							--from-file=xx=文件路径	//xx就是键，文件内容就是值
+							--from-literal=xx1=xx2   //xx1就是键，xx2就是值
+
+
+##清单格式：
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: xx
+  namespace: websphere
+data:
+  xx: |
+    xxx
+	xxx
+	...
+
 
 ###############################################################################
 将ConfigMap中的配置注入pod
@@ -229,13 +263,7 @@ spec:
 	volumeMounts:
 	- name: xx				//xx为存储卷的名字
 	  mountPath: xx			//mounPath用于指定挂载点
-	  subPath: xx			//用于指定需要挂载的内容
-							//当没有设置subPath，则把mountPath挂载到 （目录上）
-							//当设置了subPath，则把subPath挂载到 （目录里）
-							//当subPath和mountPath的最后相同时，则把mountPath挂载到 （目录里）
-							//比如：mountPath为/tmp/test，则/tmp/test挂载到目录里
-							//当subPath和mountPath的最后不相同时，则把subPath挂载到 （目录里）
-							//比如：mountPath为/tmp/test，subPath为test，则把/tmp/test/test挂载到目录里
+	  subPath: xx			
   volumes:					//创建存储卷
   - name: xx				//xx为该存储卷取名字
     configMap:				//存储卷的类型为configMap
@@ -261,5 +289,43 @@ kubectl create secret 类型 名字 --from-file=文件路径     //文件名就�
 （2）解码数据
 
 	echo 数据 | base64 --decode
+
+###############################################################################
+动态pv（以nfs为例）
+
+#在github kubernetes-incubator/extral-storage/nfs-client中有nfs相关的yaml文件
+
+1.创建provisioner
+
+#从github上复制配置文件
+
+  kubectl apply -f rbac.yaml			//授权
+  kubectl apply -f deployment.yaml		//创建provisioner（即nfs的客户端）  
+  
+2.创建StorageClass
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: xx					//重要，用于指定storage class的名字
+provisioner: xx				//重要，需要指定上面创建的provisioner
+
+3.创建一个pvc测试
+
+#指定使用的storage class
+#会自动创建pv，并与该pvc绑定
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: test-claim
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "xx"		//这项十分重要，用于指定使用哪个storage class
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Mi
 
 ###############################################################################
