@@ -124,7 +124,7 @@ spec:
   nfs:										//这里指明存储空间的类型，这里用的是nfs
     path: xx
 	server: xx
-  accessModes: ["RWX","RWO"]  				//一共由三种模式，RWX（ReadWriteMant，能被多个节点以读写方式挂载），RWO（ReadWriteOnce，只能被一个节点以读写方式挂载），ROX（ReadOnlyMany）
+  accessModes: ["ReadWriteMant","ReadWriteOnce"]  				//一共由三种模式，（ReadWriteMany，能被多个节点以读写方式挂载）,（ReadWriteOnce，只能被一个节点以读写方式挂载），（ReadOnlyMany）
   capacity:
     storage: xx								//指定允许的容量（单位：Ki，Mi，Gi，...）
   persistentvolumeReclaimPolicy: Retain  	//指定当pvc与pv解除绑定，pv的回收策略，默认是Retain，即保留pv里的数据
@@ -149,12 +149,12 @@ spec:
 创建pvc资源
 
 apiVersion: v1
-kind: persistentVolumeClaim
+kind: PersistentVolumeClaim
 metadata:
   name: xx
   namespace: default				//需要与pod在同一名称空间中
 spec:
-  accessMode: ["RWX"]				//必须是pv定义的accessMode的子集
+  accessModes: ["ReadWriteMany"]				//必须是pv定义的accessMode的子集
   resources:
     requests: 
 	  storage: xx					//单位（Ki，Mi，Gi，...）
@@ -228,12 +228,14 @@ spec:
     image: xx
 	volumeMounts:
 	- name: xx				//xx为存储卷的名字
-	  mountPath: xx			//xx为挂载路径
-	  subPath: xx			//用于帮助判断mountPath指定的文件还是目录
-							//当subPath和mountPath的最后相同时，则mounPath为文件
-							//比如：mountPath为/tmp/test，subPath为test，则/tmp/test就是文件，挂载路径就是/tmp/test
-							//当subPath和mountPath的最后不相同时，则mountPath为目录
-							//比如：mountPath为/tmp/test，subPath为test，则/tmp/test就是目录，挂载路径就是/tmp/test/test
+	  mountPath: xx			//mounPath用于指定挂载点
+	  subPath: xx			//用于指定需要挂载的内容
+							//当没有设置subPath，则把mountPath挂载到 （目录上）
+							//当设置了subPath，则把subPath挂载到 （目录里）
+							//当subPath和mountPath的最后相同时，则把mountPath挂载到 （目录里）
+							//比如：mountPath为/tmp/test，则/tmp/test挂载到目录里
+							//当subPath和mountPath的最后不相同时，则把subPath挂载到 （目录里）
+							//比如：mountPath为/tmp/test，subPath为test，则把/tmp/test/test挂载到目录里
   volumes:					//创建存储卷
   - name: xx				//xx为该存储卷取名字
     configMap:				//存储卷的类型为configMap
