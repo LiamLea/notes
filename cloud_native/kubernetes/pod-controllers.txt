@@ -215,7 +215,7 @@ spec:
 		volumeMounts:
 		- name: xx					//volume的名字
 		  mountPath: xx
-  volumeClainTemplates:
+  volumeClaimTemplates:			//这是一个模板，用于创建一个pvc
   - metadata:
       name: xx					//创建的volume的名字
 	spec:
