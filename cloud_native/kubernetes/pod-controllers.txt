@@ -216,6 +216,11 @@ spec:
 		- name: xx					//volume的名字
 		  mountPath: xx
   volumeClaimTemplates:			//这是一个模板，用于创建一个pvc
+
+#用这个模板的意义在于：
+#通过此方式创建的pv，statefulSet会唯一标识，并且与指定pod唯一对应
+#从而保证了能够维护pod的状态
+
   - metadata:
       name: xx					//创建的volume的名字
 	spec:
