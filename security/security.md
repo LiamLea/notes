@@ -1,9 +1,9 @@
-###基础
-####1.目的：
+### 基础
+#### 1.目的：
 * 机密性
 * 完整性（即防止数据被篡改）
 * 身份验证
-####2.几种加密方式：
+#### 2.几种加密方式：
 （1）单向加密		
 >输入一样，输出一定一样  
 
@@ -42,11 +42,11 @@
 >>应用：  
 >>用私钥加密特征码，保证完整性和身份验证   
 
-####3.实际双方通信时，加密的方式
+#### 3.实际双方通信时，加密的方式
 （1）利用自己的私钥加密信息特征码，从而保证了完整性和身份验证
 （2）其中利用对方的公钥加密对称加密密钥，然后发送给对方，从而实现了机密性
 
-####4.第三方机构（Certificate Authority）
+#### 4.第三方机构（Certificate Authority）
   是为了非对称加密设置的，确保所有人能够获得彼此正确的公钥
 
 >ca机构本身拥有公钥和私钥，ca机构的作用如下：
@@ -70,12 +70,12 @@
 （5）CSR请求（certificate signature request）
   ca机构根据CSR请求对相应公钥进行签名
 
-####5.SSL和TLS区别：
+#### 5.SSL和TLS区别：
   是两种协议，都是在应用层和传输层之间的，用于给数据加密
   SSL是一个公司发布的标准
   TLS是国际组织发布的标准
 
-####6.命名规范
+#### 6.命名规范
 * 私钥的后缀一般为：.key
 * 公钥的后缀一般为：.pub
 * 证书的后缀一般为：.crt
@@ -83,9 +83,9 @@
 * 请求的后缀一般为：.csr
 
 ***
-###应用
+### 应用
 
-####1.https建立连接的过程
+#### 1.https建立连接的过程
 ```mermaid
 sequenceDiagram
 client-->>server:请求建立连接
@@ -93,7 +93,7 @@ client-->server:协商使用的协议（SSLv3,TLS,...）
 server-->>client:将公钥发送给客户端
 client-->>server:随机生成对称密钥，通过公钥加密，发送给服务端
 ```
-####2.ssh建立连接过程
+#### 2.ssh建立连接过程
 ```mermaid
 sequenceDiagram
 client-->>server:请求建立连接
@@ -103,9 +103,9 @@ client-->>server:利用对称密钥加密server端的用户名和密码，完成
 server-->>client:利用对称密钥进行数据的加密
 ```
 ***
-###openssl
+### openssl
 **配置文件：/etc/pki/tls/openssl.cnf**
-####1.openssl实现私有ca
+#### 1.openssl实现私有ca
 
 （1）生成私钥
 ```shell
@@ -118,7 +118,7 @@ server-->>client:利用对称密钥进行数据的加密
 ```shell
   openssl req -new -x509 -key xx -out xx -days 3650
 ```
-####2.openssl利用已有ca，生成数字证书（即对其他公钥进行签名）
+#### 2.openssl利用已有ca，生成数字证书（即对其他公钥进行签名）
 
 （1）生成证书签名请求（利用私钥生成该请求，因为公钥是从私钥中提取出来的）
 ```shell
@@ -134,14 +134,14 @@ server-->>client:利用对称密钥进行数据的加密
           -CAcreateserial \       #当序列号文件不存在则自动创建，如果在openssl的配置的目录下找不到serial文件，该命令就会报错
           -days 3650 -out xx
 ```
-####3.查看证书内容
+#### 3.查看证书内容
 ```shell
   openssl x509 -in xx -text
 ```
 ***
-###认证机制
+### 认证机制
 
-####1.NTLM认证（new technology lan manager，winodws操作系统用户登录）
+#### 1.NTLM认证（new technology lan manager，winodws操作系统用户登录）
 密码经过hash后存储在：c:/windows/system32/config/SAM文件中
 ```mermaid
 sequenceDiagram
@@ -149,7 +149,7 @@ client-->>server:发送用户名
 server-->client:发送chanllenge（生成的随机数），server会根据用户名从SAM文件中取得密码的hash值，然后与chanllenge值计算，生成chanllenge1，保存在本地
 client-->server:输入密码，然后利用该密码的hash值和chanllenge计算出reponse发送给server，与chanllenge1比较，如果相同，则认证成功
 ```
-####2.域认证体系——kerbroes
+#### 2.域认证体系——kerbroes
 （1）kerberos是一种网络认证协议，需要第三方服务
 （2）域认证所参与的三个角色：
   * client
