@@ -142,6 +142,24 @@ kubectl（apiserver的客户端程序，是k8s集群的管理入口）
                   --target-port=xx        //target-port为容器的端口号
 
 三.查询操作
+
+
+
+*******重点******************
+
+kubectl api-resources				//查看当前系统可创建的资源
+
+kubectl get all不能获取指定命名空间下的全部资源，获取的方法：
+kubectl api-resources --verbs=list \	//过滤出支持list这个动作的资源
+					  --namespaced \	//过滤出属于名称空间范围的资源
+					  -o name		\	//过滤出资源的名字
+					  
+#可以将过滤出的资源放入一个文件中
+#然后遍历每一个资源，进行kubectl get，从而获取该名称空间下的已创建的全部资源
+
+
+
+
 1.kubectl get cs                   //cs：component status，获取改节点上的组件状态信息
 
 2.kubectl get nodes             //获取各节点的信息

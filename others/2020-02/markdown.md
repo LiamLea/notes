@@ -127,6 +127,7 @@ graph LR
 A["方形"]       //A是这个图形的名字，方形里面显示的文字是“方形”
 ("圆角"")
 {"菱形"}
+(("圆形"))
 
 A --> B       //设置箭头方向（这一个方向，可以调换图形的名字，从而改变指向）
 
@@ -157,4 +158,33 @@ subgraph 说明
   F("a")-->G("b")
 end
 
+yuan(("圆形"))
+
+```
+
+##画序列图
+```
+\`\`\`mermaid
+sequenceDiagram
+\`\`\`
+
+participant B
+participant A
+
+note [right of | left of][over] xx:Text
+
+连线：
+无箭头实线 ->
+有箭头实线 ->>
+无箭头虚线 –->
+有箭头虚线 –->>
+带x实线 -x
+带x虚线 –-x
+
+```
+```mermaid
+sequenceDiagram
+participant B
+participant A
+A-->>B:我去找B
 ```
