@@ -1,6 +1,6 @@
-###lsof（list open files）
+### lsof（list open files）
 
-####1.列出所有当前打开的文件，输出的格式：
+#### 1.列出所有当前打开的文件，输出的格式：
 ```shell
   COMMAND     #进程名称
   PID         #pid号
@@ -22,7 +22,7 @@
   NODE        #索引节点
   NAME        #文件的名称
 ```
-####2.选项
+#### 2.选项
 ```shell
   文件名         #列出打开该文件的进程
 
@@ -36,39 +36,39 @@
 
   +D 目录/      #类似+d，但是会递归子目录
 ```
-####3.应用场景
+#### 3.应用场景
 * 查看哪些进程在使用文件系统（利用+D选项）
 * 查看某个文件被哪个进程使用
 * 查看进程打开了哪些文件
 ***
-###strace
+### strace
 >strace用于跟踪进程运行时的系统调用等，输出的结果：  
 >>每一行都是一条系统调用，等号左边是系统调用的函数名及其参数，右边是该调用的返回值  
 
-####1.选项
+#### 1.选项
 ```shell
   -f            #跟踪由fork调用所产生的子进程
   -e 表达式     #表达式：
                 #trace=open 表示只跟踪open调用
 ```
 ***
-####locate
+#### locate
 
-####1.由四部分组成
+#### 1.由四部分组成
 ```shell
   /etc/updatedb.conf
   /var/lib/mlocate/mlocate.db     #存放文件信息的文件
   updatedb                        #该命令用于更新数据库
   locate                          #该命令用于在数据库中查找
 ```
-####2.配置文件：/etc/updatedb.conf
+#### 2.配置文件：/etc/updatedb.conf
 ```shell
   PRUNE_BIND_MOUNTS = "yes"       #开启过滤
   PRUNEFS = "xx1 xx2"             #过滤到的文件系统类型
   PRUNENAMES = ".git"             #过滤的文件
   PRUNEPATHS = "xx1 xx2"          #过滤的路径
 ```
-####3.locate命令
+#### 3.locate命令
 ```shell
   -b xx        #basename，文件名包含xx
   -i xx        #忽略大小写
