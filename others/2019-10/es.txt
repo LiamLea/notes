@@ -9,6 +9,15 @@
   type            //类似表
   field            //字段
   document   //一条记录
-  mapping     //用来定义各字段的属性（比如有一个字段，名为name，可以在mapping中定义这个字段，类型为string等）
+
+  settings		//用来定义该index的相关配置（比如：备份数等）
+  mappings     //用来定义该index中各字段的属性（比如有一个字段，名为name，可以在mapping中定义这个字段，类型为string等）
+
+###############################################################################
+
+curl IP:PORT/_cat				//查看可以查询的信息
+curl IP:PORT/_cat/indices		//查看有多少索引
+curl IP:PORT/INDEX?pretty		//查看该index的settings和mappings
+curl IP:PORT/INDEX/_search?pretty		//查看该index中存储的内容
 
 ###############################################################################
