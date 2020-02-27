@@ -1,7 +1,7 @@
-####1.REST架构：
+##### 1.REST架构：
 representation state transfer，表现层状态转移
 本质：URL定义资源，用HTTP方法处理资源
-#####2.利用ansible执行脚本的排错方法：
+##### 2.利用ansible执行脚本的排错方法：
 加上参数-vvv
 
 #####3.执行脚本最好使用：bash
