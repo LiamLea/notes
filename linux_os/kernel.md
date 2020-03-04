@@ -17,8 +17,6 @@ sysrq功能：可以在系统出现故障的时候协助恢复和调试系统，
 #minimum_console_loglevel           #控制台日志最高可以设置成该优先级，如：printk("<6>Hello, world!\n"); 所以尖括号中最小可以设置为该选项指定的值
 #default_console_loglevel           #控制台日志级别的缺省值，如：printk("Hello, world!\n"); 所以该消息的级别为该选项设置的默认值
 ```
-#### 3.vm.max_map_count							
-vm：virtual memory
 ***
 ### 内存参数（/proc/sys/vm）
 

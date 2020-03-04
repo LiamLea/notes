@@ -20,6 +20,11 @@
 ###函数
 **匹配对象,需要用其group()方法才能获取匹配内容**
 ```python
+m.group()       #输出匹配的内容
+m.group(1)      #输出匹配内容的第一个子串
+... ...
+```
+```python
 search('regexp','string')             #返回第一个匹配的对象
 
 m=search('f..','seafood is faad')     #m.group()为foo

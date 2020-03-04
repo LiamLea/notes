@@ -7,7 +7,7 @@
 * 用于定义index的settings和mappings（类似于表结构）
 * 要将数据传入es，必须要先设置index template
 * 在output的时候，可以创建template（即指定template的name和pattern）
-> 当模板已经存在时，不明确说明要覆盖的话，不会有任何影响
+> 当模板已经存在时，不明确说明要覆盖的话，不会对该模板有任何影响  
 > 当模板不存在时，则会利用默认配置和这里的相关配置创建相应的template    
 * 其中有一项index pattern，用于设置匹配的index
 >比如pattern设为"filebeat*"，则该模板会被应用到"filebeat*"的index上   
@@ -69,7 +69,25 @@ setup.ilm.enabled: false
 ```
 ### 更多配置
 **参考配置模板：/etc/filebeat/filebeat.refernce.yaml**
->general
+* input
+```yaml
+filebeat,inputs:
+
+#支持的typ类型：
+#   log,container,docker,kafka,redis,udp,tcp,syslog
+  - type: xx
+
+#打标签
+    tags: ["xx"]
+
+#增加额外信息到output
+    fields:
+      KEY:VALUE
+
+#设置该input的索引
+    index: "xx"
+```
+* general
 ```yaml
 name: "xx"           
 #用于设置该beat的名字，反应在agent.name字段
@@ -82,20 +100,20 @@ fields: {"key1":"vaule1","key2":"value2"}
 fields_under_root: true
 #设为true，如果添加的字段与原先冲突，添加的会覆盖原先的
 ```
->加载外部配置文件  
+* 加载外部配置文件  
 ```yaml
 filebeat.config.inputs:
   enabled: true
   path: inputs.d/*.yml
 ```
->配置queue（用于缓存，然后一次性输出）
+* 配置queue（用于缓存，然后一次性输出）
 ```yaml
 queue.mem:
   events: 4096                  #能够缓存4096个events
   flush.min_events: 512         #当达到512个时输出
   flush.timeout: 5s             #或当超过5s后输出
 ```
->output
+* output
 ```yaml
 output.elasticsearch:
   hosts: ["IP:PORT"]
@@ -116,20 +134,20 @@ output.elasticsearch:
         xx2: "yy2"
       default: "yy3"          #当没有匹配的时，就用默认的
 ```
->扩展index template  
+* 扩展index template  
 ```yaml
 output.elasticsearch:
   index: "customname-%{[agent.version]}-%{+yyyy.MM.dd}"
 setup.template.name: "your_template_name"
+
+#不使用默认模板，必须手动加载
+setup.template.enabled: false
 setup.template.fields: "path/to/fields.yml"     #这里面定义该template的内容，包括pattern
 
 #覆盖已加载模板的配置
 #setup.template.overwrite: true
-
-#不使用默认模板，必须手动加载
-#setup.template.enabled: false
 ```
->index lifecycle management  
+* index lifecycle management  
 
 管理索引，比如索引超过多少大小或多长时间，就打包在一起（起一个别名）
 ```yaml
@@ -141,7 +159,7 @@ setup.ilm.enabled: auto
 setup.ilm.name: "xx"              #使用的策略的名字
 setup.ilm.rollover_alias: "xx"    #rollover后，这些index的统称的名字
 ```
->日志设置  
+* 日志设置  
 
 ```yaml
 logging.level: info         #debug,info,warning,error
@@ -153,11 +171,11 @@ logging.files:
   permissions: 0644
 ```
 ### modules
->简化了常见日志格式的收集、解析和可视化  
-一个module就是一个配置好的配置文件  
-
+* 简化了常见日志格式的收集、解析和可视化  
+* 一个module就是一个配置好的配置文件  
 包括日志的路径、加载的index template和kibana dashboards等等
-每个module都提供一些变量供用户修改，从而能改变一些设置，比如日志的路径等
+* 每个module都提供一些变量供用户修改，从而能改变一些设置，比如日志的路径等
+* input是在module中定义的，但是可以覆盖；output是在module外定义的
 
 （1）开启指定模块
 ```shell
@@ -173,6 +191,9 @@ ls /etc/filebeat/modules/   #可以在该目录下的具体文件中，设置变
   access:
     enabled: true
     var.paths: ["xx"]
+
+#可以 覆盖input ，包括type，paths，index等
+#当覆盖paths时，上面的vars.paths就不要填了
     input:
       KEY: VALUE        #这里可以填input模块下的任何配置（比如index等）
 
