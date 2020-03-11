@@ -126,17 +126,43 @@ filter: []
 alert: [...]
 
 ```
-
-#### 3.测试rule
+### 3.在es中建立索引
+```shell
+elastalert-create-index --config xx
+```
+#### 4.测试rule
 ```shell
 #可以设置开始和结束的时间
 elastalert-test-rule --config xx rule文件路径
 ```
 
-#### 4.运行elastAlert
+#### 5.运行elastAlert
 ```shell
 #可以设置起始和结束时间，如果设置了结束时间，程序运行完就立即停止
 elastalert --verbose --config xx --rule rule文件名
+```
+***
+### 配置扩展
+#### 1.全局配置
+```yaml
+#报警时会添加告警元数据（包括：category，description，owner，priority）
+add_metadata_alert: True
+```
+#### 2.rule配置
+```yaml
+#将多个matches合并为一个alert
+aggregation:
+  hours: 2
+#比如在12:00产生了一个match，会在14:00的时候发送一个alert，不管这中间发生了多少match
+
+#在一段时间内防止重复告警
+realert: ...
+
+#设置alert的元数据
+owner: STRING         #标明告警的利益相关者
+priority: INT         #标明告警的级别
+category: STRING      #标明告警的类别
+description: STRING   #对该告警的描述信息
 ```
 ***
 ### 常用filter（过滤器）
@@ -294,7 +320,8 @@ max_cardinality: 2
 ```yaml
 alert:
   - command
-command: ["/bin/send_alert", "--username", "{match[username]}"]
+command: ["/bin/send_alert", "--username", "{field}"]
+#传递参数：{字段[子字段]}
 ```
 * Email
 * JIRA
