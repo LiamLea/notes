@@ -150,7 +150,8 @@ spec:
 	server: xx
   accessModes: ["ReadWriteMant","ReadWriteOnce"]  	//一共由三种模式，（ReadWriteMany，能被多个节点以读写方式挂载）,（ReadWriteOnce，只能被一个节点以读写方式挂载），（ReadOnlyMany）
   capacity:
-    storage: xx								//指定允许的容量（单位：Ki，Mi，Gi，...）
+    storage: xx								//描述该pv的容量（单位：Ki，Mi，Gi，...）
+											//注意：不是允许使用的容量，只是描述信息，便于pvc用来绑定相应的pv
   persistentvolumeReclaimPolicy: Retain  	//指定当pvc与pv解除绑定，pv的回收策略，默认是Retain，即保留pv里的数据
 											//并且会保留原先绑定的pvc的信息（比如：uuid），所以即使删除了pvc，这个pv也是无法使用的，重新创建pvc，也是无法使用的
 											//如果需要使用这个pv，需要删除该pv中的pod信息，即claimRef
