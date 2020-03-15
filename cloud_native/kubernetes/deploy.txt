@@ -43,7 +43,8 @@
   kubeadm init --control-plane-endpoint=域名:PORT	\	
 				--upload-certs						\
 			    --pod-network-cidr=10.244.0.0/16	\
-			    --service-cidr=10.96.0.0/12				
+			    --service-cidr=10.96.0.0/12			\
+				--kubernetes-version=v1.17.3
 
 #如果要添加多个master节点，必须设置--control-plane-endpoint和--upload-certs
 #还有其他设置：
