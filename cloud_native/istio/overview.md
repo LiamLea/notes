@@ -27,6 +27,6 @@
 ![](./imgs/overview_01.png)
 
 #### 3.traffic management
-istio维护了一个内部的服务注册表
-该表是 service和其endpoint 的集合
+istio维护了一个内部的**服务注册表**
+该表是**services**和**其endpoints**的集合
 表中的内容是由 pilot组成 自动发现生成的

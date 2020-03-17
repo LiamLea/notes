@@ -120,5 +120,11 @@ FAQ
 1.从其他节点无法访问该节点上开放的NodePort
   iptables -A FORWARD -j ACCEPT
 #是iptables的规则问题
+
+2.修改kube-proxy的mode（默认是ipvs）
+
+  kubectl edit configmap kube-proxy -n kube-system
+  
+#找到mode这个选项，改成ipvs即可  
   
 ###############################################################################
