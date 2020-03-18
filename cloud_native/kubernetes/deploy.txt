@@ -121,7 +121,18 @@ FAQ
   iptables -A FORWARD -j ACCEPT
 #是iptables的规则问题
 
-2.修改kube-proxy的mode（默认是ipvs）
+2.配置kubelet
+第一种方式：
+	vim /etc/sysconfig/kubelet		#优先级最高
+	
+第二种方式：
+	vim /var/lib/kubelet/kubeadm-flags.env
+	
+第三种方式：
+	kubectl edit configmap kube-proxy -n kube-system
+
+
+#比如：修改kube-proxy的mode（默认是ipvs）
 
   kubectl edit configmap kube-proxy -n kube-system
   

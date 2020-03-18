@@ -106,6 +106,9 @@ spec:
 #### 1.特点
 * 只是允许特定流量进入k8s集群，并未指明具体的路由到何处
 * 需要在VirtualService中绑定指定的GateWay后，允许进入的流量，才能被相应规则路由
+* 与k8s中的Ingress资源类似
+ingress创建后会自动注入配置到ingress controller中
+GateWay和VirtualService相当于自动注入配置到ingressgateway(pod)中
 #### 2.资源清单格式
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -113,6 +116,8 @@ kind: Gateway
 metadata:
   name: xx
 spec:
+
+#指定应用于哪个ingressgateway（是一个pod）
   selector:
     app: my-gateway-controller
 
