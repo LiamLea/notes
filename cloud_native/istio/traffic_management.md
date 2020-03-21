@@ -106,9 +106,6 @@ spec:
 #### 1.特点
 * 只是允许特定流量进入k8s集群，并未指明具体的路由到何处
 * 需要在VirtualService中绑定指定的GateWay后，允许进入的流量，才能被相应规则路由
-* 与k8s中的Ingress资源类似
-ingress创建后会自动注入配置到ingress controller中
-GateWay和VirtualService相当于自动注入配置到ingressgateway(pod)中
 #### 2.资源清单格式
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -183,3 +180,14 @@ spec:
 对应用来说时透明的，即不需要配置
 如果应用本身设置了故障恢复，可能会和istio的故障恢复冲突
 有些故障是istio无法恢复的，需要应用自己解决（比如503错误）
+
+### 总结
+* VirtualService会应用到所有的envoy中
+当指定gateway时会应用到该gateway所关联的ingress envoy中
+* GateWay会应用到ingress envoy(即ingressgateway这个pod)中
+* DestinationRule会应用到指定envoy中（一般
+
+与k8s中Ingress比较
+* 与k8s中的Ingress资源类似
+ingress创建后会自动注入配置到ingress controller中
+GateWay相当于自动注入配置到ingressgateway(pod)中

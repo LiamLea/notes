@@ -1,4 +1,20 @@
 # 基础概念
+### 启动流程
+```mermaid
+graph LR
+A("BIOS")--"加载booloader"-->B
+subgraph bootloader工作
+B("运行bootloader(linux上就是grub),并把控制权交给bootloader")
+B-->C("加载kernel（ramdisk或ramfs支持）")
+C-->D("识别根文件（并将控制权交给kernel）")
+end
+D-->E("init程序")
+```
+bootloader有**两个阶段**：
+```mermaid
+graph LR
+A("读取磁盘的MBR，运行bootloader程序(grub)")--"根据MBR的指引去相应分区（MBR之后的扇区会提供识别该分区文件系统的方法）找到第2阶段所需要的文件"-->B("读取grub配置，完成内核加载和文件系统识别")
+```
 ### 内存有两种：
 >RAM		  	
 >>random access memory，断电后，这里面的内容都会清空  

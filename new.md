@@ -343,3 +343,13 @@ cpu、内存、网络、存储使用率
   tr "xx" "xx"
 ```
 #### 42.hash函数用来提取 定长的特征码
+
+#### 43."No manual entry for xx"的解决方法
+1. 确保下面两个软件已经安装
+* man-pages
+>man-pages提供linux系统的相关man文档  
+* man-db
+2. 查找xx的man文档是由哪个软件提供的
+```shell
+yum provides */xx.*.gz
+```
