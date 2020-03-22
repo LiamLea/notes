@@ -353,3 +353,11 @@ cpu、内存、网络、存储使用率
 ```shell
 yum provides */xx.*.gz
 ```
+
+#### 44.getconf —— 获取系统的变量
+```shell
+getconf -a      #显示所有系统变量（比如 PAGESIZE，CLK_TCK等)
+#CLK_TCK这个变量用于计量与cpu有关的时间，标识一秒内cpu有多少次滴答（ticks）
+
+getconf xx    #显示具体变量的值
+```
