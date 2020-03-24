@@ -34,7 +34,7 @@
 	containers:
 	- name：
 	  image:
-	  imagePullPolicy:							//Always，Never，IfNotPresent
+	  imagePullPolicy:							//Always，Never，IfNotPresent（当image的标签为latest时，策略默认为Always）
 	  ports:
 		name:									//给该端口取个名
 		containerPort:							//声明要暴露的端口

@@ -5,7 +5,9 @@
 ```python
 import json
 
-json.dumps(adict)    #将字典类型，转换为json格式(即字符串）
+json.dumps(adict, indent=2)    #将字典类型，转换为json格式(即字符串）
+                              #设置缩进两格，则打印出来的格式很清晰
+                              
 json.loads(astr)     #将json格式的数据转换为特定类型
 
 #应用：获取网上的数据，例如获得天气情况：

@@ -115,7 +115,7 @@ spec:
 	spec:
 	  containers:
 	  - name: xx
-		images: xx
+		image: xx
 		
 （4）回滚
   kubectl rollout history TYPE NAME			//查看有多少个版本，和版本号
@@ -208,7 +208,7 @@ spec:
 	spec:
 	  containers:
 	  - name: xx
-	    images: xx
+	    image: xx
 		ports:
 		- containerPort: xx			//声明要暴露的端口
 		  name: xx

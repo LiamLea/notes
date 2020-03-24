@@ -65,7 +65,8 @@ spec:
   type: NodePort       
   clusterIP: xx          //固定service的ip，可以设为None，则这个service即为无头service，type这项要去掉
   ports:
-  - port: xx			 //service上端口
+  - name: xx
+    port: xx			 //service上暴露的端口，只有访问这些端口，流量才会被转发到后端相应的端口上
     targetPort: xx		 //容器上端口
 	nodePort: xx         //当类型为NodePort时，才需要这一项
 
@@ -88,6 +89,11 @@ Endpoints
 1.当创建Service时，指定了selector，根据selector中的标签会自动创建Endpoints
   如果未指定selector，则不会自动创建Endpoints
   
+2.可以利用endpoints和无selector的service实现引入外部服务（不需要通过externalName且必须填域名，这里可以利用ip）
+
+（1）首先创建无selector的service，并指明service上的端口号和后端的端口后
+（2）然后创建Endpoints，指向后端服务的ip和端口号
+  
 ###############################################################################
 Endpoints清单
 
@@ -97,9 +103,12 @@ metadata:
   name: xx					//这个名字必须能给解析（这样，访问这个地址时，会被转发到后端的地址）
 							//所以这个名字一般设为某个service的名字
 subsets:
-  - addresses:
-      - ip: xx				//这里的ip不能是VIP（比如clusterIP），必须指向一个实体（比如pod）
-    ports:
-      - port: xx
+
+#这是一个subset				//后端endpoint是这些subset的集合，分subset只是方便我们自己管理
+- addresses:
+  - ip: xx				//这里的ip不能是VIP（比如clusterIP），必须指向一个实体（比如pod）
+  ports:
+  - name: xx
+    port: xx
 
 ###############################################################################
