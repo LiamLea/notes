@@ -152,7 +152,7 @@ spec:
   capacity:
     storage: xx								//描述该pv的容量（单位：Ki，Mi，Gi，...）
 											//注意：不是允许使用的容量，只是描述信息，便于pvc用来绑定相应的pv
-  persistentvolumeReclaimPolicy: Retain  	//指定当pvc与pv解除绑定，pv的回收策略，默认是Retain，即保留pv里的数据
+  persistentvolumeReclaimPolicy: Retain  	//指定当pvc与pv解除绑定，pv的回收策略，默认是Retain，即保留pv资源（不删除pv）
 											//并且会保留原先绑定的pvc的信息（比如：uuid），所以即使删除了pvc，这个pv也是无法使用的，重新创建pvc，也是无法使用的
 											//如果需要使用这个pv，需要删除该pv中的pod信息，即claimRef
 
@@ -302,12 +302,26 @@ kubectl create secret 类型 名字 --from-file=文件路径     //文件名就�
 动态pv（以nfs为例）
 
 #在github kubernetes-incubator/extral-storage/nfs-client中有nfs相关的yaml文件
+#在github上搜索extral-storage就出来了
+
+#自动创建的pv,在nfs下创建的目录名：${namespace}-${pvcName}-${pvName}
+#当这个pv被回收后，会存储在nfs上，命名：archieved-${namespace}-${pvcName}-${pvName}-$(id}
+
+前提：运行该Pod的机器上都需要安装nfs-utils
 
 1.创建provisioner
 
-#从github上复制配置文件
+#如果需要部署到其他名称空间，则要修改清单文件
 
   kubectl apply -f rbac.yaml			//授权
+  
+#修改deploment中nfs的信息后，在创建
+#最重要的一项是PROVISIONER_NAME，这个是设置该provisioner的名字，后面Storage需要指定这个名字，才能使用
+#  env:
+#  - name: PROVISIONER_NAME
+#    value: xx
+
+
   kubectl apply -f deployment.yaml		//创建provisioner（即nfs的客户端）
 
 2.创建StorageClass
@@ -327,9 +341,9 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: test-claim
-  annotations:
-    volume.beta.kubernetes.io/storage-class: "xx"		//这项十分重要，用于指定使用哪个storage class
+  
 spec:
+  storageClassName: xx				//这项十分重要，用于指定使用哪个storage class
   accessModes:
     - ReadWriteMany
   resources:
