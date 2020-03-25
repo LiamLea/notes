@@ -30,3 +30,32 @@
 istio维护了一个内部的**服务注册表**
 该表是**services**和**其endpoints**的集合
 表中的内容是由 pilot组成 自动发现生成的
+***
+### 在k8s中使用时的注意事项
+#### 1.创建service，服务端口必须按照要求命名
+命名格式：\<protocol>[-\<suffix>]
+比如：
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: xx
+spec:
+  selector:
+    xx: xx
+  ports:
+  - name: http      #这里需要命名规范
+    port: xx
+```
+支持的协议：
+* grpc
+* grpc-web
+* http
+* http2
+* https
+* mongo
+* mysql*
+* redis*
+* tcp
+* tls
+* udp

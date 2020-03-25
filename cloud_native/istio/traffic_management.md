@@ -162,6 +162,11 @@ spec:
   - address: 2.2.2.2
   - address: 3.3.3.3
 ```
+### unknown 和 passthroughcluster 和 BlackHole
+* 当不知道的外部流量进来时，则标识来源为**unknown**
+* 当流量发往外部不知道的服务时，则标记为目的为**passthroughcluster** 或者 **blackholw**
+当允许流量外出时，为**passthroughcluster**
+当不允许流量外出时，为**blackhole**
 ### 更多流量治理（无需修改代码）
 #### 1.timeout
 设置envoy proxy等待响应超过这个时间，则认为超时（即失败）
