@@ -65,7 +65,7 @@ spec:
   type: NodePort       
   clusterIP: xx          //固定service的ip，可以设为None，则这个service即为无头service，type这项要去掉
   ports:
-  - name: xx
+  - name: xx			 //endpoints的端口名必须和这里一样
     port: xx			 //service上暴露的端口，只有访问这些端口，流量才会被转发到后端相应的端口上
     targetPort: xx		 //容器上端口
 	nodePort: xx         //当类型为NodePort时，才需要这一项
@@ -108,7 +108,7 @@ subsets:
 - addresses:
   - ip: xx				//这里的ip不能是VIP（比如clusterIP），必须指向一个实体（比如pod）
   ports:
-  - name: xx
+  - name: xx			//注意：这里的名字必须跟service中的port名字一样
     port: xx
 
 ###############################################################################
