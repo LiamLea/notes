@@ -26,10 +26,25 @@
 #### 2.整体架构
 ![](./imgs/overview_01.png)
 
-#### 3.traffic management
+#### 3.组件
+##### （1）envoy
+处理数据平面的所有流量
+##### （2）pilot
+* service discovery
+发现service，然后注入到envoy配置中
+![](./imgs/overview_02.png)
+* traffic management
 istio维护了一个内部的**服务注册表**
 该表是**services**和**其endpoints**的集合
 表中的内容是由 pilot组成 自动发现生成的
+</br>
+* resiliency
+弹性设置（比如超时时间、重试次数）
+#### （3）citadel
+利用**身份管理**和**凭证管理**实现服务到服务和终端用户的认证
+#### （4）galley
+负责配置验证、配置提取、配置处理和配置分发
+
 ***
 ### 在k8s中使用时的注意事项
 #### 1.创建service，服务端口必须按照要求命名
@@ -54,8 +69,10 @@ spec:
 * http2
 * https
 * mongo
-* mysql*
-* redis*
+* mysql
+默认关闭，需要在pilot配置文件中开启
+* redis
+默认关闭，需要在pilot配置文件中开启
 * tcp
 * tls
 * udp
