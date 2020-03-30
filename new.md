@@ -139,23 +139,6 @@ dmesg | grep xx
 exec FD<>/dev/tcp/HOST/PORT		
 #会在 /proc/self/fd/ 目录下生成一个描述符
 ```
-##### 21.模拟http请求
-（1）http/1.0
-```shell
-exec 8<>/dev/tcp/10.0.36.1/80
-echo -n -e "GET / HTTP/1.0\n\n" >&8
-cat <&8
-
-#或者
-
-echo -n -e "GET / HTTP/1.0\n\n" | nc 10.0.36.1 80
-```
-（2）http/1.1
-```shell
-	echo -n -e "GET / HTTP/1.1\nHost:10.0.36.1\n\n" >&8
-```
-**备注：\n\n 表示结束**
-**当时windows等系统，\n 需要替换为 \r\n**
 
 ##### 22.printf
 （1）类似 echo -n -e，但是功能更多
@@ -361,3 +344,14 @@ getconf -a      #显示所有系统变量（比如 PAGESIZE，CLK_TCK等)
 
 getconf xx    #显示具体变量的值
 ```
+
+#### 45.并发访问的响应模型:
+* 单进程IO模型
+* 多进程IO模型
+* 复用的IO模型:一个进程响应n个请求
+```
+多线程:一个进程生成n个线程,一个线程处理一个请求  
+
+事件驱动:一个进程直接处理多个请求,当有事件进行触发时执行,如果io阻塞,则执行其他任务  
+```
+* 复用的多进程IO模型:启动m个进程,每个进程生成n个线程(nginx就是此方式,而且利用了事件驱动)
