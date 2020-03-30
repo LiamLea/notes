@@ -12,5 +12,5 @@ APM核心的技术是distributed tracing(分布式链路追踪系统)
 trace中被命名并计时的连续性的执行片段，相当于一个调用
 * log
 每个span可以多次log，即生成多条日志
-* tat
+* tag
 每个span可以有多个tag
