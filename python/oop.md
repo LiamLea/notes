@@ -58,7 +58,7 @@ class 类名:
       pass
 ```
 
-#### 4.类的magic方法(以双下划线开始的)
+#### 4.类的magic方法
 ```python
 class A:
   def __init__(self,参数):      #构造函数
@@ -70,7 +70,7 @@ class A:
 #如: a=A()
 #print(a)，此时会返回xx
 
-  def __call_(self):    
+  def __call__(self):    
   #当对象执行调用时,自动执行这个函数
       pass
 #如: a=A()
@@ -80,6 +80,36 @@ class A:
 >两个下划线开头，声明该属性为私有，不能在类的外部被使用或直接访问，不能被子类继承
 **__attrs**  
 **__func**  
+
+#### 6.类的 \_\_getattribute__ 方法
+在类 里面,其实并没有方法这个东西,**所有**的东西都保存在**属性**里面
+所谓的调用方法其实是类里面的一个**同名属性**指向了一个**函数**,
+**返回**的是**函数的地址**,再用 **函数()** 这种方式就可以调用它
+```python
+class Demo():
+    def __getattribute__(self, item):
+#item形参是实例调用方法或属性时，传入的属性名（不是必须用item，可以用其他名字代替）
+
+        #如果调用的是test，则执行执行下面的内容，最后返回一个地址
+        #如果不设置这个条件，不论调用什么都会执行
+        if item == "test":  
+
+            def test_func(arg1):
+                print(item,arg1)
+
+            #这里返回的是一个函数的地址
+            return test_func      
+
+demo = Demo()
+demo.test       
+#会获取__getattribute__返回的地址，
+#由于返回的是函数的地址，而不是一个值的地址，
+#所以demo.test不会输出任何内容，
+
+demo.test("xxx")
+#会执行test_func()这个函数
+```
+**注意**：再__getattribute__方法中，不要使用self.xx，因为每一次调用类的属性或方法，都会执行一次__getattribute__函数，可能有问题
 
 #### 6.重写父类的方法
 **注意重写和覆盖的区别**

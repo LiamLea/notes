@@ -1,4 +1,4 @@
-#hashlib模块
+# hashlib模块
 * 直接计算md5值
 ```python
   m=hashlib.md5(b'123456')

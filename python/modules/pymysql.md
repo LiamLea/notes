@@ -1,4 +1,4 @@
-#pymysql模块
+# pymysql模块
 * **操作数据库的步骤**
 >建立连接:
 ```python
