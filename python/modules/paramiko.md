@@ -1,4 +1,4 @@
-#paramiko模块
+# paramiko模块
 * **使用**
 ```python
   ssh=paramiko.SSHClient()                

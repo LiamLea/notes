@@ -1,4 +1,4 @@
-#email和smtplib模块
+# email和smtplib模块
 ```python
 from email.mime.text import MIMEText
 from email.header import Header
