@@ -73,20 +73,22 @@
 **python装饰器本质上将一个函数输入另一个函数里，然后返回一个新的函数出来**
 ```python
 def func_a(func):           #装饰器，需要接受函数地址作为参数
-    def func_new(*args,**kwargs):     
+    def func_new(*args,**kwargs):
     #定义一个新的函数,用来接收被修饰函数的任意参数
-        func()              #使用旧的函数不是必须
-        print('new')
+        func('old')              #使用旧的函数不是必须
+        print(*args)
     return func_new         #返回这个新的函数
 
 #下面等价于func_a(func_b)()
 @func_a
-def func_b(name):               
+def func_b(name):
     print(name)
 
+func_b('1','2','one')
+
 #结果为：
-#b
-#new
+#old
+#1 2 one
 ```
 ***
 ### 常用函数

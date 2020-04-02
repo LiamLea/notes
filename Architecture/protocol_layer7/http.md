@@ -31,16 +31,17 @@ F-->G("记录日志")
 
 #### 4.请求报文格式
 ```shell
-Method  Path  protocol/version
-Headers(key:value)
-          #空行（回车符和换行符）
+Method  Path  protocol/version    #\r\n
+Headers(key:value)                #\r\n
+                                  #\r\n
 content   #非必须，GET是没有请求主体的
 ```
 
 #### 5.响应报文格式
 ```shell
-protocol/version  StatusCode  StatusMessage
-Headers(key:value)
+protocol/version  StatusCode  StatusMessage   #\r\n
+Headers(key:value)                            #\r\n
+                                              #\r\n
 content
 ```
 
@@ -57,16 +58,29 @@ PUT是上传一个资源,用的少,不安全
 （1）http/1.0
 ```shell
 exec 8<>/dev/tcp/10.0.36.1/80
-echo -n -e "GET / HTTP/1.0\n\n" >&8
+echo -n -e "GET / HTTP/1.0\r\n\r\n" >&8
 cat <&8
 
 #或者
 
-echo -n -e "GET / HTTP/1.0\n\n" | nc 10.0.36.1 80
+echo -n -e "GET / HTTP/1.0\r\n\r\n" | nc 10.0.36.1 80
 ```
 （2）http/1.1
 ```shell
-echo -n -e "GET / HTTP/1.1\nHost:10.0.36.1\n\n" >&8
+echo -n -e "GET / HTTP/1.1\r\nHost:10.0.36.1\r\n\r\n" >&8
 ```
-**备注：\n 表示空行**
-**当时windows等系统，\n 需要替换为 \r\n**
+
+#### 8.利用python模拟http服务端
+```python
+import socket
+
+sock = socket.socket()
+sock.bind(("127.0.0.1",8080))
+sock.listen()
+while True:
+    conn, addr = sock.accept()
+    data =conn.recv(1024)      #接收到的是字节码
+    print(data)                #打印HTTP请求
+    conn.send(b"HTTP/1.1 200 OK\r\n\r\nreponse")
+    conn.close()
+```

@@ -301,3 +301,121 @@ result.stderr
     yield n
   mg=mygen()    //mg就是一个生成器对象
 ```
+***
+# 特殊变量和函数
+### 概述
+* \_\_xx
+以双下划线开头的实例变量名，是一个**私有变量（private）** ，只有内部可以访问，外部不能访问
+* \_\_xx__
+以双下划线开头，并且以双下划线结尾的，是**特殊变量**，特殊变量是可以直接访问的，它不是private变量
+* \_x
+以单下划线开头的实例变量名，这样的变量外部是可以访问的，但是，按照约定俗成的规定，当你看到这样的变量时，意思就是，“虽然我可以被访问，但是请把我视为私有变量，不要随意访问”。
+
+### 特殊变量和方法
+#### 1.模块相关
+##### （1）\_\_name__
+获取模块的名字，如果是主模块则返回"\_\_main__"
+##### （2）\_\_doc__
+获取模块的注释
+##### （3）\_\_file__
+获取模块的绝对路径
+##### （4）\_\_package__
+获取模块所在的包
+##### （5）\_\_all__
+当模块被from xx import * 时，\_\_all__列表里定义的内容会被import
+```python
+# foo.py
+
+__all__ = ['bar', 'baz']
+waz = 5
+bar = 10
+def baz(): return 'baz'
+```
+```python
+from foo import *
+print(bar)
+print(baz)
+```
+#### 2.类相关
+##### （1）\_\_init__()
+初始化函数, 创建实例的时候，可以调用__init__方法做一些初始化的工作
+如果子类重写了__init__，实例化子类时，则只会调用子类的__init__，此时如果想使用父类的__init__，可以再调用一下
+```python
+  def __init__(self,参数):
+      父类.__init__(self,部分参数)
+      #等价于:super(类名,self).__init__(部分参数)
+          pass
+```
+##### （2）\_\_new__()
+构造函数，在__init__之前被调用
+\_\_new__方法是一个静态方法，第一参数是cls，\_\_new__方法必须返回创建出来的实例
+
+##### （3）\_\_del__()
+析构函数，释放对象时调用
+
+##### （4）\_\_str__()
+当对象需要转换成字符串时,自动执行这个函数
+```python
+  def __str__(self):          
+  #当对象需要转换成字符串时,自动执行这个函数
+      return  'xx'
+#如: a=A()
+#print(a)，此时会返回xx
+```
+
+##### （5）\_\_call__()
+当对象执行调用时,自动执行这个函数
+```python
+  def __call__(self):    
+  #当对象执行调用时,自动执行这个函数
+      pass
+#如: a=A()
+#a()，此时会执行...处的代码
+```
+
+##### （6）\_\_getattribute__()
+在类 里面,其实并没有方法这个东西,**所有**的东西都保存在**属性**里面
+所谓的调用方法其实是类里面的一个**同名属性**指向了一个**函数**,
+**返回**的是**函数的地址**,再用 **函数()** 这种方式就可以调用它
+```python
+class Demo():
+    def __getattribute__(self, item):
+#item形参是实例调用方法或属性时，传入的属性名（不是必须用item，可以用其他名字代替）
+
+        #如果调用的是test，则执行执行下面的内容，最后返回一个地址
+        #如果不设置这个条件，不论调用什么都会执行
+        if item == "test":  
+
+            def test_func(arg1):
+                print(item,arg1)
+
+            #这里返回的是一个函数的地址
+            return test_func      
+
+demo = Demo()
+demo.test       
+#会获取__getattribute__返回的地址，
+#由于返回的是函数的地址，而不是一个值的地址，
+#所以demo.test不会输出任何内容，
+
+demo.test("xxx")
+#会执行test_func()这个函数
+```
+**注意**：再__getattribute__方法中，不要使用self.xx，因为每一次调用类的属性或方法，都会执行一次__getattribute__函数，可能有问题
+
+#### 3.对象相关
+#####（1） definition.\_\_name__
+The name of the class, function, method, descriptor, or generator instance.
+```python
+def func_a():
+    pass
+print(func_a.__name__)      #打印该函数的名字
+print(__name__)             #打印该模块的名字，由于是主模块，所以这里打印"__main__"
+
+#输出结果：
+#func_a
+#__main__
+```
+
+##### （2）definition.\_\_doc__
+获取对象的注释
