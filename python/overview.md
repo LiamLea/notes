@@ -217,7 +217,7 @@ result.stderr
 
 （1）读取文本文件(**用for循环读取,for line in f**)
 ```python
-  f=open('xx')
+  f=open('xx', encoding = "utf8")
   data=f.read()
   data=f.readline()     #读取一行
   data=f.readlines()    #读取所有行放入列表
@@ -227,13 +227,13 @@ result.stderr
 （2）以bytes方式读取文件(**用whiled循环读取,终止条件 if not data**)  
 ```python
 #用于处理非文本文件,如可执行程序
-  f=open('xx','rb')
+  f=open('xx','rb', encoding = "utf8")
   data=f.read(4096)    #括号填字节数,一个块为4096字节,所以一般一次读取4096字节
   f.close()
 ```
 （3）写文本文件
 ```python
-  f=open('xx','w')    #w模式,清空或创建文件,a模式,必要时创建文件
+  f=open('xx', 'w', encoding = "utf8")    #w模式,清空或创建文件,a模式,必要时创建文件
   f.write('xx')      
   f.close()
 ```
@@ -241,7 +241,7 @@ result.stderr
 （4）**with语句**  
 ```python
  #适用于对资源访问的场合,无论是否异常退出,都会执行必要的清理操作
-  with open('xx') as fobj1,open('yy') as fobj2:
+  with open('xx') as fobj1,open('yy', encodeing = "utf8") as fobj2:
     ...
 ```
 

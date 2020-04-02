@@ -10,7 +10,7 @@ def scan_files_content(dir, search_pattern):
         try:
             for file in files:
                 item=os.path.join(path,file)
-                with open(item) as fobj:
+                with open(item,encoding='utf8') as fobj:
                     for line in fobj:
                         match = pattern.search(line)
                         if match :
@@ -23,8 +23,8 @@ def scan_files_content(dir, search_pattern):
     return ret
 
 if __name__ == '__main__':
-    dir = r"/tmp/test"
-    search_pattern = r"ab"
+    dir = r"D:\cloud\training_nodes\step05"
+    search_pattern = r"同"
     results = scan_files_content(dir, search_pattern)
     for file in results:
         print(file)
