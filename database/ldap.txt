@@ -30,12 +30,17 @@
 
 （9）o（organization）
 
+（10）objectClass
+	创建entry时需要指明objectClass，
+	objectClass指明了该entry是哪种类型（比如：groupOfNames，organizationUnit等），需要配置哪些属性（比如organizationUnit必须配置ou属性）
+
 10.ldap目录结构
   ldap目录服务 ---存储---> 目录数据库 ---存储结构---> 目录信息树（DIT）
   DIT---组成元素--->条目（Entry）,条目是具有唯一标识（DN)的 属性-值对 的集合
 
 11.BaseDN
   是一个目录树的访问点，即只能访问该点及其以下的内容
+  当其他软件配置ldap时，需要设置basedn，指明使用哪个目录下的内容
   
 12.条目
   类似于数据库中表的概念
