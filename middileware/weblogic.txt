@@ -46,3 +46,12 @@
   nohup ./bin/startManagedWeblogic.sh 服务器名 http://xx:7001 &
   
 ###############################################################################
+安装weblogic
+
+1.安装weblogic
+
+2.创建一个domain
+cd <weblogci home>/wlserver_<version>/common/bin
+./config.sh -mode=console
+
+###############################################################################
