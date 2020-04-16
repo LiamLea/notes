@@ -1,4 +1,24 @@
 [toc]
+**注意**
+python中都是引用对象
+如果该对象是可变对象，则可以直接修改
+如果该对象是不可变对象，则会创建一个副本，进行修改
+```python
+a = []
+b = []
+a.append(b)     #传入的是b的引用对象
+b.append(1)
+print(a)        #[[1]]
+
+a = []
+b = []
+a.append(b)
+b = [1]
+print(a)       #[[]]
+```
+这两个例子的区别是
+* 列表是一个可变对象，所以a列表中存放的是b列表的引用，所以在b列表中添加元素时，a也跟着变化了
+* 当给b赋值时，b就指向了其他地址，而不是原先的b列表的地址，所以a不会跟着变化
 # 基础积累
 ### python虚拟化环境
 （1）图形化创建
@@ -144,6 +164,24 @@ if __name__=='__main__'
 a if a else 0
 ```
 
+* 注意 is 和 == 区别
+```python
+#这里判断a和b是否指向同一块内存区域
+if a is b:
+    pass
+
+#这里判断a和b的值是否相等
+if a == b:
+    pass
+```
+
+* 有一个条件成立
+```python
+if x or y or
+#可以写成
+if any((x,y,z))
+```
+
 ### 模块
 （1）一个以.py结尾的python程序就是一个模块(模块名去除.py即可)
 （2）编写一个模块
@@ -210,6 +248,15 @@ result=subprocess.run(command,shell=True,stdout=subprocess.PIPE,stderr=subproces
 result.returncode   
 result.stdout
 result.stderr
+```
+
+（4）timeit
+```python
+import timeit
+seconds = timeit.timeit(stmt="func()", number = 10000)
+#stmt(statement)，这里填语句或者函数，比如stmt="func()"
+#number，表示前面语句被执行的次数，默认时100 0000次
+#返回的单位是秒
 ```
 ### 文件操作
 **文件对象是可迭代对象**

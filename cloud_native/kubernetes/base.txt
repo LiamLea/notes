@@ -172,7 +172,7 @@ kubectl api-resources --verbs=list \	//过滤出支持list这个动作的资源
 4.kubectl get pods 
 				   --all-nampspace	 	//获取所有命名空间下的pod
                    -n xx              	//-n指明名称空间，不加-n，默认是default名称空间
-                   -o wide          	//-o指明输出格式，wide输出扩展信息，包括该pod在哪个节点上
+                   -o wide          	//-o指明输出格式，wide输出扩展信息，包括该pod在哪个节点
                    -l xx=xx        		//过滤含有xx这个标签且标签值为xx的pods，也可以-l xx直接过滤含有xx标签的pods  
 #标签有两种关系判断：
 #  等值关系：=    !=
@@ -183,6 +183,9 @@ kubectl api-resources --verbs=list \	//过滤出支持list这个动作的资源
 5.kubectl get svc               //svc：services
 
 6.kubectl describe TYPE NAME      //TYPE：资源类型，NAME：资源名称，查看某个资源的详细信息
+
+7.kubectl get xx xx -o jsonpath='{@}'	//{@}表示输出整个jsonpath
+										//{.xx[0].xx}利用这种形式获取某个键的值
 
 四.管理标签
 1.kubectl label TYPE NAME xx1=xx ... xxn=xx       //给某个资源打标签

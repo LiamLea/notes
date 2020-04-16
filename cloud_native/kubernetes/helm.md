@@ -1,0 +1,83 @@
+# helm
+### 基础概念
+#### 1.chart
+一个helm程序包，包含定义资源的清单文件
+
+#### 2.repository
+charts仓库
+
+#### 3.release
+chart部署于目标集群上的一个实例
+
+#### 4.程序架构
+* helm
+客户端，管理本地的chart仓库，管理chart
+  与tiller服务器交互，发送chart，实例安装、查询、卸载等
+
+* tiller
+服务端，接收helm发来的charts和config，合并生成release
+
+#### 5.chart目录结构
+```shell
+  Chart.yaml            #该chart的描述文件,包括ico地址,版本信息等
+  templates/            #存放k8s模板文件目录
+  values.yaml           #给模板文件使用的变量
+  requirements.yaml     #指明该chart依赖哪些chart
+  charts/               #存放依赖的chart的目录
+```
+***
+### 使用
+
+#### 1.初始化helm（即生成tiller服务端，新版已经弃用）
+```shell
+helm init --service-account tiller
+```
+
+#### 2.检测是否可用
+```shell
+helm version      #会列出client端和server端的版本信息
+```
+
+#### 3.chart仓库管理
+```shell
+helm repo list
+helm search xx -l
+```
+
+#### 4.chart管理
+```shell
+helm create xx            #在本地创建一个chart
+helm fetch xx             #将chart下载到本地，并解压
+helm inspect xx           #查看一个chart的详细信息
+hel package chart路径     #打包本地的chart文件
+```
+
+#### 5.release管理
+```shell
+helm install --name xx xx1	 #xx1为chart名或者本地chart的路径
+helm status xx              #查看已安装的release的信息（包括service信息等）
+helm list                   #列出已安装的release
+helm delete xx --purge
+helm upgrade xx xx1         #xx1为chart名或者本地chart的路径
+```
+***
+### helm模板语法
+
+#### 1.模板引用方式
+```yaml
+  {{ .OBJECT.Name }}		#通过双括号注入,小数点开头表示从最顶层命名空间引用.
+```
+#### 2.helm内置对象
+```shell
+  Release           #release相关属性
+  Chart             #Chart.yaml文件中定义的内容
+  Values            #values.yaml文件中定义的内容
+```
+***
+
+### 自定义chart
+
+1.创建chart
+```shell
+helm create xx
+```

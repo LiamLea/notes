@@ -19,6 +19,9 @@
   
 5.数据文件（dbf、ora）
 
+6.TNS（transparent network substrate，透明网络底层）
+是oracle用于连接数据库的一种技术
+
 
 ###############################################################################
 基础操作
@@ -29,5 +32,14 @@
   sqlplus / as sysdba		//表示匿名登录，以sysdba身份登录
 2.查询
   select instance_name from v$instance; 	//查看数据库有多少实例
+  
+3.启闭数据库服务
+  sqlplus / as sysdba
+  startup
+  shutdown immediate
+ 
+4.启闭监听器
+  lsnrctl start
+  lsnrctl stop
 
 ###############################################################################

@@ -18,3 +18,25 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 ```
+
+#### 3.配置数据库
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': '数据库名',
+        'USER': 'xx',
+        'PASSWORD': 'xx',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
+}
+```
+
+#### 4.注册app
+app注册到django才能使用
+```python
+INSTALLED_APPS = [
+    'app01',
+]
+```
