@@ -25,6 +25,13 @@
 ### 基本操作
 
 #### 1.静默方式安装weblogic
+* 新版安装
+```shell
+#需要用非root的身份去执行
+java -jar xx.jar
+```
+* 老版安装
+
 （1）修改静默方式的配置文件
 ```shell
 #这个文件是事先准备号的
@@ -36,16 +43,36 @@ vim silent.xml
 ```
 （2）执行安装
 ```shell
-java -jar wls1036_generic.jar \
--mode=silent -silent_xml=./silent.xml \
--log=./weblogic10_install.log
+java -jar wls1036_generic.jar -mode=silent -silent_xml=./silent.xml -log=./weblogic10_install.log
 ```
 
-#### 2.创建域
+#### 2.创建域（利用wlst，weblogic script tool 创建）
 ```shell
 cd <WLS_INSTALL_HOME>
+cp ./common/templates/scripts/wlst/basicWLSDomain.py ./
 
-./common/bin/config.sh -mode=console
+vim basicWLSDomain.py
+```
+```py
+readTemplate("/home/weblogic/wls12214/wlserver/common/templates/wls/wls.jar")
+
+cd('Servers/AdminServer')
+set('ListenAddress','xx')
+#这里一定要填ip，不然下面把整个域复制到另一他机器时，通过节点管理器无法启动被管服务器，因为被管服务器尝试联系127.0.0.1
+set('ListenPort', 7001)
+
+cd('/')
+cd('Security/base_domain/User/weblogic')
+cmo.setPassword('weblogic123')
+
+setOption('OverwriteDomain', 'true')
+writeDomain('需要创建的域的绝对路径')
+closeTemplate()
+
+exit()
+```
+```shell
+./common/bin/wlst.sh basicWLSDomain.py
 ```
 
 #### 3.启动weblogic控制台
@@ -53,27 +80,34 @@ cd <WLS_INSTALL_HOME>
 #一般都是在BEAHOME下
 cd <BEAHOME>/user_projects/domains/<DOMAIN_NAME>
 
-nohub ./bin/startWeblogic.sh &
+nohup ./bin/startWebLogic.sh &
 #需要等好几分钟才能启动起来
 ```
 
 #### 4.启动NodeManager
+
+* 找到nodemanager目录（一般在相应的域目录下），修改nodemanager.properties
+```shell
+#vim nodemanager.properties
+SecureListener=false
+```
+* 修改startNodeManager.sh脚本，指定nodemanager目录
+```shell
+cd <WLS_INSTALL_HOME>
+vim ./server/bin/startNodeManager.sh
+```
+```
+NODEMGR_HOME="/home/weblogic/wls12214/user_projects/domains/domain_lil/nodemanager/"
+```
 （1）在本机上启动NodeManager
 ```shell
 cd <WLS_INSTALL_HOME>
 
-nohup ./server/bin/startNodeManager.sh <ip地址> 5556 &
+nohup ./server/bin/startNodeManager.sh &
 #指明该机器上的NodeManager监听的地址
 #第一次启动需要等比较久的时间
 ```
-如果报错，修改相应配置
-```shell
-cd <WLS_INSTALL_HOME>
-vim ./common/nodemanager/nodemanager.properties
-```
-```
-SecureListener=false
-```
+
 （2）在另一台机器上启动NodeManager
 前提条件：
 * 该机器安装了weblogic

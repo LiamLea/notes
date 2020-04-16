@@ -110,6 +110,28 @@ xx.sort(cmp=None,key=None,reverse=False)
 ```
 # tuple
 **相当于静态的列表，查询函数与列表一致**
+* 命名元组
+相当于有属性的简单类
+```python
+from collections import namedtuple
+Test = namedtuple("xx", "KEY1 KEY2 ...")
+# 第一个参数是元组的名字，不重要
+# 第二个参数是属性，用空格隔开
+# 返回一个类，实例化这个类就相当于创建元组
+
+#实列化
+test = Test(VALUE1, VALUE2, ...)
+
+#使用
+test.KEY1
+```
+例子
+```python
+Car = namedtuple("color", "owner")
+my_car = Car('red', 'lil')
+print(my_car.color)
+#输出为：red
+```
 # dict
 **不可变的对象才可以作为key,如:字符串,数字,元组等**
 * 生成字典的函数:dict
@@ -142,7 +164,11 @@ xx.sort(cmp=None,key=None,reverse=False)
   values()
   items()           #返回一个可迭代对象,每一个元素都是键值对,否则只能迭代key
   pop(key)
-  update(dict)      #将另一个字典加上去
+
+#合并两个字典
+  update(dict)                #将另一个字典加上去
+  dict = {**dictA, **dictB}   #如果有相同的key，第二个的值会覆盖第一个的
+
   get(key)          #若key不存在返回none(当需要判断key是否存在,用in即可)
   get(key,xx)       #若key不存在返回xx(可以是字符串,也可以是数字)
 ```

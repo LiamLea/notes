@@ -24,10 +24,12 @@ root = dom.documentElement
 ```
 （3）各节点支持的属性
 ```python
-node.tagName      #该节点的标签名
+node.tagName      #该节点的标签名（文本类型节点没有标签名）
+node.nodeName     #该节点的名字（标签名，文本类型节点的名字为#text）
 node.nodeType     #该节点的类型，1代表element_node，2代表attribute_node
 node.childNodes   #获得该节点的子节点，返回一个列表
 node.parentNode   #获得该节点的父节点
 node.getAttribute("xx")           #获取节点xx属性的值
 node.getElementsByTagName("xx")   #根据标签获取element_node，返回一个列表
+test_node.data      #打印文本内容
 ```
