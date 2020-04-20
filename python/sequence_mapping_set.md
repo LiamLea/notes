@@ -146,10 +146,13 @@ print(my_car.color)
 #返回的字典:{'a':20,'b':20,'c':20}
 ```
 
-* 遍历字典(只能遍历key)
+* **遍历字典**
 ```python
-  for key in adict:
-    print(key,adict[key])
+  for key in dict:
+    print(key)
+
+  for key,value in adict.items():
+    print(key,value)
 ```
 
 * 打印字典某些key的value

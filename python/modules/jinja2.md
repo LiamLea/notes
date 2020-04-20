@@ -34,9 +34,22 @@
 
 #### 4.能够传递的内容
 * 字符串、数字、列表等等
-* 函数
-* 对象
+* 函数（传递过去的是地址）
+```python
+def test(v):
+    return v
 
+with open("index.html", "r", encoding = "utf8") as fobj:
+    template = jinja2.Template(fobj.read())
+template.render({"func": test})
+```
+> index.html
+```python
+#通过这种方式可以调用函数
+{{ func("aaa") }}
+```
+* 对象
+***
 ### 基本使用
 ```yaml
 #temp.yaml
@@ -64,4 +77,29 @@ print(data)
 
 #输出：
 #youth
+```
+***
+### 过滤器
+#### 自定义过滤器
+```python
+import jinja2
+
+def test(v):
+    return v
+
+env = jinja2.Environment()
+env.filters["my_test"] = test
+
+with open("index.html", "r", encoding = "utf8") as fobj:
+    template = env.from_string(fobj.read())
+
+template.render({"name": "测试"})
+```
+> index.html
+```python
+<p>{{ name|my_test }}</p>
+```
+> 输出结果
+```
+<p>测试</p>
 ```
