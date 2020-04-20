@@ -5,19 +5,19 @@ url和view函数一一对应
 ```python
 urlpatterns = [
     path(r'static.html/', views.static),
-    path(r'^login.html/', views.Login.as_view())  #当匹配login.html时，会匹配的Login这个类
+    re_path(r'^login.html/', views.Login.as_view())  #当匹配login.html时，会匹配的Login这个类
 ]
 ```
 #### 2.动态路由（正则）
 ```python
 urlpatterns = [
-    path(r'^index.html/', views.index),
+    re_path(r'^index.html/', views.index),
 
     #匹配到的内容会按顺序传递给view函数
-    path(r'^demo.html/(\w+)/(\w+)/', views.demo),
+    re_path(r'^demo.html/(\w+)/(\w+)/', views.demo),
 
     #匹配的的内容会赋值给view函数中相应的形参
-    path(r'^test.html/(?P<arg1>\w+)/(?P<arg2>\w+)', views.test),
+    re_path(r'^test.html/(?P<arg1>\w+)/(?P<arg2>\w+)', views.test),
 ]
 ```
 ```python

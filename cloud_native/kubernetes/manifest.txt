@@ -22,6 +22,9 @@
 1.查看某个pod的资源清单
   kubectl get pod xx -o yaml
 
+2.列出创建某个资源的基础框架
+kubectl create xx --dry-run -o yaml
+
 2.清单主要内容
   apiVersion: group/version                 //通过kubectl api-versions可以查看
   kind: Pod
@@ -48,7 +51,7 @@
 
 3.查看如何书写清单
 （1）查看某种资源的一级字段
-  kubectl explain xx                             //xx可以填pods                       
+  kubectl explain xx                             //xx可以填pods
 （2）查看某个一级字段中的二级字段     //依次类推
   kubectl explain xx.spec
 
@@ -77,7 +80,7 @@ spec:
 
 6.删除某个文件清单创建的资源
   kubectl delete -f xx
-  
+
 7.动态修改资源清单
   kubectl edit TYPE NAME				//注意只有某些选项是可以修改的
 
