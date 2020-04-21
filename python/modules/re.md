@@ -50,6 +50,8 @@ split('\.|-','how-are-you.tar')       #以.或-作为分割符号,输出一个�
 sub('regexp','replace','string')      #用于替换
 
 sub('f..','0','seafood is faad')      #结果为'sea0d is 0d'
+
+sub(r'f..',r'\1a','seafood is faad') #结果为‘seafooad is faad’
 ```
 * 常常先将模式进行编译,可以得到更好的效率
 ```python

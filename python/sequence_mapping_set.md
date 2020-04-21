@@ -108,6 +108,22 @@ xx.sort(cmp=None,key=None,reverse=False)
 #sort可以传入一个函数(即c++中的谓词), key=函数名
 #该函数将列表中的每一项进行处理,处理的结果作为排序的依据
 ```
+* 继承list，创建自己的list类
+```python
+class MyList(list):
+    def __getitem__(self, y):
+        try:
+            return super(MyList, self).__getitem__(y)
+        except IndexError:
+            return ""
+
+temp_list = MyList([0,1,2])
+#接收的参数是一个可迭代对象
+#不能这样创建列表 temp_list = [0,1,2]
+
+print(temp_list[3])
+#输出结果为空，不会报错
+```
 # tuple
 **相当于静态的列表，查询函数与列表一致**
 * 命名元组
