@@ -23,8 +23,8 @@ def scan_files_content(dir, search_pattern):
     return ret
 
 if __name__ == '__main__':
-    dir = r"D:\cloud\python"
-    search_pattern = r"原始"
+    dir = r"D:\cloud\linux_os"
+    search_pattern = r"ring"
     results = scan_files_content(dir, search_pattern)
     for file in results:
         print(file)

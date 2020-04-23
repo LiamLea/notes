@@ -1,4 +1,5 @@
 [toc]
+**kubernetes中的应用的日志 都是 docker 管理的**
 ### 概述
 #### 1.容器日志的存放位置
 * 在docker中存放的位置
@@ -19,4 +20,10 @@
 /var/log/containers/<pod_name>_<namespace>_<container_name>_<container_id>.log
 ```
 **注意：如果某个pod没有运行在该机器上，则相应目录下没有日志**
-#### 2.k8s提供
+#### 2.k8s三种日志架构方式
+##### （1）基本方式
+```shell
+kubectl logs ...
+```
+##### （2）node层面
+![](./imgs/log_01.png)
