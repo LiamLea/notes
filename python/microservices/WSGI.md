@@ -1,4 +1,13 @@
+[toc]
 # WSGI
+**本质**
+```
+WSGI是一种协议，
+WSGI服务器本质是socket，用于接收HTTP请求，
+然后发送给后端应用（比如django），
+后端会处理这个请求，然后返回响应到WSGI，
+然后WSGI再返回给客户端
+```
 ### 概述
 #### 1.WSGI
 web server gateway interface，是一种协议，一种规范，一种接口，用于处理HTTP请求，然后路由到后端的应用
