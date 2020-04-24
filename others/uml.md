@@ -1,3 +1,4 @@
+[toc]
 # 概述
 ### 图的种类
 * 时序图
@@ -29,9 +30,9 @@ end
 
 # 部署图
 ### 1.基本语法
-```
+```shell
 frame test1{
-  card in_test1
+  card in_test1 as a       #可以利用as取别名，当名字有特殊字符时，可以使用别名
 }
 
 frame test2{
