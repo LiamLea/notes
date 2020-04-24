@@ -90,9 +90,81 @@ while True:
 ### 补充知识
 #### 1.重定向是客户端进行的
 服务端返回的信息包含重定向的内容，客户端会发送新的请求到重定向的地址
-
+***
 ### cookie
 #### 1.cookie特点
-* 保存在用户浏览器端的键值对
-* 服务端可以向用户浏览器端写cookie
-* 客户端每次发请求时，请求头中会携带当前可访问的所有cookie
+* 保存在**客户端**浏览器上的**键值对**
+* 服务端可以向客户端浏览器端写cookie
+* 客户端每次发请求时，**请求头**中会携带当前可访问的所有**cookie**
+```python
+#Request Headers
+Cookie: K1=V1,K2=V2,K3=V3,...   
+#里面的每一对键值对都是具体的cookie
+```
+***
+### session
+**相当于cookie的一个变种，因为cookie不够安全**
+```mermaid
+graph LR
+subgraph 客户端请求头
+subgraph cookie
+A("Cookie: xxx=随机字符串")
+end
+end
+subgraph 服务端
+C("看有没有名为xxx的cookie")
+subgraph session
+B("随机字符串=数据")
+end
+end
+A-->C
+C-->B
+```
+##### 1.session特点
+* 保存在**服务端**的数据（**本质**是**键值对**）
+可能存储在文件中，文件名为键，文件内容为值，也可能存储在缓存中等等
+</br>
+* 当用户登录后会生成一个键值对（**键**是**随机字符串**，**值**一般是**字典**，**保存用户信息**）
+```python
+随机字符串: {
+  #这里保存的都是用户的信息
+    "k1": v1,   
+    "k2": v2,
+    ... ...
+  }
+```
+* 生成的**随机字符串**会发给客户端作为**cookie**
+```python
+#写入客户端的cookie
+xx: 随机字符串    #这里的xx为sessionid
+```
+* session有**超时时间**
+* **保持会话**，记录用户的登录状态，敏感信息不会传送给客户
+
+##### 2.session能够存放的地方
+* 数据库
+* 缓存
+* 文件
+* 缓存 + 数据库
+* 加密cookie（相当于没用session）
+
+##### 3.demo(django)
+* 登录成功后，生成session，并发送给客户端
+```python
+#登录函数
+def login(request):
+  if 账号密码正确：
+
+      #设置session
+      request.session['username'] = "user01"
+      request.session["other-info"] = "xx"
+      return render(request)
+
+#登录后函数
+def index(request):
+
+    #获取session的信息
+    v = request.session.get("username")  
+    if v:
+        return HttpReponse("登录成功")
+```
