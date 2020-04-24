@@ -21,7 +21,8 @@ B --> C("Output")
 |-|-|
 |imuxsock|input module unix socket，通过Unix socket收集本地日志，**默认加载**，所以无需在配置中指定|
 |imjournal|input module journal，收集journald服务收集到的日志|
-|imudp|input module udp|监听在某个UDP端口，接收
+|imudp|input module udp，监听在某个UDP端口，接收日志|
+|imtcp|input module tcp，监听在某个TCP端口，接收日志|
 
 ***
 # systemd-journald
