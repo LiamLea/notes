@@ -69,27 +69,31 @@
     x=1000       //则全局的变量x就会变为1000
 ```
 ***
-### 装饰函数
+### 装饰器
+#### 1.基本装饰器
 **python装饰器本质上将一个函数输入另一个函数里，然后返回一个新的函数出来**
 ```python
-def func_a(func):           #装饰器，需要接受函数地址作为参数
+def wrapper(func):           #装饰器，需要接受函数地址作为参数
     def func_new(*args,**kwargs):
     #定义一个新的函数,用来接收被修饰函数的任意参数
-        func('old')              #使用旧的函数不是必须
-        print(*args)
+        ret = func('old')              #使用旧的函数不是必须
+        print(args)
+        return ret
     return func_new         #返回这个新的函数
 
-#下面等价于func_a(func_b)()
-@func_a
-def func_b(name):
-    print(name)
+#下面等价于func_test = wrapper(func_test)
+@wrapper
+def func_test(name):
+    return name
 
-func_b('1','2','one')
+result = func_test('1','2','one')
 
-#结果为：
-#old
-#1 2 one
+#结果为
+#('1','2','one')
+#result = 'old'
 ```
+#### 2.带参数的装饰器
+#### 3.多个装饰器装饰一个函数
 ***
 ### 常用函数
 * 生成序列数（返回的是一个可迭代对象）

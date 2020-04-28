@@ -1,3 +1,4 @@
+[toc]
 #### 1.去除列表中的空行(包括'','    '之类的元素)
 ```python
 [ i for i in my_list if i.strip() != '' ]
