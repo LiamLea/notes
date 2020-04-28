@@ -46,7 +46,7 @@ while True:
 ```python
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect(("192.168.1.1", 80))
-sock.getsockname()
+sock.getsockname()          #获取本地地址
 ```
 ***
 ### 相关函数
@@ -55,5 +55,5 @@ import socket
 
 socket.gethostname()      #获取本地的主机名
 
-socket.gethostname(xx)    #通过主机名获取相应的ip地址
+socket.gethostbyname(xx)    #通过主机名获取相应的ip地址
 ```
