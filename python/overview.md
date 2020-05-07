@@ -87,22 +87,8 @@ if __name__=='__main__':     #直接输入main,然后按下tab
   sys.argv[0]               #返回程序名  
   ...
 ```
-（3）subprocess（用于执行系统命令）
-```python
-import subprocess
 
-#在shell下执行command命令
-result=subprocess.run(command,shell=True)
-result.returncode                 #returncode就是$?
-
-result=subprocess.run(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)  
-#不显示命令的输出结果,将所有输出信息都放入返回值中
-result.returncode   
-result.stdout
-result.stderr
-```
-
-（4）timeit
+（3）timeit
 ```python
 import timeit
 seconds = timeit.timeit(stmt="func()", number = 10000)

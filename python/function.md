@@ -72,17 +72,72 @@
 ### 装饰器
 #### 1.基本装饰器
 **python装饰器本质上将一个函数输入另一个函数里，然后返回一个新的函数出来**
+
 ```python
-def wrapper(func):           #装饰器，需要接受函数地址作为参数
-    def func_new(*args,**kwargs):
+#装饰器，必须接受函数地址作为参数
+def wrapper(func):
+
     #定义一个新的函数,用来接收被修饰函数的任意参数
-        ret = func('old')              #使用旧的函数不是必须
+    def func_new(*args, **kargs):
+
+        #可以使用旧的函数不是必须
+        pass
+
+    #返回这个新的函数    
+    return func_new
+
+#@后面跟可以是任何内容，只要返回的是函数的地址即可
+#下面等价于：
+#   func_test = wrapper(func_test)
+@wrapper
+def func_test():
+    pass
+```
+#### 2.带参数的装饰器
+```python
+def wrapper_out():
+    def wrapper(func):
+        def func_new(*args, **kargs):
+            pass
+        return func_new
+    return wrapper
+
+@wrapper_out()
+def func_test():
+    pass
+```
+#### 3.多个装饰器装饰一个函数def wrap1(func):
+```python
+def wrapper01(func):
+    func_new(*args, **kwargs):
+        pass
+    return func_new
+
+def wrapper02(func):
+    func_new(*args, **kwargs):
+        pass
+    return func_new
+
+#下面的内容等价于：
+#   func_test = wrapper01(wrapper02(func_test))
+@warpper01
+@wrapper02
+def func_test():
+    pass
+```
+
+#### 4.demo
+```python
+def wrapper(func):    
+
+    def func_new(*args,**kwargs):
+        ret = func('old')              
         print(args)
         return ret
-    return func_new         #返回这个新的函数
 
-#下面等价于func_test = wrapper(func_test)
-@wrapper
+    return func_new         
+
+@wrapper                  
 def func_test(name):
     return name
 
@@ -92,8 +147,6 @@ result = func_test('1','2','one')
 #('1','2','one')
 #result = 'old'
 ```
-#### 2.带参数的装饰器
-#### 3.多个装饰器装饰一个函数
 ***
 ### 常用函数
 * 生成序列数（返回的是一个可迭代对象）
