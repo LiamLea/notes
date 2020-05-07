@@ -24,7 +24,7 @@
 	挂载configMap类型的存储卷，则该configMap中的键名就是文件名，键值就是文件内容
 
 	比如，configMap中一个键值对为 aa=bb，则会在容器内的挂载目录下生成名为aa的文件，文件的内容为bb
-	
+
 	configmap通过volume方式挂载到容器内后，修改configmap，容器内的挂载内容也会更新（例外：当挂载时使用了subPath时，容器内挂载的内容不会自动更新）
 
 （6）Secret
@@ -316,7 +316,7 @@ kubectl create secret 类型 名字 --from-file=文件路径     //文件名就�
 #如果需要部署到其他名称空间，则要修改清单文件
 
   kubectl apply -f rbac.yaml			//授权
-  
+
 #修改deploment中nfs的信息后，在创建
 #最重要的一项是PROVISIONER_NAME，这个是设置该provisioner的名字，后面Storage需要指定这个名字，才能使用
 #  env:
@@ -343,7 +343,12 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: test-claim
-  
+
+#  annotations:
+#    volume.beta.kubernetes.io/storage-class: xx
+#这里等价于storageClassName: xx
+#不过这种方式以后会丢弃
+
 spec:
   storageClassName: xx				//这项十分重要，用于指定使用哪个storage class
   accessModes:

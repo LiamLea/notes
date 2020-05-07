@@ -135,6 +135,9 @@ kubectl taint nodes NODENAME KEY1=VAVLUE1:EFFECT
 #### 4.删除某个污点
 ```shell
 kubectl taint nodes NODENAME 污点名-
+
+#当使用这种方法无法删除时，使用下面命令删除
+#kubectl edit nodes NODENAME
 ```
 ***
 ### 其他操作

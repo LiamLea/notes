@@ -158,9 +158,16 @@ if x or y or
 if any((x,y,z))
 ```
 
-#### 19.将原始字符串转换成普通字符串
+#### 19.原始字符串和普通字符串的相互转换
+
+原始字符串本质就是**被转义过的**普通字符串
+
+（1）原始字符串 --> 普通字符串
 ```python
+#decode(encoding = "unicode-escape")表示去掉字符串的转义
 s = raw_string.encode().decode(encoding = "unicode-escape")
-#unicode-escape这个字符集，是用于获取被转义的字符串（即如果这个字符串中有转义符，则去掉转义符后的结果）
-#默认是utf8字符集
+```
+（2）普通字符串 --> 原始字符串
+```python
+raw_string = s.encode(encoding = "unicode-escape").decode()
 ```
