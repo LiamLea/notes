@@ -362,3 +362,10 @@ locale -a
 ```shell
 export LANG="xx"
 ```
+
+#### 47.当kubectl describe无法查找到错误时
+```shell
+kubectl get events --sort-by=.metadata.creationTimestamp -n xx
+```
+
+#### 48.通过volumeClaimTemplate这种方式创建的pvc，删除资源时，pvc不会被删除

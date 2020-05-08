@@ -1,4 +1,5 @@
 # helm
+[toc]
 ### 基础概念
 #### 1.chart
 一个helm程序包，包含定义资源的清单文件
@@ -24,6 +25,43 @@ chart部署于目标集群上的一个实例
   values.yaml           #给模板文件使用的变量
   requirements.yaml     #指明该chart依赖哪些chart
   charts/               #存放依赖的chart的目录
+```
+#### 6.heml安装资源的顺序
+helm会收集给定chart中的所有资源，然后安装顺序安装
+```
+Namespace
+ResourceQuota
+LimitRange
+PodSecurityPolicy
+Secret
+ConfigMap
+StorageClass
+PersistentVolume
+PersistentVolumeClaim
+ServiceAccount
+CustomResourceDefinition
+ClusterRole
+ClusterRoleBinding
+Role
+RoleBinding
+Service
+DaemonSet
+Pod
+ReplicationController
+ReplicaSet
+Deployment
+StatefulSet
+Job
+CronJob
+Ingress
+APIService
+```
+#### 7.手动设置安装资源的顺序
+在资源中加上以下注释（annotations）
+```yaml
+annotations:
+  "helm.sh/hook": pre-install
+  "helm.sh/hook-weight": "5"      #权重越高，越先安装
 ```
 ***
 ### 使用
@@ -63,9 +101,16 @@ helm upgrade xx xx1         #xx1为chart名或者本地chart的路径
 ***
 ### helm模板语法
 
-#### 1.模板引用方式
+#### 1.语法
 ```yaml
-  {{ .OBJECT.Name }}		#通过双括号注入,小数点开头表示从最顶层命名空间引用.
+
+#通过双括号注入,小数点开头表示从最顶层命名空间引用.
+  {{ .OBJECT.Name }}		  
+
+#if语句
+  {{ if .OBJECT.Name }}   
+  ...
+  {{ end }}
 ```
 #### 2.helm内置对象
 ```shell
