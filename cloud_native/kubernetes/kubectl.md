@@ -149,3 +149,7 @@ kubectl proxy --address="0.0.0.0" --port=8080 --accept-hosts='^.*' --accept-path
 #比如：
 #	curl 127.0.0.1:8080/api/v1/namespaces
 ```
+#### 2.查询发生的事件（用于排错）
+```shell
+kubectl get events --sort-by=.metadata.creationTimestamp -n xx
+```

@@ -25,11 +25,20 @@ master/node架构，master一般设为3个（高可用）
 每个pod发生地址改变后，apiserver会通知kube-proxy
 kube-proxy会修改该kube-proxy所在节点的iptables规则
 
-#### 3.存储组件（一般放在master上）
+#### 3.创建和删除pod时，各组件交互过程
+（1）创建pod时
+
+![](./imgs/overview_01.png)
+
+（2）删除pod时
+
+![](./imgs/overview_02.jpg)
+
+#### 4.存储组件（一般放在master上）
 * etcd                               
 master的共享存储，存储k8s的资源
 
-#### 4.核心附件
+#### 5.核心附件
 
 ##### （1）coredns                         
 每当添加一个资源或者修改资源，都会更新dns记录，使得能够通过域名解析到相应资源
@@ -67,7 +76,7 @@ NAME.SERVICE.NAMESPACE.DOMAIN
 ```
 fluentd通过DaemonSet方式部署，挂载/var/log/containers目录，即可采集所有日志
 
-#### 5.网络组件（有很多，选择其中一个即可）
+#### 6.网络组件（有很多，选择其中一个即可）
 * flannel                            
 网络配置
 </br>

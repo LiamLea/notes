@@ -12,3 +12,6 @@ kubectl taint KEY:EFFECT-
 #当这种方法无法去除时，使用下面方法
 #kubectl edit nodes xx
 ```
+
+### 一直处于pulling image的状态的可能原因
+* 拉取的策略是拉取最新的，然而那台机器上已经有有该镜像运行的容器了，所以无法拉取到最新的镜像

@@ -333,6 +333,8 @@ kind: StorageClass
 metadata:
   name: xx					//重要，用于指定storage class的名字
 provisioner: xx				//重要，需要指定上面创建的provisioner
+reclaimPolicy: xx			//默认是Delete，即删除pvc，则自动删除对应的pv
+							//如果设置成Retain，即删除pvc，不自动删除对应的pv
 
 3.创建一个pvc测试
 

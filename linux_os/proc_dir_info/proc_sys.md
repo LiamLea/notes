@@ -55,6 +55,16 @@ sysrq功能：可以在系统出现故障的时候协助恢复和调试系统，
 #  降低系统的性能
 #  能够防止程序某些程序报内存不足的错误
 ```
+
+#### /proc/sys/vm/drop_cache
+用于清除buffer/cache
+```shell
+sync                                #清除前，需要先同步以下，否则数据可能丢失
+
+echo 1 > /proc/sys/vm/drop_cache    #清除pagecache
+echo 2 > /proc/sys/vm/drop_cache    #清除dentries和inodes
+echo 3 > /proc/sys/vm/drop_cache    #清除pagecache、dentries和inodes
+```
 ***
 #### /proc/sys/fs —— 文件系统参数
 ##### 1./pro/sys/fs/file-max

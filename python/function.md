@@ -149,18 +149,18 @@ result = func_test('1','2','one')
 ```
 ***
 ### 常用函数
-* 生成序列数（返回的是一个可迭代对象）
+#### 1.生成序列数（返回的是一个可迭代对象）
 ```python
 range(n)          #不包含最后一个数,默认从0开始
 range(n,m)
 ```
-* 匿名函数:用lambda声明
+#### 2.匿名函数:用lambda声明
 ```python
   f=lambda x:x+10       #f(1)返回11
   f=lambda x,y:x+y      #f(1,2)返回3
 ```
 
-* filter函数(用于过滤数据)
+#### 3.filter函数(用于过滤数据)
 ```python
 #第一个参数是函数,返回值必须是True或False
 #第二个参数是序列对象
@@ -170,13 +170,13 @@ range(n,m)
   list(filter(lambda x:x%2,nums))   #过滤出奇数
 ```
 
-* map函数(加工数据)
+#### 4.map函数(加工数据)
 ```python
 #第一个参数是函数,用于加工数据
 #第二个参数是序列
   list(map(lambda x:x*2,nums))
 ```
-* 偏函数(改造现有函数,将其一些参数固定下来,生成新的函数)
+#### 5.偏函数(改造现有函数,将其一些参数固定下来,生成新的函数)
 ```python
   import functools
   def add(a,b,c,d,e):
@@ -187,3 +187,12 @@ range(n,m)
   int2=functools.partial(int,base=2)
   int8=functools.partial(int,base=8)
 ```
+### 递归函数
+#### 1.基本概念
+* 递归函数：函数调用自身
+* 最大递归深度是1000层，超过1000层，就会抛出RecursionError的异常
+* 限制最大递归深度的原因：为了节省内存空间，避免用户无限使用内存空间
+* 尽量不要使用递归函数
+#### 2.递归函数的特点
+* 在调用前，必须设置一个停止条件
+* 如果需要获取停止的返回值，则必须return func(xx)

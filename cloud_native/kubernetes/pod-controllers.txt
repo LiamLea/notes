@@ -3,7 +3,7 @@
 1.pod的生命周期
 （1）状态：
   Pendind                //调度上未完成
-  Running                
+  Running
   Failed
   Succeed
   Unkown               //kubelet出故障可能导致这个问题
@@ -15,7 +15,7 @@
   容器探测：
     liveness         //用于探测容器是否存活，当发现不存活，会根据restartPolicy判断是否重启该pod
     readiness      	//用于探测容器能否提供相应服务
-  preStop（容器接收到terminated信号后，立即执行的操作，这个期间有个缓冲的时间，不是立即结束的） 
+  preStop（容器接收到terminated信号后，立即执行的操作，这个期间有个缓冲的时间，不是立即结束的）
 
 2.livenessProbe和readinessProbe有三种探针
   exec
@@ -31,27 +31,27 @@
 pod控制器类型
 
   ReplicaSet				//用于创建pod的副本，并且控制pod副本的数量达到要求
-  
+
   Deployment				//工作在ReplicaSet之上，功能更强大
 							//三层架构：
 							//	Deployment控制ReplicaSet（可能有多个）
 							//	ReplicaSet控制pods
 							//查看pods的详细信息时，显示的控制器也是ReplicaSet
-							
-  DaemonSet					//确保符合条件的node上只运行指定pod的一个副本 
-  
+
+  DaemonSet					//确保符合条件的node上只运行指定pod的一个副本
+
   Job						//只要指定pod完成特定任务后退出，即不会再重启pod
-  
+
   Cronjob					//周期性运行
-  
+
   StatefulSet				//管理有状态的pod
 
-###############################################################################  
+###############################################################################
 ReplicaSet
 
 （1）查看如何编写ReplicaSet的资源清单
   kubectl explain xx
-  
+
 （2）ReplicaSet清单的主要内容
 
 apiVersion: apps/v1
@@ -70,25 +70,25 @@ spec:
 	metadata:			//不用指定pod的名字，因为会以 "控制器名-xx" 来命名pod
 	  labels:			//这里的标签一定要符合上面的selector的要求
 		xx1: xx
-		xx2: xx 
+		xx2: xx
 	spec:
 	  containers:
 	  - name: xx
 		image: xx
 
-###############################################################################	
+###############################################################################
 Deployment
 
 （1）有两种更新策略（strategy）
   Recreate				//删一个，建一个
   RollingUpdate			//根据定义的最大多出数量和最少不可获得数量进行相应的操作
 						//比如：最少不可获得的数量为1，就需要先创建一个，再删除一个，保证最少不可获得的数量为1
-  
+
 （2）更新的原理
   会创建新的ReplicaSet来控制更新后的pods
   原来的ReplicaSet不会删除，可以方便回滚（回滚即使得相应的ReplicaSet开始工作，使其它的不工作）
   默认保留的ReplcaSet数量为10
-  
+
 （3）Deployment清单的主要内容
 
 apiVersion: apps/v1
@@ -116,7 +116,7 @@ spec:
 	  containers:
 	  - name: xx
 		image: xx
-		
+
 （4）回滚
   kubectl rollout history TYPE NAME			//查看有多少个版本，和版本号
   kubectl get rs -l xx1=xx -o wide          //查看每个版本具体的ReplicaSet
@@ -164,7 +164,7 @@ pod名称必须稳定、持久、有效、唯一
   headless service
   StatefulSet
   volumeClaimTemplate			//每个pod使用不同的存储卷
-  
+
 2.由statefulSet生成的pod的名字：
   statefulSet的名字-数字
 
@@ -189,7 +189,7 @@ spec:
   clusterIP: Node		//设置成无头的service
   selector:
     xx: xx				//通过标签关联pod
-	
+
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -220,6 +220,8 @@ spec:
 #用这个模板的意义在于：
 #通过此方式创建的pv，statefulSet会唯一标识，并且与指定pod唯一对应
 #从而保证了能够维护pod的状态
+
+#注意：通过这种方式创建的pvc，删除资源时，pvc不会被删除
 
   - metadata:
       name: xx					//创建的volume的名字
