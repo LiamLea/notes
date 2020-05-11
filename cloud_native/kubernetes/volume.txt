@@ -354,7 +354,7 @@ metadata:
 spec:
   storageClassName: xx				//这项十分重要，用于指定使用哪个storage class
   accessModes:
-    - ReadWriteMany
+  - ReadWriteMany
   resources:
     requests:
       storage: 1Mi

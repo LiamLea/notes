@@ -11,6 +11,12 @@ kubectl expose TYPE NAME \        #TYPE：控制器的类型，NAME：控制器�
           --target-port=xx        #target-port为容器的端口号
 ```
 ***
+### 删除资源
+#### 1.删除所有evicted状态的pods
+```shell
+kubectl get pods --all-namespaces --field-selector 'status.phase==Failed' -o json | kubectl delete -f -
+```
+***
 ### 查询资源
 #### 1.列出所有apiVersion
 ```shell

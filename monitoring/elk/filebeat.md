@@ -59,7 +59,7 @@ output.elasticsearch:
 #如果设置了这项，必须设置template的name和pattern
 
 #给自动加载的template取个名字
-setup.template.index: "xx"
+setup.template.name: "xx"
 
 #指明将此template用于那个index，所以这里写的要匹配上面的index
 setup.template.pattern: "xyxy*"       
@@ -71,7 +71,7 @@ setup.ilm.enabled: false
 **参考配置模板：/etc/filebeat/filebeat.refernce.yaml**
 * input
 ```yaml
-filebeat,inputs:
+filebeat.inputs:
 
 #支持的typ类型：
 #   log,container,docker,kafka,redis,udp,tcp,syslog
@@ -179,7 +179,7 @@ logging.files:
 
 （1）开启指定模块
 ```shell
-filebeat list               #查看有哪些模块，哪些是enable的
+filebeat modules list               #查看有哪些模块，哪些是enable的
 filebeat enable xx          #开启某个模块
 ls /etc/filebeat/modules/   #可以在该目录下的具体文件中，设置变量，从而修改模块的配置
 ```

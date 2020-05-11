@@ -101,22 +101,127 @@ helm upgrade xx xx1         #xx1为chart名或者本地chart的路径
 ***
 ### helm模板语法
 
-#### 1.语法
+#### 1.基本语法
 ```yaml
 
 #通过双括号注入,小数点开头表示从最顶层命名空间引用.
   {{ .OBJECT.Name }}		  
-
-#if语句
-  {{ if .OBJECT.Name }}   
-  ...
-  {{ end }}
 ```
 #### 2.helm内置对象
 ```shell
   Release           #release相关属性
   Chart             #Chart.yaml文件中定义的内容
   Values            #values.yaml文件中定义的内容
+```
+#### 3.判断语句
+```yaml
+#if语句
+  {{ if .OBJECT.Name }}   
+    # Do something
+  {{ else if .OBJECT.Name }}
+    # Do something else
+  {{ else }}
+    # Default case
+  {{ end }}
+```
+#### 4.with语句（修改作用域）
+```yaml
+{{ with .OBJECT.Name }}
+  # restricted scope
+{{ end }}
+```
+demo
+>values.yml
+```yaml
+favorite:
+  drink: coffee
+  food: pizza
+```
+>templates/xx.yml
+```yaml
+{{- with .Values.favorite }}    #则根域（.）就表示.Values.favorite
+drink: {{ .drink }}
+food: {{ .food }}
+{{- end }}
+
+#结果：
+#drink: coffee
+#food: pizza
+```
+
+#### 5.range语句（遍历）
+```yaml
+{{- range .OBJECT.Name }}
+  # restricted scope
+{{- end }}
+
+{{- range $key,$val := .OBJECT.Name }}    #不包括.OBJECT.Name
+{{key}}: {{val}}                        
+{{- end}}
+```
+demo
+>values.yml
+```yaml
+name:
+- liyi
+- lier
+- lisan
+```
+>templates/xx.yml
+```yaml
+{{ range .Values.name }}
+- {{ . }}
+{{ end }}
+
+#结果：
+#- liyi
+#- lier
+#- lisan
+```
+#### 6.常见例子
+（1）demo1
+>values.yml
+```yaml
+env:
+- name: n1
+  value: v1
+- name: n2
+  value: v2
+```
+>templates/xx.yml
+```yaml
+{{ range .Values.env }}
+  {{ with . }}
+  name: {{ .name }}
+  value: {{ .value }}
+  {{ end }}
+{{ end }}
+
+#结果：
+#name: n1
+#value: v1
+#name: n2
+#value: v2
+```
+（2）demo2
+>values.yml
+```yaml
+config:
+  test: |
+    a: 1
+    b: 2
+```
+>templates/xx.yml
+```yaml
+{{ range $key,$val := .Values.config }}
+{{ $key }}: |
+{{ $val | indent 2 }}         #indent 2表示缩进两个空格
+{{ end }}
+
+#结果：
+#test: |
+#  a: 1
+#  b: 2
 ```
 ***
 
