@@ -9,11 +9,17 @@ pod的生命周期只有以下几种情况
 |Running|所有容器都被创建，至少有一个容器正在运行|
 |Succeed|所有容器都正常终止了，并且不会再启动|
 |Failed|所有容器都终止了，至少有一个是失败的终止（即退出码不为0）|
-|UnKown|当无法与该Pod通信时|
+|UnKown|因为某些原因无法取得 Pod 的状态，通常是因为与 Pod 所在主机通信失败|
 
 ![](./imgs/pod_01.jpg)
 
-#### 2.pod conditions（pod的状态）
+#### 2.pod conditions（pod状态）
+|Type|说明|Status</br>（True、False或Unkown）|lastProbeTime</br>（上次探测pod状态的时间戳）|lastTransitionTime</br>（从一个状态转换为另一种状态的时间戳）|reason</br>（状态切换的原因）|message</br>（对该状态切换的详细说明）|
+|-|-|-|-|-|-|-|
+|PodScheduled|该pod是否调度成功||||||
+|Ready|pod是否能够处理请求||||||
+|Initialized|所有初始化容器是否启动成功||||||
+|ContainersReady|所有容器是否都启动成功||||||
 
 
 

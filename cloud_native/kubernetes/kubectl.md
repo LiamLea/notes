@@ -87,6 +87,17 @@ kubectl get TYPE NAME
 # {@}表示输出整个jsonpath
 # {.xx[0].xx}利用这种形式获取某个键的值
 ```
+#### 6.查询node节点的状态
+```shell
+kubectl describe nodes xx
+```
+|Type|说明|Status</br>（True、False或Unkown）|lastProbeTime</br>（上次探测pod状态的时间戳）|lastTransitionTime</br>（从一个状态转换为另一种状态的时间戳）|reason</br>（状态切换的原因）|message</br>（对该状态切换的详细说明）|
+|-|-|-|-|-|-|-|
+|NetworkUnavailable|是否网络不可达||||||
+|MemoryPressure|是否有内存压力||||||
+|DiskPressure|是否有磁盘压力||||||
+|PIDPressure |是否有pid压力||||||
+|Ready|是否准备就绪|
 ***
 ### 管理pods
 #### 1.创建pods
