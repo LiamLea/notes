@@ -11,6 +11,8 @@ pod的生命周期只有以下几种情况
 |Failed|所有容器都终止了，至少有一个是失败的终止（即退出码不为0）|
 |UnKown|当无法与该Pod通信时|
 
+![](./imgs/pod_01.jpg)
+
 #### 2.pod conditions（pod的状态）
 
 
