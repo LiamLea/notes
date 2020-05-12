@@ -110,7 +110,7 @@ metadata:
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
-  kind: xx							//比如：Deployment
+  kind: xx							#比如：Deployment
   name: xx
   minReplicas: xx
   maxReplicas: xx
@@ -144,17 +144,18 @@ spec:
 （2）容器回收策略
 pod 内已经被删除的容器一旦年龄超过 MinAge 就会被清理
 
+***
+
 # resource limit
 ### 基础概念
 #### 1.kubelet只支持两种文件系统
-* nodefs（rootfs）
-用于存储**local** disk volumes, daemon logs, emptyDir等等（比如：本地卷等 用的都是 **根文件系统**）
+* nodefs
+**kubelet** 用于存储volumes, daemon logs等等（即`/var/lib/kubelet/`目录下的**文件系统**）
 </br>
 * imagefs
-用于存储镜像或容器的**可写层**（比如：**overlay2**）
+**容器** 用于存储镜像和可写层（如果用的是overlay2驱动的话，image就是`/var/lib/docker/overlay2/`目录下的**文件系统**）
 </br>
-* 不关心其他文件系统
-比如：volume是利用nfs文件系统挂载的，则kubelet不会关系nfs文件系统的使用量
+
 ### 2.Eviction Policy(驱逐策略)
 
 #### 2.1驱逐信号
@@ -183,7 +184,7 @@ evictionSoft:
   memory.available: 1.5Gi
 
 EvictionSoftGracePeriod:      #在驱逐 pod 前软驱逐阈值应该被控制的时长
- memory.available: 1m30s
+  memory.available: 1m30s
 
 EvictionMaxPodGracePeriod: 180    #当满足软驱逐阈值并终止 pod 时允许的最大宽限期值（秒数）
 

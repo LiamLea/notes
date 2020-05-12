@@ -229,16 +229,6 @@ cat /proc/sys/kernel/pid_max
 ```shell
 cat /proc/sys/kernel/thereads_max
 ```
-##### 30.制作docker镜像需要考虑的问题：
-* 基础镜像
-* 镜像时间
-* 镜像内的字符编码
-* 启动的用户和挂载的目录的权限
-* 分层，当用到同样的环境，可以先制作一层
-* 僵尸进程问题
-  * 容器内的孤儿进程会交给容器内pid为1的进程，如果该进程不回收子进程，则就会出现僵尸进程
-  * 解决：让bash进程为pid为1的进程，或者docker run --init ...
-  **注意用bash解决的话，最好写入脚本，不然用bash -c可能pid为1的进程不是bash**
 
 ##### 31.如何man一个命令的子命令
 ```shell
@@ -362,10 +352,4 @@ locale -a
 ```shell
 export LANG="xx"
 ```
-
-#### 47.当kubectl describe无法查找到错误时
-```shell
-kubectl get events --sort-by=.metadata.creationTimestamp -n xx
-```
-
-#### 48.通过volumeClaimTemplate这种方式创建的pvc，删除资源时，pvc不会被删除
+#### 47.通过volumeClaimTemplate这种方式创建的pvc，删除资源时，pvc不会被删除
