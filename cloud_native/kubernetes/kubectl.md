@@ -16,6 +16,10 @@ kubectl expose TYPE NAME \        #TYPE：控制器的类型，NAME：控制器�
 ```shell
 kubectl get pods --all-namespaces --field-selector 'status.phase==Failed' -o json | kubectl delete -f -
 ```
+#### 2.强制删除
+```shell
+kubectl delete ...  --force --grace-period=0
+```
 ***
 ### 查询资源
 #### 1.列出所有apiVersion
