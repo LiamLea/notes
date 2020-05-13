@@ -3,11 +3,12 @@
 ### 基础概念
 #### 1.容器有两个维度的资源限制
 ```yaml
-spec.resources.requests     #需求，最低保障
-spec.resources.limits       #限制，硬限制
+containers.resources.requests     #需求，最低保障
+containers.resources.limits       #限制，硬限制
 ```
 
 #### 2.cpu单位
+最好用`m`表示，因为1m是最小精度
 ```shell
 1cpu代表1个虚拟cpu，即1个核心
 1 cpu == 1000m cpu        #m是千分之一的意思
@@ -16,15 +17,38 @@ spec.resources.limits       #限制，硬限制
 
 #### 3.内存单位
 ```shell
-  k（或K）	-- 		10^3 = 1000
-  Ki		--		2^10 = 1024
+k（或K） ----    10^3 = 1000
+Ki      ----    2^10 = 1024
 
-  m（或M）	--		10^6 = 1000000
-  Mi		--		2^20 = 1024*1024
+m（或M） ----    10^6 = 1000000
+Mi      ----    2^20 = 1024*1024
 
 #i：binary
 ```
-#### 4.qos class（服务质量类型）
+
+#### 4.ephemeral storage
+存储的内容都是**临时**的，pod重启后，内容会丢失
+##### 4.1 存储的内容（临时的）
+* emptyDir volumes
+* 容器的日志
+* 容器的可写层
+
+##### 4.2 作用
+* 用于限制Pods对可写层、容器日志、emptyDir volumes
+* 如果没有ephemeral storage，则pods会对容器的**可写层等** **无限的使用**，导致磁盘容量很快就用光
+
+##### 4.3 kubernetes开启这个功能
+在kubelet中配置（默认是开启的）
+```shell
+--feature-gates LocalStorageCapacityIsolation=true
+```
+##### 4.3 使用
+```yaml
+spec.containers[].resources.requests.ephemeral-storage
+spec.containers[].resources.limits.ephemeral-storage
+```
+
+#### 5.qos class（服务质量类型）
 通过下面命令查看
 ```shell
 kubectl describe pods xx
@@ -150,14 +174,15 @@ pod 内已经被删除的容器一旦年龄超过 MinAge 就会被清理
 ### 基础概念
 #### 1.kubelet只支持两种文件系统
 * nodefs
-**kubelet** 用于存储volumes, daemon logs等等（即`/var/lib/kubelet/`目录下的**文件系统**）
+**kubelet** 用于存储volumes, daemon logs等等
+即`/var/lib/kubelet/`目录下的**文件系统**（包括其本身所在的文件系统和挂载在这个目录下的文件系统）
 </br>
 * imagefs
-**容器** 用于存储镜像和可写层（如果用的是overlay2驱动的话，image就是`/var/lib/docker/overlay2/`目录下的**文件系统**）
+**容器** 用于存储镜像和可写层
+如果用的是overlay2驱动的话，image就是`/var/lib/docker/overlay2/`目录下的**文件系统**（包括其本身所在的文件系统和挂载在这个目录下的文件系统）
 </br>
 
 ### 2.Eviction Policy(驱逐策略)
-
 #### 2.1驱逐信号
 |驱逐信号|说明|
 |-|-|
@@ -196,3 +221,8 @@ EvictionPressureTransitionPeriod: 180   #是 kubelet 从压力状态中退出之
 |-|-|
 |MemoryPressure|memory.available|
 |DiskPressure|nodefs.available</br>nodefs.inodesFree</br>imagefs.available</br>imagefs.inodesFree|
+
+### 3.ephemeral storage过低，导致相关资源被驱逐
+##### 3.1原理
+* 当node上的**ephemeral storage过低**时，node会给自己打上**short on local storage** **污点**
+* 不能忍受这个污点的pods会被驱逐
