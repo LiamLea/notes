@@ -39,7 +39,7 @@ B-->|push|C[prometheus]
 ### 1.配置文件
 ```yaml
 global:
-  scrap_internal: 15s           #采集间隔
+  scrape_internal: 15s           #采集间隔
   evaluation_internal: 15s      #监控规则评估的间隔，看是否达到告警要求
 
 #配置告警发往哪里
@@ -49,7 +49,7 @@ alerting:
       - targets: ["IP:PORT"]
 
 #配置数据源（即从哪里pull数据）
-scrap_config:
+scrape_config:
 - job_name: xx                #数据源的名称
   staic_configs:
   - targets: ["IP:PORT"]      #exporter的地址，可以有多个

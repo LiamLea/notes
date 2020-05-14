@@ -1,33 +1,4 @@
 ###############################################################################
-
-1.pod的生命周期
-（1）状态：
-  Pendind                //调度上未完成
-  Running
-  Failed
-  Succeed
-  Unkown               //kubelet出故障可能导致这个问题
-（2）创建自主式pod
-  请求 -> apiserver（将请求的目标状态保存在etcd） -> scheduler（将调度结果更新到在etcd中） -> apiserver -> 指定node的kubelet（获取任务清单）-> 创建资源 -> apiserver（成功后）-> etcd更新信息
-（3）Pod生命周期中的重要行为
-  初始化容器
-  postStart（容器启动后立即执行的操作，注意：操作是在容器的启动命令后进行的）
-  容器探测：
-    liveness         //用于探测容器是否存活，当发现不存活，会根据restartPolicy判断是否重启该pod
-    readiness      	//用于探测容器能否提供相应服务
-  preStop（容器接收到terminated信号后，立即执行的操作，这个期间有个缓冲的时间，不是立即结束的）
-
-2.livenessProbe和readinessProbe有三种探针
-  exec
-  httpGet
-  tcpSocket
-
-3.lifecycle.postStart和lifecycle.preStop，有三种操作
-  exec
-  httpGet                  //用于请求某种资源
-  tcpSocket               //发起一些tcp请求
-
-###############################################################################
 pod控制器类型
 
   ReplicaSet				//用于创建pod的副本，并且控制pod副本的数量达到要求

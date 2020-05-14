@@ -4,8 +4,8 @@
 #### 1.相关启动参数
 |参数|说明|
 |-|-|
-|--kubeconfig|kubeconfig文件的路径，指定如何连接API server|
-|--config|指定配置文件|
+|--kubeconfig|指定如何连接API server的配置文件，</br>里面设置了API server的地址，<br>如果设置错误，该节点就无法加入k8s集群|
+|--config|指定kubelet的配置文件|
 [更多参数](https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/)
 ### 配置kubelet
 #### 1.配置方式
