@@ -29,6 +29,17 @@ kube-proxy会修改该kube-proxy所在节点的iptables规则
 （1）创建pod时
 
 ![](./imgs/overview_01.png)
+* 提交Pod spec到API server
+* API server将pod对象写入etcd
+* API server会反应etcd状态的改变
+* 所有k8s组件都监控着API server，检查是否有相关的改变
+* kube-scheduler发现了改变：有一个新的pod对象创建
+* kube-scheduler将该pod调度到一个node上，并且更新API server
+* API server会将这个改变再次写入etcd中
+* 相应node上的kubelet发现了新的改变与自己有关
+* kubelet调用docker，启动pods，返回容器的状态
+* API server将容器的状态存储到etcd中
+* 写入成功后，API server会告诉kubelet
 
 （2）删除pod时
 

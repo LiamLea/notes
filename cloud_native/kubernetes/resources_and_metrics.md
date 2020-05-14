@@ -224,5 +224,5 @@ EvictionPressureTransitionPeriod: 180   #是 kubelet 从压力状态中退出之
 
 ### 3.ephemeral storage过低，导致相关资源被驱逐
 ##### 3.1原理
-* 当node上的**ephemeral storage过低**时，node会给自己打上**short on local storage** **污点**
-* 不能忍受这个污点的pods会被驱逐
+* 当pod的ephemeral storage**超过**启动时设置的**limit**时，**该pod**会被**驱逐**
+* 当node上的**ephemeral storage过低**时，node会给自己打上**short on local storage** **污点**，不能忍受这个污点的pods会被驱逐
