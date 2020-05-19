@@ -76,20 +76,27 @@ kubectl describe pods xx
 由第三方组件采集，采集指标的范围更广
 
 ### 安装metrics-server
-
+metrcs-server通过api方式暴露k8s集群的指标
 #### 1.下载yaml文件
 ```shell
 github -> kubernetes -> cluster -> addons -> metrics-server
 ```
 
 #### 2.修改metrics-server-deployment.yaml
-```shell
 修改kubelet-port端口，设置为实际的端口（ss -tulnp | grep kubelet）
+```yaml
+command:
+  - /metrics-server
+  - --metric-resolution=30s
+  - --kubelet-port=10250
+  - --kubelet-insecure-tls
+  - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
 ```
 
 #### 3.修改resource-reader.yaml
-```shell
-  在rules.resources下添加一项：
+```yaml
+#在rules.resources下添加一项：
+rules.resources:
   - nodes/stats
 ```
 
@@ -182,8 +189,36 @@ pod 内已经被删除的容器一旦年龄超过 MinAge 就会被清理
 如果用的是overlay2驱动的话，image就是`/var/lib/docker/overlay2/`目录下的**文件系统**（包括其本身所在的文件系统和挂载在这个目录下的文件系统）
 </br>
 
-### 2.Eviction Policy(驱逐策略)
-#### 2.1驱逐信号
+#### 2.kubelet预留资源
+
+（1）为k8s组件预留资源
+```yaml
+kubeReserved:
+  cpu: xx
+  memory: xx
+  ephemeral: xx
+```
+（2）为系统（非k8s组件）预留资源
+```yaml
+systemReserved:
+  cpu: xx
+  memory: xx
+  ephemeral: xx
+```
+
+### 3.可用资源
+```shell
+Available = Capacity - kubeReserved - systemReserved - EvictionThreshold
+
+#Available 表示总共可以使用的资源，不是剩余可以使用的资源
+#Avaiable 可以通过kubectl describe nodes xx可以查看到
+#Capacity 表示这个资源的总量
+```
+
+### 4.Eviction Policy(驱逐策略)
+* 当**资源的真实剩余量**小于**阈值**时，开始驱逐
+* 或 当**k8s资源使用量**大于 **总共的可用量（Avaiable）** 时，开始驱逐
+#### 4.1驱逐信号
 |驱逐信号|说明|
 |-|-|
 |memory.available|memory.available = node.status.capacity.memory - memory.workingSet|
@@ -192,7 +227,7 @@ pod 内已经被删除的容器一旦年龄超过 MinAge 就会被清理
 |imagefs.available|imagefs.available = imagefs.available|
 |imagefs.inodesFree|imagefs.inodesFree = imagefs.inodesFree|
 
-#### 2.2.驱逐阈值（可以是百分比，可以是有单位的数值）
+#### 4.2.驱逐阈值（可以是百分比，可以是有单位的数值）
 * 如果 nodefs 文件系统满足驱逐阈值，kubelet通过**驱逐 pod 及其容器**来释放磁盘空间。
 * 如果 imagefs 文件系统满足驱逐阈值，kubelet通过**删除所有未使用的镜像**来释放磁盘空间
 ##### （1）hard evication threshold
@@ -216,13 +251,13 @@ EvictionMaxPodGracePeriod: 180    #当满足软驱逐阈值并终止 pod 时允�
 EvictionPressureTransitionPeriod: 180   #是 kubelet 从压力状态中退出之前必须等待的时长，防止节点在软驱逐阈值的上下振荡
 ```
 
-#### 2.3.驱逐信号导致节点的状态
+#### 4.3.驱逐信号导致节点的状态
 |节点状态|驱逐信号|
 |-|-|
 |MemoryPressure|memory.available|
 |DiskPressure|nodefs.available</br>nodefs.inodesFree</br>imagefs.available</br>imagefs.inodesFree|
 
-### 3.ephemeral storage过低，导致相关资源被驱逐
-##### 3.1原理
+### 5.ephemeral storage过低，导致相关资源被驱逐
+##### 5.1原理
 * 当pod的ephemeral storage**超过**启动时设置的**limit**时，**该pod**会被**驱逐**
 * 当node上的**ephemeral storage过低**时，node会给自己打上**short on local storage** **污点**，不能忍受这个污点的pods会被驱逐
