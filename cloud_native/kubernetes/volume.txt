@@ -49,6 +49,7 @@
 
 5.StorageClass
   默认pv是不属于任何StroageClass的
+  利用StorageClass可以对pv进行分类，使用时指定StorageClass，就在该类型的pv中寻找符合要求的pv
   利用StorageClass可以实现动态pv
 
 6.动态pv
