@@ -45,13 +45,27 @@ kubelet
 kubeadm
 kubectl
 ```
-#### 3.设置相关服务开机自启（而不是现在就启动）
+
+#### 3.修改docker配置
+防止日志量越来越大，导致存储耗尽
+`vim /etc/docker/daemon.json`
+```json
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}
+
+```
+#### 4.设置相关服务开机自启（而不是现在就启动）
 ```shell
 systemctl restart docker
 systemctl enable docker kubelet
 ```
 
-#### 4.初始化master节点
+#### 5.初始化master节点
 ```shell
 ##kubeadm config images list
 ##可以先拉取镜像，再初始化
@@ -71,11 +85,11 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
-#### 5.安装网络插件
+#### 6.安装网络插件
   参考官网的安装步骤
   注意要修改pod cidr同上面我们设置的
 
-#### 6.添加node节点
+#### 7.添加node节点
 
 （1）获取token用于加入该集群（在初始化节点上执行）
 ```shell
@@ -92,7 +106,7 @@ kubeadm join ...
 cp -r ~/.kube ip:~
 ```
 
-#### 7.添加mster节点
+#### 8.添加mster节点
 （1）获取token和证书（在初始化节点上执行）
 ```shell
 kubeadm token create --print-join-command
@@ -108,7 +122,7 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
-#### 8.删除节点
+#### 9.删除节点
 （1））还原节点（需要到该节点上执行，执行kubeadm init或join等后想要还原）
 ```shell
 kubeadm reset
@@ -121,7 +135,43 @@ kubectl delete node NODENAME
 #注意如果是master节点：可能会有问题
 #可能需要先通过etcdctl删除etcd中的成员
 ```
+***
+### 安装metrics-server
+metrcs-server通过api方式暴露k8s集群的指标
+#### 1.下载yaml文件
+```shell
+github -> kubernetes -> cluster -> addons -> metrics-server
+```
 
+#### 2.修改metrics-server-deployment.yaml
+修改kubelet-port端口，设置为实际的端口（ss -tulnp | grep kubelet）
+```yaml
+command:
+  - /metrics-server
+  - --metric-resolution=30s
+  - --kubelet-port=10250
+  - --kubelet-insecure-tls
+  - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
+```
+
+#### 3.修改resource-reader.yaml
+```yaml
+#在rules.resources下添加一项：
+rules.resources:
+  - nodes/stats
+```
+
+#### 4.安装metrics-server
+```shell
+kubectl apply -f .
+```
+
+#### 5.验证
+```shell
+kubectl api-version     #会有metrics相关的项
+kubectl top nodes
+kubectl top pods
+```
 ***
 ### etcdctl
 

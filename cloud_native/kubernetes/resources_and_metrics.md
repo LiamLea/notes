@@ -75,43 +75,6 @@ kubectl describe pods xx
 * 非核心指标（自定义指标）
 由第三方组件采集，采集指标的范围更广
 
-### 安装metrics-server
-metrcs-server通过api方式暴露k8s集群的指标
-#### 1.下载yaml文件
-```shell
-github -> kubernetes -> cluster -> addons -> metrics-server
-```
-
-#### 2.修改metrics-server-deployment.yaml
-修改kubelet-port端口，设置为实际的端口（ss -tulnp | grep kubelet）
-```yaml
-command:
-  - /metrics-server
-  - --metric-resolution=30s
-  - --kubelet-port=10250
-  - --kubelet-insecure-tls
-  - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
-```
-
-#### 3.修改resource-reader.yaml
-```yaml
-#在rules.resources下添加一项：
-rules.resources:
-  - nodes/stats
-```
-
-#### 4.安装metrics-server
-```shell
-kubectl apply -f .
-```
-
-#### 5.验证
-```shell
-kubectl api-version     #会有metrics相关的项
-kubectl top nodes
-kubectl top pods
-```
-
 ### 使用
 #### 1.设置自定义指标
 

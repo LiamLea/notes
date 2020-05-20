@@ -106,7 +106,7 @@ seconds = timeit.timeit(stmt="func()", number = 10000)
 **文件对象是可迭代对象**
 **注意 文件指针的移动**
 
-（1）读取文本文件(**用for循环读取,for line in f**)
+#### 1.读取文本文件（用for循环读取,`for line in f`）
 ```python
   f=open('xx', encoding = "utf8")
   data=f.read()
@@ -115,28 +115,28 @@ seconds = timeit.timeit(stmt="func()", number = 10000)
   f.close()
 ```
 
-（2）以bytes方式读取文件(**用whiled循环读取,终止条件 if not data**)  
+#### 2.以bytes方式读取文件（用whiled循环读取,终止条件`if not data`）
 ```python
 #用于处理非文本文件,如可执行程序
   f=open('xx','rb', encoding = "utf8")
   data=f.read(4096)    #括号填字节数,一个块为4096字节,所以一般一次读取4096字节
   f.close()
 ```
-（3）写文本文件
+#### 3.写文本文件
 ```python
   f=open('xx', 'w', encoding = "utf8")    #w模式,清空或创建文件,a模式,必要时创建文件
   f.write('xx')      
   f.close()
 ```
 
-（4）**with语句**  
+#### 4.with语句
 ```python
  #适用于对资源访问的场合,无论是否异常退出,都会执行必要的清理操作
   with open('xx') as fobj1,open('yy', encodeing = "utf8") as fobj2:
     ...
 ```
 
-（5）移动文件指针(**当打开文件后才会有 文件指针**)
+#### 5.移动文件指针（当打开文件后才会有 文件指针）
 ```python
   f.tell()        #当前文件指针所在的位置
   f.seek(-2,2)    #第一个参数是偏移量
@@ -156,6 +156,25 @@ b = 10
 
 #id(a)和id(b)是一样的，即指向同一块内存
 ```
+
+### 反射机制
+把字符串映射为某个对象的属性或方法，对象可以是任何东西（模块、类、实例等）
+
+#### 1.`hasattr(对象, "xx")`
+用于判断对象是否有xx这个属性或方法，返回True或False
+
+#### 2.`getattr(对象, "xx")`
+用于获取对象中xx这个属性或方法
+
+* `test.name` <----> `getattr(test, "name")`
+</br>
+* `test.func()`  <----> `getattr(test, "func")()`
+</br>
+* `import m1; m1.func1()` <---> `import m1; getattr(m1, "func1")()`
+</br>
+* `func()` <----> `getattr(sys.modules["__main__"], "func")()`
+调用本模块的内容
+
 ***
 # exception
 * 常见异常
@@ -261,15 +280,56 @@ gen.__next__()    #第二个next继续执行，执行到第二个yield停下来
 * `_x`
 以单下划线开头的实例变量名，这样的变量外部是可以访问的，但是，按照约定俗成的规定，当你看到这样的变量时，意思就是，“虽然我可以被访问，但是请把我视为私有变量，不要随意访问”。
 
-### 常用内置对象
+### 常用函数
 |函数|说明|
 |-|-|
-|dir(xx)|用于获取对象的属性、方法名等，返回一个字符串列表|
-|id(xx)|获取对象的内存地址|
-|type(xx)|获取对象所属的类|
+|`dir(xx)`|用于获取对象的属性、方法名等，返回一个字符串列表|
+|`id(xx)`|获取对象的内存地址|
+|`type(xx)`|获取对象所属的类|
+|`hasattr(xx, "yy")`</br>`getattr(xx, "yy")`|实现反射机制|
+|`callable(xx)`|判断xx是否是可调用|
+
+### 常用内置装饰器
+|装饰器|说明|
+|-|-|
+|`@classmethod`|把一个对象绑定的方法 修改成 一个类绑定的方法</br>当发现没必要传入self时，可以使用这个装饰器|
+|`@staticmethod`|把一个对象绑定的方法 修改成 静态方法（即与类和对象都无关|
+
+* 举例
+```python
+class A:
+
+  @classmethod
+  def func1(cls, args):
+    pass
+
+  @staticmethod
+  def func2(args):
+    pass
+
+  def func3(self, args):
+    pass
+
+#有两种调用方式
+A.func1()
+
+a = A()
+a.func1()
+```
+
+
+### 常用内置魔术方法
 
 ### 特殊变量和方法（是内置对象的属性）
-#### 1.模块相关
+#### 1.通用
+##### （1）`__dict__`
+python中一切皆对象
+获取类或对象的属性
+几乎所有类和对象都有`__dict__`这个属性，有几个特殊的没有
+```python
+
+```
+#### 2.模块相关
 ##### （1）`__name__`
 获取模块的名字，如果是主模块则返回`__main__`
 ##### （2）`__doc__`
@@ -293,7 +353,7 @@ from foo import *
 print(bar)
 print(baz)
 ```
-#### 2.类相关
+#### 3.类相关
 ##### （1）`__init__()`
 初始化函数, 创建实例的时候，可以调用__init__方法做一些初始化的工作
 如果子类重写了__init__，实例化子类时，则只会调用子类的__init__，此时如果想使用父类的__init__，可以再调用一下
@@ -360,7 +420,7 @@ demo.test("xxx")
 ```
 **注意**：再__getattribute__方法中，不要使用self.xx，因为每一次调用类的属性或方法，都会执行一次__getattribute__函数，可能有问题
 
-#### 3.对象相关
+#### 4.对象相关
 #####（1） `definition.__name__`
 The name of the class, function, method, descriptor, or generator instance.
 ```python
