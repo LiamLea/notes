@@ -129,10 +129,11 @@ kubectl exec NAME [-c xx] [-it] -- 命令
 #### 5.查看日志
 ```shell
 kubectl logs POD_NAME
-            -c xx     #指定要查看的容器
-            -f        #follow
-            -p        #previous，查看该容器的上一个实例（常用于查询终止的容器的日志）
-                      #当容器重新启动，kubelet会保留该容器上一个终止的实例
+            -c xx         #指定要查看的容器
+            --since=5s    #显示最近5s的日志，当日志特别的的时候，这个选项很实用（可以将结合-f使用）
+            -f            #follow
+            -p            #previous，查看该容器的上一个实例（常用于查询终止的容器的日志）
+                          #当容器重新启动，kubelet会保留该容器上一个终止的实例
 ```
 ***
 ### 管理标签和污点

@@ -353,3 +353,17 @@ locale -a
 export LANG="xx"
 ```
 #### 47.通过volumeClaimTemplate这种方式创建的pvc，删除资源时，pvc不会被删除
+
+#### 48.`systemctl reload` 和 `systemctl restart`区别
+* reload：remain running + re-read configuration files
+* restart：stop + start
+
+#### 49.清空一个 正被文件描述符引用 的 文件
+注意：不能直接删除该文件，即使删除也不会释放存储
+```shell
+echo > xx
+```
+#### 50.两个虚拟机之间的传输速度
+* 虚拟网络设备的速度取决于于宿主机，该网络设备显示的参数没有任何意义，仅仅是显示而已
+* 同一台宿主机上，虚拟机间的传输速度与存储的速度有关
+* 不同宿主机上，虚拟机间的传输速度与物理网卡和网络有关
