@@ -12,6 +12,10 @@
 |fluntd|将日志发往fluentd|
 |...||
 
+#### 2.日志的生命周期
+* 只有当容器被**删除**时，日志才会被删除
+* 容器重启或者容器停止，日志都不会被删除
+
 ### 使用
 #### 1.查看当前使用的log-driver
 ```shell
@@ -20,7 +24,8 @@ docker info
 #Logging Driver: xx
 ```
 
-#### 1.使用json-file
+#### 2.使用json-file
+注意：daemon.json对逗号的使用很严格，如果后面没有内容了，不要加逗号，否则会报错
 ```yaml
 {
   "log-driver": "json-file",

@@ -5,7 +5,7 @@ socket是一种数据结构（**文件**），用于存储通信需要的重要�
 #### 2.协议族（family）
 * AF_INET    IPv4
 * AF_INET6   IPv6
-* AF_LOCAL   UNIX域协议
+* AF_UNIX   UNIX域协议
 * AF_ROUTE   路由套接字
 * AF_KEY     密钥套接字
 #### 3.套接字类型（type）
