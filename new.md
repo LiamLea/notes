@@ -67,7 +67,10 @@ ip link add xx1 type veth peer name xx2
 ##### 14.当在zabbix中添加新的oid，一定要先用snmpget看看有没有数据，snmpwalk有数据没用，因为可能没有到底
 
 ##### 15.模拟cpu高负载
-  cat /dev/urandom | gzip -9 | gzip -d > /dev/null        //当需要更高的负载，则可以继续压缩解压
+```shell
+#当需要更高的负载，则可以继续压缩解压
+cat /dev/urandom | gzip -9 | gzip -d > /dev/null    
+```
 
 ##### 16.SPAN（switch port analyzer，交换机的端口镜像技术）
   利用SPAN技术，可以把交换机上的某些端口的数据流 copy 一份，发往到指定端口
@@ -360,10 +363,25 @@ export LANG="xx"
 
 #### 49.清空一个 正被文件描述符引用 的 文件
 注意：不能直接删除该文件，即使删除也不会释放存储
+* 可以通过gdb来清空
 ```shell
-echo > xx
+gdb -p <PID>
+call ftruncate(<FD>,0)
 ```
+* 用其他内容填充
+```shell
+echo xx > `readlink <FD>`
+```
+
 #### 50.两个虚拟机之间的传输速度
 * 虚拟网络设备的速度取决于于宿主机，该网络设备显示的参数没有任何意义，仅仅是显示而已
 * 同一台宿主机上，虚拟机间的传输速度与存储的速度有关
 * 不同宿主机上，虚拟机间的传输速度与物理网卡和网络有关
+
+#### 51.执行命令后，没有响应可能的原因：
+* 高IO和剩余少量的内存
+  * 原因
+    * 当文件系统读写频率过高，且内存剩余量很少时，由于内存没办法缓存，导致读写效率很低，因为很多命令是要读写文件的，所以这样会导致，命令执行非常慢
+  * 解决
+    * 通过`echo 1 > /proc/sys/vm/block_dump`和`dmesg -c`查看高io的进程
+    * 通过`ps aux`查看内存使用率高的进程

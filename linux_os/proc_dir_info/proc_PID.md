@@ -55,3 +55,6 @@ getconf CLK_TCK
 
 #### /proc/PID/fd/
 该目录下存放该进程的文件描述符（链接到打卡的文件）
+
+#### /proc/PID/io
+该进程的io使用情况

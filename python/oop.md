@@ -1,6 +1,16 @@
 [toc]
 # OOP(object oriented program)
 **在python中一切皆对象**
+### 能够定义在类中的对象
+* 静态变量
+* 属性
+`self.xx`
+* 绑定方法
+`self.func(self, args)`
+* 类方法
+通过`@classmethod`修饰的方法
+* 静态方法
+通过`@staticmethod`修饰的方法
 ### 类和对象的命名空间
 #### 1.模型
 ```plantuml
@@ -15,17 +25,15 @@ allowmixing
 frame instance1{
   card "pointer" as p1
   card "attributes" as a1
-  card "self" as s1
 }
 frame instance2{
   card "pointer" as p2
   card "attributes" as a2
-  card "self" as s2
 }
 p1 -d->A
 p2 -d->A
-s1 -> instance1
-s2 -> instance2
+A -> instance1:通过self指针
+A -> instance2:通过self指针
 ```
 * 类有自己的一块内存空间
 * 实例化时，对象开辟新的内存空间，并且用一个**类指针** **指向该对象的类**，用**self指针** **指向对象本身**

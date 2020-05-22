@@ -18,3 +18,8 @@ set
 |$#|添加到Shell的参数个数|
 |$0|Shell本身的文件名|
 |\$1～$n|添加到Shell的各参数值。\$1是第1参数、\$2是第2参数|
+
+#### 3.设置命令的超时时间：`timeout`
+```shell
+timeout <sec> <COMMAND>
+```

@@ -25,5 +25,23 @@
 ```shell
 kubectl logs ...
 ```
-##### （2）node层面
+##### （2）node-level
 ![](./imgs/log_01.png)
+* logrotate由容器的log-driver来做，k8s不进行logrotate
+* `kubectl logs`只查看一个文件的日志，不会查看其他切割的文件
+
+##### （3）cluster-level
+k8s没有原生的集群层面的日志的解决方法
+可以利用以下方式实现集群层面的日志
+
+* node logging agent
+  ![](./imgs/log_02.png)
+  * 日志代理需要运行在每个node上，所以可以设成DaemonSet类型
+  * 比如：EFK解决方案
+</br>
+* Sidecar container with a logging agent
+![](./imgs/log_03.png)
+  * 不建议使用
+</br>
+* Exposing logs directly from the application
+![](./imgs/log_04.png)

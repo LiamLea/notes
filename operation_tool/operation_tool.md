@@ -18,6 +18,14 @@ show xx             #常用的有：
                     #   environment
                     #   paths
 ```
+#### 4.利用gdb管理文件描述符
+```shell
+#关闭某个文件描述符
+call close(<FD>)
+
+#清空某个文件描述符（即清空文件，直接删除文件会影响程序）
+call ftruncate(<FD>,0)
+```
 ***
 ### lsof（list open files）
 #### 1.列出所有当前打开的文件，输出的格式：
@@ -68,6 +76,7 @@ show xx             #常用的有：
 #### 1.选项
 ```shell
   -f            #跟踪由fork调用所产生的子进程
+  -c            #进行统计，统计调用哪些系统调用、调用的次数和错误等，最后给出一个统计结果
   -e 表达式     #表达式：
                 #trace=open 表示只跟踪open调用
 ```
@@ -122,3 +131,40 @@ count=xx      #仅拷贝xx个块
 ```shell
 dd if=/dev/zero of=/dev/sda
 ```
+***
+### stree-ng
+#### 1.模拟高负载
+* 原理：创建多个进程，争抢cpu
+```shell
+stress-ng -c <核数>     #核数如果为4，则会创建4个进程，每个进程用满一个核
+```
+
+#### 2.模拟高内存
+* 原理：持续运行`malloc()`和`free()`
+* 注意：
+  * 当设置的一个进程消耗的内存过高时，则不能耗尽内存，需要再起一个
+```shell
+stress-ng -m <NUM> --vm-bytes <BYTES> --vm-keep   
+#-m表示开启多少个进程，每个进程消耗那么多vm
+#--vm-keep就是占用内存，不重新分配
+```
+#### 3.模拟高I/O（测试文件系统）
+* 原理：持续写、读和删除临时文件
+```shell
+stress-ng -d <NUM> --hdd-write-size <BYTES> -i <NUM>
+#-d：开启<NUM>个负责，执行读、写和删除临时文件
+#--hdd-write-size每个负载写的数据量
+#-i：开启<NUM>个负载，执行sync()
+```
+***
+### io相关
+##### `iostat -dx`
+显示io详细情况
+##### `iotop`
+显示所有进程的io情况
+***
+### 一些查看的小命令
+##### `xxd -b <FILE>`
+以二进制形式查看文件
+##### `strings <FILE>`
+将二进制文件转换成字符串

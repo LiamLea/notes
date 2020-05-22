@@ -56,7 +56,7 @@ sysrq功能：可以在系统出现故障的时候协助恢复和调试系统，
 #  能够防止程序某些程序报内存不足的错误
 ```
 
-#### /proc/sys/vm/drop_cache
+##### /proc/sys/vm/drop_cache
 用于清除buffer/cache
 ```shell
 sync                                #清除前，需要先同步以下，否则数据可能丢失
@@ -64,6 +64,15 @@ sync                                #清除前，需要先同步以下，否则�
 echo 1 > /proc/sys/vm/drop_cache    #清除pagecache
 echo 2 > /proc/sys/vm/drop_cache    #清除dentries和inodes
 echo 3 > /proc/sys/vm/drop_cache    #清除pagecache、dentries和inodes
+```
+
+##### /proc/sys/vm/block_dump
+表示是否打开Block Debug模式，用于记录所有的读写及Dirty Block写回动作
+```shell
+echo 1 > /proc/sys/vm/block_dump
+
+dmesg -c        #可以查看到读写的日志
+                #-c，一边查看一遍删除日志
 ```
 ***
 #### /proc/sys/fs —— 文件系统参数
