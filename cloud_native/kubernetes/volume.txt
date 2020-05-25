@@ -332,6 +332,9 @@ kubectl create secret 类型 名字 --from-file=文件路径     //文件名就�
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"			#可以设置成默认的storageClass
+	
   name: xx					//重要，用于指定storage class的名字
 provisioner: xx				//重要，需要指定上面创建的provisioner
 reclaimPolicy: xx			//默认是Delete，即删除pvc，则自动删除对应的pv

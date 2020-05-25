@@ -23,3 +23,6 @@ kubectl taint KEY:EFFECT-
 * 可以先delte该pod
 * 重启kubelet（pod不会受影响）
 * 重启docker（容器都会重启）
+
+### 当pod已经被调度后，出现问题的终极排错方法：
+查看该pod所在节点的**kubelet的日志**
