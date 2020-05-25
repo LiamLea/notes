@@ -61,6 +61,7 @@ kubectl api-resources \
          --verbs=list \	      #过滤出支持list这个动作的资源
          --namespaced \	      #过滤出属于名称空间范围的资源
          -o name \            #过滤出资源的名字
+         --show-labels         #查看资源的所有标签
 
 #可以将过滤出的资源放入一个文件中
 #然后遍历每一个资源，进行kubectl get，从而获取该名称空间下的已创建的全部资源
