@@ -32,11 +32,62 @@ a -> b
 b -> c
 c -> d
 ```
+***
+### 安装
+利用helm
+* nginx-ingress默认不转发TCP和UDP，需要设置一下
+#### 1.设置转发TCP
+（1）方式一：
+```shell
+$ vim nginx-ingress/values.yaml
+```
+```yaml
+tcp:
+  #将nginx controller上的端口转发到某个命名空间的某个service上的某个端口
+  <CONTROLLER_PORT>: "<NAMESPACE>/<SERVICE_NAME>:<SERVICE_PORT>"
+service:
+  type: NodePort
+  nodePorts:
+    http: 32080
+    https: 32443
+    tcp:
+      #将nginx-controller-service上的某个端口转发到nginx-controller上的指定端口
+      <SERVICE_PORT>: <CONTROLLER_PORT>
 
+#用于返回404的页面
+defaultBackend:
+  enabled: true
+```
+（2）方式二：
+* 修改启动参数
+```shell
+vim nginx-ingrss/values.yaml
+```
+```yaml
+extraArgs:
+  tcp-services-configmap: <NAMESPACE>/<CONFIGMAP_NAME>
+  udp-services-configmap: <NAMESPACE>/<CONFIGMAP_NAME>
+```
+* 设置具体转发哪里端口
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: <CONFIGMAP_NAME>
+  namespace: <NAMESPACE>
+data:
+  #将30080端口转发到<NAMESPACE>命名空间中的<SERVICE_NAME>service上的80端口
+  #具体转发TCP还是UDP，看上面配置的configmap名字
+  30080: "<NAMESPACE>/<SERVICE_NAME>:80"
+```
+
+***
 ### 使用
 * 把配置注入到ingress controller中（当创建了Ingress资源，就会自动注入到相应类型的ingress controller中，不需要明确指定）
 * 当后端pod的ip地址改变了，ingress就会相应修改ingress controller中的配置
 * 当删除Ingress资源，注入到ingress controller中的配置也会被删除
+
+#### 1.清单文件
 ```yaml
 apiversion: extensions/v1beta1
 kind: Ingress
@@ -54,6 +105,15 @@ metadata:
     kubernetes.io/tls-acme: "true"
     #指明证书颁发机构，会自动生成tls相关证书
     cert-manager.io/issuer: xx
+
+    #默认开启tls后，所有http请求都会被重定向到https
+    #可以关闭重定向
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+    #设置能够上传的文件大小
+    #设为0，表示不限制大小
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+
 spec:
   rules:
 
@@ -78,4 +138,19 @@ spec:
     #相关证书都存放在secret中，指定secret
     #如果上面设置了颁发机构，则这里会自动生成该secret，不需要提前生成
     secretName: xx
+```
+
+#### 2.查看是否注入
+```shell
+#进入重启内部
+kubectl exec ...    
+
+#查看配置文件，查看是否有响应的转发内容
+vi /etc/nginx/nginx.conf
+```
+
+#### 3.排错
+```shell
+kubectl logs -f ...
+#然后，访问一下，看日志输出的什么
 ```

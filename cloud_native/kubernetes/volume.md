@@ -15,10 +15,14 @@
 * 当节点宕机了，pod就会调度到另一个节点上，数据就会丢失（可以利用nfs解决这种情况）
 
 ##### （3）local
-用于解决磁盘挂载在特定的node上，想让特定的pod使用这些磁盘
-* 首先需要创建local类型的pv资源，该pv必须指定nodeAffinity，即该local只能在哪些node上创建
-* 创建时，设置storageClassName，将该pv划分为某一类中
-* 使用时，指定storageClassName，只会使用该类型中符合要求的pv
+跟hostPath类似
+最大的区别是：**local volume与某个node绑定**
+用于解决：**让pod使用指定node上的存储**
+* 创建local类型的pv资源，该pv必须指定nodeAffinity，即该local只能在哪些node上创建
+* 创建多个local类型的pv，并通过storageClassName进行分类
+  比如这些pv是要给mysql用的，可以归类到pv-mysql这个类
+* 使用时，指定storageClassName可以，动态从该类中的pv中，寻找符合要求的pv
+
 ##### （3）nfs
 用nfs服务器提供的目录
 
@@ -71,6 +75,8 @@ persistent volume claim，是一种资源
 
 #### 5.StorageClass
 * 默认pv是不属于任何StroageClass的
+  * 创建pv时，设置storageClassName，将该pv划分为某一类中
+  * 使用pv时，指定storageClassName，只会使用该类型中符合要求的pv
 * 利用StorageClass可以对pv进行分类，使用时指定StorageClass，就在该类型的pv中寻找符合要求的pv
 * 利用StorageClass可以实现动态pv
 

@@ -77,7 +77,7 @@ kubectl get xx
     --filed-selector xx=yy    #过滤xx字段为yy的资源
                               #字段即kubectl describe xx能够查看到的字段
                               #比如：--filed-selector metadata.namespace=default,statu.phase!=Running
-                  
+
 #标签有两种关系判断：
 #  等值关系：=    !=
 #  集合关系：KEY in (VALUE1,VALUE2,...)   
@@ -174,7 +174,7 @@ kubectl proxy --address="0.0.0.0" --port=8080 --accept-hosts='^.*' --accept-path
 
 #之后就可以利用url获得相关资源
 #比如：
-#	curl 127.0.0.1:8080/api/v1/namespaces
+#  curl 127.0.0.1:8080/api/v1/namespaces
 ```
 #### 2.查询发生的事件（用于排错）
 ```shell

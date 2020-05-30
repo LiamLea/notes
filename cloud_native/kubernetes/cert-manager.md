@@ -3,14 +3,26 @@
 ### 概述
 ### 部署
 [参考官网](https://cert-manager.io/docs/installation/kubernetes/)
+```shell
+kubectl create namespace cert-manager
+
+helm repo add jetstack https://charts.jetstack.io
+
+helm install \
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --version v0.15.0 \
+  --set installCRDs=true
+```
 ### 使用
 #### 1.创建证书签发机构
 ##### （1）方式一：Issuer（指定命名空间中的证书签发机构）
 Issuer只能在Issuer所在命名空间中签发证书
 
 ```shell
+#ca.crt和ca.key需要提前生成
 kubectl create secret tls ca-key-pair \
-   --cert=ca.crt \    #ca.crt和ca.key需要提前生成
+   --cert=ca.crt \    
    --key=ca.key \
    --namespace=default
 ```
@@ -27,6 +39,9 @@ spec:
 ```
 
 ##### （2）方式二：ClusterIssuer（全局证书签发机构）
+注意：
+如果利用这种方式，生成证书，证书可能一直处于waiting状态（即没有申请到）
+可能的原因是当前所在的域达到了申请次数
 ```yaml
 #issuer.yaml
 apiVersion: cert-manager.io/v1alpha2
