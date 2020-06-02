@@ -89,7 +89,7 @@ data:
 
 #### 1.清单文件
 ```yaml
-apiversion: extensions/v1beta1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: xx
