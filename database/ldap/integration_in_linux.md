@@ -18,9 +18,9 @@ group: files ldap
 ```
 
 #### 4.修改配置文件：`/etc/pam.d/xx`
-
-#### 5.启动服务：nslcd
 具体怎么修改去网上搜一下
+#### 5.启动服务：nslcd
+
 
 ##### 6.设置可以sudo提权，修改配置文件：`/etc/sudoers`
 ```shell
