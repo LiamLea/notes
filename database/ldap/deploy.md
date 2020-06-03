@@ -84,7 +84,7 @@ ldap_password_attr: userPassword
 
 #### 4.重启服务：saslauthd
 
-#### 5.验证;ldap账号
+#### 5.验证ldap账号
 ```shell
 testsaslauthd -uxx -pxx
 ```

@@ -36,6 +36,14 @@
 * 一个enry可以有多个objectClass
 * objectClass指明了该entry是哪种类型（比如：groupOfNames，organizationUnit等），需要配置哪些属性（比如organizationUnit必须配置ou属性）
 
+##### （11）有两类属性
+* 用户属性
+创建条目时指定的属性
+</br>
+* 操作属性
+比如条目的创建时间、修改时间、memberof等等
+
+
 #### 2.ldap目录结构
 ```plantuml
 cloud "ldap目录服务" as a

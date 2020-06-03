@@ -101,7 +101,7 @@ emerg
   #如果日志文件为空，轮循不会进行
   notifempty
 
-  #以指定的权限创建全新的日志文件
+  #指定由该配置文件生成的新文件的权限
   create 640 nginx adm
 
   #在所有其它指令完成后，postrotate和endscript之间指定的命令将被执行
@@ -111,5 +111,26 @@ emerg
                   kill -USR1 `cat /var/run/nginx.pid`
           fi          
   endscript
+}
+```
+
+### demo
+#### 1.对docker日志进行logrotate
+```shell
+/var/lib/docker/containers/*/*.log {
+    daily
+    rotate 5
+
+    #复制原文件，然后清空原文件
+    #不设置这一下就移走原文件，然后生成新文件
+    copytruncate
+
+    missingok  
+    compress
+
+    #logrotate执行的时候，如果文件没有到一天的时间，但是超过了50m，则依然logrotate
+    maxsize 50m
+    #logrotate执行的时候，如果文件到了一天的时间，但是没有到10m，则不logrotate
+    minsize 10m
 }
 ```

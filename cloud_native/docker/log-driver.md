@@ -34,6 +34,7 @@ docker inspect xx
 #### 3.使用json-file
 * 注意：daemon.json对逗号的使用很严格，如果后面没有内容了，不要加逗号，否则会报错
 * 只有把容器删掉重新创建，这下面的配置才会生效（重启docker只对新创建的容器有效)
+* 也可以通过logrotate实现对容器日志的轮替
 ```yaml
 {
   "log-driver": "json-file",

@@ -174,8 +174,9 @@ systemReserved:
 Available = Capacity - kubeReserved - systemReserved - EvictionThreshold
 
 #Available 表示总共可以使用的资源，不是剩余可以使用的资源
-#Avaiable 可以通过kubectl describe nodes xx可以查看到
+#Available 可以通过kubectl describe nodes xx可以查看到
 #Capacity 表示这个资源的总量
+#EvictionThreshold 如果是ephemeral-storage，这个阈值就是nodefs阈值的量
 ```
 
 ### 4.Eviction Policy(驱逐策略)
@@ -191,8 +192,15 @@ Available = Capacity - kubeReserved - systemReserved - EvictionThreshold
 |imagefs.inodesFree|imagefs.inodesFree = imagefs.inodesFree|
 
 #### 4.2.驱逐阈值（可以是百分比，可以是有单位的数值）
-* 如果 nodefs 文件系统满足驱逐阈值，kubelet通过**驱逐 pod 及其容器**来释放磁盘空间。
-* 如果 imagefs 文件系统满足驱逐阈值，kubelet通过**删除所有未使用的镜像**来释放磁盘空间
+注意：nodefs和imagefs可能用的是不同的文件系统，所有者**两个阈值是没有任何关联的**
+* 如果 nodefs 文件系统满足驱逐阈值，kubelet
+  * 删除停止的pod及其容器
+  * 删除未使用的镜像
+</br>
+* 如果 imagefs 文件系统满足驱逐阈值，kubelet通
+  * 删除所有未使用的镜像
+</br>
+* 如果上面的操作还是无法释放更多的空间，kubelet就会**驱逐pod**来释放空间
 ##### （1）hard evication threshold
 ```yaml
 evictionHard:
