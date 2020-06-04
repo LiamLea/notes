@@ -1,4 +1,5 @@
 # 基础使用
+[toc]
 ### 命令行
 #### 1.查询条目
 ```shell
@@ -32,6 +33,24 @@ ldapadd
   -f xx.ldif
 ```
 
+#### 3.修改条目
+```shell
+$ vim xx.ldif
+
+dn: <DN>                  #指定要修改的条目的dn
+changetype: modify        #表示要修改该条目
+replace: <ATTRIBUTR>      #要修改某个属性
+<ATTRIBUTE>: xx           #修改后的内容
+-                         #分隔多个修改操作
+add: <ATTRIBUTE>          #要添加某个属性
+<ATTRIBUTE>: xx           #要添加的属性的内容
+-                         #分隔多个修改操作
+delete: <ATTRIBUTE>       #要删除某个属性
+```
+```shell
+ldapadd -H ldap://<IP> -x -D cn=admin,dc=cangoal,dc=com -w cangoal -f xx.ldif
+```
+***
 ### filter（过滤器）
 #### 1.格式
 ```shell

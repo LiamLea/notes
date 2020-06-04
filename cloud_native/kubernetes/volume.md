@@ -330,6 +330,13 @@ echo 数据 | base64 --decode
 
 #### 7.动态pv（以nfs为例）
 前提：运行该Pod的机器上都需要安装nfs-utils
+可以直接通过helm安装：
+```shell
+helm install my-nfs-release \
+  --set nfs.server=192.168.33.12 \
+  --set nfs.path=/mnt/dev \
+  stable/nfs-client-provisioner
+```
 ##### （1）项目地址
 * 在github kubernetes-incubator/external-storage/nfs-client中有nfs相关的yaml文件
 * 在github上搜索external-storage就出来了
