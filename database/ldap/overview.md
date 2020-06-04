@@ -36,13 +36,12 @@
 * 一个enry可以有多个objectClass
 * objectClass指明了该entry是哪种类型（比如：groupOfNames，organizationUnit等），需要配置哪些属性（比如organizationUnit必须配置ou属性）
 
-##### （11）有两类属性
-* 用户属性
-创建条目时指定的属性
-</br>
-* 操作属性
-比如条目的创建时间、修改时间、memberof等等
-
+##### （11）schema
+* Schema是LDAP的一个重要组成部分，类似于数据库的模式定义
+* LDAP的Schema定义了LDAP目录所应遵循的结构和规则
+比如一个 objectclass会有哪些属性，这些属性又是什么结构等等
+* schema给LDAP服务器提供了LDAP目录中类别，属性等信息的**识别方式**
+  让这些 可以被LDAP服务器识别
 
 #### 2.ldap目录结构
 ```plantuml
@@ -63,7 +62,27 @@ note bottom of d:条目是具有唯一标识（DN)的 属性-值 对 的集合
 #### 4.Entry（条目）
 * 每个条目都一个DN，用于唯一标识该条目，用于检索该条目
 
-#### 5.LDIF（ldap data interchange format，ldap数据交换格式）
+#### 5.有两类属性
+* 用户属性
+创建条目时指定的属性
+</br>
+* 操作属性
+比如条目的创建时间、修改时间、memberof等等
+
+#### 6.有四类搜索区域（scope）
+* base
+  * 只匹配DN本身这一个条目
+</br>
+* one（one-level，一级）
+  * 匹配 以DN为父目录 的条目（不包括DN）
+</br>
+* subtress（默认）
+  * 匹配 DN下面的所有条目（包括DN）
+</br>
+* children
+  * 匹配 DN下面的所有条目（不包括DN）
+
+#### 7.LDIF（ldap data interchange format，ldap数据交换格式）
 （1）基本的格式
 ```shell
 属性: 属性值
@@ -73,10 +92,3 @@ note bottom of d:条目是具有唯一标识（DN)的 属性-值 对 的集合
 （4）若以空格开头，表示该行接着上面一行
 （5）每行的结尾不允许有空格
 （6）属性可以被重复赋值
-
-#### 6.schema
-* Schema是LDAP的一个重要组成部分，类似于数据库的模式定义
-* LDAP的Schema定义了LDAP目录所应遵循的结构和规则
-比如一个 objectclass会有哪些属性，这些属性又是什么结构等等
-* schema给LDAP服务器提供了LDAP目录中类别，属性等信息的**识别方式**
-  让这些 可以被LDAP服务器识别
