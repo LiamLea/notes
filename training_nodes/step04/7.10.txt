@@ -18,7 +18,7 @@
   SELinux安全 权限划分
 
 6种命名空间:
-  hostname    //隔离主机名
+  UTS    	  //unix timesharing system，隔离主机名
   process     //隔离进程
   net         //隔离网络
   filesystem  //隔离文件系统

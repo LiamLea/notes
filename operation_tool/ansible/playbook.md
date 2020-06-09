@@ -148,9 +148,17 @@ register: <VARIABLE_NAME>     #则结果就会存在该变量中
 
 ##### （4）指定在具体主机上执行某个task：`deltegate_to`
 ```yaml
-name: <ANNOTATIONS>
 <MODULE>:
   ...
 delegate_to: <HOSTNAME>   #主机名是在主机清单中定义的
                           #比如这里可以填：localhost
+```
+
+##### （5）设置某个task只执行一次
+比如在具体主机上删除某个文件（只要执行一次即可），然后再创建
+不需要每个主机执行的时候都去具体主机上删除一次，否则有些主机执行的慢，具体主机上刚刚创建出来又被删了，就会有问题
+```yaml
+<MODULE>:
+  ...
+run_once: True
 ```
