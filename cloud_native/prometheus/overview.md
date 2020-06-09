@@ -22,16 +22,15 @@
   ```
 #### 4.相关名词
 ##### （1）metric
-* metric一个**特征**（比如：1分钟负载、内存使用量等等）
+* 一个metric是一个**特征**（比如：1分钟负载、内存使用量等等）
 
 ##### （2）label
 * 标识不同**维度**的metric
-* 以`__`开头的label是内置标签
 * 比如：
   * 一分钟负载，可以利用label标识这个metric来自哪个实例
 
 ##### （3）时间序列（相当于监控项）
-* 由metric和label组成（具有**唯一**性）：`METRIC{LABEL="VALUE",...}`
+* 由metric和label组成（具有**唯一**性）：`METRIC{<LABEL>="<VALUE>",...}`
 * 比如：
   * `node_cpu_seconds_total{cpu="9",instance="3.1.4.232:9100",job="kubernetes-nodes",mode="idle"}`
 
@@ -45,17 +44,21 @@
     * instance 2: 1.2.3.4:5671
     * instance 3: 5.6.7.8:5670
     * instance 4: 5.6.7.8:5671
-##### （6）target
+##### （6）target（重要）
+* targets指采集目标，一个target就相当于一个endpoint
 
-#### 5.抓取时自动生成的标签
+#### 5.标签（label）
+##### （1）内部标签
+* 以`__`开头的label供内部使用，不会出现在最终的时间序列中
+  * 以`__meta`开头的是元标签（meta label）
+
+##### （2）抓取时自动生成的标签
 * job
+target所属的job（即在配置文件中配置的`job_name`）
+</br>
 * instance
+target的`<ip>:<port>`
 
-#### 6.标签的阶段
-Global labels, which are assigned to every target scraped by the Prometheus instance.
-The job label, which is configured as a default value for each scrape configuration.
-Labels that are set per target group within a scrape configuration.
-Advanced label manipulation via relabeling.
 
 #### 6.metrics的主要类型
 * gauge
@@ -66,27 +69,16 @@ Advanced label manipulation via relabeling.
 
 * histogram
 统计数据的分布情况
+
+#### 7.两类rule
+* recording rule
+  * 允许预先计算经常需要或计算上昂贵的表达式，并将其结果保存为一组新的时间序列
+  * 因此，查询预先计算的结果通常比每次需要时执行原始表达式快得多
+* alert rule
+  * 告警规则
 ***
 ### 基本使用
-#### 1.配置文件
-```yaml
-global:
-  scrape_internal: 15s           #采集间隔
-  evaluation_internal: 15s      #监控规则评估的间隔，看是否达到告警要求
-
-#配置告警发往哪里
-alerting:
-  alertmanagers:
-   - static_configs:
-      - targets: ["IP:PORT"]
-
-#配置数据源（即从哪里pull数据）
-scrape_config:
-- job_name: xx                #数据源的名称
-  staic_configs:
-  - targets: ["IP:PORT"]      #exporter的地址，可以有多个
-```
-#### 2.通过url获取exporter数据
+#### 1.通过url获取exporter数据
 http://IP:PORT/metrics
 
 获取的数据如下：
@@ -96,7 +88,7 @@ http://IP:PORT/metrics
 node_sockstat_UDP_mem_bytes 12288
 ```
 
-#### 3.常用公式
+#### 2.常用公式
 * 过滤
 ```shell
 METRIC{KEY=VALUE}
