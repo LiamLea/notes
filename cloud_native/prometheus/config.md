@@ -160,6 +160,8 @@ kubernetes_sd_configs:
 ##### （2）基本格式
 ```yaml
 relabel_configs:
+  
+  #如果source_labels未设置，而action是replace，则表达添加一个新标签
 - source_labels: [<LABEL_NAME>, <LABEL_NAME>,...]
 
   #设置分隔符

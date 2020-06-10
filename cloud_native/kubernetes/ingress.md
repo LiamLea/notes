@@ -101,7 +101,7 @@ metadata:
     #不能省略，指明使用nginx实现的ingress
     kubernetes.io/ingress.class: "nginx"
 
-    #指明是否使用tls认证
+    #使用clusterissuer
     kubernetes.io/tls-acme: "true"
     #指明证书颁发机构，会自动生成tls相关证书
     cert-manager.io/issuer: xx

@@ -25,10 +25,13 @@ c-->d:"git push"
 ### 命令
 #### 1.基本操作
 ```shell
+git remote add <NAME> <URL>       #添加一个远程仓库，起名为：<NAME>
 git status                        #查看 工作区 文件状态，有哪些文件没有上传到暂存区
 git add .                         #将变化的内容上传到暂存区
 git commit -m '该版本的详细说明'   #将暂存区的内容上传到本地仓库
-git push 仓库地址别名 xx           #将本地仓库的 xx分支 提交到远程仓库
+
+#将本地仓库的 <LOCAL_BRANCH>分支 提交到 名为<NAME>的远程仓库 的 <REMOTE_BRANCH>分支
+git push <NAME> <LOCAL_BRANCH>:<REMOTE_BRANCH>           
 ```
 #### 2.回滚操作
 ```shell
@@ -59,8 +62,10 @@ git stash drop 标号
 
 ![](./imgs/git_02.png)
 ```shell
+git branch -a           #查看所有分支（包括本地分支和远程分支）
 git branch xx           #创建xx分支，拥有和 当前分支 一样的内容
+git branch -d xx        #删除xx分支
+
 git checkout xx         #切换到xx分支
 git merge xx            #当xx分支合并到 当前分支
-git branch -d xx        #删除xx分支
 ```
