@@ -29,6 +29,22 @@
 典型的例子是：等待多个结果，不知道哪个结果先来
 ### 概述
 ![](./imgs/process_related_01.jpg)
+
+#### 1.特点
+* windows系统不知道多进程,只支持多线程
+* 每个进程都有自己独立的运行环境
+* 进程的生命周期
+```mermaid
+graph LR
+A("parent process")--"fork()"-->B("child process")
+B--"exec()"-->C("child process")
+C--"exit()"-->D("zombine process")
+D--"回收"-->A
+```
+
+***
+
+### 使用
 #### 1. `os.fork()`
 底层的命令，其他process相关的模块都是基于这个命令
 ```python
@@ -50,9 +66,7 @@ for i in range(3):
 ```
 ***
 ### multiprocssing模块
-
-#### 使用
-##### 1.基本用法
+#### 1.基本用法
 ```python
 from multiprocessing import Process
 
@@ -61,7 +75,7 @@ p.start()           #这是一个异步操作，不会阻塞
 p.pid               #获取进程的pid
 p.terminate()       #强制结束一个子进程，异步非阻塞
 ```
-##### 2.`join()`的用法
+#### 2.`join()`的用法
 ```python
 
 p_list = []

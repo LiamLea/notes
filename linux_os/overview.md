@@ -1,5 +1,10 @@
 # linux基础
 ### shell
+**注意**：
+* `ssh <USER>@<IP> <COMMAND>`
+  * 执行这个command的是non-login shell，即使ssh需要输入账号密码
+* `ssh <USER>@<IP>`
+  * 这个登录后是login shell
 #### 1.login shell 和 non-login shell 的区别
 * login shell
 ```plantuml

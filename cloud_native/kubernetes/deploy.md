@@ -87,7 +87,13 @@ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 
 #### 6.安装网络插件
   参考官网的安装步骤
-  注意要修改pod cidr同上面我们设置的
+
+**注意要修改pod cidr同上面我们设置的**
+```shell
+wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+vim kube-flannel.yml
+kubectl apply -f kube-flannel.yml  
+```
 
 #### 7.添加node节点
 
@@ -126,6 +132,12 @@ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 （1））还原节点（需要到该节点上执行，执行kubeadm init或join等后想要还原）
 ```shell
 kubeadm reset
+
+#该节点要清理干净的话：
+rm -rf /etc/cni/net.d
+iptables -F
+ipvsadm --clear
+rm -rf $HOME/.kube/config
 ```
 
 （2）删除节点
