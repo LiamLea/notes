@@ -330,6 +330,7 @@ echo 数据 | base64 --decode
 
 #### 7.动态pv（以nfs为例）
 前提：运行该Pod的机器上都需要安装nfs-utils
+
 可以直接通过helm安装：
 ```shell
 helm install my-nfs-release \
