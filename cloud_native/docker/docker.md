@@ -2,9 +2,22 @@
 [toc]
 
 ### 基础概念
-#### 1.使用docker的前提
+
+#### 1.docker隔离6种namespace
+|namespace|说明|
+|-|-|
+|uts|unix timesharing system，主机名和域名的隔离|
+|user|用户的隔离|
+|mnt|mount，文件系统的隔离|
+|pid|进程的隔离|
+|ipc|进程间通信的隔离|
+|net|网络的隔离|
+
+
+#### 2.使用docker的前提
 * 需要关闭selinux
-#### 2.有两种存储卷
+
+#### 3.有两种存储卷
 （1）Dokcer-managed volume
 由docker自动设置宿主机目录，目录为`/var/lib/docker/volumes/容器id/_data`
 ```shell
@@ -15,7 +28,7 @@
 ```shell
   -v 宿主机目录:容器目录
 ```
-#### 3.注意事项
+#### 4.注意事项
 * 在容器中跑任何程序都不能运行在后台，否则容器会认为程序终止了，容器也就会结束
 ***
 ### 相关操作和概念

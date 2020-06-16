@@ -42,6 +42,7 @@ kubectl top pods
 ```
 ***
 # kube-state-metrics
+apiserver需要设置：`--enable-aggregator-routing=true`
 ### 概述
 #### 1.kube-state-metrics特点
 * 监听aip-server，获取资源实例的状态（包括副本数、标签、运行时间等等）

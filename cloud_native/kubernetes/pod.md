@@ -10,7 +10,9 @@ a -> e
 e -> b
 b -> c
 ```
-#### 1.pod phase（生命周期）
+#### 1.定义
+一组containers的集合，这些containers共享**net**和**ipc**命名空间，共享**volume**
+#### 2.pod phase（生命周期）
 影响字段：
 ```yaml
 Pod.status.phase

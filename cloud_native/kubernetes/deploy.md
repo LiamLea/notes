@@ -85,7 +85,16 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
-#### 6.安装网络插件
+#### 6.配置apiserver
+```shell
+vim /etc/kubernetes/manifests/kube-apiserver.yaml
+```
+```yaml
+#允许kubernetes扩展API
+--enable-aggregator-routing=true
+```
+
+#### 7.安装网络插件
   参考官网的安装步骤
 
 **注意要修改pod cidr同上面我们设置的**
@@ -95,7 +104,7 @@ vim kube-flannel.yml
 kubectl apply -f kube-flannel.yml  
 ```
 
-#### 7.添加node节点
+#### 8.添加node节点
 
 （1）获取token用于加入该集群（在初始化节点上执行）
 ```shell
@@ -112,7 +121,7 @@ kubeadm join ...
 cp -r ~/.kube ip:~
 ```
 
-#### 8.添加mster节点
+#### 9.添加mster节点
 （1）获取token和证书（在初始化节点上执行）
 ```shell
 kubeadm token create --print-join-command
@@ -128,7 +137,7 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
-#### 9.删除节点
+#### 10.删除节点
 （1））还原节点（需要到该节点上执行，执行kubeadm init或join等后想要还原）
 ```shell
 kubeadm reset
@@ -138,6 +147,12 @@ rm -rf /etc/cni/net.d
 iptables -F
 ipvsadm --clear
 rm -rf $HOME/.kube/config
+
+#删除虚拟网卡
+ip link delete <INTERFACE>
+
+#重启相关服务
+systemctl restart docker kubelet
 ```
 
 （2）删除节点
