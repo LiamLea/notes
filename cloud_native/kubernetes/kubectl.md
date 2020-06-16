@@ -40,7 +40,7 @@ apis/GROUP/VERSION/RESOURCE
 #列出default命名空间中的所有deployment控制器
 
 #特例：核心群组
-#比如：api/v1/namespace
+#比如：api/v1/namespaces
 #列出所有的命令空间
 ```
 #### 2.列出所有apiReousrces
@@ -53,6 +53,15 @@ kubectl api-resources
 #NAMESPACED       是否是命名空间内的资源
 #KIND             资源类型
 ```
+
+#### 3.访问api
+```shell
+kubectl get --raw "<url>"
+
+#比如查看所有namespace
+kubectl get --raw "/api/v1/namespaces"
+```
+
 #### 3.查看已创建的资源实例
 ```shell
 kubectl get all         #不能获取指定命名空间下的全部资源
@@ -175,6 +184,9 @@ kubectl proxy --address="0.0.0.0" --port=8080 --accept-hosts='^.*' --accept-path
 #之后就可以利用url获得相关资源
 #比如：
 #  curl 127.0.0.1:8080/api/v1/namespaces
+
+#可以直接使用下面的命令，无需开启代理
+# kubectl get --raw "/api/v1/namespaces"
 ```
 #### 2.查询发生的事件（用于排错）
 ```shell

@@ -23,4 +23,6 @@ path.ismount('xx')  #是挂在点吗
 path.isdir('xx')    #存在并且是目录吗
 path.islinke('xx')  #存在并且是链接吗
 path.exists('xx')   #存在吗
+
+os.getpod()         #获取当前进程的pid
 ```

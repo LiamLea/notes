@@ -31,7 +31,7 @@
 ![](./imgs/process_related_01.jpg)
 
 #### 1.特点
-* windows系统不知道多进程,只支持多线程
+* windows系统不支持多进程,只支持多线程
 * 每个进程都有自己独立的运行环境
 * 进程的生命周期
 ```mermaid
@@ -41,6 +41,12 @@ B--"exec()"-->C("child process")
 C--"exit()"-->D("zombine process")
 D--"回收"-->A
 ```
+
+#### 2.守护进程
+* 守护进程 会随着主进程的结束而结束
+* 如果主进程结束后还有其他子进程在运行，守护进程不守护
+* 在linux中实现系统级别守护进程的方式：fork两次，孙进程会被systemd接管，从而成为守护进程
+
 
 ***
 
@@ -74,6 +80,8 @@ p = Process(target = xx, args = (xx,))
 p.start()           #这是一个异步操作，不会阻塞
 p.pid               #获取进程的pid
 p.terminate()       #强制结束一个子进程，异步非阻塞
+
+p.daemon = True     #将该进程设置为守护进程（守护主进程），在start前设置
 ```
 #### 2.`join()`的用法
 ```python

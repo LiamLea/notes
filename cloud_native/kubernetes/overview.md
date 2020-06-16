@@ -4,13 +4,13 @@ master/node架构，master一般设为3个（高可用）
 
 #### 1.master核心组件
 * apiserver                         
-是整个集群对外的接口
+用于暴露kubernetes的API（是整个集群对外的接口）
 </br>
 * scheduler 	                     
 负责调度资源
 </br>
 * controller-manager                 
-用于监控控制器，控制器有多种，某类控制器用于监控pod（即容器）
+用于管理控制器，控制器用于管理pod（控制器有多种）
 
 #### 2.node核心组件
 * kubelet                            
@@ -45,9 +45,9 @@ kube-proxy会修改该kube-proxy所在节点的iptables规则
 
 ![](./imgs/overview_02.jpg)
 
-#### 4.存储组件（一般放在master上）
+#### 4.存储组件（一般放在master上，非常重要）
 * etcd                               
-master的共享存储，存储k8s的资源
+master的共享存储，存储k8s的资源数据
 
 #### 5.核心附件
 
