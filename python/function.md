@@ -187,6 +187,9 @@ range(n,m)
   int2=functools.partial(int,base=2)
   int8=functools.partial(int,base=8)
 ```
+
+***
+
 ### 递归函数
 #### 1.基本概念
 * 递归函数：函数调用自身
@@ -196,6 +199,8 @@ range(n,m)
 #### 2.递归函数的特点
 * 在调用前，必须设置一个停止条件
 * 如果需要获取停止的返回值，则必须return func(xx)
+
+***
 
 ### 闭包
 #### 1.定义
@@ -218,4 +223,20 @@ def wrapper():
   def inner():
     print(a)
   return inner
+```
+
+***
+
+### 回调函数
+通过函数指针（地址）调用的函数
+callback意思就是留下地址，然后进行回电话，回调函数本质也是这样，通过函数地址调用函数
+```python
+def sum(a, b):
+    return int(a) + int(b)
+
+
+def compute(a, b, func):
+    return func(a, b)
+
+result = compute(1, 2, sum)    #这里的sum就是回调函数
 ```
