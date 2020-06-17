@@ -153,6 +153,8 @@ ip link delete <INTERFACE>
 
 #重启相关服务
 systemctl restart docker kubelet
+
+#最好重启一下主机，否则可能会有些其他问题
 ```
 
 （2）删除节点

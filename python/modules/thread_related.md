@@ -83,3 +83,61 @@ lock.release()        #释放锁
 with lock:
     pass
 ```
+
+#### 4.递归锁
+* 这个锁可以被同一个人acquire多次
+* acquire多少次就必须release多少次，否则别人无法acquire这个锁
+* 作用：
+  * 当线程需要同时获取某两个锁时，才能执行，如果只获取其中一个，另一个被另一个线程获取，就会发生死锁
+  * 所以用同一把锁 锁住两个变量，一个线程获得其中一把锁，其他线程就无法获取该锁，所以被该锁 锁住 的两个变量，只能只能被一个线程操作
+* 特点：
+  * 性能较低
+  * 尽量用一把互斥锁，从而避免死锁
+
+可能死锁的代码
+```python
+from threading import Lock
+
+lock1 = Lock()
+lock2 = Lock()
+
+def thread1():
+    lock1.acquire()
+    lock2.acquire()
+    pass
+    lock2.release()
+    lock1.releas()
+
+def thread2():
+    lock2.acquire()
+    lock1.acquire()
+    pass
+    lock1.release()
+    lock2.release()
+
+#当启动连个线程同时执行thread1和thread2两个函数时，可能会发生死锁
+#当thread1获得lock1锁，thread2获取lock2锁，此时就会死锁
+
+```
+
+快速解决死锁：把所有的互斥锁都改成一把递归锁
+```python
+from threading import RLock
+
+locl1 = lock2 = RLock()
+
+def thread1():
+    lock1.acquire()
+    lock2.acquire()
+    pass
+    lock2.release()
+    lock1.releas()
+
+def thread2():
+    lock2.acquire()
+    lock1.acquire()
+    pass
+    lock1.release()
+    lock2.release()
+
+```

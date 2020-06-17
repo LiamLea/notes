@@ -27,22 +27,31 @@ kubectl delete ...  --force --grace-period=0
 kubectl api-versions
 ```
 （1）apiVersion的结构
-```shell
-group/verison
+* 核心群组
+  ```shell
+  v1
+  ```
+* 非核心群组
+  ```shell
+  <GROUP>/<VERSION>
 
-#特例是核心群组中的：v1
-```
+  #比如：appsys/v1
+  ```
 （2）url中的路径
-```shell
-apis/GROUP/VERSION/RESOURCE
+* 核心群组
+  ```shell
+  /api/v1/<RESOURCE>
 
-#比如：apis/apps/v1/namespaces/default/deployment
-#列出default命名空间中的所有deployment控制器
+  #比如：/api/v1/namespaces
+  #列出所有的命令空间
+  ```
+* 非核心群组
+  ```shell
+  /apis/<GROUP>/<VERSION>/<RESOURCE>
 
-#特例：核心群组
-#比如：api/v1/namespaces
-#列出所有的命令空间
-```
+  #比如：apis/apps/v1/namespaces/default/deployment
+  #列出default命名空间中的所有deployment控制器
+  ```
 #### 2.列出所有apiReousrces
 ```shell
 kubectl api-resources

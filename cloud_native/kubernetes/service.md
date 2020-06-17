@@ -90,6 +90,8 @@ _<PORT_NAME>._<PORTP_ROTOCOL>.<SERVICENAME>.<NAMESPACE>.svc.<CLUSTERNAME>
 #### 7.Endpoints
 就是一个真实的访问点，service就是通过后端关联endpoints，实现代理功能的
 ##### （1）service与endponts的关系
+* service或endpoints单独存在是没有意义的，因为**service**提供了**域名解析**，**endpoints**则提供了**后端访问点**
+</br>
 * 当创建Service时，指定了selector，根据selector中的标签会自动创建Endpoints
 * 如果未指定selector，则不会自动创建Endpoints
 
