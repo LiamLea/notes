@@ -87,8 +87,41 @@ spec:
     - name: alertmanager-main
       namespace: monitoring
       port: web
+
+  #使用持久化存储
+  storage:
+    volumeClaimTemplate:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Gi
+        storageClassName: <STORAGE_CLASS>
+```
+#### 3.grafana数据持久化
+```shell
+vim kube-prometheus-master/manifests/grafana-deployment.yaml
+```
+##### （1）插件等数据持久化
+```yaml
+volumes:
+  - name: grafana-storage
+    persistentVolumeClaim:
+      claimName: <PVC_NAME>
 ```
 
+##### （2）dashboards持久化
+* 修改dashboards的导入路径
+```shell
+vim kube-prometheus-master/manifests/grafana-dashboardSources.yaml
+
+#"path": "/grafana-dashboard-definitions/0"
+```
+
+* 将dashboards放入一个目录中，然后挂载此目录到上面设置的目录下
 ***
 
 ### 监控
@@ -167,7 +200,45 @@ spec:
     protocol: TCP
 ```
 
-#### 4.ServiceMonitor资源清单
+#### 4.监控其他软件
+##### （1）修改clusterRole的权限
+* 默认prometheus绑定的role权限有限
+* 需要修改即role的权限，从而能够监控其他namespace
+```shell
+vim kube-prometheus-master/manifests/prometheus-clusterRole.yaml
+```
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus-k8s
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes/metrics
+  - services
+  - endpoints
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+```
+
+##### （2）查看某个软件暴露出的采集端口
+```shell
+kubectl describe pods <POD> -n <NAMESPACE>
+
+#看annotations字段
+#如果开放了采集端口，会在这里面描述
+```
+
+##### （3）使用ServiceMonitor添加target
 ```yaml
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
