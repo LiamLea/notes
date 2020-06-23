@@ -1,5 +1,7 @@
+# python
 [toc]
 
+### 重要知识
 python中一切皆对象，对象的三个要素：
 * id（内存地址）
 * type（属于的类）
@@ -24,8 +26,12 @@ print(a)       #[[]]
 这两个例子的区别是
 * 列表是一个可变对象，所以a列表中存放的是b列表的引用，所以在b列表中添加元素时，a也跟着变化了
 * 当给b赋值时，b就指向了其他地址，而不是原先的b列表的地址，所以a不会跟着变化
-# 基础概念
-### python虚拟化环境
+
+***
+
+### 基础概念
+
+#### 1.python虚拟化环境
 （1）图形化创建
 >settings -> project -> project interpreter -> add local... -> 指定虚拟环境的目录和python的目录 -> 确定 -> 选择解释器(即选择了虚拟环境)
 
@@ -39,7 +45,10 @@ source 目录/bin/activate
 #执行python脚本:python xx.py
 ```
 
+***
+
 ### 模块
+#### 1.概述
 （1）一个以.py结尾的python程序就是一个模块(模块名去除.py即可)
 （2）编写一个模块
 ```python
@@ -55,10 +64,10 @@ def xx():
 （3）使用一个模块
 **导入模块时,python在sys.path定义的路径中搜索模块**
 ```python
-  import xx         #即运行一遍该模块
-  help(xx)
-  xx.function()
-  xx.variable
+import xx         #即运行一遍该模块
+help(xx)
+xx.function()
+xx.variable
 ```
 （4）导入模块中的某些功能
 ```python
@@ -78,7 +87,7 @@ def xx():
 if __name__=='__main__':     #直接输入main,然后按下tab
     ...
 ```
-### 常用简单模块
+#### 2.常用简单模块
 （1）随机数模块：random
 ```python
   import random
@@ -101,6 +110,9 @@ seconds = timeit.timeit(stmt="func()", number = 10000)
 #number，表示前面语句被执行的次数，默认时100 0000次
 #返回的单位是秒
 ```
+
+***
+
 ### 文件操作
 **文件对象是可迭代对象**
 **注意 文件指针的移动**
@@ -141,13 +153,19 @@ seconds = timeit.timeit(stmt="func()", number = 10000)
   f.seek(-2,2)    #第一个参数是偏移量
                   #第二个参数是相对位置,0表示开头,1表示当前位置,2表示结尾
 ```
+
+***
+
 ### 代码块缓存机制
 #### 1.代码块
 代码块作为一个执行单元，一个模块、一个函数体、一个类定义、一个脚本文件，都是一个代码块
+
 #### 2.同一个代码块下的缓存机制
 适用对象：int，bool，几乎所有的string
+
 #### 3.不同代码块下的缓存机制
 适用对象：（-5~256）的int，bool，满足规则的string
+
 #### 4.举例
 ```python
 a = 10
@@ -155,6 +173,8 @@ b = 10
 
 #id(a)和id(b)是一样的，即指向同一块内存
 ```
+
+***
 
 ### 反射机制
 把字符串映射为某个对象的属性或方法，对象可以是任何东西（模块、类、实例等）
@@ -174,42 +194,94 @@ b = 10
 * `func()` <----> `getattr(sys.modules["__main__"], "func")()`
 调用本模块的内容
 
-***
-# exception
-* 常见异常
-```python
-  NameError             #没有声明或初始化对象
-  IndexError
-  SyntaxError           #语法错误
-  KeyboardInterrupt     #用户终端(按ctrl+c)
-  EOFError              #读到EOF(按ctrl+d)
-  IOError               #输入/输出操作失败
-```
-* 处理异常
-```python
-  try:
-    ...               //可能发生异常的程序,不会发生异常的不要放在里面
-  except xx:          //多个异常:(xx1,xx2,..)
-    ...               //捕获异常
-  else:               //不发生异常会执行
-    ...
-  finally:            //无论如何都会执行
-    ...
-  ...                 //继续执行下面的程序,除非上面指明退出(exit())
-```
-* 触发异常(自己编写)
-```python
-如:
-  if n>200:
-    raise ValueError('n的值超过了200')
+#### 3.利用反射机制可以实现，根据配置文件的配置，执行相应的内容
+目录结构
+![](./imgs/overview_01.png)
+```shell
+#settings.py
+plugins = [
+    "lib.plugins.plugin1.func1",
+    "lib.plugins.plugin2.func2"
+]
 
-或者使用 断言异常:
+#plugin1.py
+def func1():
+    print("plugin1")
 
-  assert n<=200,'n的值超过了200'    //这里产生的异常是:AssertionError
+#plugin2.py
+def func2():
+    print("plugin2")
 ```
+```python
+from settings import  plugins
+
+import importlib
+
+for plugin in plugins:
+
+    #获取模块的路径和函数名
+    module_path, func = plugin.rsplit(".", maxsplit = 1)
+
+    #导入模块
+    module = importlib.import_module(module_path)
+
+    #调用模块内的函数
+    getattr(module, func)()
+```
+
 ***
-# 迭代
-### 基础概念
+
+### exception
+#### 1.常见异常
+
+```python
+NameError             #没有声明或初始化对象
+IndexError
+SyntaxError           #语法错误
+KeyboardInterrupt     #用户终端(按ctrl+c)
+EOFError              #读到EOF(按ctrl+d)
+IOError               #输入/输出操作失败
+```
+
+#### 2.处理异常
+
+```python
+try:
+    pass              #可能发生异常的程序,不会发生异常的不要放在里面
+except <EXCEPTION>:   #多个异常:(xx1,xx2,..)
+    pass              #捕获异常
+else:                 #不发生异常会执行
+    pass
+finally:              #无论如何都会执行
+    pass
+
+#继续执行下面的程序,除非上面指明退出(exit())
+```
+
+#### 3.捕获异常的堆栈信息（一般用于记录在日志中）
+```python
+import tracebacks
+
+try:
+    pass
+except <EXCEPTION>:
+    print(trackback.format_exc())
+```
+
+#### 4.触发异常(自己编写)
+```python
+#如:
+if n>200:
+  raise ValueError('n的值超过了200')
+
+#或者使用 断言异常:
+
+assert n<=200,'n的值超过了200'      #这里产生的异常是:AssertionError
+```
+
+***
+
+### 迭代
 #### 1.可迭代对象
 （1）定义
 拥有`__iter__`方法的对象，该方法用于生成迭代器，迭代器用于迭代该可迭代对象
@@ -234,9 +306,10 @@ b = 10
 （3）例子
 文件对象是迭代器
 for语句内部机制是将可迭代对象转换成迭代器，从而进行迭代取值
+
 ***
-# 生成器
-### 基础概念
+
+### 生成器
 #### 1.生成器定义
 生成器本质就是迭代器，只不过生成器里面的内容是我们放进去的，迭代器里的内容是读取过来的
 
@@ -269,9 +342,11 @@ gen.__next__()    #第二个next继续执行，执行到第二个yield停下来
 (10+i for i in range(10))
 ('hello' for i in range(100))
 ```
+
 ***
-# 特殊变量和函数
-### 概述
+
+### 特殊变量和函数
+#### 1.概述
 * `__xx`
 以双下划线开头的实例变量名，是一个**私有变量（private）** ，只有内部可以访问，外部不能访问
 * `__xx__`
@@ -279,7 +354,7 @@ gen.__next__()    #第二个next继续执行，执行到第二个yield停下来
 * `_x`
 以单下划线开头的实例变量名，这样的变量外部是可以访问的，但是，按照约定俗成的规定，当你看到这样的变量时，意思就是，“虽然我可以被访问，但是请把我视为私有变量，不要随意访问”。
 
-### 常用内置函数
+#### 2.常用内置函数
 |函数|说明|
 |-|-|
 |`dir(xx)`|用于获取对象的属性、方法名等，返回一个字符串列表|
@@ -289,7 +364,7 @@ gen.__next__()    #第二个next继续执行，执行到第二个yield停下来
 |`callable(xx)`|判断xx是否是可调用|
 |`isinstance(<OBJ>, <CLASS>)`|判断`<OBJ>`是不是`<CLASS>`的实例|
 
-### 常用内置装饰器
+#### 3.常用内置装饰器
 |装饰器|说明|
 |-|-|
 |`@classmethod`|把一个绑定方法 修改成 一个类方法</br>当发现没必要传入self时，可以使用这个装饰器|
@@ -318,13 +393,13 @@ a = A()
 a.func1()
 ```
 
-### 特殊变量和方法（是内置对象的属性）
-#### 1.通用
+#### 特殊变量和方法（是内置对象的属性）
+##### （1）通用
 |属性名|说明|
 |-|-|
 |`__dict__`|获取类或对象的属性</br>几乎所有类和对象都有`__dict__`这个属性，有几个特殊的没有|
 
-#### 2.模块相关
+##### （2）模块相关
 |属性名|说明|
 |-|-|
 |`__name__`|获取模块的名字，如果是主模块则返回`__main__`|
@@ -347,7 +422,7 @@ from foo import *
 print(bar)
 print(baz)
 ```
-#### 3.类相关（魔法函数）
+##### （3）类相关（魔法函数）
 |属性名|说明|
 |-|-|
 |`__init__()`|初始化函数, 创建实例的时候，可以调用__init__方法做一些初始化的工作</br>如果子类重写了__init__，实例化子类时，则只会调用子类的__init__</br>此时如果想使用父类的__init__，可以再调用一下|
@@ -413,7 +488,7 @@ demo.test("xxx")
 ```
 **注意**：再__getattribute__方法中，不要使用self.xx，因为每一次调用类的属性或方法，都会执行一次__getattribute__函数，可能有问题
 
-#### 4.对象相关
+##### （4)对象相关
 |属性名|说明|
 |-|-|
 |`definition.__name__`|The name of the class, function, method, descriptor, or generator instance.|
