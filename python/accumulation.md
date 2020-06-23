@@ -29,3 +29,31 @@ temp_list = MyList([0,1,2])
 print(temp_list[3])
 #输出结果为空，不会报错
 ```
+
+#### 3.多个文件共享同一个全局变量
+**最好的方式是用一个文件单独放置全局变量，然后`import <FILE>`，通过`<FILE>.<VAR>`使用该变量**
+```python
+#file1.py
+
+global a
+```
+注意：不能直接import这个变量，因为此时这个变量可能还没有被赋值
+```python
+#正确的使用方法
+
+import file1
+
+file1.a = 1
+```
+
+#### 4.python项目的组织形式
+```
+项目名
+  lib
+    utils
+    common
+    modules
+    plugins
+  settings.py
+  xx.py  
+```

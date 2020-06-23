@@ -33,7 +33,7 @@ kubectl top pods
 
 ### 概述
 #### 1.kube-state-metrics特点
-* 获取集群信息（而不是单个组件的）
+* 获取集群信息（而不是单个组件的），转换为prometheus的监控指标（供prometheus采集）
 * 监听aip-server，获取资源实例的状态（包括副本数、标签、运行时间等等）
 ### 安装
 利用helm进行安装

@@ -81,10 +81,11 @@ kubectl describe pods xx
 （1）安装prometheus
 
 （2）安装kube-state-metrics		
-用于将采集都的指标转换为k8s能够识别的格式
+* 转换为prometheus的监控指标（供prometheus采集）
 
 （3）安装k8s-prometheus-adapter
-用于将自定义的指标整合为一个api服务，供k8s集群使用
+* 用于将prometheus的指标整合为一个api服务（autoscaling/v2beta1），供k8s的HPA使用
+* apiserver需要设置允许api聚合：`--enable-aggregator-routing=true`
 
 #### 2.HPA（horizontal pod autoscaler）控制器
 
