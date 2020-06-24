@@ -47,13 +47,22 @@ file1.a = 1
 ```
 
 #### 4.python项目的组织形式
-```
+```shell
 项目名
+
   lib
-    utils
-    common
-    modules
-    plugins
+    utils         #存放一些工具函数和工具类
+    common        #存放通用的方法和类（比如Base类）
+    modules       #存放模块
+    vars          #存放全局变量等
+    plugins       #存放插件
+
   settings.py
   xx.py  
 ```
+
+#### 5.import包、函数等注意事项
+* 不能导入未定义的内容
+  * 所以当循环import时就会出问题（导入b，b导入c，c导入a）
+* `from lib.demo import test`
+  * 虽然只导入test，但是还是会执行demo这个模块（如果demo是包的话，会执行`__init__.py`）
