@@ -69,3 +69,18 @@ git branch -d xx        #删除xx分支
 git checkout xx         #切换到xx分支
 git merge xx            #当xx分支合并到 当前分支
 ```
+
+#### 5.版本控制（打标签操作）
+```shell
+#在当前位置打标签
+git tag -a <TAG> -m <msg>
+
+#推送所有标签（并没有推送到master，此时master不是最新标签）
+git push --tags
+
+#将最新的内容推送到master
+git push
+
+#切换到指定标签
+git checkout  <TAG>
+```
