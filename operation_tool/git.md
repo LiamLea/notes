@@ -22,17 +22,83 @@ c-->d:"git push"
 ```
 ![](./imgs/git_01.png)
 
+#### 3.引用——Refs（references）
+##### （1）概念
+* 引用是一类文件，用于保存commit的哈希值
+
+##### （2）`.git/refs/`目录
+* `heads/`目录
+描述了所有本地的分支（在该目录下，**文件名**就是**本地分支名**）
+* `remotes/`目录
+描述了所有远程的分支（在该目录下，**目录名**就是**远程仓库名**，在目录中，**文件名**就是**远程分支名**）
+* `tags/`目录
+描述所有的标签（在该目录下，**文件名**就是**标签名**）
+
+##### （3）完整的分支名
+* 本地分支：`refs/heads/<LOCAL_BRANCH>`
+简写：`<LOCAL_BRANCH>`
+* 远程分支：`refs/remotes/<REMOTE_REPO_NAME>/<REMOTE_BRANCH>`
+简写：`<REMOTE_BRANCH>`
+
+***
+### 配置
+#### 1.配置文件（优先级由小到大）
+* 系统级别（system）：一般在系统配置文件目录下
+* 当前用户级别（global）：`~/.gitconfig`
+* 当前项目级别（local）：`<REPO>/.git/config`
+
+#### 2.查看配置
+* 查看所有配置：`git config --list`
+* 查看系统级别的配置：`git config --system --list`
+* 查看全局配置：`git config --global --list`
+* 查看当前仓库的配置：`git config --local --list`
+
+#### 3.配置主要内容
+```shell
+#核心配置
+[core]
+
+#远程仓库配置
+#这个名字不是远程仓库的名字，而是一个别名，代表了远程仓库的url等信息
+#fetch中存放本地仓库和远程仓库的映射关系（因为可能存在多个远程仓库，其中一个远程仓库是和本地仓库一样的，另一个远程仓库内容比较旧，所以需要存放这些映射关系，才能清楚的知道远程仓库的情况）
+#+表示强制更新
+[remote "<REMOTE_REPO_NAME>"]
+    url = <REMOTE_REPO_URL>
+    fetch = +refs/heads/*:refs/remotes/<REMOTE_REPO_NAME>/*
+
+#当处于<BRANCH>分支时，设置默认的远程仓库和远程分支，分支名要一样
+[branch "<BRANCH>"]
+    remote = <REMOTE_REPO_NAME>
+    merge = refs/heads/<BRANCH>
+```
+
+***
+
 ### 命令
 #### 1.基本操作
 ```shell
-git remote add <NAME> <URL>       #添加一个远程仓库，起名为：<NAME>
+git remote add <REMOTE_REPO_NAME> <URL>       #添加一个远程仓库，起名为：<NAME>
 git status                        #查看 工作区 文件状态，有哪些文件没有上传到暂存区
 git add .                         #将变化的内容上传到暂存区
-git commit -m '该版本的详细说明'   #将暂存区的内容上传到本地仓库
-
-#将本地仓库的 <LOCAL_BRANCH>分支 提交到 名为<NAME>的远程仓库 的 <REMOTE_BRANCH>分支
-git push <NAME> <LOCAL_BRANCH>:<REMOTE_BRANCH>           
+git commit -m '该版本的详细说明'   #将暂存区的内容上传到本地仓库         
 ```
+</br>
+##### （1）将本地仓库的`<LOCAL_BRANCH>`分支 提交到名为`<REMOTE_REPO_NAME>`的远程仓库的`<REMOTE_BRANCH>`分支
+```shell
+git push <REMOTE_REPO_NAME> <LOCAL_BRANCH>:<REMOTE_BRANCH>
+```
+
+##### （2）设置默认的远程仓库和远程分支（即执行git push时，不需要指定远程仓库和远程分支）
+* 如果当前没有处于相应的分支，则git push时会给出提示，需要明确指定远程仓库和分支
+```shell
+git push -u origin master
+```
+
+##### （3）省略本地分支名，则表示删除指定的远程分支
+```shell
+git push <REMOTE_REPO_NAME> :<REMOTE_BRANCH>
+```
+
 #### 2.回滚操作
 ```shell
 git logs                  #查看该版本即之前的版本
