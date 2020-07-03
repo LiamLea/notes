@@ -25,11 +25,11 @@ nmap ... 3.1.1.1-50
 ***
 ### 主机发现
 #### 1.基本主机扫描方式
-（1）-sL（List scan）
+（1）`-sL`（List scan）
 列出指定范围内在线主机，返回ip地址（如果有域名则返回域名）
 不能与更高级的扫描（端口扫描等）结合使用
 
-（2）**-sn（No port scan）**
+（2）**`-sn`（No port scan）**
 跳过端口扫描阶段（即只进行主机发现），不加这一项，都会进行端口扫描
 利用以下方式进行主机发现：
 * icmp echo-request
@@ -40,15 +40,15 @@ nmap ... 3.1.1.1-50
 
 能够与更高级的扫描结合使用
 
-（3）-PS<port list>（TCP SYN Ping）
-（4）-PA<port list>（TCP ACK Ping)
-（5）-PU<port list>（UDP Ping）
-（6）-PY<port list>（STCP INIT Ping)
-（7）-PO<port list>（protocol Ping）
+（3）`-PS<port list>`（TCP SYN Ping）
+（4）`-PA<port list>`（TCP ACK Ping)
+（5）`-PU<port list>`（UDP Ping）
+（6）`-PY<port list>`（STCP INIT Ping)
+（7）`-PO<port list>`（protocol Ping）
 
-（8）--disable-arp-ping
+（8）`--disable-arp-ping`
 
-（9）--traceroute
+（9）`--traceroute`
 ***
 ### 端口探测（用于获取端口的状态）
 #### 1.nmap端口扫描基于tcp以下特性：
@@ -57,55 +57,40 @@ nmap ... 3.1.1.1-50
 * 收到FIN包，打开的tcp端口不回复，其他端口回复RST
 
 #### 2.nmap可以检测出的6种端口状态
-（1）open
-检测到该port正处于listening状态
-
-（2）closed
-检测到该port并没有处于listening状态
-
-（3）filtered
-由于网络原因（比如防火墙），无法检测到该port
-
-（4）unfiltered
-检测到了该port，但是无法判断其状态
-当用ACK扫描时会出现这种状态，用于判断端口是否被防火墙过滤
-**close或open端口收到ACK，都会回复RST**
-
-（5）open|filtered
-port处于open或者filtered的状态
-当用FIN、UDP等扫描时会出现这种状态
-**close的port接收到FIN，会直接回复RST**
-**open的port接收到FIN，会不回复**
-通过不回复不能判断是open，因为不回复也有可能是filter的原因）
-
-（6）closed|filtered
-当用idle方式扫描时，可能出现着这种状态
+|Port State|说明|可能出现该状态的扫描方式|
+|-|-|-|
+|open|检测到该port正处于listening状态|SYN|
+|closed|该port能够响应nmap发送的探测包，但是并没有应用监听在此端口上|SYN|
+|filtered|由于网络原因（比如防火墙），无法检测到该port</br>这会迫使Nmap重试几次，以防万一由于网络拥塞而不是过滤导致探针被丢弃。 这会大大降低扫描速度|SYN、ACK|
+|unfiltered|**无法检测到该端口**，只能判断出其未被防火墙过滤</br>当用ACK扫描时会出现这种状态，用于判断端口是否被防火墙过滤</br>close或open端口收到ACK，都会回复RST|ACK|
+|open\|filtered|port处于open或者filtered的状态</br>当用FIN、UDP等扫描时会出现这种状态</br></br>close的port接收到FIN，会直接回复RST</br>open的port接收到FIN，会不回复</br>通过不回复不能判断是open，因为不回复也有可能是filter的原因|FIN、UDP|
+|closed\|filtered|当用idle方式扫描时，可能出现着这种状态|idle|
 
 #### 3.基础端口扫描方式
-（1）**-sS（TCP SYN scan）**
+（1）**`-sS`（TCP SYN scan）**
 发送SYN包进行探测，不完成完整的tcp连接
 
-（2）-sA（TCP ACK scan）
+（2）`-sA`（TCP ACK scan）
 发送ACK包进行探测，用来检测端口是否被**filter**了
 
 
-（3）-sT（TCP connect scan）
+（3）`-sT`（TCP connect scan）
 建立tcp连接，建议使用SYN扫描方式
 
-（4）-sU（UDP scan）
+（4）`-sU`（UDP scan）
 速度慢的原因：
 * 串行执行的
 * open port和filter port可能不回复，所以超时后，会进行重发
 
-（5）-sY（SCTP INIT scan）
+（5）`-sY`（SCTP INIT scan）
 类似于tcp的SYN扫描方式
 
-（6）-sO（IP protocol scan）
+（6）`-sO`（IP protocol scan）
 扫描哪些ip协议是打开的
 
 
 #### 4.高级端口扫描方式
-（1）-sI（idle scan）
+（1）`-sI`（idle scan）
 利用一台中间空闲机器去扫描
 原理：
 * 与中间机通信，获取当前的ip id
@@ -127,7 +112,7 @@ port处于open或者filtered的状态
 * 版本号
 #### 2.原理
 与端口进行通信，根据返回的相关信息，从而判断该端口提供的协议，进而获取应用名称和版本号
-#### 3.命令：-sV
+#### 3.命令：`-sV`
 ***
 ### OS探测
 #### 1.尝试获取的信息
@@ -136,10 +121,28 @@ port处于open或者filtered的状态
 * os family
 #### 2.原理
 向多个端口发送指定报文，根据返回的信息生成系统指纹，对比系统指纹库，寻找最接近的系统
-#### 3.命令：-O
+#### 3.命令：`-O`
 ***
 ### 脚本探测
+#### 1.概述
+* 脚本扫描被认为是有侵入性的，因此，未经许可不能使用
+
+#### 2.命令：`-sC`
+
+***
+
+### 深入扫描（Aggressive scan）
+#### 1.概述
+会进行以下几个方面的扫描
+* OS扫描（`-O`）
+* 版本扫描（`-sV`）
+* 脚本扫描（`-sC`）
+* 路由跟踪（`--traceroute`）
+
+#### 2.命令：`-A`
+
+***
 
 ### 优化
-* -n
+* `-n`
 不进行DNS解析
