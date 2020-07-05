@@ -1,6 +1,22 @@
 # gerrit
 [toc]
 
+### 概述
+#### 1.gerrit的常用引用
+* `refs/for/`
+推送到这个引用后，需要code review之后才可以提交到gitlab
+* `refs/head/`
+推送到这个引用后，不需要code review，gerrit直接提交到gitlab
+所以需要对这个引用的权限严格把控，最好不允许使用这个引用
+* `refs/meta/config`
+该引用用于配置projects
+
+#### 2.引用权限的设置
+设置 指定用户 对 指定引用 的权限
+All-Projects -> Access
+
+***
+
 ### 安装
 * 注意：git的版本必须>=2.24
 
@@ -150,9 +166,10 @@ git add .
 git commit -m 'xx'
 
 git push <REMOTE_REPO_NAME> <BRANCH>:refs/for/<BRANCH>
-#refs/for代表将分支推送到gerrit上的某个分支
+#refs/for代表需要经过code review，gerrit才会将代码push到gitlab
 ```
 
+##### （3）提交被打回如何处理
 * 如果提交的内容被打回，提交者需要把本地的git仓库回滚到提交已经的状态
   * 如果只是把被打回的内容删除，然后重新提交，如果gerrit那边同意了这个提交，就会引起冲突，从而导致仓库不可用
   * 所以客户端一定要回滚
@@ -162,7 +179,7 @@ git push <REMOTE_REPO_NAME> <BRANCH>:refs/for/<BRANCH>
 ### gerrit和jenkins集成
 
 #### 1.gerrit开启verified功能
-* 开启后，指定用户可以进行verif，跟jenkins没有任何关系，只要登录指定用户，然后找到提交记录，点击verify按钮即可
+* 开启后，指定用户可以进行verify，跟jenkins没有任何关系，只要登录指定用户，然后找到提交记录，点击verify按钮即可
 * 与jenkins结合就是，当有记录提交，jenkins会触发构建，jenkins会利用指定账号对该记录进行verify，构建成功verify的值置为1，构建失败verify的值置为0
 ##### （1）修改All-Projects的配置
 ```shell
