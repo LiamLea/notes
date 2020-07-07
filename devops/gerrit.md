@@ -170,9 +170,9 @@ git push <REMOTE_REPO_NAME> <BRANCH>:refs/for/<BRANCH>
 ```
 
 ##### （3）提交被打回如何处理
-* 如果提交的内容被打回，提交者需要把本地的git仓库回滚到提交已经的状态
+* 如果提交的内容被打回，提交者需要把本地的git仓库**软回滚**到提交已经的状态
   * 如果只是把被打回的内容删除，然后重新提交，如果gerrit那边同意了这个提交，就会引起冲突，从而导致仓库不可用
-  * 所以客户端一定要回滚
+  * 所以客户端一定要软回滚
 
 ***
 
@@ -181,6 +181,9 @@ git push <REMOTE_REPO_NAME> <BRANCH>:refs/for/<BRANCH>
 #### 1.gerrit开启verified功能
 * 开启后，指定用户可以进行verify，跟jenkins没有任何关系，只要登录指定用户，然后找到提交记录，点击verify按钮即可
 * 与jenkins结合就是，当有记录提交，jenkins会触发构建，jenkins会利用指定账号对该记录进行verify，构建成功verify的值置为1，构建失败verify的值置为0
+* **注意**：
+  * 触发jenkins后，jenkins应该做的是验证，而不是部署，所以jenkins的流水线应该只是编译，验证代码有没有问题，所以验证流水线应该拉取的gerrit特定分支（见下文）
+  * 部署流水线应该拉取gitlab上的流水线
 ##### （1）修改All-Projects的配置
 ```shell
 $ git clone <URL>/All-Projects
@@ -222,8 +225,11 @@ Managed jenkins -> Gerrit Trigger ->Add New Server
 ![](./imgs/gerrit_10.png)
 点击红点，变蓝表示开启
 
-##### （2）配置进行verify的流水线
-**注意：这里要从gerrit上拉代码，而不是gitlab**
+##### （2）配置 进行verify 的流水线
+注意：
+  * 要从gerrit上拉代码，而不是gitlab
+  * GERRIT_REFSPEC这个变量只有被gerrit触发才会有，手动构建不会有
+![](./imgs/gerrit_13.png)
 
 ![](./imgs/gerrit_11.png)
 
