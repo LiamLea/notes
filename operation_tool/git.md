@@ -103,7 +103,9 @@ git push <REMOTE_REPO_NAME> :<REMOTE_BRANCH>
 ```shell
 git logs                  #查看该版本即之前的版本
 git reflog                #查看所有的版本
-git reset --hard xx       #回滚到指定版本
+git reset --soft xx       #回滚到指定版本，但是当前的工作空间的内容不变
+                          #用于代码在code review阶段被打回时进行的操作
+git reset --hard xx       #回滚到指定版本，当前的工作空间的内容也会回滚
 ```
 
 #### 3.git stash（将修改的内容暂存起来，而不是提交到暂存区，不常用这种方式，而是用branch方式）
