@@ -3,13 +3,13 @@
 ### 正则补充
 #### 1.利用转义符
 ```python
-  [^0-9]        #匹配非数字的单个字符
-  [\^0-9]       #匹配数字或^
-  [0-9^]        #匹配数字或^
+[^0-9]        #匹配非数字的单个字符
+[\^0-9]       #匹配数字或^
+[0-9^]        #匹配数字或^
 
-  [a-9]         #出错
-  [a\-9]        #匹配a或9或-
-  [a9-]         #匹配a或9或-
+[a-9]         #出错
+[a\-9]        #匹配a或9或-
+[a9-]         #匹配a或9或-
 ```
 
 #### 2.贪婪匹配
@@ -40,7 +40,9 @@ m.group(1)      #输出匹配内容的第一个子串
 ... ...
 ```
 ```python
-search('regexp','string')             #返回第一个匹配的对象
+search('regexp','string', re.IGNORECASE)  #返回第一个匹配的对象
+                                          #re.IGNORECASE代表忽略大小写
+
 
 m=search('f..','seafood is faad')     #m.group()为foo
 ```
@@ -70,7 +72,7 @@ sub(r'f..',r'\1a','seafood is faad') #结果为‘seafooad is faad’
 ```
 * 常常先将模式进行编译,可以得到更好的效率
 ```python
-  pattern=re.compile('regexp')
-  m=pattern.search('string')
-  pattern.split('string')
+pattern=re.compile('regexp', re.IGNORECASE)   #re.IGNORECASE表示忽略大小写
+m=pattern.search('string')
+pattern.split('string')
 ```

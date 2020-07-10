@@ -56,3 +56,17 @@ timeout <sec> <COMMAND>
 
 ##### （4）永久重定向
 `exec <REDIRECT>`
+
+#### 4.查看用户登录信息
+* 查看当前登录的用户
+```shell
+w
+```
+* 查看指定用户的登录记录
+```shell
+last <USER>
+```
+* 查看所有用户的登录状态（是否登陆过，上一次的登录时间）
+```shell
+lastlog
+```
