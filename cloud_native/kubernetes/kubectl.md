@@ -2,6 +2,48 @@
 # kubectl
 apiserver的客户端程序，是k8s集群的管理入口
 
+### 配置文件：~/.kube/config
+```yaml
+apiVersion: v1
+kind: Config
+
+#定义集群信息（可以设置多个）
+clusters:
+- name: <CUSTOME_CLUSTER_NAME>
+  cluster:
+    server: https://<IP>:<PORT>
+
+    #不能同时设置ca和insecure，只能设置一个
+    #当有ca证书时
+    certificate-authority-data: <CA_CONTENT>
+    #当没有ca证书或者ca证书不正确时，设置：
+    insecure-skip-tls-verify: true
+
+#定义用户信息（可以设置多个）
+users:
+- name: <CUSTOME_USER_NAME>
+  user:
+    #当用证书连接时，需要这样设置
+    client-certificate-data: <CERTIFICATE>
+    client-key-data: <PRIVATE_KEY>
+
+    #当使用serviceaccount时，需要设置token，账号无需指定
+    #<TOKEN>获取方式：
+    # 1.根据serviceaccount获取存储token的secret
+    # 2.获取token内容并且base64 --decode：kubectl get secret -o yaml
+    token: <TOKEN>
+
+#上下文信息，就是进行组合，将用户和集群进行组合（即用指定用户登录指定集群）
+contexts:
+- name: <CUSTOME_CONTEXT_NAME>
+  context:
+    cluster: <CLUSTER_NAME>
+    user: <USER_NAME>
+
+#指定当前使用的上下文，即使用指定用户登录指定集群
+current-context: <CONTEXT_NAME>
+```
+
 ### 创建资源
 #### 1.创建service
 ```shell

@@ -57,6 +57,16 @@ spec.ServiceAcountName
 * 创建一个ClusterRole，然后使用RoleBinding 在 某个命名空间中 将 角色 与 某个账号 绑定
 * 好处是，不需要在每个命名空间中再额外创建role
 
+#### 4.verbs
+* create
+* get（用于单个资源）
+* list（用于集合）
+* watch
+* update
+* patch
+* delete（用于单个资源）
+* deletecollection（用于集合）
+
 ### 使用
 
 #### 1.定义角色
@@ -68,6 +78,7 @@ metadata:           #ClusterRole不需要指定namespace
 
 #配置该role的权限，即对什么资源有什么权限
 #如何配置可以通过此命令查看：kubectl get api-resources -o wide
+#设置全部的话就设为："*"
 rules:
 - apiGroups:
   - xx            #指定api群组，如果是核心组，就填：""
@@ -79,7 +90,7 @@ rules:
 
 #### 2.将角色与账号（包括UserAccount和ServieAccount）绑定
 ```yaml
-apiVersion: rbac.authorazation.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: xx
@@ -91,7 +102,8 @@ roleRef:              #指定需要绑定的role
   name: xx
 
 subjects:             #指定需要绑定的账号
-- apiGroup: rbac.authorization.k8s.io
+- apiGroup: ""        #当kind为ServiceAccount时，apiGroup为：""，即核心组
+                      #当kind为User或Group时，apiGroup为：rbac.authorization.k8s.io
   kind: ServiceAccount        #还可以填User和Group
   name: xx
 ```

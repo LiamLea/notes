@@ -114,6 +114,10 @@ metadata:
     #设为0，表示不限制大小
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 
+    #设置读写超时时间，当后端是websocket时，需要设置这一项，默认是60s，nginx会关闭和websocket的连接
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+
 spec:
   rules:
 
