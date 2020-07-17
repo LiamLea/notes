@@ -28,7 +28,15 @@ call ftruncate(<FD>,0)
 ```
 ***
 ### lsof（list open files）
-#### 1.列出所有当前打开的文件，输出的格式：
+#### 1.底层原理
+基于进程的以下几个文件
+`/proc/<PID>/exec`
+`/proc/<PID>/cwd`
+`/proc/<PID>/root`
+`/proc/<PID>/fd/`
+`/proc/<PID>/maps`
+
+#### 2.列出所有当前打开的文件，输出的格式：
 ```shell
   COMMAND     #进程名称
   PID         #pid号
@@ -50,7 +58,7 @@ call ftruncate(<FD>,0)
   NODE        #索引节点
   NAME        #文件的名称
 ```
-#### 2.选项
+#### 3.选项
 ```shell
   文件名         #列出打开该文件的进程
 
@@ -64,7 +72,7 @@ call ftruncate(<FD>,0)
 
   +D 目录/      #类似+d，但是会递归子目录
 ```
-#### 3.应用场景
+#### 4.应用场景
 * 查看哪些进程在使用文件系统（利用+D选项）
 * 查看某个文件被哪个进程使用
 * 查看进程打开了哪些文件

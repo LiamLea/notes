@@ -140,3 +140,14 @@ $ srvctl config  vip -node <NODE>
 srvctl config srvpool
 srvctl status srvpool
 ```
+
+#### （4）查看具体node上的信息
+```shell
+srvctl status vip -n <NODE>
+```
+
+### crsctl
+#### （1）查看域名的ip地址
+```shell
+crsctl status ip -A <IP_NAME>
+```

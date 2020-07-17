@@ -98,6 +98,7 @@ vim ./server/bin/startNodeManager.sh
 ```
 ```
 NODEMGR_HOME="/home/weblogic/wls12214/user_projects/domains/domain_lil/nodemanager/"
+ListenAddress=192.168.33.55
 ```
 （1）在本机上启动NodeManager
 ```shell
@@ -145,6 +146,6 @@ password=xx
 
 （3）启动managed server
 ```shell
-nohup ./bin/startManagedWeblogic.sh 服务器名 http://xx:7001 &
+nohup ./bin/startManagedWebLogic.sh 服务器名 http://xx:7001 &
 #指明Administrator Server的地址
 ```
