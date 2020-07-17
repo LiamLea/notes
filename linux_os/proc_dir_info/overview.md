@@ -1,15 +1,17 @@
-/proc —— 伪文件系统，内核相关数据
-* /proc/PID/ —— 进程信息  
+`/proc` —— 伪文件系统，内核相关数据
+* `/proc/<PID>/` —— 进程信息  
 </br>
-* /proc/sys/ —— 内核有关参数  
-  * /proc/sys/kernel —— 内核参数  
-  * /proc/sys/vm —— 内存参数  
-  * /proc/sys/fs —— 文件系统参数  
-  * /proc/sys/net —— 网络参数  
+* `/proc/sys/` —— 内核有关参数  
+  * `/proc/sys/kernel` —— 内核参数  
+  * `/proc/sys/vm` —— 内存参数  
+  * `/proc/sys/fs` —— 文件系统参数  
+  * `/proc/sys/net` —— 网络参数  
 </br>
-* /proc/stat —— 系统的统计数据（自系统启动以来）
-  * **cpu ... ...**  
-  ```
+* `/proc/stat` —— 系统的统计数据（自系统启动以来）
+  </br>
+  * **`cpu ... ...`**  
+  </br>
+  ```shell
   #第一行为cpu的统计数据
 
   user（通常缩写为us），代表用户态CPU时间。注意，它不包括下面的nice时间，但包括了guest时间。
@@ -32,35 +34,41 @@
 
   guest_nice （通常缩写为gnice），代表以低优先级运行虚拟机的时间。
   ```
-  * **intr ... ...**  
-  ```
+  * **`intr ... ...`**
+  </br>  
+  ```shell
   第一列 服务的中断总数
   其他列 为特定中断的数量统计
   ```
-  * **ctxt ...**  
-  ```
+  * **`ctxt ...`**  
+  </br>
+  ```shell
   上下文切换的总次数
   ```
-  * **btime ...**  
-  ```
+  * **`btime ...`**  
+  </br>
+  ```shell
   系统启动的时间（自1970-01-01以来的秒数）
   ```
-  * **processes ...**  
-  ```
+  * **`processes ...`**  
+  </br>
+  ```shell
   forks的总次数
   ```
-  * **procs_running ...**  
-  ```
+  * **`procs_running ...`**  
+  </br>
+  ```shell
   正在运行的进程数
   ```
-  * **procs_blocked ...**  
-  ```
+  * **`procs_blocked ...`**  
+  </br>
+  ```shell
   等待I/O完成的进程数
   ```
 </br>
 
-* /proc/diskstats —— 磁盘的I/O统计数据
-
+* `/proc/diskstats` —— 磁盘的I/O统计数据
+</br>
   ```
   iostat -x
 

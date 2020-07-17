@@ -53,6 +53,9 @@ a -l-> b          #left
 
 A-->B:"加文字"
 
+#设置注释（方向：left,right,top,bottom）
+note left of <NAME>: 注释的内容
+
 ```
 ### 2.示例
 ```plantuml

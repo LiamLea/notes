@@ -38,9 +38,12 @@ test_node.data      #打印文本内容
 ### xmltodict模块（将xml转换成字典类型）
 ```python
 import xmltodict
-xmltodict.parse("xx", xml_attribs = False)     
+my_dict = xmltodict.parse("xx", xml_attribs = False)     
 #第一个参数传入xml文本
 #xml_attribs参数默认为True，即会采集element的属性信息
+
+#将其完全转换成字典类型
+my_dict = json.loads(json.dumps(my_list))
 ```
 输出
 ```json

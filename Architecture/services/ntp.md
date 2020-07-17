@@ -53,3 +53,71 @@ server <NTP_SERVER> iburst
 ***
 
 ### 查询ntp状态
+#### ntpq命令格式
+#### 1.格式
+```shell
+ntp -c <COMMAND>
+```
+
+#### 2.ntpq常用命令
+##### （1）`ntpq -c peers`
+显示ntp服务器的信息
+```shell
+$ ntpq -c peers   #等价与ntpq -p
+
+remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+*114.118.7.163   210.72.145.18    2 u  991 1024  377    3.352    2.036   1.603
++120.25.115.20   10.137.53.7      2 u  816 1024  377   37.174    3.138   2.061
+210.72.145.44   .INIT.          16 u    - 1024    0    0.000    0.000   0.000
+LOCAL(0)        .LOCL.          10 l   9h   64    0    0.000    0.000   0.000
+```
+字段说明
+* remote
+  * NTP服务器的IP或主机名
+  * 如果有`*`代表目前正在作用当中的上层NTP
+  * 如果是`+`代表也有连上线，而且可作为下一个提供时间更新的候选者
+</br>
+* refid
+  ntp服务器的ntp服务器的标识，可能的值：
+  * `<IP>`，即ntp服务器使用的是ip为`<IP>`的ntp服务器
+  * `.INIT.`，即还没有开始同步，也可以说是处于初始状态还没建立同步
+  * `.LOCL.`，即本机 (当没有远程节点或服务器可用时）
+</br>
+* st（stratum）
+ntp服务器所在的层
+</br>
+* when
+  几秒钟前曾经做过时间同步化更新的动作
+</br>
+* poll
+  查询的时间间隔
+</br>
+* reach
+  已经向上层NTP伺服器要求更新的次数
+</br>
+* delay
+  从本地机发送同步要求到ntp服务器的往返时间（单位为微秒）
+</br>
+* offset
+  * 主机通过NTP时钟同步与所同步时间源的时间偏移量，单位为毫秒
+  * offset越接近于0，主机和ntp服务器的时间越接近
+
+##### （2）`ntpq -c associations`
+查询各个服务器的关联id，为了进一步获取更多信息
+```shell
+$ ntpq -c associations
+
+ind assid status  conf reach auth condition  last_event cnt
+===========================================================
+  1 43782  963a   yes   yes  none  sys.peer    sys_peer  3
+  2 43783  9424   yes   yes  none candidate   reachable  2
+  3 43784  8011   yes    no  none    reject    mobilize  1
+  4 43785  8043   yes    no  none    reject unreachable  4
+```
+
+##### （3）`ntpq -c "rv <assid>"`
+rv：read variables，读取变量，有三类 相关变量：
+* 系统变量（当assid为0时，获取的是系统变量）
+* 服务器变量（当assid为非0时，获取的是指定服务器的变量）
+* 时钟变量（`ntpq -c cv`，获取的是时钟变量(clock variables)）

@@ -1,3 +1,4 @@
+[toc]
 ### 基础内容
 #### 1.set
 ```shell
@@ -69,4 +70,15 @@ last <USER>
 * 查看所有用户的登录状态（是否登陆过，上一次的登录时间）
 ```shell
 lastlog
+```
+
+#### 5.awk高级用法
+##### （1）将命令的输出存入变量
+```shell
+awk '{"<COMMAND>"|getline <VARIABLE_NAME>;print <VARIABLE_NAME>}' <FILE>
+
+#<COMMAND>可以由位置变量组成，比如：
+# ps -o pid ax | awk '{"readlink /proc/"$1"/exe"|getline a;print a}'
+# awk '{"readlink /proc/22/exe"|getline a;print a}' <FILE>
+
 ```
