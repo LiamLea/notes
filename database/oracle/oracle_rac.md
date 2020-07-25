@@ -55,7 +55,7 @@ Instance orcl12 is running on node rac2
 
 * 查看数据库在指定节点上的实例
 ```shell
-$ srvctl status instance -d <DB_NAME> -node <NODE1>,<NODE2>,...
+$ srvctl status instance -d <DB_NAME> -n <NODE1>,<NODE2>,...
 ```
 
 * 查看管理数据库（不一定有）

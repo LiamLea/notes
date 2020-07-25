@@ -33,7 +33,7 @@ mkdir -p /var/run/netns/
 
 * 将netns连接到`/var/run/netns/`目录下
 ```shell
-ln -s /proc/<PID>/net/ns /var/run/netns/<CUSTOME_NAME>
+ln -s /proc/<PID>/ns/net /var/run/netns/<CUSTOME_NAME>
 
 #ip netns list就可以看到该netns
 ```

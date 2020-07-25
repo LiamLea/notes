@@ -66,8 +66,8 @@ class A:
         return cls.__instance
 
     def __init__(self):
-        if not __init_flag:
-            __init_flag = True
+        if not A.__init_flag:
+            A.__init_flag = True
             pass
 
 a1 = A()

@@ -175,6 +175,30 @@ stress-ng -d <NUM> --hdd-write-size <BYTES> -i <NUM>
 ***
 ### tcpdump
 #### 1.在宿主机上抓取容器中某个网卡的数据包
+##### （1）方法是一
+默认`ip netns`无法显示和操作容器中的netns
+* 获取容器的pid
+```shell
+pid=`docker inspect -f '{{.State.Pid}}' <CONTAINER_ID>`
+#根据pid可以找到netns：
+#  /proc/<PID>/net/ns
+```
+* 创建`/var/run/netns/`目录
+```shell
+mkdir -p /var/run/netns/
+```
+
+* 将netns连接到`/var/run/netns/`目录下
+```shell
+ln -s /proc/<PID>/ns/net /var/run/netns/<CUSTOME_NAME>
+
+#ip netns list就可以看到该netns
+```
+* 监听
+```shell
+ip netns exec <CUSTOME_NAME> <COMMAND>
+```
+##### （2）方法二
 * 进入容器执行
 ```shell
 $ cat /sys/class/net/<INTERFACE>/iflink
