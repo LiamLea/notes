@@ -67,7 +67,7 @@ lsnrctl start
 lsnrctl stop
 ```
 
-#### 1.基础查询
+#### 2.基础查询
 * 数据库名
 ```shell
 select name from v$database;
@@ -75,6 +75,8 @@ select name from v$database;
 * 实例名
 ```shell
 select instance_name from v$instance;
+#或者
+ps aux | grep pmon
 ```
 * 数据库域名
 ```shell
