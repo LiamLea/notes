@@ -223,6 +223,28 @@ $ ip link
 tcpdump -i cali5ddcf4a2547 -nn
 ```
 ***
+### `ps`和`top`
+#### （1）查看线程信息
+```shell
+#LWP：light-weight process
+#NLWP：number of light-weight process
+#STAT: R     //running
+#      S     //interruptable sleeping
+#      D     //uninterruptable sleeping
+#      T     //stopped
+#      Z     //zombie
+
+#      +     //前台数据
+#      l     //多线程进程
+#      N     //低优先级进程
+#      <     //高优先级进程
+#      s     //session leader
+
+ps -eLf
+ps -Lf -p <PID>
+top -H <PID>
+```
+***
 ### 一些查看的小命令
 ##### `xxd -b <FILE>`
 以二进制形式查看文件

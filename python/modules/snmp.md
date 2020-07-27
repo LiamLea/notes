@@ -6,6 +6,7 @@
 ```python
 session = easysnmp.session(
     hostname = "<HOST>",
+    remote_port = <PORT>,
     version = 3,
     security_username = "<USERNAME>",
     security_level = "auth_with_privacy",
@@ -20,7 +21,8 @@ session = easysnmp.session(
 session = easysnmp.session(
     hostname = "<HOST>",
     version = 2,
-    community = "<COMMUNITY>"
+    community = "<COMMUNITY>",
+    use_sprint_value = True     #加了这个参数，跟用snmpwalk获取的输出是一样的，否则会将16进制的数据进行转码
 )
 ```
 

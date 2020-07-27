@@ -81,7 +81,7 @@ i->g
 ![](./imgs/jvm_02.png)
 
 * 会将内存在物理和逻辑上进行分区
-新生代区：eden s0 s1
+新生代区：eden s0 s1     （s:survivor）
 老年代区：old（空间较大）
 
 #### 5.回收过程
@@ -100,10 +100,88 @@ eden满了会进行垃圾回收，eden区大部分对象都会被回收
 ***
 
 ### jvm监控工具
-#### 1.`jps`
+#### 1.`jps`（JVM process status）
 ```shell
 jps
     -l        #输出完全的包名，应用主类名，jar的完全路径名
     -v        #输出jvm参数
     -m        #输出传入 main 方法的参数
+```
+#### 2.`jstat`（JVM statistics Monitoring）
+```shell
+jstat <OPTION> <VMID>   #VMID就是JVM的id，即进程号
+
+#<OPTION>:
+
+  -class              #类加载统计
+#Loaded:加载class的数量
+#Bytes：所占用空间大小
+#Unloaded：未加载数量
+#Bytes:未加载占用空间
+#Time：时间
+
+  -compiler           #编译统计
+#Compiled：编译数量。
+#Failed：失败数量
+#Invalid：不可用数量
+#Time：时间
+#FailedType：失败类型
+#FailedMethod：失败的方法
+
+  -gc                 #gc统计
+#S0C：第一个幸存区的大小
+#S1C：第二个幸存区的大小
+#S0U：第一个幸存区的使用大小
+#S1U：第二个幸存区的使用大小
+#EC：伊甸园区的大小
+#EU：伊甸园区的使用大小
+#OC：老年代大小
+#OU：老年代使用大小
+#MC：方法区大小
+#MU：方法区使用大小
+#CCSC:压缩类空间大小
+#CCSU:压缩类空间使用大小
+#YGC：年轻代垃圾回收次数
+#YGCT：年轻代垃圾回收消耗时间
+#FGC：整个堆垃圾回收次数，当这个数量特别多的时候，程序可能有问题，可能发生了内存泄漏
+      #当新生代的晋升大小 大于 老年代的剩余大小时，会发生full gc
+#FGCT：整个堆垃圾回收消耗时间
+#GCT：垃圾回收消耗总时间
+
+  -gcutil           #gc比例统计
+#S0：幸存1区当前使用比例
+#S1：幸存2区当前使用比例
+#E：伊甸园区使用比例
+#O：老年代使用比例
+#M：元数据区使用比例
+#CCS：压缩使用比例
+#YGC：年轻代垃圾回收次数
+#FGC：整个堆垃圾回收次数
+#FGCT：整个堆垃圾回收消耗时间
+#GCT：垃圾回收消耗总时间
+```
+
+#### 3.`jinfo`（JVM configuration info）
+```shell
+jinfo <OPTION> <VMID>
+
+#<OPTION>:
+  -flags      #输出VM flags，可以看出用的哪个垃圾回收算法
+  -sysprops   #输出java system properties
+```
+#### 4.`jmap`（jvm memory map）
+```shell
+jmap <OPTION> <VMID>
+
+#<OPTION>:
+  -heap       #打印heap的信息，包括各个分代使用情况
+```
+
+#### 5.`jstack`（thread stack trace for a java process）
+```shell
+jstack -l <VMID>   
+
+#跟踪某个java进程中的所有线程的栈，能够获取以下信息：
+#   1.线程的状态（java.lang.Thread.State）
+#   2.能够检查是否发生了死锁（Found one Java-level deadlock:）
 ```
