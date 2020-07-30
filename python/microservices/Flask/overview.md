@@ -42,3 +42,120 @@ def func():
 #运行该应用
 app.run()
 ```
+
+#### 2.配置app
+有很多中方式
+* 原始方式：
+```python
+app.config["<CONFIG_KEY>"] = "<CONFIG_VALUE>"
+```
+* 从类中读取
+```python
+#将这个类放在 settings.py
+class DevConfig:
+  <CONFIG_KEY> = <CONFIG_VALUE>
+
+#main.py
+app.config.from_object("settings.DevConfig")
+```
+
+#### 3.请求和响应
+* 请求对象
+```python
+from flask import request
+
+request.method
+request.args
+request.cookies
+request.headers
+request.url
+#... ...
+```
+* 响应对象
+```python
+from flask import redirect
+from flask import render_template
+from flask import make_reponse
+from flask import jsonify
+
+return "字符串"
+return render_template(<TEMPLATE_PATH>, <ARGS_DICT>)
+return redirect("<URL>")
+
+reponse = make_reponse(render_template(<TEMPLATE_PATH>, <ARGS_DICT>))
+reponse.set_cookie("<KEY>", "<VALUE>")
+reponse.headers["<HEADER>"] = "VALUE"
+return reponse
+
+return jsonify(<DICT>)
+```
+
+#### 4.session
+
+```python
+from flask import session
+
+app.secret_key = "xx"   #用于加密session的内容
+
+@app.route("/")
+def func():
+  session["k1"] = "v1"
+  session["k2"] = "v2"
+  return "xx"
+
+#flask会secret_key对session的内容进行加密，然后添加到cookie中
+#添加的cookie的key为app.session_cookie_name，value为加密的内容
+#通过源码发现，是 这样添加的：reponse.set_cookie(app.session_cookie_name, val)
+```
+
+#### 5.请求和响应的扩展（相当于Django的中间件）
+##### （1）在所有请求被路由前做的操作（可以用于身份认证）
+```python
+@app.before_request
+def func():
+    return None     #表示什么都不做，可以继续执行下面的视图函数
+    return "拦截"   #不会执行视图函数和其他被before_request装饰的函数
+                    #但是会执行被after_request装饰的函数
+```
+##### （2）在所有请求后，即执行完视图函数后进行的操作
+```python
+@app.after_request
+def func(reponse):
+    return reponse
+```
+
+##### （3）当有多个before_request和after_request时的顺序
+* before_request是顺序执行的
+* after_request是倒序执行的
+```python
+@app.before_request
+def func1():
+    print(func1)
+
+@app.before_request
+def func2():
+    print(func2)
+
+@app.after_request
+def func3(reponse):
+    print(func3)
+    return reponse
+
+@app.after_request
+def func4(reponse):
+    print(func4)
+    return reponse
+
+最后的结果：
+  func1
+  func2
+  func4
+  func3
+```
+
+##### （4）定制错误信息
+```python
+@app.errorhandler(404)
+def func(arg):
+    return "404错误"
+```

@@ -90,7 +90,7 @@ str.endswith('xx')          #如果以xx结尾,返回True
   sort(reverse=True)
   count(xx)             #统计元素为xx的个数
   pop()
-  pop(xx)
+  pop(<INDEX>)
   copy()
 #blist=alist.copy() 和 clist=alist 区别:
 #blist和alist指向不同的存储空间
@@ -182,14 +182,16 @@ print(my_car.color)
   keys()
   values()
   items()           #返回一个可迭代对象,每一个元素都是键值对,否则只能迭代key
-  pop(key)
+
+  pop(<KEY>)          #返回<KEY>的值，并且把该<KEY>从字典中移除
+  pop(<KEY>, <XX>)    #如果该<KEY>不存在，则返回<XX>
 
 #合并两个字典
-  update(dict)                #将另一个字典加上去
+  <DICT>.update(dict)                #将另一个字典加上去
   dict = {**dictA, **dictB}   #如果有相同的key，第二个的值会覆盖第一个的
 
-  get(key)          #若key不存在返回none(当需要判断key是否存在,用in即可)
-  get(key,xx)       #若key不存在返回xx(可以是字符串,也可以是数字)
+  get(<KEY>)          #若<KEY>不存在返回none(当需要判断key是否存在,用in即可)
+  get(<KEY>, <XX>)       #若<KEY>不存在返回<XX>(可以是字符串,也可以是数字)
 ```
 
 * 利用字典,根据条件执行相应的函数  
