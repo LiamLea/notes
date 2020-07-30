@@ -12,8 +12,8 @@ cpu的核心，一个核心代表一个独立的处理器（即物理cpu，提�
 会**欺骗**操作系统，把一个Thread当作一个逻辑CPU
 </br>
 * CPU（逻辑CPU）
-`逻辑CPU = Socket * Core * Thread`
-`物理CPU = Socket * Core`
+`逻辑CPU = Socket * Core per socket * Thread per core`
+`物理CPU = Socket * Core per socket`
 #### 2.系统uuid相关
 ##### （1）system-serial_number
 是服务器的序列码，写在服务器的外部

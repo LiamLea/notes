@@ -82,3 +82,31 @@ awk '{"<COMMAND>"|getline <VARIABLE_NAME>;print <VARIABLE_NAME>}' <FILE>
 # awk '{"readlink /proc/22/exe"|getline a;print a}' <FILE>
 
 ```
+
+#### 6.连接相关
+##### （1）查看文件是否是硬连接
+```shell
+stat <FILE>   #看Links字段
+#或者
+ll <FILE>     #看第二个字段
+```
+##### （2）查找一个文件的所有硬连接
+```shell
+find / -inum <NUMBER>    #<NUMBER>通过stat <FILE>命令中的Inode字段
+```
+##### （3）查看是否在链接的目录中
+```shell
+pwd         #显示逻辑路径，即在链接目录中的路径
+pwd -P      #P:physical，显示真实的路径
+```
+
+#### 7.查看时区
+```shell
+date +"%Z %z"
+```
+
+#### 8.在shell中建立tcp连接
+```shell
+exec FD<>/dev/tcp/HOST/PORT		
+#会在 /proc/self/fd/ 目录下生成一个描述符
+```

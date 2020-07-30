@@ -14,7 +14,8 @@
 一次连接就是一个 Request 一个 Respons
 </br>
 * HTTP/1.1，**长连接**
-有一个keep-alive，在一个HTTP连接中，可以发送多个Request，接收多个Response，在一定时间内没有请求，才断开连接
+  * 有一个keep-alive，在一个HTTP连接中，可以发送多个Request，接收多个Response，在一定时间内没有请求，才断开连接
+  * 增加Host字段
 </br>
 * HTTP/1.1协议开始,使用**MIME标准**
 不仅仅可以输出文本文件,还有其他的文件类型（MIME:multipurpose internet mail extensions,定义了多种文件类型）
@@ -86,6 +87,19 @@ while True:
     conn.send(b"HTTP/1.1 200 OK\r\n\r\nreponse")
     conn.close()
 ```
+
+#### 9.HTTP常用请求头
+```shell
+From        #发起此请求的用户的邮件地址
+Host        #请求的目标服务器的host和port number
+X-Forwarded-For     #用于标识源ip地址（是一种标准）
+                    #但这个请求头需要手动设置（默认不会有这个请求头）
+                    #比如前面有一层负载，需要在前面负载中设置一下，用真正的client ip设置X-Forwarded-For请求头
+                    #后端记录日志时，需要设置日志的格式用x-forwarded-for头
+Cookie      #用于存储所有cookie，一个cookie的格式：<KEY>=<VALUE>;
+```
+
+***
 
 ### 补充知识
 #### 1.重定向是客户端进行的
