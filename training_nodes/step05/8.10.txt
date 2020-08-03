@@ -18,7 +18,7 @@ python的官方模块文件站点:pypi.org
 
 2.设置使用国内的镜像站点
   mkdir -p ~/.pip
-  vim ~/.php/pip.conf
+  vim ~/.pip/pip.conf
     [global]
     index-url=http://pypi.douban.com/simple/
     [install]

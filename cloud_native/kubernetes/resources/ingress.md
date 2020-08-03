@@ -114,15 +114,19 @@ metadata:
     #设为0，表示不限制大小
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 
+    #建立连接时的超时时间
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+
     #设置读写超时时间，当后端是websocket时，需要设置这一项，默认是60s，nginx会关闭和websocket的连接
+    #read-timeout的意思是，如果在这个时间内，没有进行read操作，则断开连接，同理write-timeout
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 
 spec:
   rules:
 
-  #匹配虚拟主机（即访问的目标主机），不设置这一项，匹配所有请求继续进行规则判断
-  #比如：curl test.example.com，如果host设为test.example.com，该访问就能匹配该规则
+  #匹配 HTTP请求头中 的 Host字段的域名部分 是否 匹配下面设置的域名
+  #不设置这一项，匹配所有请求继续进行规则判断
   - host: xx				
     http:
       paths:

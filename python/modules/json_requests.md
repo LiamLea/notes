@@ -1,5 +1,6 @@
+[toc]
 # json模块
->JSON(javaScript Object Notation),是一种轻量级的数据交换格式
+JSON(javaScript Object Notation),是一种轻量级的数据交换格式
 可以通过网络传输各种类型的数据
 采用完全独立于语言的文本格式，实现语言之间的数据交换
 ```python
@@ -18,31 +19,44 @@ data=html.read()
 json.loads(data)
 ```
 
+***
+
 #requests模块
->requests是一个HTTP库，内部采用urllib3实现
+requests是一个HTTP库，内部采用urllib3实现
 提供了使用某种方法(如：GET,POST)访问web的函数
 
-* 获取url资源,以str类型返回数据
+#### 1.基本使用
 ```python
-  reponse=requests.get(url)
-  reponse.text
+#修改HTTP请求头（没有修改的字段就用默认的）
+headers = <DICT>
+#设置cookie
+cookies = <DICT>
+
+#发送HTTP请求
+response=requests.get(url,
+  verify = False,     #当采用https时，不进行证书认证
+  headers = headers,
+  cookies = cookies
+)
 ```
-* 获取url资源，以bytes类型返回数据（如图片等）
+#### 2.处理返回
 ```python
-  reponse=requests.get(url)
-  reponse.content
-```
-* 获取url资源，解析json格式，返回特定类型
-```python
-  reponse=requests.get(url)
-  reponse.encoding='utf8'  
+#以str类型返回数据
+response.text
+
+#以bytes类型返回数据（如图片等）
+reponse.content
+
+#解析json格式，返回特定类型
 #注意url资源的编码，通过html.encoding可以查看现在的编码
-  reponse.json()           
+reponse.encoding='utf8'  
 #将json格式转换为特定的数据类型
+reponse.json()           
 ```
 
-#requests+json的框架
->调用其他软件提供的api,如：钉钉机器人，图灵机器人，zabbix
+***
+# requests+json的框架
+调用其他软件提供的api,如：钉钉机器人，图灵机器人，zabbix
 ```python
 import requests
 import json
