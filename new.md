@@ -387,3 +387,12 @@ ll /etc/httpd/logs/error_log
 stat /etc/httpd/logs/error_log
 #看Links字段
 ````
+
+#### 55.在k8s上运行的镜像要求
+* 启动命令不能是`/bin/bash`这样的，这样镜像无法启动，虽然用`docker -itd`可以启动，启动必须是在前台运行（比如：`/usr/sbin/sshd -D`）
+
+#### 56.upstream和downstream的区别
+* upstream
+发出去的流量
+* downstream
+接收的流量

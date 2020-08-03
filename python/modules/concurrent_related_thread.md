@@ -141,3 +141,18 @@ def thread2():
     lock2.release()
 
 ```
+
+#### 5.上下文管理
+threading.local对象，用于为每个线程开辟一块空间来保存该线程独有的值
+```python
+local_obj = threading.local()
+
+#可以存储一些变量，这个变量被各个线程独有
+def func(val):
+  local_obj.k1 = val
+  print(local_obj.k1)
+
+for i in range(20):
+  th = threading.Thread(target = func, args = (i, ))
+  th.start()
+```

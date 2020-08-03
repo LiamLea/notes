@@ -5,6 +5,16 @@
 路由匹配发生在`app.url_map`中
   * app是Flask的一个实例（用户创建的实例）
   * url_map是Map的一个实例（创建Flask实例时生成）
+
+#### 2.建议目录结构
+```shell
+Project
+  |
+  -views        #不同的路由规则，放在不同的文件中
+    |
+    -account.py
+    -cmdb.py
+```
 ***
 
 ### 使用
