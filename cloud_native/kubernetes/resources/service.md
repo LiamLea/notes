@@ -58,7 +58,9 @@
 
 #### 4.headless service
 * 无头service，即该service没有ClusterIP
-* 当解析该service的域名时，将Endpoints（即podIP数组）返回
+* 当解析该service的域名时，将Endpoints（即ip集合）返回
+  * client决定怎么使用这个ip集合
+  * 正常service返回的是service的地址
 * 使用场景：
   * 自主选择权，让客户端自行决定使用哪个
   * 与StatefulSet一起使用

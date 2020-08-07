@@ -4,7 +4,7 @@
 ##### 1.建立session
 * snmp v3
 ```python
-session = easysnmp.session(
+session = easysnmp.Session(
     hostname = "<HOST>",
     remote_port = <PORT>,
     version = 3,
@@ -18,7 +18,7 @@ session = easysnmp.session(
 ```
 * snmp v2
 ```python
-session = easysnmp.session(
+session = easysnmp.Session(
     hostname = "<HOST>",
     version = 2,
     community = "<COMMUNITY>",

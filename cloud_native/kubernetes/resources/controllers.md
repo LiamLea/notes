@@ -142,11 +142,14 @@ spec:
 
 ##### （2）需要关联service
 注意：只有通过StatefulSet控制器创建的pod才有域名
-* 该service用于管理该StatefulSet控制器创建的pod，所以
-  * 他们必须绑定相同的pod
-  * service必须在StatefulSet创建
-* StatefulSet会为其管理的pod创建一个唯一的名字，而且会在DNS添加解析记录，所在的域即是该service的域，所以pod的域名为：`<POD_NAME>.<SERVICE_NAME>.<NAMESPACE>.svc.<CLUSTERNAME>`
-* 如果该service是headless的，则解析该service域名，就能获取后端所有pod的域名
+* 该service用于控制 该StatefulSet控制器创建的pod 所在的域
+所以
+  * service必须在StatefulSet前创建（因为需要用service控制pods所在的域，从而给每一个pod设置一个唯一的域名）
+  * service和StatefulSet必须绑定相同的pod
+</br>
+* StatefulSet会为其管理的 pod 设置域名解析（在DNS中添加解析记录），所以唯一标识了一个pod
+  * 所在的域即是该service的域，所以pod的域名为：`<POD_NAME>.<SERVICE_NAME>.<NAMESPACE>.svc.<CLUSTERNAME>`
+
 
 ##### （3）修改更新策略：
 ```yaml

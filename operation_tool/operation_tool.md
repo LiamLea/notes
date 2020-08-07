@@ -224,26 +224,44 @@ tcpdump -i cali5ddcf4a2547 -nn
 ```
 ***
 ### `ps`和`top`
-#### （1）查看线程信息
+#### 1.查看线程信息
 ```shell
-#LWP：light-weight process
-#NLWP：number of light-weight process
-#STAT: R     //running
-#      S     //interruptable sleeping
-#      D     //uninterruptable sleeping
-#      T     //stopped
-#      Z     //zombie
-
-#      +     //前台数据
-#      l     //多线程进程
-#      N     //低优先级进程
-#      <     //高优先级进程
-#      s     //session leader
-
 ps -eLf
 ps -Lf -p <PID>
 top -H <PID>
+
+#LWP：light-weight process
+#NLWP：number of light-weight process
 ```
+
+#### 2.相关指标
+##### （1）`STAT`
+```shell
+R     #running
+S     #interruptable sleeping
+D     #disk，uninterruptable sleeping
+T     #stopped
+Z     #zombie
+
++     #前台数据
+l     #多线程进程
+N     #低优先级进程
+<     #高优先级进程
+s     #session leader
+```
+
+##### （2）`%CPU`
+当为100%时，表示该进程一直在使用CPU
+当为50%时，表示该进程有一半时间在使用CPU
+```shell
+(process CPU time / process duration) * 100
+
+#process CPU time，进程使用cpu的时长
+#process duration，进程运行的时长
+#所有进程的cpu使用率，加起来应该 = CPU数 * 100
+```
+
+
 ***
 ### 一些查看的小命令
 ##### `xxd -b <FILE>`
