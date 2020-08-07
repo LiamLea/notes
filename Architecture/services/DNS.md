@@ -2,10 +2,7 @@
 [toc]
 ### 概述
 #### 1.域名解析时的各项解析记录
-查询指定记录
-```shell
-dig <SERVER> -t <TYPE>
-```
+
 * A记录
   将域名指向一个IPv4地址
 </br>
@@ -32,3 +29,26 @@ dig <SERVER> -t <TYPE>
 </br>
 * PTR记录
   PTR记录是A记录的逆向记录，又称做IP反查记录或指针记录，负责将IP反向解析为域名
+
+#### 2.DNS的search选项
+```shell
+#vim /etc/resolv.conf
+nameserver <DNS_SERVER>
+search <DOMAIN1> <DOMAIN@>
+```
+```shell
+ping <HOST>
+```
+* 首先会在本地解析`<HOST>`
+* 当本地无法解析时，会去DNS服务器解析`<HOST>`
+* 当DNS服务器无法解析`<HOST>`时，会加上search中设置的域，即会尝试去DNS服务器解析`<HOST>.<DOMAIN1>`，`<HOST>.<DOMAIN2>`
+
+***
+
+### 使用
+#### 1.`dig`
+```shell
+dig <SERVER>
+    +search         #利用/etc/resolv.conf中的search参数，默认不使用
+    -t <TYPE>       #查询指定记录
+```

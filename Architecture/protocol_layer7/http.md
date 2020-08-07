@@ -88,7 +88,21 @@ while True:
     conn.close()
 ```
 
-#### 9.HTTP常用请求头
+#### 9.超时时间
+* `connectTimeout`
+建立tcp连接的超时时间
+</br>
+* `writeTimeout`
+写超时时间
+客户端向服务器写数据，当客户端在规定时间内没有响应，客户端就会触发写超时
+</br>
+* `readTimeout`
+读超时时间
+客户端从服务器读取数据，当服务器在规定时间内没有返回数据，客户端就会触发读超时
+
+***
+
+### HTTP常用请求头
 ```shell
 From        #发起此请求的用户的邮件地址
 Host        #请求的目标服务器的host和port number
