@@ -1,7 +1,12 @@
 # switch
 [toc]
 ### 基础
-#### 1.port的命名
+#### 1.术语
+* optical port（光口）
+* electrical port（电口）
+
+The electrical ports support 10/100/1000 Mbps, and optical ports support 1000 Mbps (1 Gbps) using SFP.
+#### 2.port的命名
 ```shell
 <TYPE><SLOT>/<SUBSLOT>/<PORT>
 
@@ -14,7 +19,7 @@
 #<PORT>表示在第几个端口上（从0开始）
 ```
 
-#### 2.`PortIndex`、`IfIndex`和`IfName`
+#### 3.`PortIndex`、`IfIndex`和`IfName`
 |Item|Description|
 |-|-|
 |IfName|Interface name|
@@ -31,6 +36,24 @@ Wlan-Capwap0                    7         1
 Wlan-Radio0/0/0                 9         --                                    
 Wlan-Radio0/0/1                 4         --    
 ```
+
+#### 4.端口信息
+##### （1）端口状态
+* Admin status
+当为UP，表示该端口可用（enabled）
+</br>
+* Operation status
+当为UP，表示该端口有设备连接此端口，该端口正在使用中
 ***
 
 ### 使用
+
+#### 常用oid
+* 端口信息
+```shell
+1.3.6.1.4.1.25506.8.35.18.4.5.1
+```
+* 接口信息（包括端口）
+```shell
+1.3.6.1.2.1.2.2.1
+```

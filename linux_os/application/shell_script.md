@@ -110,3 +110,13 @@ date +"%Z %z"
 exec FD<>/dev/tcp/HOST/PORT		
 #会在 /proc/self/fd/ 目录下生成一个描述符
 ```
+
+
+#### 9.查看和设置系统支持的字符集
+```shell
+locale -a
+```
+设置字符集（必须是上面存在的）
+```shell
+export LANG="C.UTF-8"
+```
