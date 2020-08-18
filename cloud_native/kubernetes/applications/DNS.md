@@ -33,13 +33,17 @@
 
 * ClusterFirst（默认）
 当查询DNS时，域名后缀不匹配<CLUSER_DOMAIN>，则会去node的nameserver
-
+</br>
 * ClusterFirstWithHostNet
 当pod使用host网络时，需要明确设置这一项
-
+</br>
 * None
 不自动配置DNS，只使用dnsConfig这个字段的配置DNS
 
 #### 4.增加DNS配置
-`Pod.spec.dnsConfig `
+`Pod.spec.dnsConfig`
+
 对于所有dnsPolicy，dnsConfig都生效（是对DNS配置的增加，而不是覆盖）
+
+#### 5.在容器的hosts文件中增加解析记录
+`spec.hostAliases`
