@@ -396,3 +396,10 @@ stat /etc/httpd/logs/error_log
 发出去的流量
 * downstream
 接收的流量
+
+#### 57.处于不可中断(`D`)的后台进程不能被kill掉（前台的可以被kill）
+
+#### 58.强制卸载某个文件系统
+```shell
+umount -f <PATH>
+```

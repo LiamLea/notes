@@ -1,7 +1,8 @@
 # service
 [toc]
 ### 概述
-#### 1.service
+
+#### 1.service（**service负载的是4层流量**）
 用于代理后端pod，service需要配置端口的映射，这样访问service的某个端口，才会被转发到后端pods的指定端口
 
 #### 2.service三种工作模式
@@ -141,6 +142,20 @@ spec:
 
 #### 3.Endpoints清单
 ```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: vantiq
+  namespace: aiops-nx
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: xx
+    targetPort: xx
+
+---
+
 apiVersion: v1
 kind: Endpoints
 metadata:

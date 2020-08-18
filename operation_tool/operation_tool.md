@@ -239,7 +239,10 @@ top -H <PID>
 ```shell
 R     #running
 S     #interruptable sleeping
+
 D     #disk，uninterruptable sleeping
+      #处于不可中断的后台进程不能被kill掉（前台的可以被kill）
+
 T     #stopped
 Z     #zombie
 

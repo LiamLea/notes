@@ -37,28 +37,29 @@ c -> d
 利用helm
 * nginx-ingress默认不转发TCP和UDP，需要设置一下
 #### 1.设置转发TCP
-（1）方式一：
+##### （1）方式一：
 ```shell
 $ vim nginx-ingress/values.yaml
 ```
 ```yaml
 tcp:
-  #将nginx controller上的端口转发到某个命名空间的某个service上的某个端口
+  #将nginx controller上的端口转发到 某个命名空间 的 某个service上 的 某个端口
   <CONTROLLER_PORT>: "<NAMESPACE>/<SERVICE_NAME>:<SERVICE_PORT>"
+
 service:
   type: NodePort
   nodePorts:
     http: 32080
     https: 32443
     tcp:
-      #将nginx-controller-service上的某个端口转发到nginx-controller上的指定端口
+      #将nginx-controller的service上的某个端口转发到nginx-controller上的指定端口
       <SERVICE_PORT>: <CONTROLLER_PORT>
 
 #用于返回404的页面
 defaultBackend:
   enabled: true
 ```
-（2）方式二：
+##### （2）方式二：
 * 修改启动参数
 ```shell
 vim nginx-ingrss/values.yaml
@@ -67,8 +68,17 @@ vim nginx-ingrss/values.yaml
 extraArgs:
   tcp-services-configmap: <NAMESPACE>/<CONFIGMAP_NAME>
   udp-services-configmap: <NAMESPACE>/<CONFIGMAP_NAME>
+
+service:
+  type: NodePort
+  nodePorts:
+    http: 32080
+    https: 32443
+    tcp:
+      #将nginx-controller的service上的某个端口转发到nginx-controller上的指定端口
+      <SERVICE_PORT>: <CONTROLLER_PORT>
 ```
-* 设置具体转发哪里端口
+* 通过configmap，设置具体转发哪里端口
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -76,9 +86,42 @@ metadata:
   name: <CONFIGMAP_NAME>
   namespace: <NAMESPACE>
 data:
-  #将30080端口转发到<NAMESPACE>命名空间中的<SERVICE_NAME>service上的80端口
+  #将 nginx-controller上的30080端口 转发到 <NAMESPACE>命名空间中的<SERVICE_NAME>的service上的80端口
   #具体转发TCP还是UDP，看上面配置的configmap名字
   30080: "<NAMESPACE>/<SERVICE_NAME>:80"
+```
+
+##### （3）方式三：
+* 通过configmap设置转发规则
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: <CONFIGMAP_NAME>
+  namespace: <NAMESPACE>
+data:
+  #将 nginx-controller上的30080端口 转发到 <NAMESPACE>命名空间中的<SERVICE_NAME>的service上的80端口
+  #具体转发TCP还是UDP，看上面配置的configmap名字
+  30080: "<NAMESPACE>/<SERVICE_NAME>:80"
+```
+
+* 修改nginx启动参数（通过修改pod的控制器）
+```yaml
+containers:
+ - args:
+   #加下面的参数
+   - --tcp-services-configmap=<NAMESPACE>/<CONFIG_MAP_NAME>
+```
+
+* 修改nginx-controller的serivce
+```yaml
+spec:
+  ports:
+  - name: tcp
+    nodePort: <宿主机_PORT>
+    port: <SERVICE_PORT>
+    protocol: TCP
+    targetPort: <nginx-controller上_PORT>
 ```
 
 ***
