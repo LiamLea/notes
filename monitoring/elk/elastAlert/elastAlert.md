@@ -1,4 +1,5 @@
 # elastAlert
+[toc]
 ###  基础概念
 #### 1.工作流程
 ```mermaid
@@ -126,7 +127,7 @@ filter: []
 alert: [...]
 
 ```
-### 3.在es中建立索引
+#### 3.在es中建立索引
 ```shell
 elastalert-create-index --config xx
 ```

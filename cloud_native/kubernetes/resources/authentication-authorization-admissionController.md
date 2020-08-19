@@ -22,7 +22,7 @@ kubectl create serviceaccount 账号名
 
 #创建ServiceAccount资源后，会自动生成一个用于 认证 的Secret，并与该ServiceAccount绑定
 ```
-##### 2.指定pod使用哪个账号
+#### 2.指定pod使用哪个账号
 ```shell
 spec.ServiceAcountName
 
@@ -82,13 +82,34 @@ metadata:           #ClusterRole不需要指定namespace
 rules:
 - apiGroups:
   - xx            #指定api群组，如果是核心组，就填：""
+                  #设置全部的话就设为："*"
   resources:      #指定资源类型
-  - xx            #比如：pods
+  - xx            #比如：pods，设置全部的话就设为："*"
+
   verbs:          #指定允许的操作
   - xx            #比如：get,list,watch
 ```
 
 #### 2.将角色与账号（包括UserAccount和ServieAccount）绑定
+* 通过ClusterRoleBinding绑定
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: zdgt
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: zdgt
+
+subjects:
+- kind: ServiceAccount
+  name: zdgt
+  namespace: default
+```
+
+* 通过RoleBinding绑定
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -101,6 +122,8 @@ roleRef:              #指定需要绑定的role
   kind: ClusterRole
   name: xx
 
+
+#账号需要与RoleBinding在同一个命名空间
 subjects:             #指定需要绑定的账号
 - apiGroup: ""        #当kind为ServiceAccount时，apiGroup为：""，即核心组
                       #当kind为User或Group时，apiGroup为：rbac.authorization.k8s.io

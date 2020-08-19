@@ -95,11 +95,17 @@ pom.xml的配置
 ```
 在pom.xml的路径下执行mvn命令，即可处理多个maven工程
 
+#### 10.artifact
+* 在maven中，一个artifact就是被maven project生成的资源，一个artifact就是一个jar或war等
+* 每个artificat都有一个`<artifactId>-<version>.pom`文件，用于描述该artifact是怎么build的和有哪些依赖依赖
+* 每个artifact都有group ID (通常是反向域名，比如com.vmware)，artifact ID (artifact的名字), version（版本号），这些内容唯一标识一个artifact
+
 ***
 
 ### maven命令
 ```shell
 mvn -f <POM_FILE> <phase(s)>
+    -o      #offine mode，脱机模式（就是不联网，即不会从远程仓库下载）
 ```
 #### 1.常用命令
 ```shell
@@ -151,3 +157,12 @@ mvn -f pom.xml clean deploy -D maven.test.skip=true
   <password>nexus</password>
 </server>
 ```
+
+***
+
+### FAQ
+#### 1.本地有artifct，但是还是从远程下载
+* 当artifact从仓库中下载下来，会在保存本地maven仓库中，会有一个`_maven.repositories`文件，用于记录该artifact从哪里解析来的
+</br>
+* 如果`_maven.repositories`中记录的仓库，**不在有效的仓库列表中**，则会重新去有效列表中去下载（有效列表：在maven中、在pom文件中等地方配置的）
+* 使用offine mode，`_maven.repositories`文件会被忽略

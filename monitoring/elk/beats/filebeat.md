@@ -1,8 +1,10 @@
 # filebeat
+[toc]
 ### 基础概念
 #### 1.input
 * 用于采集日志，包括从文件读取、从端口读取等
 * 从一个input的采集的日志，存储在同一个index中（除非是动态index）
+
 #### 2.index template
 * 用于定义index的settings和mappings（类似于表结构）
 * 要将数据传入es，必须要先设置index template
@@ -12,7 +14,8 @@
 * 其中有一项index pattern，用于设置匹配的index
 >比如pattern设为"filebeat*"，则该模板会被应用到"filebeat*"的index上   
 
-### 流程
+#### 3.filebeat处理流程
+
 ```mermaid
 graph LR
 subgraph 定义数据采集
@@ -31,7 +34,13 @@ A-->B
 B-->C
 C-->D
 ```
-### 配置filebeat
+
+#### 4.注册表：`/var/lib/registry`
+
+***
+
+### 配置
+#### 1.基本配置
 （1）设置input
 ```yaml
 #当使用模块时，就将input设为false
@@ -67,7 +76,8 @@ setup.template.pattern: "xyxy*"
 #关闭index lifecycle management
 setup.ilm.enabled: false
 ```
-### 更多配置
+
+#### 2.更多配置
 **参考配置模板：/etc/filebeat/filebeat.refernce.yaml**
 * input
 ```yaml
@@ -170,6 +180,9 @@ logging.files:
   keepfiles: 7
   permissions: 0644
 ```
+
+***
+
 ### modules
 * 简化了常见日志格式的收集、解析和可视化  
 * 一个module就是一个配置好的配置文件  
@@ -177,13 +190,15 @@ logging.files:
 * 每个module都提供一些变量供用户修改，从而能改变一些设置，比如日志的路径等
 * input是在module中定义的，但是可以覆盖；output是在module外定义的
 
-（1）开启指定模块
+#### 1.基本使用
+##### （1）开启指定模块
 ```shell
 filebeat modules list               #查看有哪些模块，哪些是enable的
 filebeat enable xx          #开启某个模块
 ls /etc/filebeat/modules/   #可以在该目录下的具体文件中，设置变量，从而修改模块的配置
 ```
-（2）配置模块
+
+##### （2）配置模块
 ```yaml
 #/etc/filebeat/modules.d/nginx.yaml
 
@@ -203,7 +218,8 @@ ls /etc/filebeat/modules/   #可以在该目录下的具体文件中，设置变
 
 #/etc/filebeat/filebeat.yml
 ```
-（3）配置kibbana dashboard和output
+
+##### （3）配置kibbana dashboard和output
 ```yaml
 setup.dashboards.enabled: true
 #设置可视化的索引，dashboard是由一个个可视化组成的
@@ -218,9 +234,8 @@ output.elasticsearch:
 #自定义索引，就将ilm关闭
 setup.ilm.enabled: false
 ```
-（3）启动模块
+
+##### （4）启动模块
 ```yaml
 启动filebeat即可
 ```
-### 注册表
-/var/lib/registry
