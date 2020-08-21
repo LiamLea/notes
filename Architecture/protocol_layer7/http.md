@@ -111,6 +111,8 @@ X-Forwarded-For     #用于标识源ip地址（是一种标准）
                     #比如前面有一层负载，需要在前面负载中设置一下，用真正的client ip设置X-Forwarded-For请求头
                     #后端记录日志时，需要设置日志的格式用x-forwarded-for头
 Cookie      #用于存储所有cookie，一个cookie的格式：<KEY>=<VALUE>;
+
+Content-Type    #请求体的数据格式，常用的：application/json
 ```
 
 ***

@@ -110,7 +110,7 @@ fields: {"key1":"vaule1","key2":"value2"}
 fields_under_root: true
 #设为true，如果添加的字段与原先冲突，添加的会覆盖原先的
 ```
-* 加载外部配置文件  
+* 加载外部配置文件（input配置）  
 ```yaml
 filebeat.config.inputs:
   enabled: true
@@ -197,6 +197,7 @@ filebeat modules list               #查看有哪些模块，哪些是enable的
 filebeat enable xx          #开启某个模块
 ls /etc/filebeat/modules/   #可以在该目录下的具体文件中，设置变量，从而修改模块的配置
 ```
+
 
 ##### （2）配置模块
 ```yaml

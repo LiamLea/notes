@@ -110,34 +110,34 @@ server-->>client:利用对称密钥进行数据的加密
 
 （1）生成私钥
 ```shell
-  (umask 077;openssl genrsa -out xx)     #括号里的命令是在子进程中执行的
+(umask 077;openssl genrsa -out <CA.KEY>)     #括号里的命令是在子进程中执行的
 
 #公钥是从私钥中提取出来的，因为ca需要的是自签署证书，所以这里不需要这样提取
 #openssl rsa -in xx -pubout -out xx
 ```
 （2）生成自签署证书（即ca，数字证书的格式为x509）
 ```shell
-  openssl req -new -x509 -key xx -out xx -days 3650
+openssl req -new -x509 -key <CA.KEY> -out <CA.CRT> -days 3650
 ```
 #### 2.openssl利用已有ca，生成数字证书（即对其他公钥进行签名）
 
 （1）生成证书签名请求（利用私钥生成该请求，因为公钥是从私钥中提取出来的）
 ```shell
-  openssl req -new -key xx -out xx -subj '\CN=xx'
+openssl req -new -key <SERVER.KEY> -out <SERVER.CSR> -subj '/CN=xx'
 
 #CN很重要！！！！
 #CN（Common Name）一定要和访问的域名设置成一样
 ```
 （2）签署证书请求文件，生成数字证书
 ```shell
-  openssl x509 -req -in xx \      #-req -in 后面跟请求文件
-          -CA xx -CAkey xx \
-          -CAcreateserial \       #当序列号文件不存在则自动创建，如果在openssl的配置的目录下找不到serial文件，该命令就会报错
-          -days 3650 -out xx
+openssl x509 -req -in <SERVER.CSR> \      #-req -in 后面跟请求文件
+        -CA <CA.CRT> -CAkey <CA.KEY> \
+        -CAcreateserial \       #当序列号文件不存在则自动创建，如果在openssl的配置的目录下找不到serial文件，该命令就会报错
+        -days 3650 -out <SERVER.CRT>
 ```
 #### 3.查看证书内容
 ```shell
-  openssl x509 -in xx -text
+openssl x509 -in xx -text
 ```
 ***
 ### 认证机制

@@ -128,32 +128,16 @@ curl -H "Content-Type: application/json" \
 ```
 
 
-#### 2.查询节点和集群状态
-（1）查看单个节点状态
+#### 3.节点相关
+##### （1）查看单个节点状态
 ```shell
 curl IP:PORT/_cat/health
 #查看分片的状态
 curl IP:PORT/_cat/shards
 ```
-（2）查看集群状态
+
+#### 4.集群相关
+###### （1）查看集群状态
 ```shell
 curl IP:PORT/_cluster/health?level=indices
-```
-
-#### 3.集群问题排除
-（1）集群状态为red
-red表示不是所有的主分片都可用，通常时由于某个索引的主分片为分片unassigned，只要找出这个索引的分片，手工分配即可
-
-（2）集群状态为yellow
-yellow表示所有主分片可用，但不是所有副本分片都可用，最常见的情景是单节点时，由于es默认是有1个副本，主分片和副本不能在同一个节点上，所以副本就是未分配unassigned
-
-解决思路：
-* 先找出有问题的indices和nodes
-```shell
-curl IP:PORT/_cluster/health?level=indices
-curl IP:POTT/_cat/health    #一个个试
-```
-* 然后查看该节点上哪一个分片是unassigned
-```shell
-curl IP:PORT/_cat/shards
 ```
