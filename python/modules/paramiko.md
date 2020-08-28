@@ -17,7 +17,10 @@ ssh.connect(hostname = <IP>, port = <NUM>, username = <USER> , password = <PASSW
 #### 2.执行命令
 ```python
 #执行命令并获取结果
-result = ssh.exec_command(<COMMAND>)   
+result = ssh.exec_command(<COMMAND>, timeout = None)
+
+#timeout 表示读写的超时时间，默认为None，即不会抛超时异常
+#         若超时，会抛出超时异常
 ```
 ##### （1）基本选项
 * `get_pty = True`

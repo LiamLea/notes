@@ -63,11 +63,11 @@ persistent volume claim，是一种资源
 只能被一个节点以读写方式挂载
 </br>
 * ReadOnlyMany
-##### （2）两种pv回收策略
+##### （2）两种pv回收策略（如何使用released pv）
 * Retain（静态pv默认）
   * 当pvc与pv解除绑定，保留pv资源（不删除pv）
   * 并且会保留原先绑定的pvc的信息（比如：uuid），所以即使删除了pvc，这个pv也是无法使用的，重新创建pvc，也是无法使用的
-  * 如果需要使用这个pv，需要删除该pv中的pod信息，即claimRef
+  * 如果需要使用这个pv，需要删除该pv中的pod信息，即**claimRef**
 
 * Delete（动态pv默认）
   * 一般只有动态pv能设置成Delete=
