@@ -181,7 +181,7 @@ kind: StatefulSet
 metadata:
   name: xx
 spec:
-  serviceName: xx
+  serviceName: xx      #用于控制由statefulSet创建的pods所在的域
   replicas: xx
   selector:
     matchLabels:

@@ -38,7 +38,7 @@ uris => [ "http://elastic.co", "http://example.net" ]
 ssl_enable => true
 ```
 
-##### （5）hash（键值对的集合）
+##### （5）hash（也就是字典）
 ```shell
 #注意使用空格分隔，而不是逗号分隔
 match => {
@@ -88,7 +88,7 @@ output {
 ```
 
 ##### （3）条件判断
-```shell
+```python
 if <EXPRESSION> {
   ...
 } else if <EXPRESSION> {
@@ -105,7 +105,7 @@ if <EXPRESSION> {
   * 复合表达式：`and, or, nand, xor, !`
 
 比如:
-```shell
+```python
 filter {
   if [action] == "login" {
     mutate { remove_field => "secret" }
@@ -116,7 +116,7 @@ filter {
 #### 3.特殊字段：`@metadata`
 output时，不会输出该字段
 输出`@metadata`字段
-```shell
+```python
 output {
   stdout { codec => rubydebug { metadata => true }}
 }

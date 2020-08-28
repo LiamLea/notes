@@ -1,8 +1,16 @@
 # logstash
 [toc]
 ### 概述
-#### 1.特点
-* **接收**不同数据源的数据，进行**清洗**，**发往**指定目的地
+#### 1.工作方式
+* **接收**不同数据源的数据（比如：数据库、消息队列、文件等）
+* 进行**清洗**
+* **发往**指定目的地（比如：es、消息队列等）
+
+#### 2.优点
+Logstash具有基于磁盘的自适应缓冲系统
+
+#### 3.架构
+如果需要缓冲数据，无需使用外部队列（如：kafka等），使用logstash的持久化队列即可
 
 #### 2.pipeline（数据管道）
 串联的data processing elements的集合，
@@ -91,10 +99,12 @@ config:
 ***
 
 ### codec
+用于设置event的数据展现形式（比如：json格式、rubydebug形式等）
 #### 1.处理multiline events
-* 如果用beats作为input的话，最好在beats端处理多行的情况
+* 如果用beats作为input的话，最好**在beats端处理多行**的情况
+  * 否则可能会导致数据错乱
 * 在logstash中处理多行event的方式：multiline codec
-
+* 注意这里的multiline和**filebeat的multiline不太一样**
 ```shell
 codec => multiline {
   pattern => "<PATTERN>"     #用于匹配行
@@ -104,5 +114,20 @@ codec => multiline {
   what => "<DIRECTION>"      #有两个方向：
                              #previous，匹配的行是前一行的一部分
                              #next，匹配的行是下一行的一部分
+}
+```
+
+#### 2.序列化和反序列化json数据
+* input时是反序列化
+```shell
+input {
+  codec => json
+}
+```
+
+* output时是序列化
+```shell
+output {
+  codec => json
 }
 ```

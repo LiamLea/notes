@@ -41,7 +41,7 @@ C-->D
 
 ### 配置
 #### 1.基本配置
-（1）设置input
+##### （1）设置input
 ```yaml
 #当使用模块时，就将input设为false
 filebeat.inputs:
@@ -51,7 +51,7 @@ filebeat.inputs:
 #设置索引
 #最好将ilm关闭，因为ilm匹配不到这个索引，会自动生成一个内容为空的索引
 ```
-（2）导入kibana dashboard
+##### （2）导入kibana dashboard
 ```yaml
 setup.dashboards.enabled: true
 #设置可视化的索引，dashboard是由一个个可视化组成的
@@ -59,7 +59,7 @@ setup.dashboards.index: "xx"
 setup.kibana:
   host: "IP:PORT"
 ```
-（3）output
+##### （3）output
 ```yaml
 output.elasticsearch:
   hosts: ["IP:PORT"]
@@ -79,7 +79,7 @@ setup.ilm.enabled: false
 
 #### 2.更多配置
 **参考配置模板：/etc/filebeat/filebeat.refernce.yaml**
-* input
+##### （1）input
 ```yaml
 filebeat.inputs:
 
@@ -97,7 +97,19 @@ filebeat.inputs:
 #设置该input的索引
     index: "xx"
 ```
-* general
+
+##### （2）使用multiline
+注意：这里的multiline和logstash区别
+* 这里的`match: before`表示 匹配的内容是 行的前一部分，后面未匹配的内容为行的后一部分
+* logstash的`what => previous`表示 匹配的内容是 上一行的一部分
+```yaml
+- type: <TYPE>
+  multiline:
+    pattern: <PATTERN>
+    negate: <BOOLEAN>
+    match: <before or after>
+```
+##### （3）general
 ```yaml
 name: "xx"           
 #用于设置该beat的名字，反应在agent.name字段
@@ -110,7 +122,7 @@ fields: {"key1":"vaule1","key2":"value2"}
 fields_under_root: true
 #设为true，如果添加的字段与原先冲突，添加的会覆盖原先的
 ```
-* 加载外部配置文件（input配置）  
+##### （4）加载外部配置文件（input配置）  
 ```yaml
 filebeat.config.inputs:
   enabled: true
@@ -123,7 +135,7 @@ queue.mem:
   flush.min_events: 512         #当达到512个时输出
   flush.timeout: 5s             #或当超过5s后输出
 ```
-* output
+##### （5）output
 ```yaml
 output.elasticsearch:
   hosts: ["IP:PORT"]
@@ -144,7 +156,7 @@ output.elasticsearch:
         xx2: "yy2"
       default: "yy3"          #当没有匹配的时，就用默认的
 ```
-* 扩展index template  
+##### （6）扩展index template  
 ```yaml
 output.elasticsearch:
   index: "customname-%{[agent.version]}-%{+yyyy.MM.dd}"
@@ -157,7 +169,7 @@ setup.template.fields: "path/to/fields.yml"     #这里面定义该template的�
 #覆盖已加载模板的配置
 #setup.template.overwrite: true
 ```
-* index lifecycle management  
+##### （7）index lifecycle management  
 
 管理索引，比如索引超过多少大小或多长时间，就打包在一起（起一个别名）
 ```yaml
@@ -169,7 +181,7 @@ setup.ilm.enabled: auto
 setup.ilm.name: "xx"              #使用的策略的名字
 setup.ilm.rollover_alias: "xx"    #rollover后，这些index的统称的名字
 ```
-* 日志设置  
+##### （8）日志设置  
 
 ```yaml
 logging.level: info         #debug,info,warning,error
