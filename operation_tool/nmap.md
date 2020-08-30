@@ -7,7 +7,7 @@
 ```shell
 -Pn      #No Ping，跳过主机发现阶段
 ```
-* 对在线的主机执行端口扫描（-Sxx)
+* 对在线的主机执行端口扫描（-sxx)
 ```shell
 -sn      #No port scan，跳过端口扫描阶段
 ```
