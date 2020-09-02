@@ -78,6 +78,24 @@ openssl x509 -req -in <SERVER.CSR> \      #-req -in 后面跟请求文件
 openssl x509 -in xx -text
 ```
 
+#### 4.创建x509 v3证书（支持多个域名）
+* 创建一个文件 v3.ext（名字随便取）
+```shell
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName=DNS:hostname1, DNS:hostname2
+```
+
+* 签署证书 时，需要加一个选项
+```shell
+openssl x509 -req -in <SERVER.CSR> \
+        -CA <CA.CRT> -CAkey <CA.KEY> \
+        -CAcreateserial \
+        -days 3650 -out <SERVER.CRT> \
+        -extfile v3.ext       #需要增加这个选项
+```
+
 ***
 
 ### 应用

@@ -141,3 +141,20 @@ curl IP:PORT/_cat/shards
 ```shell
 curl IP:PORT/_cluster/health?level=indices
 ```
+
+***
+
+### 其他操作
+
+#### 1.重新索引（把一个index的documents 拷贝到 另一个index）
+```python
+POST _reindex
+{
+  "source": {
+    "index": "<OLD_INDEX_NAME>"
+  },
+  "dest": {
+    "index": "<NEW_INDEX_NAME>  "
+  }
+}
+```

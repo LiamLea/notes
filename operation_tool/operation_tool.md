@@ -1,32 +1,5 @@
 [toc]
-### gdb（GNU debugger）
-#### 1.特点
-* 可以进入正在执行的某个进程，进入后，进程就**暂停**在进入点
 
-#### 2.基本使用
-```shell
-gdb -p <PID>      #进入某个进程
-```
-
-#### 3.gdb终端命令
-利用两下\<Tab>可以查看有什么命令
-```shell
-call <SYSCALL>      #调用系统调用
-                    #man syscalls 或者 按两下tab 可以查看有哪些系统调用
-
-show xx             #常用的有：
-                    #   environment
-                    #   paths
-```
-#### 4.利用gdb管理文件描述符
-```shell
-#关闭某个文件描述符
-call close(<FD>)
-
-#清空某个文件描述符（即清空文件，直接删除文件会影响程序）
-call ftruncate(<FD>,0)
-```
-***
 ### lsof（list open files）
 #### 1.底层原理
 基于进程的以下几个文件
@@ -76,20 +49,9 @@ call ftruncate(<FD>,0)
 * 查看哪些进程在使用文件系统（利用+D选项）
 * 查看某个文件被哪个进程使用
 * 查看进程打开了哪些文件
-***
-### strace
->strace用于跟踪进程运行时的系统调用等，输出的结果：  
->>每一行都是一条系统调用，等号左边是系统调用的函数名及其参数，右边是该调用的返回值  
 
-#### 1.选项
-```shell
-  -f            #跟踪由fork调用所产生的子进程
-  -c            #进行统计，统计调用哪些系统调用、调用的次数和错误等，最后给出一个统计结果
-  -e 表达式     #表达式：
-                #trace=open 表示只跟踪open调用
-  -p <PID>      #可以跟踪正在运行的进程
-```
 ***
+
 #### locate
 
 #### 1.由四部分组成
@@ -114,7 +76,9 @@ call ftruncate(<FD>,0)
   -r xx        #正则
   -R           #列出ppid
 ```
+
 ***
+
 ### traceroute
 #### 1.原理
 ```
@@ -122,6 +86,9 @@ call ftruncate(<FD>,0)
 如果超过这个跳数还没到达目的地，则会丢弃该ip包，
 并通知发送方（利用类型为time-exceeded的icmp包通知）
 ```
+
+***
+
 ### dd
 #### 1.特点
 * 用**指定大小的块**拷贝一个文件，并在拷贝的同时进行指定的**转换**
@@ -140,88 +107,15 @@ count=xx      #仅拷贝xx个块
 ```shell
 dd if=/dev/zero of=/dev/sda
 ```
-***
-### stree-ng
-#### 1.模拟高负载
-* 原理：创建多个进程，争抢cpu
-```shell
-stress-ng -c <核数>     #核数如果为4，则会创建4个进程，每个进程用满一个核
-```
 
-#### 2.模拟高内存
-* 原理：持续运行`malloc()`和`free()`
-* 注意：
-  * 当设置的一个进程消耗的内存过高时，则不能耗尽内存，需要再起一个
-```shell
-stress-ng -m <NUM> --vm-bytes <BYTES> --vm-keep   
-#-m表示开启多少个进程，每个进程消耗那么多vm
-#--vm-keep就是占用内存，不重新分配
-```
-#### 3.模拟高I/O（测试文件系统）
-* 原理：持续写、读和删除临时文件
-```shell
-stress-ng -d <NUM> --hdd-write-size <BYTES> -i <NUM>
-#-d：开启<NUM>个负责，执行读、写和删除临时文件
-#--hdd-write-size每个负载写的数据量
-#-i：开启<NUM>个负载，执行sync()
-```
 ***
+
 ### io相关
 ##### `iostat -dx`
 显示io详细情况
 ##### `iotop`
 显示所有进程的io情况
 
-***
-### tcpdump
-#### 1.在宿主机上抓取容器中某个网卡的数据包
-##### （1）方法是一
-默认`ip netns`无法显示和操作容器中的netns
-* 获取容器的pid
-```shell
-pid=`docker inspect -f '{{.State.Pid}}' <CONTAINER_ID>`
-#根据pid可以找到netns：
-#  /proc/<PID>/net/ns
-```
-* 创建`/var/run/netns/`目录
-```shell
-mkdir -p /var/run/netns/
-```
-
-* 将netns连接到`/var/run/netns/`目录下
-```shell
-ln -s /proc/<PID>/ns/net /var/run/netns/<CUSTOME_NAME>
-
-#ip netns list就可以看到该netns
-```
-* 监听
-```shell
-ip netns exec <CUSTOME_NAME> <COMMAND>
-```
-##### （2）方法二
-* 进入容器执行
-```shell
-$ cat /sys/class/net/<INTERFACE>/iflink
-
-28
-```
-* 在宿主机执行
-```shell
-$ ip link
-
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: ens192: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
-    link/ether 00:50:56:b8:6d:a3 brd ff:ff:ff:ff:ff:ff
-... ...
-28: cali5ddcf4a2547@if4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default
-    link/ether ee:ee:ee:ee:ee:ee brd ff:ff:ff:ff:ff:ff link-netnsid 7
-```
-
-* 在宿主机上 抓取 容器中指定网卡 的数据包
-```shell
-tcpdump -i cali5ddcf4a2547 -nn
-```
 ***
 ### `ps`和`top`
 #### 1.查看线程信息

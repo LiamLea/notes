@@ -8,3 +8,9 @@
 
 #### 2.TCP11中状态
 ![](./imgs/tcp_01.gif)
+
+#### 3.tcp receive window（影响网络传输性能）
+* tcp接收缓冲区，用于缓冲还没有被应用处理的数据
+* tcp hearder中会包含window size字段，告诉对方，自己还能接收多少字节的数据
+  * 即对方就知道发送多少数据合适了，当发送数据后
+  * 本地接收到数据，会返回一个acknowledgment报文，header中同样包含window size字段
