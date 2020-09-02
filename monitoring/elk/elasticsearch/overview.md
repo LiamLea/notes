@@ -7,18 +7,11 @@
   * 正常索引：以文档ID作为索引，以文档内容作为记录
   * inverted index：以文档内容作为索引，以文档id作为记录
 
-#### 1.类比数据库
-```mermaid
-graph LR
-A("indices(库)")-->B("types(表)")
-B-->C("documents(一行记录)")
-C-->D("fields(字段)")
-```
-
 #### 2.核心概念
 ```shell
 index         #documents的集合
-type          #类似表
+type          #类似表，7.0版本，已经弃用type（因为type会影响性能）
+              #一个index中，不会有多个type
 document      #fields的集合（一条json记录）
 field         #key-value键值对
 
@@ -37,10 +30,6 @@ mappings      #用来定义该index中各字段的属性（比如有一个字段
   * 1个副本
 
 ![](./imgs/overview_02.png)
-
-  * 2个副本
-
-![](./imgs/overview_03.png)
 
 #### 3.角色
 ES集群给每个节点分配不同角色，每种角色干的活都不一样
@@ -84,3 +73,21 @@ curl IP:POTT/_cat/health    #一个个试
 ```shell
 curl IP:PORT/_cat/shards
 ```
+
+***
+
+### Aggregations（聚合）
+#### 1.有4类聚合
+##### （1）bucketing
+用于生成buckets的聚合方式
+每个bucket都有 一个**key**（key用于标识该bucket） 和 一个**document条件**
+当执行聚合时，会对每个document进行条件评估
+如果，document符合某个backet的条件，则该document属于该bucket
+最后，会返回多个backets
+
+##### （2）metric
+计算一组document的数值指标
+
+##### （3）matrix（试验阶段）
+
+##### （4）pipeline

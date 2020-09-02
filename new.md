@@ -232,7 +232,7 @@ awk 'NR==1{print};/xx/{print}' xx
   awk 'BEGIN{print "title1 title2"}/xx/{print}' xx
 ```
 ##### 33.WAL：write-ahead logging
-  预写日志，更改首先记录在日志中（日志存储在稳定的存储上），然后再将更改写入数据库
+预写日志，更改**首先记录在日志**中（日志存储在稳定的存储上），然后**再将更改写入数据库**
 
 ##### 34.以指定用户身份执行命令
 （1）且获得该用户的环境变量
@@ -403,3 +403,17 @@ stat /etc/httpd/logs/error_log
 ```shell
 umount -f <PATH>
 ```
+
+#### 50.Stream（流）
+流表示对象（对象通常是字节，但不是一定）的序列
+流的典型操作：
+* read one byte，Next time you read, you'll get the next byte
+* read several bytes
+* seek (move your current position in the stream, so that next time you read you get bytes from the new position)
+  * 输入输出流不能seek，除非有缓冲
+* write one byte
+* write several bytes into the stream
+* skip bytes from the stream
+* push back bytes into an input stream（放回）
+* peek (look at bytes **without reading them**, so that they're **still there in the stream** to be read later)
+  * peek函数返回当前指针指向的字符，指针不会向后移动
