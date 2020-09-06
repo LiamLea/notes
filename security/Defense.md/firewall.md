@@ -116,9 +116,11 @@ iptables-save > /etc/sysconfig/iptables
 
 #### 7.相关应用
 ##### （1）nat表的应用
+
 ```shell
-iptables -t nat -A POSTROUTING -s <SRC_IP>  -j SNAT --to-source <NEW_SRC_IP>
 #选择路由之后，将源ip地址修改为网关的公网ip地址(SNAT:源地址转换)
+
+iptables -t nat -A POSTROUTING -s <SRC_IP_OR_MASK>  -j SNAT --to-source <NEW_SRC_IP>
 ```
 * 如果网关的公网ip不是固定的（指定转换成指定网卡的ip）
 ```shell
