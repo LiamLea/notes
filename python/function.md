@@ -149,6 +149,7 @@ result = func_test('1','2','one')
 ```
 ***
 ### 常用函数
+
 #### 1.生成序列数（返回的是一个可迭代对象）
 ```python
 range(n)          #不包含最后一个数,默认从0开始
@@ -176,16 +177,23 @@ range(n,m)
 #第二个参数是序列
   list(map(lambda x:x*2,nums))
 ```
-#### 5.偏函数(改造现有函数,将其一些参数固定下来,生成新的函数)
+
+#### 5.partial 偏函数
+##### 当有些函数的参数固定时，这个方法非常有用， 可以用来扩展参数
+* 扩展参数的例子：
+  * 回调函数
+    * 回调函数一般只接受一个参数，所以如果要扩展参数，可以使用该方法
+* 改造现有函数,将其一些参数固定下来,生成新的函
 ```python
-  import functools
-  def add(a,b,c,d,e):
-    return a+b+c+d+e
-  functools.partial(add,10,20,30,40)  //将add的前4个参数固定下来
+from functools import partial
+
+def add(a,b,c,d,e):
+  return a+b+c+d+e
+functools.partial(add,10,20,30,40)  //将add的前4个参数固定下来
 
 #改造int函数
-  int2=functools.partial(int,base=2)
-  int8=functools.partial(int,base=8)
+int2 = functools.partial(int,base=2)
+int8 = functools.partial(int,base=8)
 ```
 
 ***

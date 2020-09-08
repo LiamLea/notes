@@ -1,19 +1,42 @@
-[toc]
 # OOP(object oriented program)
+
+[toc]
+
 **在python中一切皆对象**
-### 能够定义在类中的对象
+
+### 概述
+
+####  1.能够定义在类中的对象
 * 静态变量
+
 * 属性
 `self.xx`
+
 * 绑定方法
 `self.func(self, args)`
+
 * 类方法
 通过`@classmethod`修饰的方法
 传递"cls"参数
+
 * 静态方法
 通过`@staticmethod`修饰的方法
 没有"self"和"cls"参数
+
+#### 2.访问私有变量的方法：`obj._<CLASS_NAME>__<PRIVATE_VARIABLE`
+```python
+class A:
+  def __init__(self):
+    self.__name = "lili"
+
+a = A()
+print(a._A__name)
+```
+
+***
+
 ### 类和对象的命名空间
+
 #### 1.模型
 ```plantuml
 Class A{
@@ -37,6 +60,7 @@ p2 -d->A
 A -> instance1:通过self指针
 A -> instance2:通过self指针
 ```
+
 * 类有自己的一块内存空间
 * 实例化时，对象开辟新的内存空间，并且用一个**类指针** **指向该对象的类**，用**self指针** **指向对象本身**
 * 实例调用 属性和函数 时，先在自己的命名空间中寻找，找不到会去类的命名空间中寻找
@@ -71,6 +95,8 @@ class B:
     def func1():
       super(A, self).func1()
 ```
+
+***
 
 ### 基础
 #### 1.定义一个类的基本格式
@@ -177,6 +203,7 @@ class 类名:
 在类 里面,其实并没有方法这个东西,**所有**的东西都保存在**属性**里面
 所谓的调用方法其实是类里面的一个**同名属性**指向了一个**函数**,
 **返回**的是**函数的地址**,再用 **函数()** 这种方式就可以调用它
+
 ```python
 class Demo:
     def __getattribute__(self, item):
@@ -201,19 +228,35 @@ demo.test
 demo.test("xxx")
 #会执行test_func()这个函数
 ```
+
 **注意**：再`__getattribute__`方法中，不要使用`self.xx`，因为每一次调用类的属性或方法，都会执行一次`__getattribute__`函数，可能有问题
+
+##### （8）`__enter__`和`__exit__`
+* 当执行with方法时，会调用对象的`__enter__`方法
+* `__enter__`返回值就会赋值给变量`f`
+* 当with语句执行结束时，会调用对象的`__exit__方法`
+```python
+with obj as f:      
+  pass
+```
+
 #### 5.类的特殊属性和函数
+
 * `_xx`
 以单下划线开头，表示外部是可以访问的，但是，按照约定俗成的规定，当你看到这样的属性时，意思就是，“虽然我可以被访问，但是请把我视为私有属性，不要随意访问”。
+
 * `__xx`   
 两个下划线开头，声明该属性为私有，不能在类的外部被使用或直接访问，不能被子类继承
+
 * `__xx__`
 两个下划线开头和结尾，表示这个内置的属性或函数
 
 #### 6.重载（overload）和重写（override，覆盖）
 * 重写：子类中实现父类中**同名且参数相同**的函数
 * 重载：子类中实现父类中**同名但参数不同**的函数
+
 ***
+
 ### 多继承
 * python3中都是新式类（继承object的类都是新式类）
 * 新式类遍历父类 使用的是 广度优先
@@ -224,7 +267,9 @@ demo.test("xxx")
 * 是一个开发的规范
 
 #### 1.实现抽象类
+
 * 方式一（常用）
+
 ```python
 #A就是一个抽象类
 class A:
@@ -232,7 +277,9 @@ class A:
   def func1():
     raise NotImplementedError("请在子类中重写该方法")
 ```
+
 * 方式二
+
 ```python
 from abc import ABCMeta.abstractmethod
 
@@ -242,11 +289,13 @@ class A(metaclass = ABCMeta):
   def func1():
     pass
 ```
+
 * 两种方式的区别
   * 方式一，如果没有重写func1方法，调用func1方法时才报错
   * 方式二，如果没有重写func1方法，实例化时就会报错
 
 #### 2.接口和抽象类
+
 * 抽象类是对本质的抽象（IS-A）
 * 接口是对行为的抽象，本质就是抽象类，只不过定义的都是抽象的方法（LIKE-A）
 

@@ -25,6 +25,8 @@
 * 守护线程 随着进程的结束而结束
 * 如果主线程结束了，还有其他子线程正在运行，守护线程也守护
 
+#### 4.单个操作码（即指令机器码）是线程安全的（因为有GIL的存在）
+
 ***
 
 ### 使用
@@ -55,11 +57,11 @@ t_list = []
 
 t = Thread(target = xx, args = (xx,))
 t.start()
-t_list.append(p)
+t_list.append(t)
 
 t = Thread(target = xx, args = (xx,))
 t.start()
-t_list.append(p)
+t_list.append(t)
 
 for t in t_list:
     t.join()        #阻塞，直到收到t线程返回值（即执行完毕）
@@ -142,8 +144,24 @@ def thread2():
 
 ```
 
-#### 5.上下文管理
-threading.local对象，用于为每个线程开辟一块空间来保存该线程独有的值
+#### 5.Condition（基于锁）
+通过锁的机制实现
+```python
+con = Condition()     #可以传一个lock进行，不传的话会默认创建一个
+
+with con:            #这个跟锁一样
+  pass
+
+con.wait()            #阻塞，notify才能唤醒
+                      #timeout = xx，可以设置阻塞的时间
+con.notify_all()      #唤醒所有阻塞的线程
+```
+
+#### 6.上下文管理（实现线程内的全局变量）
+threading.local对象，用于为每个线程开辟一块空间来 保存 **该线程 独有的 全局变量**
+* 本质：
+  * 定义一个全局变量，该变量是一个字典，key 为 **线程id**
+  * local对象，通过__setattr__和__getattr__，实现对线程内变量的存取
 ```python
 local_obj = threading.local()
 
