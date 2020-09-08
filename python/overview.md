@@ -45,6 +45,16 @@ source 目录/bin/activate
 #执行python脚本:python xx.py
 ```
 
+#### 2.with语句的本质
+
+* 当执行with方法时，会调用对象的`__enter__`方法
+* `__enter__`返回值就会赋值给变量`f`
+* 当with语句执行结束时，会调用对象的`__exit__方法`
+```python
+with obj as f:      
+  pass
+```
+
 ***
 
 ### 模块
@@ -143,8 +153,8 @@ seconds = timeit.timeit(stmt="func()", number = 10000)
 #### 4.with语句
 ```python
  #适用于对资源访问的场合,无论是否异常退出,都会执行必要的清理操作
-  with open('xx') as fobj1,open('yy', encodeing = "utf8") as fobj2:
-    ...
+with open('xx') as fobj1,open('yy', encodeing = "utf8") as fobj2:
+  ...
 ```
 
 #### 5.移动文件指针（当打开文件后才会有 文件指针）
@@ -352,7 +362,7 @@ a.func1()
 ##### （2）模块相关
 |属性名|说明|
 |-|-|
-|`__name__`|获取模块的名字，如果是主模块则返回`__main__`|
+|`__name__`|获取模块的`import_name`（包括路径，比如`lib.modules.nginx.scan_nginx`，如果是主模块则返回`__main__`|
 |`__doc__`|获取模块的注释|
 |`__file__`|获取模块的绝对路径|
 |`__package__`|获取模块所在的包|

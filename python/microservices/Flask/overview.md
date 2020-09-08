@@ -34,7 +34,7 @@ app = Flask("<应用名称>")
 
 #利用装饰器设置路由系统
 @app.route("<URL>")
-def func():
+def func(host = "0.0.0.0", port = 80):
   #构建响应报文
   reponse = jsonify(<DICT>)
   return reponse
@@ -160,23 +160,9 @@ def func(arg):
     return "404错误"
 ```
 
-#### 6.Blueprint（蓝图）
-相当于将一个app分割成多个小的app
-相当于对url进行分类
-当url比较多，且分布在多个文件中时，应该采用这种方式
+#### 6.一次请求中的全局变量（即一个线程中的全局变量）
 ```python
-from flask import Blueprint
+from flask import g
 
-obj = Blueprint("<NAME>", "<IMPORT_NAME>")
-
-@obj.route("<URL>")
-def func():
-    return ""
-
-#则访问由url_prefix + route组合而成的url，就会执行func视图函数
-app.register_blueprint(obj, url_prefix = "<URL>")
+g.<KEY> = <VALUE> 
 ```
-
-#### 7.上下文管理
-当有多个线程时，from flask import request就有问题，相当于都公用的一个request，应该让每个线程单独使用一个request，这个问题 可以用threading.local()解决
-当有多个协程时，上面的解决方法就不可行了
