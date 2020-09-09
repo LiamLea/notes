@@ -2,7 +2,9 @@
 [toc]
 
 ### 重要知识
-python中一切皆对象，对象的三个要素：
+python中一切皆对象，
+类也是对象，是由type类创建的对象
+对象的三个要素：
 * id（内存地址）
 * type（属于的类）
 * value（值）
@@ -45,15 +47,37 @@ source 目录/bin/activate
 #执行python脚本:python xx.py
 ```
 
-#### 2.with语句的本质
+#### 2.上下文管理器：with语句
 
 * 当执行with方法时，会调用对象的`__enter__`方法
 * `__enter__`返回值就会赋值给变量`f`
 * 当with语句执行结束时，会调用对象的`__exit__方法`
 ```python
-with obj as f:      
+class A:
+  def __enter__(self):
+    return self
+
+  def __exit__(self, type, value, traceback):
+    pass
+
+with A() as f:      
   pass
 ```
+
+#### 3.所有类都是由 type类 实例化 创建的对象
+* 默认定义类时，会自动**实例化type**，并**传入相关参数**，会生成type的对象，**该对象就是新的类**
+```python
+A = type("A", (object,), {})
+
+#等价于
+
+class A(obj):
+  pass
+```
+
+#### 3.metaclass
+用来指定当前类由谁来创建
+如果不指定，默认是type创建的类的
 
 ***
 

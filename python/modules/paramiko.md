@@ -1,7 +1,11 @@
 [toc]
 # paramiko模块
-### 概述
-### 使用
+
+### 使用（注意必须要明确关闭ssh连接）
+
+如果将ssh client赋值给一个变量，当该变量结束时，连接不会关闭
+这是paramiko的一个bug，会造成 **内存泄漏**
+
 #### 1.建立ssh连接
 ```python
 #创建SSHClient实例

@@ -34,14 +34,14 @@ finally:              #无论如何都会执行
 
 #### 3.捕获异常的堆栈信息（一般用于记录在日志中）
 ```python
-import tracebacks
+import traceback
 
 try:
     pass
 
 except <EXCEPTION>:
 
-    print(trackback.format_exc())
+    print(traceback.format_exc())
 ```
 
 #### 4.触发异常(自己编写)
