@@ -31,8 +31,9 @@
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import ProcessPoolExecutor
 
-#创建线程池（需要指定线程数）
-thread_pool = ThreadPoolExecutor(<NUMBER>)
+#创建线程池（需要指定最大线程数）
+#设置最大线程数（没有其他关于线程数的配置了）
+thread_pool = ThreadPoolExecutor(<NUMBER>)      
 
 #提交任务到线程池
 #ret是一个Future对象，用于保存结果，这一步不会阻塞（结果可能还没存入这个对象，所以叫未来对象）

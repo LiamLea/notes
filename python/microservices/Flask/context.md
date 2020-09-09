@@ -3,6 +3,9 @@
 [toc]
 
 ### 概述
+
+上下文本质就是一个 对象，将 **本次请求相关的所有数据** **封装到** **该对象中**，然后将 **该对象** 存储到 **Local**中
+
 #### 1.上下文管理
 * flask中的reuqest是线程安全的
 * 当有多个请求到来，会有多个线程来处理请求
@@ -18,8 +21,10 @@ LocalProxy（封装了LocalStack）
 
 ##### 3.有两类上下文
 实现方式都是一样的
+
 * 请求上下文：ctx = RequestContext对象
   * 保存每个线程独有的 request 和 session 相关数据
+
 * 应用上下文：app_ctx = AppContext对象
   * 保存每个线程独有的 app 和 g（全局变量）相关数据
 
@@ -41,3 +46,7 @@ LocalProxy（封装了LocalStack）
 ##### （3）请求结束
 * `ctx.pop()`
 将当前线程的ctx（即RequestContext对象）从Local中移除
+
+#### 5.flask中的Local对象为什么使用栈保存数据
+如果写web程序（web运行环境），栈中永远保存1条数据
+如果写脚本获取app信息时，可能存在app上下文嵌套关系
