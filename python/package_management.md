@@ -1,11 +1,17 @@
-### 概念
+# 包管理
+[toc]
+### 概述
+
 #### 1.包
-当一个目录下有__init__.py这个文件（可以为空）时，这个目录即为一个包
+
+当一个目录下有`__init__.py`这个文件（可以为空）时，这个目录即为一个包
+
 #### 2.包的特点
-* 可以被import（当一个目录不是包时不能被import，执行通过路径import该目录下的指定py文件）
-* 当被import时，\_\_init__.py文件里的内容就会被执行
-* 所以\_\_init__.py里一般import该目录下的文件或者文件中的方法和类等，这样import这个包后，可以直接使用该包导入的模块、函数等（如：包名.函数名）
->比如有以下目录结构  
+* 当被import时，`__init__.py`文件里的内容就会被执行
+  * 所以`__init__.py`里一般 import 该目录下的文件 或者 文件中的方法 和 类等，
+  * 这样可以从该包中，直接 import 已经import到该包中的对象
+</br>
+* 比如有以下目录结构：
 ```python
 demo
   |
@@ -19,16 +25,18 @@ demo
   |
   main.py
 ```
->\_\_init__.py  
+* `__init__.py`  
 ```python
-import package.a
-from package.b import funcA
+from . import a
+from .b import funcA
 ```
->main.py
+* `main.py`
 ```python
-import package      
-#可以直接导入包
-#导入之后，可以直接使用该包已经导入的模块、函数等
-package.a
-package.funcA
+from package import a
+from package import funcA
 ```
+
+#### 3.限制可以import的内容：`__all__`
+
+在文件中设置`__all__ = ["属性1"]`
+则该文件只有 属性1 能够被import
