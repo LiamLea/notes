@@ -8,7 +8,7 @@
 ![](./imgs/ip_01.png)
 
 ##### （1）TTL（time to live）
-每个ip都有一个TTL，没经过一个路由，TTL-1，当TTL=0时，ip包就会被丢弃（防止ip包被无限传播）
+每个ip都有一个TTL，每经过一个路由，TTL-1，当TTL=0时，ip包就会被丢弃（防止ip包被无限传播）
 可以`ping <IP> -t <TTL>`，用设置的TTL减去返回的TTL，就能知道经过了多少路由
 
 ##### （2）protocol
