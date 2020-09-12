@@ -1,4 +1,6 @@
 # logging
+[toc]
+
 ### 概述
 #### 1.作用
 * 记录用户行为 —— 数据分析
@@ -13,24 +15,11 @@
 * critical
 
 ### 使用
-#### 1.基本使用
+
+#### 1.全局配置
+不要在这里配置，在这里配置会自动生一个一个日志器，在具体的 日志器 里配置
 ```python
 import logging
-
-logging.debug("xx")
-logging.info("xx")
-logging.warning("xx")
-logging.error("xx")
-logging.critical("xx")
-```
-
-#### 2.配置
-```python
-
-#创建一个文件句柄
-fh = logging.FileHandler("文件名", encoding = "utf8")
-#创建标准错误输出的句柄
-sh = logging.StreamHandler()
 
 logging.basicConfig = (
 
@@ -47,7 +36,51 @@ logging.basicConfig = (
   handlers = [fh, sh]
 )
 ```
-#### 3.实现日志切割
+
+#### 2.创建 日志器
+日志需要到指定句柄（即输出到指定目标）
+* 创建句柄
+```python
+#创建一个文件句柄
+fh = logging.FileHandler("文件名", encoding = "utf8")
+#创建标准错误输出的句柄
+sh = logging.StreamHandler()
+```
+
+* 配置句柄（包括日志格式）
+```python
+#设置日志格式
+formatter = logging.Formatter("%(asctime)s - %(name)s  - %(levelname)s[line:%(lineno)d] - %(module)s %(funcName)s: %(message)s")
+
+#设置时间格式
+formatter.datefmt = "%Y-%m-%d %H:%M:%S"
+
+#设置句柄
+sh.setFormatter(formatter)
+```
+
+
+* 创建日志器
+```python
+#创建日志器，并给该日志器取一个名字
+logger = logging.getLogger("<CUSTOME_NAME")
+
+#配置日志器
+logger.setLevel(logging.DEBUG)    #设置打印DEBUG以上等级的日志，默认打印warning即以上等级
+logger.addHandler(<HANDLER>)
+```
+
+#### 3.使用 日志器
+```python
+logger.debug("xx")
+logger.info("xx")
+logger.warning("xx")
+logger.error("xx")
+logger.critical("xx")
+```
+
+
+#### 4.实现日志切割
 ```python
 from logging import handlers
 
@@ -56,4 +89,9 @@ rh = handlers.RotatingFileHandler("文件名", maxBytes = 1024, backupCount = 5,
 
 #按时间切割，每24小时创建新的文件，最多保留5个文件
 th = handlers.TimedRotatingFileHandler("文件名", when = "h", interval = 24, backupCount = 5， encoding = "utf8")
+```
+
+#### 5.关闭某个 日志器
+```python
+logging.getLogger(<LOGGER_NAME>).disabled = True
 ```
