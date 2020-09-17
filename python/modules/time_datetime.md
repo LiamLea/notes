@@ -26,10 +26,12 @@ time.localtime()
 #### 2.相互转换
 * 按特定格式输出 时间字符串,%a代表星期的缩写
 ```python
+#f:format，tuple -> str
 strftime('%Y-%m-%d %H:%M:%S %a')
 ```
 * 将 时间字符串 转换成9元组
 ```python
+#p:parse，str -> tuple
 strptime('2019-01-01','%Y-%m-%d')
 ```
 
