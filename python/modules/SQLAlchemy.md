@@ -21,6 +21,7 @@
 #### 1.创建数据库 连接池
 ```python
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 engine = create_engine(
     "mysql+pymysql://root:123@127.0.0.1:3306/aiops_db?charset=utf8",
@@ -44,6 +45,8 @@ session.close()
 ```
 
 #### 3.创建ORM（即类和表的对应关系）
+
+##### （1）关联并创建表
 ```python
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
@@ -55,6 +58,18 @@ class Users(Base):
 
     id = Column(Integer, primary_key = True)
     name = Column(String(32), index = True, nullable = False)
+```
+
+##### （2）与已有的表进行关联
+```python
+class Users(Base):
+    __table__ = Table('<TABLE_NAME>', Base.metadata, autoload = True, autoload_with = engine)
+
+#该类的属性就是表中的字段名
+session = Session()
+for obj in session.query(Users).all():
+  print(obj.id)
+
 ```
 
 #### 4.操作ORM（执行增删改查操作）

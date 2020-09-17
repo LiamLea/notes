@@ -22,25 +22,12 @@ For TCP: `proxy_pass backend:123`
 
 ***
 
-### 配置
+### 配置文件的结构
 
-#### 1.配置文件的结构
-##### （1）顶层contexts
+#### 1.顶层contexts
 contexts就是指令组，即用`<DIRECTIVE>{...}`括起来的指定的集合
-* events
-常规连接处理
-</br>
-* http
-HTTP traffic
-```shell
-http {
-  ...
-}
-```
-* mail
-Mail traffic
-</br>
-* stream
+
+##### （1）stream
 TCP and UDP traffic
 ```shell
 stream {
@@ -48,7 +35,23 @@ stream {
 }
 ```
 
-##### （2）virtual servers
+##### （2）http
+HTTP traffic
+```shell
+http {
+  ...
+}
+```
+
+##### （3）events
+常规连接处理
+
+##### （4）mail
+Mail traffic
+
+#### 2.子层结构
+
+##### （1）virtual servers
 在每个流量处理contexts中，都包含一个或多个server context，用于控制请求处理
 ```shell
 server {
@@ -56,11 +59,13 @@ server {
 }
 ```
 
-##### （3）继承
+#### 3.继承
 child context会继承parent context的内容，但是可以进行覆盖
 
+***
 
-#### 2.请求转发相关配置
+### 配置
+#### 1.请求转发相关配置
 ##### （1）`proxy_set_header`    
 用于修改或者添加发往后端服务器的请求头
 ```shell
