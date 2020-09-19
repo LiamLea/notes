@@ -120,3 +120,31 @@ locale -a
 ```shell
 export LANG="C.UTF-8"
 ```
+
+#### 10.getent：查找相关信息（包括域名解析等），特别通用的命令
+get entries，从管理员database中查看指定key的信息
+```shell
+getent <DATABASE> <KEY>
+```
+
+##### （1）常用database类型
+* hosts
+查看域名解析记录（包括hosts文件和DNS），会解析出域名对应的所有ip
+```shell
+getent hosts baidu.com
+```
+
+* services
+查看server名和端口号对应关系
+```shell
+getent services
+getent services 22
+getent services ssh
+```
+
+* protocols
+查看本系统支持的协议类型
+```shell
+getent protocols
+getent protocols <协议号>
+```
