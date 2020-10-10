@@ -23,7 +23,7 @@ point to point tunneling protocol
 
 #### 4.特点
 
-* pptpd server会监听在1723端口
+* pptpd server会监听在 **1723端口**
 
 ##### （1）优点
 * 由于低级别的加密，速度较快
@@ -36,7 +36,7 @@ point to point tunneling protocol
 * 防火墙很容器组织 PPTP连接
 
 #### 5.passthrough
-是路由器的一个功能，如果没有这个功能，路由器无法转发VPN流量
+是路由器的一个功能，如果没有这个功能，使用NAT的路由器无法转发VPN流量
 * 由于PPTP会加密网络层协议，导致NAT没有办法创建映射记录
   * 因为NAT需要根据 源ip + 上层协议的状态（比如端口、icmp中的id），添加映射记录
 
