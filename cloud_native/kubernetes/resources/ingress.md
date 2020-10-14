@@ -165,6 +165,11 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 
+    #往location block中加配置
+    #比如添加一个响应头 name: aa
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header name aa;
+
 spec:
   rules:
 

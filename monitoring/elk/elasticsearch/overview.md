@@ -10,7 +10,8 @@
 #### 2.核心概念
 ```shell
 index         #documents的集合
-type          #类似表，7.0版本，已经弃用type（因为type会影响性能）
+type          #已经弃用type（因为type会影响性能）
+              #类似表，7.0版本
               #一个index中，不会有多个type
 document      #fields的集合（一条json记录）
 field         #key-value键值对

@@ -1,7 +1,28 @@
 # DNS
 [toc]
 ### 概述
-#### 1.域名解析时的各项解析记录
+
+#### 1.基础概念
+![](./imgs/dns_01.gif)
+
+##### （1）stub resolver（存根解析器）
+是DNS客户端库，用于查询DNS服务器进行解析工作
+
+##### （2）recursive DNS server（cacheing DNS server，递归DNS）
+* 递归查询
+即本机无法查询到结果，会继续去其他DNS server查询
+</br>
+* 缓存查询结果
+
+##### （3）authoritative DNS server（权威DNS）
+权威DNS服务器，负责维护 指定域 中的域名信息
+
+##### （4）forwarding DNS server（转发DNS）
+查询请求转发给另外一台DNS服务器，由另外一台DNS服务器来完成查询请求
+* 客户端会自己去 转发到的DNS服务器 查询结果
+* 递归服务器会帮忙查询到结果并返回
+
+#### 2.域名解析时的各项解析记录
 
 * A记录
   将域名指向一个IPv4地址
@@ -30,7 +51,7 @@
 * PTR记录
   PTR记录是A记录的逆向记录，又称做IP反查记录或指针记录，负责将IP反向解析为域名
 
-#### 2.DNS的search选项
+#### 3.DNS的search选项
 ```shell
 #vim /etc/resolv.conf
 nameserver <DNS_SERVER>
