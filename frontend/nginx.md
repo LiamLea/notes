@@ -144,14 +144,25 @@ child context会继承parent context的内容，但是可以进行覆盖
 ***
 
 ### 配置
-#### 1.请求转发相关配置
+#### 1.转发http请求相关配置
+* 可以配置在 http、server和location 这三个block中
+* 只有当前block未配置，才会从上层继承
+  * 比如在http、server和location都配置了proxy_set_header，只有location中的生效
+  * 比如当前location中未定义proxy_set_header，会从server中继承proxy_set_header，如果server中没有，会继承http中的proxy_set_header配置
 ##### （1）`proxy_set_header`    
-用于修改或者添加发往后端服务器的请求头
-```shell
-proxy_set_header Host $http_host;
+用于修改或者添加发往后端服务器的**请求头**
+```python
+proxy_set_header <HEADER> <VALUE>;
 
+#比如：proxy_set_header Host $http_host;
 #如果不设置，转发的请求中的Host字段就是原http请求中的Host字段
 #设置后 后端服务器可以通过 Host 头得知用户访问的真正的域名，能够实现动态拼接url
+```
+
+##### （2）`add_header`
+用于添加发往客户端的**响应头**
+```python
+add_header <HEADER> <VALUE>;
 ```
 
 #### 2.常用变量
