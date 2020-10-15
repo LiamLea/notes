@@ -20,7 +20,7 @@ settings      #用来定义该index的相关配置（比如：备份数等）
 mappings      #用来定义该index中各字段的属性（比如有一个字段，名为name，可以在mapping中定义这个字段，类型为string等）
 ```
 
-#### 4.shards（数据分片）
+#### 3.shards（数据分片）
 ##### （1）primary shards（主分片）
 * es会将数据进行分片，从而减轻单台服务器上的数据量
   * 但当有一个节点宕机，部分数据会丢失
@@ -32,7 +32,7 @@ mappings      #用来定义该index中各字段的属性（比如有一个字段
 
 ![](./imgs/overview_02.png)
 
-#### 3.角色
+#### 4.角色
 ES集群给每个节点分配不同角色，每种角色干的活都不一样
 
 **（1）master**
@@ -51,29 +51,18 @@ ES集群给每个节点分配不同角色，每种角色干的活都不一样
 **（4）ingest node**
 对索引的文档做预处理
 
-#### 4.命名格式
+#### 5.命名格式
 （1）meta-filed
 元字段用下划线开头
 
-#### 5.ES中的时区是UTC（无法修改）
+#### 6.ES中的时区是UTC（无法修改）
 
-#### 6.集群状态及解决
-##### （1）集群状态为red
-red表示**不是**所有的**主分片**都可用，通常时由于某个索引的主分片为分片unassigned，只要找出这个索引的分片，手工分配即可
+#### 7.index modules
 
-##### （2）集群状态为yellow
-yellow表示所有**主分片**可用，但**不是**所有**副本分片**都可用，最常见的情景是单节点时，由于es默认是有1个副本，主分片和副本不能在同一个节点上，所以副本就是未分配unassigned
-
-##### （3）解决思路：
-* 先找出有问题的indices和nodes
-```shell
-curl IP:PORT/_cluster/health?level=indices
-curl IP:POTT/_cat/health    #一个个试
-```
-* 然后查看该节点上哪一个分片是unassigned
-```shell
-curl IP:PORT/_cat/shards
-```
+每个index都有多个modules，用于控制各个方面的内容
+常用的modules:
+* settings
+* mappings
 
 ***
 

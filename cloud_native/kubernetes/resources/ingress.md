@@ -127,6 +127,7 @@ spec:
 ***
 ### 使用
 * 把配置注入到ingress controller中（当创建了Ingress资源，就会自动注入到相应类型的ingress controller中，不需要明确指定）
+  * 一个ingress中的配置都会注入到相应主机中的 server或location block中
 * 当后端pod的ip地址改变了，ingress就会相应修改ingress controller中的配置
 * 当删除Ingress资源，注入到ingress controller中的配置也会被删除
 

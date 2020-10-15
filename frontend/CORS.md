@@ -36,7 +36,7 @@
 "Access-Control-Allow-Origin": "<具体的域>"  #这里就不能用通配符     
 ```
 
-##### （2）标识可以接受带凭证的头：Set-Cookie
+#### 3.Request header field token is not allowed by Access-Control-Allow-Headers in preflight response.
 ```shell
-"Access-Control-Allow-Headers": "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,Set-Cookie"
+"Access-Control-Allow-Headers": "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,Set-Cookie,token"
 ```
