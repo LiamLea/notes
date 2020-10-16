@@ -234,3 +234,16 @@ Managed jenkins -> Gerrit Trigger ->Add New Server
 ![](./imgs/gerrit_11.png)
 
 ![](./imgs/gerrit_12.png)
+
+***
+
+### FAQ
+
+#### 1.gerrit和gitlab冲突的问题
+* gerrit备份原先仓库，并且重新clone
+```shell
+cp -r /var/gerrit/review_site/git/backend-aiops-nx.git /tmp
+rm -rf /var/gerrit/review_site/git/backend-aiops-nx.git
+git clone --bare ssh://git@gitlab-pro-gitlab-shell.gitlab:30222/aiops-nx/backend-aiops-nx.git
+```
+* **注意:** 提交者本地仓库需要重新clone，否则如果提交者本地有提交记录，会跟gerrit的冲突

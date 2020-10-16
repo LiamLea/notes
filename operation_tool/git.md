@@ -86,6 +86,7 @@ git commit -m '该版本的详细说明'   #将暂存区的内容上传到本地
 ##### （1）将本地仓库的`<LOCAL_BRANCH>`分支 提交到名为`<REMOTE_REPO_NAME>`的远程仓库的`<REMOTE_BRANCH>`分支
 ```shell
 git push <REMOTE_REPO_NAME> <LOCAL_BRANCH>:<REMOTE_BRANCH>
+#如果远程不存在<REMOTE_BRANCH>分支，会自动创建一个临时分支，当merge之后这个分支就会消失
 ```
 
 ##### （2）设置默认的远程仓库和远程分支（即执行git push时，不需要指定远程仓库和远程分支）
