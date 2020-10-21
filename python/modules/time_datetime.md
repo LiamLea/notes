@@ -48,7 +48,7 @@ t = datetime.datetime.now()
 #属性:year,month,day,hour,minute,second,microsecond
 
 #将 datatime对象 转换成 时间字符串
-t.strftime('%Y-%m-%d %H:%M%S')  
+t.strftime('%Y-%m-%d %H:%M:%S')  
 
 #将 时间字符串 转换成datatime对象
 datetime.datetime.strptime('2019-01-01','%Y-%m-%d')      

@@ -168,21 +168,9 @@ kubectl delete node NODENAME
 #注意如果是master节点：可能会有问题
 #可能需要先通过etcdctl删除etcd中的成员
 ```
-***
-### etcdctl
 
-#### 1.语法
-```shell
-ETCDCTL_API=3 etcdctl --endpoints=127.0.0.1:2379 \    #指定版本和endpoint
-        --cacert=/etc/kubernetes/pki/etcd/ca.crt \
-        --cert=/etc/kubernetes/pki/etcd/peer.crt \
-        --key=/etc/kubernetes/pki/etcd/peer.key \
-        get 路径 --prefix --keys-only                 #查看以这个路径为前缀的所有key
-
-#get / --prefic --keys-only     列出etcd中所有的key
-#member list      列出etcd中集群的成员
-```
 ***
+
 ### FAQ
 
 #### 1.从其他节点无法访问该节点上开放的NodePort
