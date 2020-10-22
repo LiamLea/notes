@@ -62,6 +62,7 @@ class Users(Base):
 
 ##### （2）与已有的表进行关联
 ```python
+from sqlalchemy import Table
 class Users(Base):
     __table__ = Table('<TABLE_NAME>', Base.metadata, autoload = True, autoload_with = engine)
 
@@ -137,7 +138,16 @@ user_list = session.query(Users).filter( Users.name.like("li%")).all()
 user_list = session.query(Users.name).all()[1:2]
 
 #排序
-user_list = session.query(Usera).order_by(Users.name.desc()).all()
+user_list = session.query(Users).order_by(Users.name.desc()).all()
+```
+
+* 子查询（subquery）
+将多个查询在一个查询中执行，比如将一个查询的结果用作另一个查询的条件
+```python
+subquery = session.query(Users).filter(Users.id > 2).subquery
+
+#在主查询中使用子查询的字段：subquery.c.字段名    （c代表Column）
+xx_list = session.query(xx).filter(subquery.c.name == "liyi")
 ```
 
 
