@@ -3,6 +3,14 @@
 JSON(javaScript Object Notation),是一种轻量级的数据交换格式
 可以通过网络传输各种类型的数据
 采用完全独立于语言的文本格式，实现语言之间的数据交换
+#### 1.可实现的转换
+|python 数据类型|json 类型|
+|-|-|
+|dict|json对象：`{}`|
+|list, tuple|json数组：`[]`|
+|str|json字符串：`""`，且必须将特殊字符转义|
+
+#### 2.使用
 ```python
 import json
 
@@ -17,6 +25,23 @@ url='http://www.weather.com.cn/data/sk/101010100.html'
 html=request.urlopen(url)
 data=html.read()
 json.loads(data)
+```
+
+#### 3.FAQ
+##### （1）通过 sql语句 将json数据 插入到 mysql的json_filed类型字段
+利用`json.dumps()`将 **普通的字符串**（这个字符串是json对象格式的字符串）转换成 **json字符串**
+
+插入时mysql需要的是一个 `形如："xxx"` 的字符串，系统会对xxx内容中的特殊字符进行特殊处理（跟print一样），所以xxx内容需要考虑这一点，需要将特殊字符转义，不然会被系统处理成其他内容
+
+```python
+
+a = "dsd\"aaa\t"
+b = "haha " + json.dumps(a)
+
+print(b)
+
+#输出：
+#haha "dsd\"aaa\t"
 ```
 
 ***
