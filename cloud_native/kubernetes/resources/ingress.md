@@ -130,6 +130,9 @@ spec:
   * 一个ingress中的配置都会注入到相应主机中的 server或location block中
 * 当后端pod的ip地址改变了，ingress就会相应修改ingress controller中的配置
 * 当删除Ingress资源，注入到ingress controller中的配置也会被删除
+* 每个ingress都可以设置tls（即每个server block中都可以有独立的tls配置）
+  * tls是动态的，定义ingress时会被加载到共享内存中
+  * 当nginx处理请求时，会自动加载证书
 
 #### 1.清单文件
 ```yaml
@@ -189,10 +192,10 @@ spec:
   tls:
   - hosts:
 
-    #在证书中设置的主机名
+    #在证书中设置的主机名（这里必须要匹配，如果不写的话默认可能会用通配符）
     - xx
 
-    #相关证书都存放在secret中，指定secret
+    #指定已存在的secret，该server block中tls配置需要的 相关证书都存放在secret中
     #如果上面设置了颁发机构，则这里会自动生成该secret，不需要提前生成
     secretName: xx
 ```
