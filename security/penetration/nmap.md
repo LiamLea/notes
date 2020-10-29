@@ -212,6 +212,12 @@ nmap会根据当前网络状况，自动调节
 ##### （6）insane（`T6`，疯狂的）
 
 #### 5.常用组合
+* 深度扫描
 ```shell
 nmap -A -n -T5  --min-rate 100 --max-retries 2 --top-ports 100 ...
+```
+
+* 大量扫描ip
+```shell
+nmap -sn -n 3.1.0.0/16 --min-rate 10000
 ```
