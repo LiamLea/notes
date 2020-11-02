@@ -26,7 +26,7 @@ except <EXCEPTION> as e:   #多个异常:(xx1,xx2,..)
 else:                 #不发生异常会执行
     pass
 
-finally:              #无论如何都会执行
+finally:              #无论如何都会执行（但是如果捕获后还是抛出异常，这里不会执行）
     pass
 
 #继续执行下面的程序,除非上面指明退出(exit())

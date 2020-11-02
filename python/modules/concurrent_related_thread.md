@@ -169,7 +169,24 @@ con.wait()            #阻塞，notify才能唤醒
 con.notify_all()      #唤醒所有阻塞的线程
 ```
 
-#### 6.上下文管理（实现线程内的全局变量）
+#### 6.通过event管理线程
+```python
+import threading
+
+#创建事件
+event = Event()
+
+#创建线程，传入对应事件
+t1 = threading.Thread(target = <FUNC>, args = (event,))
+
+#事件相关的方法
+event.is_set()    #判断事件的标志，返回True或False，标识是主动设置的
+event.wait()      #阻塞，等待事件标志变为True
+event.set()       #将事件标志设为True
+event.clear()     #将事件标志设为False
+```
+
+#### 7.上下文管理（实现线程内的全局变量）
 threading.local对象，用于为每个线程开辟一块空间来 保存 **该线程 独有的 全局变量**
 * 本质：
   * 定义一个全局变量，该变量是一个字典，key 为 **线程id**

@@ -1,5 +1,14 @@
 # kafka
 [toc]
+
+### 概述
+
+#### 1.KafkaProducer是线程安全的，KafkaConsumer不是线程安全的
+
+#### 2.多个进程 之间不能 共享KafkaProducer
+
+***
+
 ### 使用
 #### 1.安装kafka模块
 ```shell

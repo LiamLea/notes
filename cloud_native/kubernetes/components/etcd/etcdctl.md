@@ -82,7 +82,7 @@ etcdctl del <KEY>
 etcdctl del <KEY> --prev-kv
 ```
 
-#### 6.监视一个key
+#### 6.监视一个key（即订阅）
 ```shell
 etcdctl watch <KEY>  
 #当该key发生任何命令，都会打印出来，比如：

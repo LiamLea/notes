@@ -4,7 +4,8 @@
 ### 使用（注意必须要明确关闭ssh连接）
 
 如果将ssh client赋值给一个变量，当该变量结束时，连接不会关闭
-这是paramiko的一个bug，会造成 **内存泄漏**
+这是paramiko的一个bug，会造成 **连接泄漏**
+connect一次就会产生一个新的连接，所以如果肯定多次会造成 **连接泄露**（如果要多次connect，先close）
 
 #### 1.建立ssh连接
 ```python
@@ -15,6 +16,7 @@ ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
 #连接目标机器
+#注意：每执行一次connect，会创建一个连接，之前的连接就会泄露
 ssh.connect(hostname = <IP>, port = <NUM>, username = <USER> , password = <PASSWD>)
 ```
 
