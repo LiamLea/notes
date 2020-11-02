@@ -23,10 +23,25 @@
 * `cpu_count * 1 < 进程数 < cpu_count * 2`
 * `线程数 = cpu_count * 5`
 
+#### 4.进程间数据是独立的，不能共享数据（子进程会 复制 主进程的数据）
+即子进程不能操作主进程中的数据，如果需要操作主进程中的数据可以利用回调函数
+```python
+from concurrent.futures import ProcessPoolExecutor
+
+t = []
+def call_back(future):
+  t.append(future.result())
+
+process_pool = ProcessPoolExecutor(<NUMBER>)
+
+process_pool.submit(<func_name>,*args，**kwargs).add_done_callback(call_back)
+```
+
 ***
 
 ### 使用
 #### 1.线程池和进程池
+不能清空线程池，当线程池满了，会自动清空（之前使用过的线程）
 ```python
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import ProcessPoolExecutor
@@ -36,15 +51,17 @@ from concurrent.futures import ProcessPoolExecutor
 thread_pool = ThreadPoolExecutor(<NUMBER>)      
 
 #提交任务到线程池
-#ret是一个Future对象，用于保存结果，这一步不会阻塞（结果可能还没存入这个对象，所以叫未来对象）
-ret = thread_pool.submit(<func_name>,*args，**kwargs)
+#返回一个Future对象，用于保存结果，这一步不会阻塞（结果可能还没存入这个对象，所以叫未来对象）
+future = thread_pool.submit(<func_name>,*args，**kwargs)
 
 #获取执行结果，这一步会阻塞，直到任务执行结束并返回结果
-ret.result()
+#注意：  
+#   当使用future.result这个方法时，如果线程中的任务出现异常，则程序会抛出异常，当不使用这个方式时，Future对象会自动捕获异常，不会抛给程序
+future.result()
 
 #在当前线程中，添加回调函数，添加的这个动作是非阻塞的
 #当Future对象执行完成，会自动调用该回调函数，并将Future对象作为参数传给回调函数
-ret.add_done_callback(<callback_func>)
+future.add_done_callback(<callback_func>)
 ```
 
 #### 2.当回调函数需要扩展参数时：paritial偏函数
@@ -65,6 +82,7 @@ future.done()           #判断是否完成（取消也是完成，返回True或
 
 future.result(timeout = <NUM>)    #阻塞，获取线程的执行结果
                                   #可以设置阻塞时间，超时会抛出TimeoutEorror异常
+
 future.exception()                #阻塞，获取线程发生的异常
 
 future.cancel()         #取消提交的任务，如果任务已经在线程池中运行了，就取消不了

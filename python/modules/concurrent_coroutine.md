@@ -1,5 +1,7 @@
 # coroutine（协程）
+
 [toc]
+
 ### 概述
 #### 1.协程特点
 * 是操作系统不可见的
@@ -26,6 +28,8 @@
 基于python原生的协程
 提供协程的关键字：async await
 
+***
+
 ### 使用
 #### 1.gevent
 ```python
@@ -45,20 +49,4 @@ g1 = gevent.spawn(<func>)
 
 g1.join()                 #阻塞，直到协程执行完成
 gevent.joinall(<LIST>)
-```
-
-#### 2.asyncio
-```python
-import asyncio
-
-#定义async函数
-async def func():
-    #await关键字，后面跟可能会阻塞的语句，执行到这里就会切换任务
-    #await关键字必须写在async函数中
-    await asyncio.sleep(1)
-    pass
-
-#执行async函数
-loop = asyncio.get_event_loop()
-loop.run_until_complete(asyncio.wait([func()]))
 ```

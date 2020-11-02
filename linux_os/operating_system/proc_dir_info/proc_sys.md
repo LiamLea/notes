@@ -156,3 +156,7 @@ default：应用于之后创建的网卡
 
 #### 3.`/proc/sys/net/ipv4/ip_local_port_range`
 设置 TCP和UDP 用来 选择本地端口的范围
+
+#### 4.`/proc/sys/net/core/somaxconn`
+限制了接收新 TCP 连接侦听队列的大小
+当服务器有很高的负载才需要设置这一项
