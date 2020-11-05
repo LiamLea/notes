@@ -1,6 +1,10 @@
 # cert-manager
 [toc]
+
 ### 概述
+
+***
+
 ### 部署
 [参考官网](https://cert-manager.io/docs/installation/kubernetes/)
 ```shell
@@ -14,6 +18,9 @@ helm install \
   --version v0.15.0 \
   --set installCRDs=true
 ```
+
+***
+
 ### 使用
 #### 1.创建证书签发机构
 ##### （1）方式一：Issuer（指定命名空间中的证书签发机构）
@@ -94,7 +101,7 @@ spec:
   - <FQDN>
 ```
 
-#### （2）方式二：创建Ingress时，自动生成
+##### （2）方式二：创建Ingress时，自动生成
 ```yaml
 metadata:
   annotations:
