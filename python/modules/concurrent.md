@@ -101,3 +101,51 @@ from concurrent.futures import as_completed
 for future in as_completed(future_list):
     pass
 ```
+
+***
+
+### 多进程和多线程结合
+```python
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from multiprocessing import Process,Queue
+import time
+
+#用于给 进程1 分发任务
+q1 = Queue()
+
+#用于给 进程2 分发任务
+q2 = Queue()
+
+#用于给 进程3 分发任务
+q3 = Queue()
+
+
+def task():
+    print("ttttt")
+    print(Process.ident)
+
+def func(q):
+    thread_pool = ThreadPoolExecutor(5)
+    while True:
+        thread_pool.submit(q.get())
+
+if __name__ == '__main__':
+
+    p1 = Process(target=func, args=(q1,))
+    p2 = Process(target=func, args=(q2,))
+    p3 = Process(target=func, args=(q3,))
+
+    p1.start()
+    p2.start()
+    p3.start()
+
+    q1.put(task)
+    q2.put(task)
+    q3.put(task)
+    q1.put(task)
+    q2.put(task)
+
+    time.sleep(10)
+
+
+```
