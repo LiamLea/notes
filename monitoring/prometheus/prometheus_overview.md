@@ -70,6 +70,10 @@ target的`<ip>:<port>`
 * histogram
 统计数据的分布情况
 
+#### 6.需要的资源
+##### （1）所需存储计算方式
+`needed_disk_space = retention_time_seconds * ingested_samples_per_second * bytes_per_sample`
+
 ***
 ### 基本使用
 #### 1.通过url获取exporter数据
