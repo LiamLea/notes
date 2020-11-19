@@ -22,6 +22,8 @@ from kafka import KafkaProducer
 
 #创建kafka的生产者（即会连接kafka）
 producer = KafkaProducer(bootstrap_servers = '<IP>:<PORT>')
+
+#此时如果kafka连接断开，执行下面的内容不会报错
 producer.send('<TOPIC>',b'<MSG>')    #发送的内容必须是二进制的
 producer.flush()
 ```
