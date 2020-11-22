@@ -26,3 +26,7 @@ hypervisor装在操作系统上（一般用于测试和实验环境）
 
 * Oracle VM VirtualBox
 * VMware Workstation
+
+
+#### 3.虚拟机分配
+虚拟机是具体分配在某个物理机上的，不会跨物理机，所以虚拟机的CPU和memory也是用的同一台物理机上的

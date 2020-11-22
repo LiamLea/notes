@@ -42,19 +42,33 @@
 
 
 ##### （1）partition log目录
-`<TOPIC>-<PARTITION>`
+`<TOPIC>-<PARTITION>/`
 * 比如：`topic_os_config-0/`
+* 该目录下存放多个log segment
 
-##### （2）log segemnt
+##### （2）log segment的组成
+通过`kafka-dump-log.sh --files <FILE>`能够以可读的方式查看下面某个文件的内容
 * `<OFFSET>.index`
+  * 偏移量索引文件
+  * 用于记录 offset 与 消息在log文件中的position 的映射关系
+  ```shell
+  $ ./kafka_2.11-2.4.0/bin/kafka-dump-log.sh --files ./logs/test_lil-0/00000000000000000051.index
+
+  Dumping ./logs/test_lil-0/00000000000000000051.index
+  offset: 55 position: 4280
+  offset: 59 position: 8560
+  ```
 * `<OFFSET>.log`
+  * 日志文件
+  * 每条日志的内容：
+    * 前4N个字节存放该 消息的字节长度，后面紧跟消息的内容
 * `<OFFSET>.timestamp`
-  * 比如：`00000000000000000202.log`，表示第一条消息从202 offset开始
+  * 时间戳索引文件
+  * 用于记录 offset 与 时间戳 的映射关系
 
-##### （3）log条目的内容
-前4N个字节存放该 消息的字节长度，后面紧跟消息的内容
+* 比如：`00000000000000000202.log`，表示该segment中存放的第一条消息从202 offset开始
 
-##### （4）日志操作
+##### （3）日志操作
 * 写入
 该日志允许串行追加，该追加始终会转到最后一个文件。 当该文件达到可配置的大小（例如1GB）时，它将被滚动到一个新文件。 日志有两个配置参数：M（在强制操作系统将文件刷新到磁盘之前，提供了要写入的消息数）和S（在强制刷新后的秒数内）。 这样可以持久保证在系统崩溃时最多丢失M条消息或S秒的数据。
 </br>
@@ -85,10 +99,26 @@
 
 ***
 
-### 集群
+### 集群（高可用）
 
-消费者的消费记录（offset）存储在某一个broker上的，这个broker成为协调broker
-消费者连接另一个broker，会先获取协议broker信息，然后都会协调broker上提交和获取offset
+#### 1.概述
+
+![](./imgs/kafka_02.png)
+
+##### （1）现象：
+无论访问哪一个broker，看到的内容都是一样的，包括分区和消息
+
+##### （2）原理
+* 集群时，分区其实被分配到各个broker上
+  * 只创建一个分区时，该分区数据只会存在一个broker上，该broker称为 该分区的leader broker
+  * 连接任意一个broker，会先获取leader broker信息，然后都会在leader broker上提交和获取offset
+  * 当leader broker宕机，则数据就会无法访问到
+
+* 要实现高可用：创建topic时，需要指定副本数
+  * 副本数 <= broker数量，否则创建时会报错
+  * 对于某一个分区而言，有一个leader broker，其余都是follwer broker（kafka会自动选择谁是leader，谁是follower）
+  * 所有读写操作都是在leader broker上进行的，follower broker会复制leader的数据和状态
+  * 所以当leader宕机，还可以继续使用
 
 ***
 
@@ -96,14 +126,14 @@
 
 #### 1.broker配置
 
-* 基本配置
+##### （1）基本配置
 
 ```shell
 #当前kafka server的id，在同一个集群中，id必须唯一
 broker.id=<NUM>
 ```
 
-* 监听器设置
+##### （2）监听器设置
 
 ```shell
 #监听器名称 和 安全协议 之间的映射关系（相当于创建监听器）
@@ -121,7 +151,8 @@ listeners=<PROTOCOL or LISTENER_NAME>://<IP>:<PORT>
 advertised.listeners=<PROTOCOL or LISTENER_NAME>://<IP>:<PORT>
 ```
 
-* topic相关配置
+##### （3）topic默认配置
+如果创建topic时不指定相关配置，则使用默认配置
 ```shell
 #允许自动创建topic，比如生产者需要往某个topic推数据，不需要先创建好topic
 auto.create.topics.enable=true
@@ -132,7 +163,8 @@ auto.leader.rebalance.enable
 delete.topic.enable==true
 ```
 
-* zookeeper相关配置
+##### （4）zookeeper相关配置
+
 ```shell
 #指定zookeeper地址，为了高可用可以指定多个，用逗号隔开
 #还可以指定，将数据放在zookeeper指定目录下
@@ -140,7 +172,8 @@ delete.topic.enable==true
 zookeeper.connect=<host:port>,<host:port>
 ```
 
-* 日志相关
+##### （5）日志相关
+
 日志删除的基本单位是：log segment
 ```shell
 #日志存储目录
@@ -161,8 +194,8 @@ log.retention.check.interval.ms=<NUM>
 #该大小必须设为大于日志分片的大小，否则不生效
 log.retention.bytes=<NUM>
 
+#根据 设置的时间 和 log segemnt创建的时间删除，不依赖检查时间（log.retention.check.interval.ms）
 #当设置了更小的单位时，只会按照较单位执行
-#根据时间删除，不依赖检查时间（log.retention.check.interval.ms）
 log.retention.hours=<NUM>
 log.retention.minutes=<NUM>
 log.retention.ms=<NUM>
@@ -174,22 +207,22 @@ log.flush.interval.ms=<NUM>
 #log.cleaner是关于日志压缩策略的配置
 ```
 
+#### 2.producer配置（客户端的配置）
+```python
+from kafka import KafkaProducer
 
-
-
-
-* 其他配置
-```shell
-#设置（名称:协议）的映射，一个名称就是一个listener
-#这里定义了两个listener，一个是EXTERNAL，一个是INTERNAL
-listener.security.protocol.map = EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
-
-#设置listener监听的地址（listener已经在上面定义）
-listeners = EXTERNAL://:9092,INTERNAL://:9093
-
-#对外宣称的listener地址（listener已经在上面定义）
-advertised.listeners = EXTERNAL://3.1.5.15:30909,INTERNAL:3.1.5.15:30910
-
-#用于设置broker之间进行通信时采用的listener名称
-inter.broker.listener.name = INTERNAL
+producer = KafkaProducer(**configs)
 ```
+* configs:
+
+```python
+#指定kafka broker地址
+  bootstrap_servers = "<IP:PORT>"
+
+#
+# 0表示，不等待确认消息
+# 1表示
+  acks = <NUM>
+```
+
+#### 3.consumer配置（客户端的配置）

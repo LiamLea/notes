@@ -12,3 +12,14 @@ kafka {
   codec => json             #反序列化，即输入的是json数据，反序列化成event格式
 }
 ```
+
+#### 2.file
+
+```shell
+file {
+  path => "<PATH>"
+  #存储读取到文件的位置，如果要从头读，需要将该文件先删除
+  sincedb_path => "<PATH>"
+  start_position => "beginning or end"
+}
+```

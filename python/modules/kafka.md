@@ -46,3 +46,23 @@ consumer = KafkaConsumer(*topics, **configs)
 for msg in consumer:
   print(msg)
 ```
+
+#### 4.管理topic
+```python
+from kafka import KafkaAdminClient
+from kafka.admin import NewTopic
+
+#连接kafka
+client = KafkaAdminClient(**configs)
+
+#创建topic
+my_topic = NewTopic(
+  name = "<TOPIC>",
+  num_partitions = <NUM>,
+  replication_factor = <NUM>,
+  #topic的配置，如果没有，用broker中默认的
+  topic_configs = {}
+)
+
+client.create_topics([my_topic])
+```
