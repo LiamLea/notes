@@ -87,7 +87,45 @@ kibana的数据存储在es中的.kibana索引下
 （3）修改显示格式
 ![](./imgs/kibana_09.png)
 
-#### 2.visualize（可视化）
 
-#### 3.dashboard
-由一个个visualize组成
+
+#### 3.设置filter
+
+##### （1）设置单个条件
+
+* 某个key的value包含 某个词
+```shell
+<KEY>: <TERMS>
+#比如：message: "error"
+#过滤出：message内容中有error的日志
+```
+
+* 使用通配符过滤包含某个词的内容
+```shell
+#比如：
+os:win*
+
+#如果内容为：dsdswindows10, win11111111
+#会匹配windows 10和 win11111111
+#特殊符合不会被匹配，比如逗号
+```
+
+* 存在某个key
+```shell
+<KEY>:*
+#过滤出存在这个key的日志
+```
+
+* 设置范围
+```shell
+reponse >= 400
+```
+
+##### （2）多个条件结合：
+* or
+* and
+* 括号
+
+```shell
+response:200 and not (message:error or message:info)
+```

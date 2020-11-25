@@ -217,12 +217,57 @@ producer = KafkaProducer(**configs)
 
 ```python
 #指定kafka broker地址
-  bootstrap_servers = "<IP:PORT>"
+  bootstrap_servers = <STRING or LIST>
 
-#
+#确认写入完成
 # 0表示，不等待确认消息
-# 1表示
+# 1表示，leader写入成功立即返回确认，不需要等待其他副本写入成功
+# all表示，leader写入成功并且等待所有副本写入成功，才会返回确认
   acks = <NUM>
+
+#设置缓冲的大小（字节），如果一条数据大于缓冲区大小，则无法发送
+#一般数据先放在缓冲区，当缓冲区满了，会将数发送出去
+#也可以直接flush，将数据发送出去
+#缓冲原因：当发送数据速度大于数据被发送到服务器上的速度，则会引发异常
+  buffer.memory = <NUM>
+
+#设置批处理的大小（字节）
+#批处理是将多条消息一起发送
+#批处理大小 限制 一次请求最大发送多少数据（必须小于buffer.memory大小）
+  batch.size = <NUM>
+
+#用于标识请求源
+#就能通过日志跟踪请求源，便于排查问题
+  client_id = "<STR>"
 ```
 
+* producer send时可以指定分区、设置keyd等
+
 #### 3.consumer配置（客户端的配置）
+```python
+from kafka import KafkaConsumer
+
+consumer = KafkaConsumer(*topics, **configs)
+```
+
+* configs：
+```python
+#指定kafka broker地址
+  bootstrap_servers = <STRING or LIST>
+
+#设置group id和client id
+  group_id = "<STR>"
+  client_id = "<STR>"
+
+#当没有offset记录时，该设置才生效，有以下几个值：
+# earliest  当没有offset记录，从头开始消费
+# latest    当没有offset记录，从现在开始消费
+# none      当没有offset记录，则抛异常
+auto_offset_reset = "earliest"
+
+#是否自动提交offset记录，如果不自动，需要手动i提交offset记录
+enable_auto_commit = True
+
+#用于设置最少获取多少数据，当一条消息很小时，通过此配置能够提高效率
+  fetch.min.bytes = <NUM>
+```

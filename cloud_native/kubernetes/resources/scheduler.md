@@ -80,8 +80,11 @@ spec.affinity.podAntiAffinity
 ```yaml
 spec.tolerations
 ```
+
 ***
+
 ### 基本使用
+
 #### 1.给node打标签和打污点
 ```shell
   kubectl label nodes NODENAME KEY1=VALUE1
