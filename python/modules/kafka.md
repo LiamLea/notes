@@ -21,7 +21,7 @@ pip install kafka-python
 from kafka import KafkaProducer
 
 #创建kafka的生产者（即会连接kafka）
-producer = KafkaProducer(bootstrap_servers = "<IP:PORT>")
+producer = KafkaProducer(bootstrap_servers = <STRING or LIST>)
 
 #此时如果kafka连接断开，执行下面的内容不会报错
 producer.send("<TOPIC>", b"<MSG>")    #发送的内容必须是二进制的
@@ -36,7 +36,7 @@ consumer = KafkaConsumer(*topics, **configs)
 
 # *topics，可以传入多个topic
 # **configs:
-#   bootstrap_servers = "<IP:PORT>"
+#   bootstrap_servers = "<STRING or LIST>"
 #   group_id = "<GID>"
 #   client_id = "<CID>"
 #   auto_offset_reset = "earliest"    //latest
@@ -47,7 +47,7 @@ for msg in consumer:
   print(msg)
 ```
 
-#### 4.管理topic
+#### 4.创建AdminClient
 ```python
 from kafka import KafkaAdminClient
 from kafka.admin import NewTopic

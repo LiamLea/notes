@@ -97,3 +97,32 @@ Init:N/M|有M个初始化容器，只有N个初始化容器执行成功
 Init:Error|有一个初始化容器执行失败
 Init:CrashLoopBackOff|有一个初始化容器多次执行失败
 PodInitializing</br>Running|所有初始化容器都执行成功
+
+***
+
+### 资源清单
+
+```yaml
+
+spec:
+
+  #设置使用的容器
+  containers:
+  - name: xx
+    image: xx
+    imagePullPolicy: xx
+
+    #挂在逻辑卷
+    volumeMounts:
+    - name: xx
+      mountPath: xx
+
+  volumes:
+  - name: xx
+    configMap:
+      name: xx
+
+  #设置网络，当使用主机网络时，需要进行以下设置
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet      #必须设置这一项，不然无法访问到service
+```

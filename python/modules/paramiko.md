@@ -1,11 +1,13 @@
+# paramiko
+
 [toc]
-# paramiko模块
 
 ### 使用（注意必须要明确关闭ssh连接）
 
-如果将ssh client赋值给一个变量，当该变量结束时，连接不会关闭
+* 如果将ssh client赋值给一个变量，当该变量结束时，连接不会关闭
 这是paramiko的一个bug，会造成 **连接泄漏**
-connect一次就会产生一个新的连接，所以如果肯定多次会造成 **连接泄露**（如果要多次connect，先close）
+</br>
+* connect一次就会产生一个新的连接，所以如果肯定多次会造成 **连接泄露**（如果要多次connect，先close）
 
 #### 1.建立ssh连接
 ```python
@@ -28,6 +30,7 @@ result = ssh.exec_command(<COMMAND>, timeout = None)
 
 #timeout 表示读写的超时时间，默认为None，即不会抛超时异常
 #         若超时，会抛出超时异常
+#注意：当执行的命令一直有内容输出，则timeout不生效
 ```
 
 **基本选项：**
@@ -47,8 +50,8 @@ result = ssh.exec_command(<COMMAND>, timeout = None)
 * 比如使用sudo命令时需要输入密码
 * 可以不采用pty的方式，sudo可以从标准输入中获取密码
 * `sudo -S -p ''` 这样就不会有其他干扰性的输出了
-  * -S，stdin表示从标准输入获取密码，比如：`echo xx | sudo -S ls`
-  * -p ''，表示不输入任何提示信息
+  * `-S`，stdin表示从标准输入获取密码，比如：`echo xx | sudo -S ls`
+  * `-p ''`，表示不输入任何提示信息
 ```python
 #输入
 result[0].write('xx\n')   #必须以'\n'结束
@@ -66,4 +69,19 @@ stderr=result[2].read().decode()
 ```python
 #关闭ssh连接
 ssh.close()
+```
+
+***
+
+### FAQ
+#### 1.解决阻塞在read
+```python
+client = paramiko.SSHClient()
+client.connect(addr, port, username, password)
+stdin, stdout, stderr = client.exec_command(cmd)
+
+while True:
+    print(stdout.readline())
+    if stdout.channel.exit_status_ready():
+        break
 ```

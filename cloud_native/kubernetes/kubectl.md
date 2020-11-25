@@ -173,7 +173,8 @@ kubectl describe nodes xx
 ```shell
 kubectl run NAME \          #NAME为pod控制器的名字
       --image=xx \                
-      --replicas=xx         #replicas指明副本数，至少为1，即只有1个容器
+      --replicas=xx \        #replicas指明副本数，至少为1，即只有1个容器
+      --command -- 具体名
 ```
 
 #### 2.动态扩容和缩容pods
