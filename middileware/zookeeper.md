@@ -5,20 +5,44 @@
 
 ### 概述
 
-#### 1.用途
-用来开发分布式程序
+**本质**：存储的是key-value，跟etcd差不多
+
+#### 1.数据模型
+
+* 这里所说的node统一称为：**znode**（zookeeper data node）
+
+![](./imgs/zookeeper_01.png)
+
+##### （1）namespace（类似文件系统）
+分层级的存储nodes，每个层级用`/`隔开
+通过name（即绝对路径）找到各个node，所以叫namespace
+
+##### （2）nodes 和 ephemeral nodes
+* 每个node（本质就是key），都可以设置值
+* ephemeral node，短暂节点，当创建node的会话结束，将删除该node
+
 
 #### 2.核心功能
 * 分布式一致性
-* 有一个leader节点
-* 数据树（key-value的形式存储数据）
-  * key是有层级的，跟linux中的目录一样（/为根）
 
-#### 3.特点
-* 读速度 比 写速度更快
-  * 读 可以通过任意一个节点
-  * 写 会先将写请求发送到leader，由leader完成写操作
-* 数据存储在内存中
+#### 3.集群
+
+![](./imgs/zookeeper_02.png)
+
+##### （1）leader 和 follower
+* zookeeper集群中只有一个leader，其余都是follower或者observer
+* 读请求每个server都可以自己响应
+* 写请求只有leader server能够操作，当其余server收到写请求，会转发给leader
+  * **每次写请求都需要投票**，只有获得一半以上的票数，写请求才会成功
+
+##### （2）observer
+* observer与follower区别就是不参加选举
+  * 当集群中follower过多，写请求就会更慢
+
+##### （3）选举机制
+* leader是通过选取产生的,必须获得超过一半的票数(总票数不会因为有主机宕机而变少)
+
+* 所需至少需要3台主机才能实现可高用,当一台宕机后,可以选举出新的leader
 
 #### 4.应用场景
 
@@ -36,6 +60,7 @@
 ***
 
 ### 配置
+
 ```shell
 #server.<ID>=主机名:2888:3888[:observer]
 #<ID>号不重复进行，有多少个节点，就写多少个server
@@ -45,12 +70,15 @@ server.3=192.168.1.3:2888:3888
 ```
 
 * 需要在zookeeper的数据目录下设置该节点的id
+
 ```shell
 mkdir <DATA_DIR>
 
 echo <ID> > <DATA_DIR>/myid
 ```
+
 * 启动
+
 ```shell
 
 ```
