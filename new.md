@@ -417,3 +417,8 @@ umount -f <PATH>
 * push back bytes into an input stream（放回）
 * peek (look at bytes **without reading them**, so that they're **still there in the stream** to be read later)
   * peek函数返回当前指针指向的字符，指针不会向后移动
+
+#### 51.kill父进程和其所有的子进程
+```shell
+kill -- -<PPID>
+```
