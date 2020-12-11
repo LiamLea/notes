@@ -71,6 +71,14 @@ stderr=result[2].read().decode()
 ssh.close()
 ```
 
+#### 6.使用时关闭paramiko自身的日志
+```python
+import logging
+logging.getLogger("paramiko").disabled = True
+logging.getLogger("paramiko.transport").disabled = True
+logging.getLogger("paramiko.sftp").disabled = True
+```
+
 ***
 
 ### FAQ
