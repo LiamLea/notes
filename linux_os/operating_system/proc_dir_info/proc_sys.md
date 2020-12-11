@@ -122,7 +122,7 @@ dmesg -c        #可以查看到读写的日志
 
 ***
 
-### 网络参数
+### `/proc/sys/net` —— 网络参数
 
 #### 1.socket buffer
 
@@ -154,8 +154,17 @@ default：应用于之后创建的网卡
 #注意：如果all和eth*设置的不同，需要看该选项的逻辑是OR还是AND，所以最好两个都改一下
 ```
 
-#### 3.`/proc/sys/net/ipv4/ip_local_port_range`
+#### 3.`/proc/sys/net/ipv4/ —— ipv4相关参数
+
+##### （1）`/proc/sys/net/ipv4/ip_local_port_range`
 设置 TCP和UDP 用来 选择本地端口的范围
+
+##### （2）`/proc/sys/net/ipv4/icmp_echo_ignore_all`
+不回复所有的icmp协议包
+
+##### （3）`/proc/sys/net/ipv4/icmp_echo_ignore_broadcasts`
+不回复广播的icmp协议包（包括组播的）
+比如其他主机`ping 224.0.0.1`，该主机接收到icmp的组播包，不会进行回复
 
 #### 4.`/proc/sys/net/core/somaxconn`
 限制了接收新 TCP 连接侦听队列的大小
