@@ -165,7 +165,7 @@ session.query(Users).filter(Users.id == 1).update({"name": "lier"})
 session.commit()
 ```
 
-##### 5.将两张表建立关联
+#### 5.将两张表建立关联
 
 ```python
 from sqlalchemy import relationship
@@ -186,4 +186,23 @@ class Hobby(Base):
 
     id = Column(Integer, primary_key = True)
     hobby = Column(String(32), index = True, nullable = False)
+```
+
+#### 6.使用数据库内置的函数
+```python
+from sqlalchemy import func
+#func.<FUNC_NAME>(<COLOUMN>)
+
+session.query(Users).filter(func.lower(Users.name) == "liyi").all()
+```
+
+#### 7.操作json类型数据
+
+```python
+session.query(HOST_TABLE.config["base_info"]).filter(HOST_TABLE.config["base_info"]["scan_ip"] == "3.1.5.19").all()
+```
+
+* 忽略大小写
+```python
+session.query(HOST_TABLE.config["base_info"]).filter(func.lower(HOST_TABLE.config["base_info"]["scan_ip"]) == func.json_quote("3.1.5.19")).all()
 ```

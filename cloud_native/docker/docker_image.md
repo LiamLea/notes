@@ -41,16 +41,19 @@
 |vfs|所有文件系统|
 
 #### 5.overlay2驱动
+
 ##### 5.1 特点
 * image的每一层，都会在`/var/lib/docker/overlay2/`目录下生成一个目录
 * 启动容器后，会在`/var/lib/docker/overlay2/`目录下生成一个目录（即**可写层**），会将**overlay文件系统** **挂载** 在该目录下的`merged`目录上
 
 ##### 5.2`/var/lib/docker/overlay2/<id>/`目录下可能有的内容
+
 |目录或文件|说明|
 |-|-|
-|diff（目录）|包含该层的内容|
-|lower（文件）|记录该层下面的层的信息|
-|merged（目录，可写层才有）|将底层和可写层合并后的内容|
+|diff（目录）|目录里存储 **可写层的内容**，即发生了变化的内容</br>目录层级，与容器内目录层级一样|
+|merged（目录）|目录里存储 **下面所有的层** 和 **可写层** **合并**后的内容，即容器内的文件系统|
+|lower（文件）|记录 下面所有层的 id</br>根据层的id，查看层的内容：`ll /var/lib/docker/overlay2/l/`|
+|link（文件）|记录 当前层的 id</br>根据层的id，查看层的内容：`ll /var/lib/docker/overlay2/l/`|
 
 #### 6.docker registry
 一个registry可以存在多个repository（一般一个软件有一个repository，里面存储该软件不通版本的镜像）

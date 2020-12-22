@@ -1,4 +1,7 @@
+# overview
+
 [toc]
+
 ### 概述
 
 #### 1.数据库的高可用
@@ -20,6 +23,17 @@ warm standby的服务器不能被连接，直到该服务器成为primary服务�
 
 * host standby
 host standby的服务器能够接收只读的请求
+
+#### 3.database schema
+
+是一个抽象的设计，用于描述 数据如何组织 和 数据间的关系
+database schema在不同DBMS（database management system）中是不同的：
+* 在mysql中
+  * 一个schema代表一个数据库
+* 在oracle中
+  * 一个schema代表一个数据库的一部分：属于某个用户的表和其他对象
+* 在postgrelsql中
+  * 一个schema代表一个数据库中的一个命名空间，该命名空间中存储数据库对象（如：表等）
 
 ***
 
