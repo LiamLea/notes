@@ -152,9 +152,10 @@ kubectl get TYPE NAME
 
     -o yaml
 
-    -o jsonpath='{@}'
-# {@}表示输出整个jsonpath
-# {.xx[0].xx}利用这种形式获取某个键的值
+    -o jsonpath='{$}'
+#'{<JSONPATH>}'
+#'{<JSONPATH>}xxx'
+#'{<JSONPATH}{"\n"}'
 ```
 #### 6.查询node节点的状态
 ```shell
