@@ -74,13 +74,19 @@ systemctl enable docker kubelet
 ##kubeadm config images list
 ##可以先拉取镜像，再初始化
 
-kubeadm init --control-plane-endpoint=域名:PORT \
+kubeadm init --control-plane-endpoint=域名:PORT \   
+             --apiserver-advertise-address 3.1.5.15 \
+             --apiserver-bind-port 6443 \
              --upload-certs \
              --pod-network-cidr=10.244.0.0/16 \
              --service-cidr=10.96.0.0/12 \
              --kubernetes-version=v1.17.3
 
 #如果要添加多个master节点，必须设置--control-plane-endpoint和--upload-certs
+
+#control-plane-endpoint是kubelet等组件访问apiserver的访问点
+#所以要实现服务的高可用，这个endpoint需要是个vip，不然无法实现高可用
+
 #还有其他设置：
 #  --service-dns-domain=cluster.local
 # ...
