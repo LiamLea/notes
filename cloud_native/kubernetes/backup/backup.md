@@ -21,6 +21,8 @@ kubectl get cm -n kube-system kubeadm-config -o yaml > /tmp/kubeadm-config.yaml
 
 ### 恢复master
 
+**注意**：如果有多个master，恢复其中一个（并且修改etcd的member的peer address，参考恢复etcd集群数据），然后其他master重置，重新加入就行了
+
 #### 1.重置master（不是必须，如果原先的master只是数据需要恢复，这步可以不执行）
 ```shell
 kubeadm reset

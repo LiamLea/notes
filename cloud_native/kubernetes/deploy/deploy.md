@@ -74,9 +74,9 @@ systemctl enable docker kubelet
 ##kubeadm config images list
 ##可以先拉取镜像，再初始化
 
-kubeadm init --control-plane-endpoint=域名:PORT \   
-             --apiserver-advertise-address 3.1.5.15 \
-             --apiserver-bind-port 6443 \
+kubeadm init --control-plane-endpoint=<VIP_OR_DNS>:<PORT> \   
+             --apiserver-advertise-address=<IP> \
+             --apiserver-bind-port=<PORT> \
              --upload-certs \
              --pod-network-cidr=10.244.0.0/16 \
              --service-cidr=10.96.0.0/12 \
@@ -141,7 +141,9 @@ kubeadm init phase upload-certs --upload-certs
 （2）加入该集群
 ```shell
 kubeadm join xx --token xx --discovery-token-ca-cert-hash xx \
-                --control-plane --certificate-key xx
+                --control-plane --certificate-key xx \
+                --apiserver-advertise-address=<IP> \
+                --apiserver-bind-port=<PORT>
 
 mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config

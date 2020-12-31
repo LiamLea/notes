@@ -23,6 +23,11 @@ etcdctl put <KEY> <VALUE>
 ```
 
 #### 4.查询操作
+
+```shell
+-w <FORMAT>   #已指定格式输出，比如：table、json等
+```
+
 * 查询所有key和值
 ```shell
 etcdctl get --prefix ""
@@ -171,7 +176,16 @@ etcdctl snapshot restore test.db --data-dir=<DIR>
 ```
 
 #### 11.集群有关
-* 查看集群状态
+
+##### （1）查询集群信息
+
+* 查看集群成员信息
 ```shell
-etcdctl endpoint status -w table
+etcdctl member list -w table
+```
+
+* 查看集群成员状态
+```shell
+#endpoints指定哪些，才能查看哪些节点的信息
+etcdctl endpoint status -w table --endpoints="xx,xx"
 ```
