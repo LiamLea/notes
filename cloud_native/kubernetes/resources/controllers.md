@@ -1,25 +1,29 @@
 # controllers
+
 [toc]
+
 ### 概述
-#### 1.定义
+
+#### 1.controller定义
 * **监视**集群的状态，**调整**集群的状态到**更接近** **期望**的状态
   * 通过监视apiserver，从而监视集群的状态
   * controller中的spec字段 就是 期望的状态
-#### 2.pod控制器类型
-|Controller|说明|
-|-|-|
-|ReplicaSet|用于创建pod的副本，并且控制pod副本的数量达到要求|
-|Deployment|工作在ReplicaSet之上，功能更强大</br>三层架构：</br>&emsp;Deployment控制ReplicaSet（可能有多个）</br>&emsp;ReplicaSet控制pods</br>&emsp;查看pods的详细信息时，显示的控制器也是ReplicaSet
-|DaemonSet|确保符合条件的node上只运行指定pod的一个副本|
-|Job|只要指定pod完成特定任务后退出，即不会再重启pod|
-|Cronjob|周期性运行|
-|StatefulSet|管理有状态的pod|
+
+#### 2.owner and dependent
+用来描述资源的关系，
+一个controller是一组pod的所有者，对应的这些pod，从属于该controller
+可以通过`metadata.ownerReferences`能够查看该资源（pod或控制器）的所有者
 
 ***
 
-### 使用
+### 控制器
+
 #### 1.ReplicaSet
-##### （1）资源清单
+
+##### （1）特点
+用于创建pod的副本，并且控制pod副本的数量达到要求
+
+##### （2）资源清单
 ```yaml
 apiVersion: apps/v1
 kind: ReplicaSet
@@ -51,20 +55,25 @@ spec:
 
 #### 2.Deployment
 
-##### （1）有两种更新策略（strategy）
+##### （1）特点
+* Deployment管理ReplicaSet
+  * Deployment有版本的概念，支持回滚
+  * 一个版本对应一个ReplicaSet
+* ReplicaSet管理pod
+
+##### （2）更新（生成新版本）
+当Deployment的**Pod template改变**，就会生成一个新的版本（即一个新的ReplicaSet）
+之前的ReplicaSet不会删除，只会将之前的ReplicaSet的pod的数量置为0
+
+##### （3）有两种更新策略（strategy）
 * Recreate				
   * 删一个，建一个
-  </br>
-* RollingUpdate			
+
+* RollingUpdate（默认）
   * 根据定义的最大多出数量和最少不可获得数量进行相应的操作
   * 比如：最少不可获得的数量为1，就需要先创建一个，再删除一个，保证最少不可获得的数量为1
 
-##### （2）更新的原理
-* 会创建新的ReplicaSet来控制更新后的pods
-* 原来的ReplicaSet不会删除，可以方便回滚（回滚：使得相应的ReplicaSet开始工作，使其它的不工作）
-* 默认保留的ReplcaSet数量为10
-
-##### （3）资源清单
+##### （4）资源清单
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -77,11 +86,14 @@ spec:
     matchLabels:
       xx1: xx
       xx2: xx
+
+  revisionHistoryLimit: <NUM>   #保存的版本数
   strategy:                   #指定更新策略
     type: xx
     rollingUpdate:            #当更新策略为RollingUpdate（默认的策略），这项才有效
       maxSurge: xx            #最大多出的数量
       maxUnavailable: xx      #最少不可获得数量
+
   template:
     metadata:     
     #不用指定pod的名字，会自动设置Pod的名字
@@ -94,22 +106,13 @@ spec:
       - name: xx
         image: xx
 ```
-##### （4）回滚
-```shell
-#查看有多少个版本，和版本号
-kubectl rollout history TYPE NAME		
-
-#查看每个版本具体的ReplicaSet
-kubectl get rs -l xx1=xx -o wide
-
-kubectl rollout undo TYPE NAME
-#默认回滚到上一个版本
-#--to-revision=版本号，回滚到指定版本
-```
 
 #### 3.DaemonSet（两种更新策略：OnDelete和RollingUpdate，只能先删再更新）
 
-##### （1）清单内容
+##### （1）特点
+确保符合条件的node上只运行指定pod的一个副本
+
+##### （2）清单内容
 ```yaml
 apiVersion: apps/v1
 kind: DaemonSet
@@ -134,31 +137,50 @@ spec:
         - name: 变量名
           value: 变量值
 ```
-#### 4.statefulSet（是控制器）
-##### （1）pod是有状态的
+
+#### 4.StatefulSet
+
+##### （1）特点
 * pod是有序的
-* pod名称是稳定、持久、有效、唯一：`<STATEFULSET_NAME>-<NUMBER>`
-* 重新创建pod，创建顺序是一定的，绑定的volume也是对应的
-
-##### （2）需要关联service
-注意：只有通过StatefulSet控制器创建的pod才有域名
-* 该service用于控制 该StatefulSet控制器创建的pod 所在的域
-所以
-  * service必须在StatefulSet前创建（因为需要用service控制pods所在的域，从而给每一个pod设置一个唯一的域名）
-  * service和StatefulSet必须绑定相同的pod
+  * 生成是按照{0..N-1}顺序生成的
+    * 只有当前一个pod运行且处于就绪状态，才会部署下一个pod
+  * 删除是逆序删除的
+    * 只有当前一个pod被删除了，才会删除下一下pod
 </br>
-* StatefulSet会为其管理的 pod 设置域名解析（在DNS中添加解析记录），所以唯一标识了一个pod
-  * 所在的域即是该service的域，所以pod的域名为：`<POD_NAME>.<SERVICE_NAME>.<NAMESPACE>.svc.<CLUSTERNAME>`
+* pod有唯一的标识符
+  * pod的名称：`<STATEFULSET_NAME>-<ORDINAL>`
+</br>
+* pod有唯一的网络标识（即域名，需要**headless service**）
+  * 该pod所在的域由该headless service标识
+  * 所以pod的域名为：`<POD_NAME>.<SERVICE_NAME>.<NAMESPACE>.svc.<CLUSTERNAME>`
+
+##### （2）为什么pod是有状态的
+* 每个pod都有一个唯一的标识符，和volume绑定时使用的是这个标识符
+  * 所以，当重新创建pod，会根据标识符与已存在的volume绑定
+  * 从而实现了有状态的
+
+##### （3）注意
+* pvc要在清单文件中指定
+* 删除StatefulSet，pvc不会被删除
+* 需要先创建一个headless service
+* 删除StatefulSet，不保证pod一定会被删除，所以删除StatefulSet前，先将scale降为0
+
+##### （4）其他
+StatefulSet会为每个Pod添加一个标签：`statefulset.kubernetes.io/pod-name`，这样可以为每个pod单独设置一个svc
+
+##### （5）更新策略
+* OnDelete
+需要手动删除pod，那个pod才会更新
+</br>
+* RollingUpdate（默认）
+删除一个pod，重新创建，每次只会更新一个pod，只有当该pod更新好，才会更新下一个
+  * `spec.updateStrategy.rollingUpdate.partition: <ORDINAL>`
+    * 大于等于这个序号的pod才会被更新
+    * 小于这个序号的pod不会更新，即使删除了该pod，重新生成的也是旧的
+  * 当更新模板后，引入一个问题，导致pod无法运行，回滚后，需要将当前有问题的pod先删除
 
 
-##### （3）修改更新策略：
-```yaml
-spec.updateStrategy.rollingUpdate.partition: N
-#N默认等于0，即更新所有
-#当pod的数字>=N时才会被更新，从而可以控制更新测试
-```
-
-##### （4）创建statefulSet控制器
+##### （6）创建statefulSet控制器
 ```yaml
 #创建headless-service
 apiVersion: v1
@@ -219,4 +241,44 @@ spec:
           storage: 2Gi
           #设置pv需要满足2Gi的条件（i代表按1024计算）
           #会自动匹配到符合条件的pv，并进行绑定
+```
+
+#### 5.Job
+只要指定pod完成特定任务后退出，即不会再重启pod
+
+#### 6.Cronjob
+周期性运行
+
+***
+
+### 运维
+
+#### 1.更新
+
+#### 2.回滚
+* 查看某一个controller所有版本
+```shell
+kubectl rollout history <CONTROLLER_TYPE> <CONTROLLER_NAME>
+```
+
+* 查看某一个controller某一版本的详细信息
+```shell
+kubectl rollout history <CONTROLLER_TYPE> <CONTROLLER_NAME> --revision=<NUMBER>
+```
+
+* 回滚到指定版本
+```shell
+kubectl rollout undo <CONTROLLER_TYPE> <CONTROLLER_NAME> --to-revision=<NUMBER>   #当为0时，表示回滚到最新版本
+```
+
+#### 3.暂停和恢复
+
+* 暂停
+```shell
+kubectl rollout pause <CONTROLLER_TYPE> <CONTROLLER_NAME>
+```
+
+* 恢复
+```shell
+kubectl rollout resume <CONTROLLER_TYPE> <CONTROLLER_NAME>
 ```

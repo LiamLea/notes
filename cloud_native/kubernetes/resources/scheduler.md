@@ -1,23 +1,58 @@
 # scheduler
-[toc]
-### 基础概念
-#### 1.调度分为三个过程
-* predict（预选）
-  排除不满足的节点
-</br>
-* priority（优选）
-</br>
-* select（选定）
 
-```plantuml
-card "predict（预选）" as a
-card "priority（优选）" as b
-card "select（选定）" as c
-a->b
-b->c
+[toc]
+
+### 基础概念
+
+#### 1.调度有三个过程
+
+##### （1）Filtering（筛选）
+找出所有feasible nodes（可行性节点），即满足条件的节点
+
+##### （2）Scoring（计分）
+根据得分，选出最合适的节点
+
+##### （3）Assign（分配）
+将pod分配到选出的节点上
+
+#### 2.调度需要考虑的几个方面
+
+##### （1）资源需求
+```yaml
+sepc.containers.resources.requests
 ```
 
+##### （2）根据标签或名称选择节点
+```yaml
+spec.nodeName               #直接指定node的名字
+
+spec.nodeSelector           #根据node的标签
+```
+
+##### （3）亲和性
+
+* 与节点亲和
+```yaml
+spec.affinity.nodeAffinity  #根据node的标签，分为硬亲和（requested）和软亲和（preferred）
+```
+
+* 与pod亲和（affinity）
+```yaml
+spec.affinity.podAffinity
+spec.affinity.podAntiAffinity
+```
+
+##### （4）污点（taints）
+```yaml
+spec.tolerations
+```
+
+##### （5）其他约束
+* local pv
+* 等等
+
 #### 2.亲和性（反亲和性）
+
 亲和性调度是基于标签的
 ```  
 比如：
@@ -46,13 +81,15 @@ b->c
   尽量满足亲和性额要求
 
 #### 3.污点（taints）
+
+##### （1）说明
 * 污点（taints）是node资源的属性，
 * 一个node可以又多个taints，
 * 每个taint都有一个key来命名该污点，都有一个value值来说明该污点，而且还需要定义排斥效果（effect)，
 * node会判断pod能不能忍受它身上的所有污点，如果不能忍受某个污点，会则执行该污点的排斥效果（effect）
 * pod通过tolerations来定义能够忍受的污点
 
-**三种排斥效果（effect）**：
+##### （2）三种排斥效果（effect）
 * NoSchedule			
 仅影响调度过程，对现存pod不产生影响
 </br>
@@ -62,37 +99,18 @@ b->c
 * PreferNoSchedule		
 仅影响调度过程，不能容忍的pod实在找不到node，该node可以接收它
 
-#### 4.影响调度的方式
-
-##### （1）节点选择器
-```yaml
-spec.nodeName               #直接指定node的名字
-spec.nodeSelector           #根据node的标签
-spec.affinity.nodeAffinity  #根据node的标签，分为硬亲和（requested）和软亲和（preferred）
-```
-##### （2）pod的亲和性
-```yaml
-spec.affinity.podAffinity
-spec.affinity.podAntiAffinity
-```
-
-##### （3）污点调度（taints）
-```yaml
-spec.tolerations
-```
-
 ***
 
 ### 基本使用
 
 #### 1.给node打标签和打污点
 ```shell
-  kubectl label nodes NODENAME KEY1=VALUE1
-  kubectl taint nodes NODENAME KEY1=vAVLUE1:EFFECT
+kubectl label nodes NODENAME KEY1=VALUE1
+kubectl taint nodes NODENAME KEY1=vAVLUE1:EFFECT
 ```
 
 #### 2.删除标签和污点
-```
-  kubectl label nodes NODENAME 标签名-
-  kubectl taint nodes NODENAME 污点名-
+```shell
+kubectl label nodes NODENAME 标签名-
+kubectl taint nodes NODENAME 污点名-
 ```

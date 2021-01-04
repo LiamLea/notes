@@ -77,7 +77,7 @@ target的`<ip>:<port>`
 ***
 ### 基本使用
 #### 1.通过url获取exporter数据
-http://IP:PORT/metrics
+`http://IP:PORT/metrics`
 
 获取的数据如下：
 ```

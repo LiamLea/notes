@@ -3,7 +3,7 @@
 #### 1.有四个部分
 * 全局配置：`global`
 * 加载rule文件：`rule_files`
-* 采集配置：`scape_configs`
+* 采集配置：`scrape_configs`
 * 告警配置：`alerting`
 #### 2.基本格式
 ```yaml
@@ -89,6 +89,7 @@ scape_configs:
 
 #### 2.k8s服务发现
 从k8s的apiserver中发现targets
+
 ##### （1）能够发现5种类型的targets
 * node
 * service
@@ -125,6 +126,7 @@ kubernetes_sd_configs:
       <LABLE_OR_FIELD>: <VALUE>
 
 ```
+
 #### 3.relabel
 在采集之前，动态重写target的标签
 
