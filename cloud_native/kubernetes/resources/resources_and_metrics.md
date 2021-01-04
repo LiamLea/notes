@@ -1,6 +1,8 @@
 [toc]
+
 # resources
 ### 基础概念
+
 #### 1.容器有两个维度的资源限制
 ```yaml
 containers.resources.requests     #需求，最低保障
@@ -55,6 +57,7 @@ Mi      ----    2^20 = 1024*1024
 
 #### 4.ephemeral storage
 存储的内容都是**临时**的，pod重启后，内容会丢失
+
 ##### 4.1 存储的内容（临时的）
 * emptyDir volumes
 * 容器的日志
@@ -69,6 +72,7 @@ Mi      ----    2^20 = 1024*1024
 ```shell
 --feature-gates LocalStorageCapacityIsolation=true
 ```
+
 ##### 4.3 使用
 ```yaml
 spec.containers[].resources.requests.ephemeral-storage
@@ -93,6 +97,7 @@ kubectl describe pods xx
 **当资源不够用时，先杀死优先级的pod**
 
 ***
+
 # metrics
 ### 基础概念
 #### 1.两类指标

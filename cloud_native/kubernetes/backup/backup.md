@@ -36,9 +36,6 @@ scp /etc/kubernetes/admin.conf ~/.kube/config
 ```
 
 #### 2.恢复etcd数据（重要）
-* 注意：如果有多个master，即有多个etcd
-  * 只要恢复主etcd的数据，其他etcd会自动同步主etcd的内容
-  * 主etcd是第一个master上的etcd
 
 ```shell
 rm -rf /var/lib/etcd/
