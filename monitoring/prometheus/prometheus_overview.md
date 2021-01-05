@@ -1,11 +1,16 @@
 #overview
+
 [toc]
+
 ### 基础知识
+
 #### 1.prometheus特点
 * 所有查询基于**数学公式**
 * 采用HTTP协议 pull/push两种采集方式
+
 #### 2.架构图
 ![architecture](./imgs/overview_1.png)
+
 #### 3.组件
 * exporter
   * 客户端程序，用于pull模式
@@ -20,7 +25,9 @@
   A[自定义脚本]-->|push采集到的数据|B[pushgateway]
   B-->|push|C[prometheus]
   ```
+
 #### 4.相关名词
+
 ##### （1）metric
 * 一个metric是一个**特征**（比如：1分钟负载、内存使用量等等）
 
@@ -36,6 +43,7 @@
 
 ##### （4）instance
 * 能够抓取数据的endpoint
+
 ##### （5）job
 * 具有相同目的的insance的集合
 * 举例：
@@ -44,21 +52,19 @@
     * instance 2: 1.2.3.4:5671
     * instance 3: 5.6.7.8:5670
     * instance 4: 5.6.7.8:5671
+
 ##### （6）target（重要）
 * targets指采集目标，一个target就相当于一个endpoint
 
 #### 5.标签（label）
-##### （1）内部标签
+
+##### （1）元标签（meta label）
 * 以`__`开头的label供内部使用，不会出现在最终的时间序列中
-  * 以`__meta`开头的是元标签（meta label）
+  * 元标签会影响配置，详情见prometheus_config
 
-##### （2）抓取时自动生成的标签
-* job
-target所属的job（即在配置文件中配置的`job_name`）
-</br>
-* instance
-target的`<ip>:<port>`
-
+##### （2）抓取时自动生成的标签（通过配置文件或者元标签生成）
+* `job="在配置文件中配置的job_name"`
+* `instance="<ip>:<port>"`
 
 #### 6.metrics的主要类型
 * gauge
@@ -71,11 +77,14 @@ target的`<ip>:<port>`
 统计数据的分布情况
 
 #### 6.需要的资源
+
 ##### （1）所需存储计算方式
 `needed_disk_space = retention_time_seconds * ingested_samples_per_second * bytes_per_sample`
 
 ***
+
 ### 基本使用
+
 #### 1.通过url获取exporter数据
 `http://IP:PORT/metrics`
 

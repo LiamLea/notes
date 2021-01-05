@@ -6,7 +6,7 @@
 分为两个部分：
 * 告警规则在prometheus server中配置
 * 触发的告警被发往alertmanager，alertmanager负责管理告警
-  * 聚合（aggregation）
+  * 分组（grouping）
   * 抑制（inhibition）
   * 静默（silencing）
   * 通过邮件等发送告警
@@ -15,8 +15,9 @@ Prometheus会周期性的对告警规则进行计算，如果满足告警触发�
 
 #### 2.相关特性
 ![](./imgs/alertmanager_overview_02.png)
-##### （1）聚合（aggregation）
-当有多个类似的告警时，只发送一个告警通知
+
+##### （1）分组（grouping）
+将有相似性质的告警，分成一组，只发送单个通知
 
 ##### （2）抑制（inhibition）
 指当某一告警发出后，可以停止重复发送由此告警引发的其它告警的机制

@@ -28,7 +28,9 @@ kubectl api-version     #会有metrics相关的项
 kubectl top nodes
 kubectl top pods
 ```
+
 ***
+
 # kube-state-metrics
 
 ### 概述
