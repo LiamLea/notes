@@ -22,6 +22,9 @@ groups:
     - <rule>
 ```
 
+#### 2.rules评估的时间间隔
+在prometheus_config的全局配置中设置
+
 ***
 
 ### recoding rule
@@ -51,7 +54,7 @@ alert: <NAME>
 #触发告警的表达式
 expr: <PromQL>
 
-#评估等待时长，只有当触发条件持续一段时间后才发送告警
+#等待时长，在等待时间内，如果这个告警恢复了，则alerts处于pending状态（即未发送状态）
 for: <duration | default = 0s>
 
 #添加或覆盖之前的标签（标签很重要，用于对告警进行分类）

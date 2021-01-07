@@ -20,7 +20,7 @@
 ```yaml
 global:
   scrape_internal: 15s           #采集间隔
-  evaluation_internal: 15s      #监控规则评估的间隔，看是否达到告警要求
+  evaluation_internal: 15s      #rules评估的间隔，看是否达到告警要求
 
 #配置告警发往哪里
 alerting:

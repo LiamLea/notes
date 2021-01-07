@@ -2,7 +2,7 @@
 
 ### pipeline内容配置（`xx.conf`）
 
-```shell
+```ruby
 input {
 }
 
@@ -19,27 +19,27 @@ output {
 `key => value` 相当于 `key: value`
 
 ##### （1）字符串
-```shell
+```ruby
 name => "liyi"
 ```
 ##### （2）数组（常用列表）
-```shell
+```ruby
 users => [ {id => 1, name => bob}, {id => 2, name => jane} ]
 ```
 
 ##### （3）列表
-```shell
+```ruby
 path => [ "/var/log/messages", "/var/log/*.log" ]
 uris => [ "http://elastic.co", "http://example.net" ]
 ```
 
 ##### （4）bool类型
-```shell
+```ruby
 ssl_enable => true
 ```
 
 ##### （5）hash（也就是字典）
-```shell
+```ruby
 #注意使用空格分隔，而不是逗号分隔
 match => {
   "field1" => "value1"
@@ -49,7 +49,7 @@ match => {
 ```
 
 ##### （6）数字
-```shell
+```ruby
 age => 18
 ```
 
@@ -74,7 +74,7 @@ age => 18
 如果需要引用os字段的内容：`"[ua][os]"`
 
 注意在hash（即字典）类型中，字段的引用：`.`
-```shell
+```ruby
 mutate {
   convert => {
     "request.time" => "float"   #也就是[request][time]
@@ -86,7 +86,7 @@ mutate {
 格式化和字段引用的区别，格式化引用时，字符串内会有其他内容：
 `"操作系统为：%{[ua][os]}"`和`"[ua][os]"`
 `"类型为：%{type}"`和`[type]`
-```shell
+```ruby
 output {
   statsd {
   increment => "apache.%{[response][status]}"   #会用 key为[reponse][status]的值 的值，填充 %{...}
@@ -98,7 +98,7 @@ output {
 ```
 
 ##### （3）条件判断
-```python
+```ruby
 if <EXPRESSION> {
   ...
 } else if <EXPRESSION> {
@@ -115,7 +115,7 @@ if <EXPRESSION> {
   * 复合表达式：`and, or, nand, xor, !`
 
 比如:
-```python
+```ruby
 filter {
   if [action] == "login" {
     mutate { remove_field => "secret" }
@@ -126,14 +126,14 @@ filter {
 #### 3.特殊字段：`@metadata`
 output时，不会输出该字段
 输出`@metadata`字段
-```python
+```ruby
 output {
   stdout { codec => rubydebug { metadata => true }}
 }
 ```
 
 #### 4.使用系统的环境变量：`${}`
-```shell
+```ruby
 ${<VAR>}    #如果不存在<VAR>这个环境变量，启动logstash会报错
 ${<VAR>:<DEFAULT_VAR>}    #如果不存在<VAR>这个环境变量，会用默认值：<DEFAULT_VAR>
 ```
