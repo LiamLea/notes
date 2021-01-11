@@ -438,3 +438,10 @@ kill -- -<PPID>
 
 #### 52.`kubectl edit cm xx`导致data中的数据变为一行
 解决方法：修改后，确保data中的每一行后面没有空格
+
+#### 53.查看网络设备的参数
+```shell
+modinfo /lib/modules/3.10.0-957.el7.x86_64/kernel/drivers/net/bonding/bonding.ko.xz
+```
+
+#### 54.ping 本地的任何ip，其实都是ping的`127.0.0.1`
