@@ -34,3 +34,10 @@
 * 广播域 是逻辑上的，在数据链路层
 
 ![](./imgs/overview_01.png)
+
+
+#### 6.BUM frame
+* broadcast
+* unkown-unicast
+  当目的地址不在fdb中时，会将该包广播出去（这种方式现在已经不用，因为会先用arp获取地址）
+* multicast

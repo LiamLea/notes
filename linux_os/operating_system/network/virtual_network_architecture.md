@@ -119,7 +119,22 @@ ip netns exec ns2 ip link set veth1 up
 
 ![](./imgs/bridge_01.png)
 
-#### 2.设置
+#### 2.bridge特点
+
+##### （1）bridge不配置ip，无法处理网络层数据包
+* 如果需要处理ip数据包，需要在交换机上配置ip
+  * 路由等都是在bridge上进行的（不是在bridge接口上）
+
+##### （2）bridge上的interface，无法处理网络层数据包
+因为协议栈中定义了特定的函数处理bridge interface接收到的数据包，不会做其他额外处理
+* 所以bridge接口配置ip没有任何意义
+* 把物理端口绑定到bridge上，就无法连接外网了
+  * 因为此时物理端口无法处理ip包，所以此时配置在物理端口上的对外ip就失效了
+  * 可以将对外ip配置到bridge上，就可以与外界通信了
+  * 或者直接从协议栈走，不将物理端口绑定到bridge上
+* veth pair，绑定在bridge上的一端无法处理ip包，未绑定的一端可以处理
+
+#### 3.设置
 ```shell
 ip link add br0 type bridge
 ip link set tap1 master br0
@@ -135,6 +150,11 @@ ip link set veth1 master br0
 bridge link show
 ```
 ![](./imgs/bridge_02.png)
+
+##### （2）查询fdb（forwading database）
+```shell
+bridge fdb show
+```
 
 ***
 
@@ -192,6 +212,8 @@ ip link add eth0.3 link eth0 type vlan id 3
 * 隧道协议，用于解决传统vlan只能划分4096个的问题
 * 用UDP封装二层数据帧
 ![](./imgs/vxlan_01.png)
+
+#### 2.详细查看：`Architecture/protocol/vxlan.md`
 
 ***
 

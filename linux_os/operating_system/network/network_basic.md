@@ -30,6 +30,7 @@ Kernel Space           |
                       wire
 ```
 
+
 #### 2.network namesapce
 
 ##### （1）ip netns命令
@@ -73,8 +74,42 @@ ln -s /proc/<PID>/ns/net /var/run/netns/<CUSTOME_NAME>
 #ip netns list就可以看到该netns
 ```
 
+#### 3.`ifindex`和`iflink`
 
-#### 3.判断设备属于何种类型（TUN/TAP、veth等）
+##### （1）在同一network namespace下，`ifindex`是唯一的
+
+##### （2）`iflink`标识对端设备`ifindex`
+* 如果iflink等于ifindex（比如：`bridge`、`ens192`等）
+  * 表示该设备没有对端设备
+* 如果iflink不等于ifindex（比如：`veth pair`）
+  * 则iflink则为对端设备的ifindex
+  * 还需要知道**对端设备所在的netns**，才能定位到对端设备
+  ```shell
+  $ ip link
+
+  #其中，link-netnsid标识了对端设备所在的netns
+  6: vethbb74a593@if3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default
+    link/ether 5a:56:4d:b4:06:0b brd ff:ff:ff:ff:ff:ff link-netnsid 0
+  7: veth5d181a6f@if3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue master cni0 state UP mode DEFAULT group default
+    link/ether 1a:a0:c8:b2:47:57 brd ff:ff:ff:ff:ff:ff link-netnsid 1
+  ```
+
+##### （3）有对端设备的接口的命名方式：`@`
+* 当对端设备也在该netns中时
+  * `<ifname>@<peername>`
+
+* 当对端设备在其他netns中时
+  * `<ifname>@if<iflink>`
+
+#### 4.`netnsid`和`link-netnsid`
+
+##### （1）`netnsid`唯一标识netns
+* root netns没有netnsid
+* 先被使用的netns（不是先创建的），会先分配netnsid（从0开始）
+
+##### （2）`link-netnsid`标识对端设备所在的netns的id
+
+#### 5.判断设备属于何种类型（TUN/TAP、veth等）
 
 * 判断设备属于哪种类型
 ```shell
