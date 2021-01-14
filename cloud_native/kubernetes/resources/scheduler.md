@@ -17,6 +17,8 @@
 
 #### 2.调度需要考虑的几个方面
 
+具体的策略看文档：https://kubernetes.io/docs/reference/scheduling/policies/
+
 ##### （1）资源需求
 ```yaml
 sepc.containers.resources.requests

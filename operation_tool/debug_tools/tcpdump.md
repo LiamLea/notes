@@ -1,9 +1,28 @@
+# tcpdump
+
 [toc]
 
-### tcpdump
-抓包阶段 是在 包被iptables 处理 **之前**
+### 概述
+
+#### 1.tcpdump和iptables的处理顺序
+* inbound流量
+```shell
+Wire -> NIC -> tcpdump -> netfilter/iptables
+```
+
+* outbound流量
+```shell
+iptables -> tcpdump -> NIC -> Wire
+```
+
+***
+
+### 使用
+
 #### 1.在宿主机上抓取容器中某个网卡的数据包
+
 ##### （1）方法一
+
 默认`ip netns`无法显示和操作容器中的netns
 * 获取容器的pid
 ```shell
@@ -26,13 +45,16 @@ ln -s /proc/<PID>/ns/net /var/run/netns/<CUSTOME_NAME>
 ```shell
 ip netns exec <CUSTOME_NAME> <COMMAND>
 ```
+
 ##### （2）方法二
+
 * 进入容器执行
 ```shell
 $ cat /sys/class/net/<INTERFACE>/iflink
 
 28
 ```
+
 * 在宿主机执行
 ```shell
 $ ip link
