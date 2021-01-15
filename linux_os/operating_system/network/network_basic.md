@@ -4,8 +4,11 @@
 
 ### 概述
 
+#### 1.netfilter
+![](./imgs/netfilter_01.png)
 
-#### 1.物理网卡
+
+#### 2.物理网卡
 ```            
                 +-------------+   
                 | Socket API  |   
@@ -31,7 +34,7 @@ Kernel Space           |
 ```
 
 
-#### 2.network namesapce
+#### 3.network namesapce
 
 ##### （1）ip netns命令
 
@@ -74,7 +77,7 @@ ln -s /proc/<PID>/ns/net /var/run/netns/<CUSTOME_NAME>
 #ip netns list就可以看到该netns
 ```
 
-#### 3.`ifindex`和`iflink`
+#### 4.`ifindex`和`iflink`
 
 ##### （1）在同一network namespace下，`ifindex`是唯一的
 
@@ -101,7 +104,7 @@ ln -s /proc/<PID>/ns/net /var/run/netns/<CUSTOME_NAME>
 * 当对端设备在其他netns中时
   * `<ifname>@if<iflink>`
 
-#### 4.`netnsid`和`link-netnsid`
+#### 5.`netnsid`和`link-netnsid`
 
 ##### （1）`netnsid`唯一标识netns
 * root netns没有netnsid
@@ -109,7 +112,7 @@ ln -s /proc/<PID>/ns/net /var/run/netns/<CUSTOME_NAME>
 
 ##### （2）`link-netnsid`标识对端设备所在的netns的id
 
-#### 5.判断设备属于何种类型（TUN/TAP、veth等）
+#### 6.判断设备属于何种类型（TUN/TAP、veth等）
 
 * 判断设备属于哪种类型
 ```shell

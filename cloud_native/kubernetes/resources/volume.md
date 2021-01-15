@@ -1,6 +1,9 @@
 # volume
+
 [toc]
-### 基础概念
+
+### 概述
+
 #### 1.在kubernetes中，存储卷是针对pod而言的，而不是container
 * 首先需要创建存储卷，即给基础架构容器创建存储卷
 * 然后容器需要挂载存储卷，即使用基础架构容器的存储卷
@@ -46,7 +49,9 @@
 #一般通过命令生成相应配置文件模板或者直接创建
 kubectl create secret 类型 ... --dry-run -o yaml
 ```
+
 #### 3.pvc
+
 persistent volume claim，是一种资源
 是一个抽象的概念，根据设定的条件，绑定相应的pv资源（和pv是一一对应的关系）
 * 会自动匹配符合条件的pv，从而进行绑定
@@ -55,7 +60,15 @@ persistent volume claim，是一种资源
 #### 4.pv（是集群级别的资源，不属于某个名称空间，所有名称都可以用）
   persistent volume，是一种资源
   是存储卷，映射到指定的后端存储空间（能够映射各种存储空间）
-#####  （1）三种AccessModes
+
+
+##### （1）与pvc关系
+通过`claimRef`字段，建立与pvc的关系
+```shell
+kubectl get pv <PV> -o yaml
+```
+
+#####  （2）三种AccessModes
 * ReadWriteMany
 能被多个节点以读写方式挂载
 </br>
@@ -63,15 +76,30 @@ persistent volume claim，是一种资源
 只能被一个节点以读写方式挂载
 </br>
 * ReadOnlyMany
-##### （2）两种pv回收策略（如何使用released pv）
+
+##### （3）两种pv reclaim policy（回收策略）
+
+不管哪种策略，实际并没有删除磁盘上的数据，删除的只是k8s资源
+
 * Retain（静态pv默认）
-  * 当pvc与pv解除绑定，保留pv资源（不删除pv）
-  * 并且会保留原先绑定的pvc的信息（比如：uuid），所以即使删除了pvc，这个pv也是无法使用的，重新创建pvc，也是无法使用的
-  * 如果需要使用这个pv，需要删除该pv中的pod信息，即**claimRef**
+  * 当删除与其绑定的pvc，将对应的pv状态置为released（即不对pv进行回收）
+  * 但是该pv是无法使用的，因为其还保留了pvc的信息（`claimRef`）
+  * 删除`claimRef`字段，就可以使用该pv了
 
 * Delete（动态pv默认）
-  * 一般只有动态pv能设置成Delete=
-  * 当pvc与pv解除绑定，删除pv（动态nfs还会把使用的目录打包，逻辑相当于删除了数据，实际是没有删除的）
+  * 当删除与其绑定的pvc，对应的pv也会被删除（即对pv进行回收）
+    * 动态nfs还会把使用的目录打包，逻辑相当于删除了数据，实际是没有删除的
+  * 一般只有动态pv能设置Delete回收策略
+
+##### （4）pv的4种阶段
+* Avaliable
+  * 可使用的状态
+* Bound
+  * 被使用的状态
+* Released
+  * 对应的pvc被删除了，但集群还未回收该pv（即该pv无法使用）
+* Failed
+  * 自动回收该pv失败了
 
 #### 5.StorageClass
 * 默认pv是不属于任何StroageClass的
@@ -81,11 +109,9 @@ persistent volume claim，是一种资源
 * 利用StorageClass可以实现动态pv
 
 #### 6.动态pv
-  当创建pvc后，会自动生成pv与之绑定
-
-  自动创建的 PV 以${namespace}-${pvcName}-${pvName}这样的命名格式创建在 NFS 服务器上的共享数据目录中
-
-  而当这个PV被回收后会以archieved-${namespace}-${pvcName}-${pvName}这样的命名格式存在 NFS 服务器上
+* 当创建pvc后，会自动生成pv与之绑定
+* 自动创建的 PV ，会在nfs上生成目录：`${namespace}-${pvcName}-${pvName}`
+* 而当这个PV被回收后，在nfs上生成的目录会被改名：`archieved-${namespace}-${pvcName}-${pvName}`
 
 
 #### 6.mountPath和subPath（注意！！！！！）
@@ -100,7 +126,9 @@ mount操作 是将 volume 挂载 进容器内，所以volume中的内容会覆�
   ```
 
 ***
+
 ### 基本使用
+
 #### 1.emptyDir的使用
 创建一个自主式pod，使用emptyDir存储卷
 ```yaml
@@ -121,6 +149,7 @@ spec:
   - name: xx
     emptyDir: {}        #empty是对象（即字典），{}表示为空，即使用默认值
 ```
+
 #### 2.hostPath的使用
 创建一个自主式pod，使用hostPath存储卷
 ```yaml
@@ -143,6 +172,7 @@ spec:
       path: xx          #节点上的路径
       type: xx          #有多种类型，其中DirectoryOrCreate，表示path是一个目录，如果该目录不能存在则创建
 ```
+
 #### 3.nfs的使用
 创建一个自主式pod，使用nfs存储卷
 ```yaml
@@ -167,6 +197,7 @@ spec:
 ```
 
 #### 4.pv和pvc的使用
+
 ##### （1）创建pv资源
 ```yaml
 apiVersion: v1
@@ -238,7 +269,9 @@ spec:
     persistentVolumeClaim:
       claimName: xx           #指定已经存在的pvc的名字
 ```
+
 #### 5.ConfigMap的使用
+
 ##### （1）创建ConfigMap资源
 * 命令行
 ```shell
@@ -310,6 +343,7 @@ spec:
 #键名就是文件名
 #键值就是文件的内容
 ```
+
 #### 6.Secret的使用
 ##### （1）创建Secret资源
 ```shell
@@ -338,9 +372,11 @@ helm install my-nfs-release \
   --set nfs.path=/mnt/dev \
   stable/nfs-client-provisioner
 ```
+
 ##### （1）项目地址
 * 在github kubernetes-incubator/external-storage/nfs-client中有nfs相关的yaml文件
 * 在github上搜索external-storage就出来了
+
 ##### （2）存储信息
 * 自动创建的pv,在nfs下创建的目录名：`<namespace>-<pvcName>-<pvName>`
 * 当这个pv被删除后，会存储在nfs上，命名：`archieved-<namespace>-<pvcName>-<pvName>-<id>`
@@ -359,7 +395,9 @@ kubectl apply -f rbac.yaml        #授权
 
 kubectl apply -f deployment.yaml    #创建provisioner（即nfs的客户端）
 ```
+
 ##### （4）创建StorageClass
+
 ```yaml
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -372,7 +410,9 @@ provisioner: xx       #重要，需要指定上面创建的provisioner
 reclaimPolicy: xx     #默认是Delete，即删除pvc，则自动删除对应的pv
                       #如果设置成Retain，即删除pvc，不自动删除对应的pv
 ```
+
 ##### （5）创建一个pvc测试
+
 指定使用的storage class
 会自动创建pv，并与该pvc绑定
 ```yaml
@@ -396,6 +436,7 @@ spec:
 ```
 
 #### 8.local类型的pv的使用（使用指定node上的存储）
+
 ##### （1）创建pv资源
 ```yaml
 apiVersion: v1
@@ -425,6 +466,7 @@ spec:
           values:
           - node-1
 ```
+
 ##### （2）使用该pv资源
 ```yaml
 kind: PersistentVolumeClaim
