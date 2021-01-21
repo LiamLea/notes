@@ -20,7 +20,11 @@
 
 ##### （3）rule
 设置规则，匹配数据包（比如：dstport=80等）
-匹配原则：**匹配即停止**（即该包不会往下匹配了，因为该包jump到指定target了）
+匹配原则：一条一条匹配
+  * 匹配后，jump到指定target了
+    * 匹配某些target，就不会继续匹配了，比如：ACCEPT、DROP、REJECT
+    * 如果target为MARK，只是给包加个标记，所以还会继续匹配下面的规则
+    * 所以并**不是匹配即停止**
 
 ##### （4）target
 target描述了对包的处理过程（比如：DROP，会将匹配到的包丢弃）
@@ -48,6 +52,9 @@ target描述了对包的处理过程（比如：DROP，会将匹配到的包丢�
 |FORWARD|路由（不会 与 输入和输出 出现在同一个表中）|
 
 #### 6.常用target
+
+target也可以是某条chain
+
 |target|说明|Options|
 |-|-|-|
 |ACCEPT|接受该包||
@@ -65,12 +72,27 @@ target描述了对包的处理过程（比如：DROP，会将匹配到的包丢�
 #### 8.`iptables -nL`格式解析
 ![](./imgs/iptables_02.png)
 
+
+
+#### 9.跟踪数据包的状态（`conntrack`模块）
+详情见 conntrack.md
+|状态|说明|
+|-|-|
+|NEW|该数据包在conntrack表中，生成新的条目（一般都是发起请求的数据包）|
+|ESTABLISHED|看到了双向的数据包，比如3.1.5.19:11给3.1.5.20:80发了一个数据包，3.1.5.20:80给3.1.5.19:11发了一个数据包</br>这里的ESTABLISHED状态和conntrack表中的ESTABLISHED状态不一样<br>（conntrack表中的ESTABLISHED是tcp的状态）|
+|RELEATED|这个数据包会生成新的条目，并且和已存在的连接有关联，则这个数据包的状态就是RELATED|
+|INVALID|无效的状态，可能的原因发生了错误等|
+|UNTRACKED|未被conntrack跟踪的数据包，可以用NOTRACK target实现|
+|DNAT|目标地址改变了的包|
+|SNAT|源地址改变了的包|
+
 ***
 
 ### 使用
 
 #### 1.匹配规则
-* 匹配即停止（不会往下匹配了，因为该包jump到target了)
+* 不是匹配即停止
+  * 如果target是ACCEPT之类的，因为数据包被ACCEPT了，所以不会往下面匹配了
 * 如果没有匹配的规则,则使用默认策略
 
 #### 2.命令格式:
@@ -109,33 +131,47 @@ iptables [-t <TABLE>] <OPTIONS> [<CHAIN>] [<CONDITIONS>] [-j <TARGET> [<TARGET_O
        #如:iptables -t filter -P INPUT DROP
 ```
 
-##### （2）条件(取反:!)
+##### （2）通用条件(取反:!)
 ```shell
 数字              #匹配第几条规则,从而进行插入
--p 协议名
+-p 协议名         #支持 cat /etc/protocols 里面的所有协议
 -s 源地址
 -d 目标地址
 -i 收数据的网卡
 -o 发数据的网卡
---sport 源端口
---dport 目标端口
--p icmp --icmp-type <ICMP_TYPE>     #如:echo-request,通过抓包查看
 ```
 
 ##### （3）扩展条件(需要指定模块):
 
-* MAC地址匹配
+* tcp模块：`-m tcp`
+```shell
+--sport <source_port>
+--dport <destination_port>
+
+--tcp-flags <mask> <compared_flags>
+#<mask>指明要检查哪些标志位
+#<compared_flags>检查的结果与这里设置的比较，如果一样，表示匹配成功
+#比如：--tcp-flags FIN,SYN,RST,ACK SYN
+#检查FIN、SYN、RST、ACK这几个标志位，如果数据包只有SYN标志位设置了，其他标志位没有设置，则该数据包就被匹配
+```
+
+* icmp模块： `-m icmp`
+```shell
+-m icmp --icmp-type <ICMP_TYPE>   #如:echo-request
+```
+
+* mac模块（匹配mac地址）：`-m mac`
 ```shell
 -m mac --mac-source MAC地址
 ```
 
-* 多端口匹配
+* multiport模块（匹配多端口）：`-m multiport`
 ```shell
 -m multiport --sports 源端口列表(逗号隔开)
 -m multiport --dports 目标端口列表
 ```
 
-* IP范围匹配
+* iprange模块（匹配IP范围）：`-m iprange`
 ```shell
 -m iprange --src-range IP1-IP2
 -m iprange --dst-range IP1-IP2
@@ -179,4 +215,10 @@ iptables -t raw -A OUTPUT xx(比如：-s 1.1.1.1) -j TRACE
 ##### （3）实现端口映射
 ```shell
 iptables -t nat -A PREROUTING -d <DST_IP> -p tcp --dport <DST_PORT> -j DNAT --to-destination <NEW_DST_IP>:<NEW_DST_PORT>
+```
+
+##### （4）只允许访问外部，不允许外部访问（利用conntrack模块）
+```shell
+iptables -A INPUT -p tcp -m conntrack --ctstate ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p tcp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
 ```

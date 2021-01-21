@@ -25,7 +25,6 @@ meta: <META_TASKS>
 fail: msg="xx"      #已失败的形式退出playbook
 ```
 
-####
 ***
 
 ### 调试模块
@@ -101,7 +100,9 @@ exepect:
   responses:
     (?i)password: 123456
 ```
+
 ***
+
 ### 系统模块
 #### 1.service
 ```yaml
@@ -117,6 +118,13 @@ user:
   name: xx
   state: xx       #present和absent
 ```
+
+#### 3.reboot
+```yaml
+reboot:
+  reboot_timeout: <int | default=600>   #等待机器重启的时间，默认是600s   
+```
+
 ***
 
 ### 包管理模块
@@ -126,7 +134,9 @@ yum:
   name: <PACKAGE>
   state: <STATE>      #present、latest、absent
 ```
+
 ***
+
 ### 文件模块
 
 #### 1.copy
