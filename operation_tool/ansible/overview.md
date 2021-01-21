@@ -28,11 +28,12 @@
   常用的有：
   ```yaml
   {{groups}}                    #所有组的信息
+  {{groups['all']}}             #列出所有主机
   {{group_names}}               #当前主机所在的组
   {{inventory_hostname}}        #当前主机的主机名
   {{inventory_hostname_short}}  #当前主机的主机名的第一部分
-  {{hostvars[主机名][xx]}}       #可以获得其他主机的变量，xx为主机名
-  {{hostvars[xx][ansible_facts][xxx]}}    #所以需要有facts缓存，或者在此playbook中之前已与该主机进行过通信
+  {{hostvars['主机名']['xx']}}       #可以获得其他主机的变量，xx为主机名
+  {{hostvars['xx']['ansible_facts']['xxx']}}    #所以需要有facts缓存，或者在此playbook中之前已与该主机进行过通信
   ```
 
 #### （2）管理主机变量和组变量
