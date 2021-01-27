@@ -16,7 +16,7 @@ helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 
 #### 2.安装
 ```shell
-helm insall metrics-server stable/metrics-server -n kube-system \
+helm install metrics-server stable/metrics-server -n kube-system \
   --set args[0]="--kubelet-port=10250" \
   --set args[1]="--kubelet-insecure-tls" \
   --set args[2]="--kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP"

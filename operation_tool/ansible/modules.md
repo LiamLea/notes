@@ -7,7 +7,9 @@
 查看具体模块的参数：`ansible-doc -s <MODULE>`（s：snippet）
 
 ***
+
 ### 工具模块
+
 #### 1.meta（能够影响ansible内部执行和状态）
 ```yaml
 meta: <META_TASKS>
@@ -23,6 +25,12 @@ meta: <META_TASKS>
 #### 2.fail
 ```yaml
 fail: msg="xx"      #已失败的形式退出playbook
+```
+
+#### 3.set_fact（在任务运行时，设置变量）
+```yaml
+set_fact:
+  <VARIABLE>: <VALUE>
 ```
 
 ***

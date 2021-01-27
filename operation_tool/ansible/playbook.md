@@ -83,13 +83,20 @@ import_role: xx         #是一个task
 #### 1.控制语句
 ##### （1）条件判断：`when`
 * when使用的表达式是原生的jinja2表达式，所以变量不需要加双括号
+
 * 当when中使用了or时，记得加括号
 比如：
   ```yaml
   when: A or B and C          #只要A为真就不会判断后面
   when: (A or B) and C        #只有当A或B有一个为真且C为真，条件才成立
   ```
+
 * 判断变量是否存在：`when: xx is definded`
+
+* 判断某个值是否存在某个列表中
+  ```yaml
+  when: inventory_hostname in groups.<GROUP_NAME>
+  ```
 
 ##### （2）触发器：`notify`和`handlers`
 ```yaml

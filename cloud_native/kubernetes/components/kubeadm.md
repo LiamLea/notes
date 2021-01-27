@@ -26,6 +26,35 @@ vim /tmp/kubeadm.conf
 #使用：执行kubeadm时指定该文件
 ```
 
+```yaml
+...
+kind: InitConfiguration
+
+#相当于--apiserver-advertise-address=<IP> --apiserver-bind-port=<PORT>
+localAPIEndpoint:
+  advertiseAddress: 3.1.5.241
+  bindPort: 6443
+...
+
+---
+
+...
+kind: ClusterConfiguration
+imageRepository: k8s.gcr.io
+
+#--control-plane-endpoint=<VIP_OR_DNS>:<PORT>
+controlPlaneEndpoint: 3.1.5.241:6443
+
+#--kubernetes-version=v1.17.3
+kubernetesVersion: v1.17.3
+
+networking:
+  dnsDomain: cluster.local
+  serviceSubnet: 10.96.0.0/12
+  podSubnet: 10.244.0.0/16
+...
+```
+
 #### 2.`kubeadm init`上传的文件
 会上传以下文件，以configmap形式存储：
 * `kubeadm-config.kube-system`

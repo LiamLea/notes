@@ -5,13 +5,23 @@
 ### 概述
 
 #### 1.容器有两个维度的 资源限制
-* `containers.resources.requests`
-  * 需求，申明需要的资源
-  * **影响调度过程**
 
-* `containers.resources.limits`
-  * 限制，硬限制
-  * 达到限制，该pod会被kill
+##### （1）requests： `containers.resources.requests`
+* 需求，申明需要的资源
+* **影响调度过程**
+
+##### （2）limits： `containers.resources.limits`
+
+* 限制，硬限制
+* 达到限制，该pod会被kill（**OOMKilled**）
+
+```shell
+$ kubectl describe ...
+
+#可以查看
+Last State:     Terminated
+    Reason:       OOMKilled
+```
 
 #### 2.cpu单位
 最好用`m`表示，因为1m是最小精度

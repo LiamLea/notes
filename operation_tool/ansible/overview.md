@@ -20,6 +20,11 @@
 #### 3.变量
 
 #### （1）变量来源
+* 外部变量
+  ```shell
+  -e <KEY=VALUE>
+  -e @<FILE>    #文件可以是key=value格式的，也可以是json、yaml格式的
+  ```
 * 清单文件
 * playbook内
 * include的文件或roles

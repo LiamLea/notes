@@ -64,7 +64,7 @@ target也可以是某条chain
 |SNAT|源地址转换（可以转换port）|--to-source|
 |MASQUERADE|源地址转换（转换成外出网卡的地址，不需要手动指定），同时也可以转换源端口|--to-ports|
 |REDIRECT|端口重定向|--to-ports|
-
+|LOG|用于记录日志，可以在DROP之前，进行LOG，进行查看DROP掉了哪些|
 
 #### 7.数据包流程图
 ![](./imgs/iptables_01.png)
@@ -104,7 +104,7 @@ iptables [-t <TABLE>] <OPTIONS> [<CHAIN>] [<CONDITIONS>] [-j <TARGET> [<TARGET_O
 #j:jump
 ```
 
-##### （1）常见选项
+#### 3.常见选项
 
 * 添加规则
 ```shell
@@ -131,7 +131,7 @@ iptables [-t <TABLE>] <OPTIONS> [<CHAIN>] [<CONDITIONS>] [-j <TARGET> [<TARGET_O
        #如:iptables -t filter -P INPUT DROP
 ```
 
-##### （2）通用条件(取反:!)
+#### 4.通用条件
 ```shell
 数字              #匹配第几条规则,从而进行插入
 -p 协议名         #支持 cat /etc/protocols 里面的所有协议
@@ -141,9 +141,9 @@ iptables [-t <TABLE>] <OPTIONS> [<CHAIN>] [<CONDITIONS>] [-j <TARGET> [<TARGET_O
 -o 发数据的网卡
 ```
 
-##### （3）扩展条件(需要指定模块):
+#### 5.扩展条件(需要指定模块):
 
-* tcp模块：`-m tcp`
+##### （1）tcp模块：`-m tcp`
 ```shell
 --sport <source_port>
 --dport <destination_port>
@@ -155,36 +155,97 @@ iptables [-t <TABLE>] <OPTIONS> [<CHAIN>] [<CONDITIONS>] [-j <TARGET> [<TARGET_O
 #检查FIN、SYN、RST、ACK这几个标志位，如果数据包只有SYN标志位设置了，其他标志位没有设置，则该数据包就被匹配
 ```
 
-* icmp模块： `-m icmp`
+##### （2）icmp模块： `-m icmp`
 ```shell
 -m icmp --icmp-type <ICMP_TYPE>   #如:echo-request
 ```
 
-* mac模块（匹配mac地址）：`-m mac`
+##### （3）mac模块（匹配mac地址）：`-m mac`
 ```shell
 -m mac --mac-source MAC地址
 ```
 
-* multiport模块（匹配多端口）：`-m multiport`
+##### （4）multiport模块（匹配多端口）：`-m multiport`
 ```shell
 -m multiport --sports 源端口列表(逗号隔开)
 -m multiport --dports 目标端口列表
 ```
 
-* iprange模块（匹配IP范围）：`-m iprange`
+##### （5）iprange模块（匹配IP范围）：`-m iprange`
 ```shell
 -m iprange --src-range IP1-IP2
 -m iprange --dst-range IP1-IP2
 ```
 
-##### （4）保存规则:
+#### 6.条件取反：`!`
 ```shell
-iptables-save > /etc/sysconfig/iptables
+! -p tcp    #匹配不是tcp协议的数据包
+-p tcp -m tcp ! --dport 80    #匹配tcp协议，但目标端口不是80的数据包  
 ```
 
-#### 3.相关应用
+#### 7.custom chains（自定义链）
+* 自定义链没有默认策略
 
-##### （1）nat表的应用
+##### （1）创建链
+```shell
+iptables -N <NEW_CHAIN>
+```
+
+##### （2）往链中添加rule
+```shell
+iptables -A <NEW_CHAIN> ...
+```
+
+##### （3）使用自定义链
+```shell
+iptables ... -j <NEW_CHAIN>
+```
+
+##### （4）删除自定义链
+需要先删除链中的规则
+```shell
+iptables -X <NEW_CHAIN>
+```
+
+#### 8.通过文件批量修改iptables规则
+* 先导出rules
+```shell
+iptables-save > /tmp/iptables.rules
+```
+
+* 进行修改
+
+* 导入rules（原先的rules会被清空）
+```shell
+iptables-restore < /tmp/iptables.rules
+```
+
+#### 9.持久化iptables规则
+默认重启后，iptables就会清空
+可以在redhat上安装`iptables-services`，在debian上安装`iptables-persistent`，从而能够实现iptables规则持久化（本质就是利用iptables save/restore命令）
+
+#### 10.调试iptables（利用TRACE target）
+
+TRACE target会**标记数据包**（所以需要在最开始标记，所以在raw表中的PREROUTING链中标记是最合适的），如果某个rule匹配了该数据包，会在日志中进行记录
+
+##### （1） 开启内核功能
+```shell
+modprobe nf_log_ipv4
+sysctl net.netfilter.nf_log.2=nf_log_ipv4
+```
+
+##### （2） 添加跟踪规则（在raw表中添加）
+```shell
+iptables -t raw -A PREROUTING <这里填需要跟踪的包的条件> -j TRACE
+```
+
+##### （3） 查看日志：`/var/log/messages`
+
+***
+
+### 相关应用
+
+#### 1.nat表的应用
 
 ```shell
 #选择路由之后，将源ip地址修改为网关的公网ip地址(SNAT:源地址转换)
@@ -196,28 +257,12 @@ iptables -t nat -A POSTROUTING -s <SRC_IP_OR_MASK>  -j SNAT --to-source <NEW_SRC
 iptables -t nat -A POSTROUTING -s <SRC_IP> -o <INTERFACE> -j MASQUERADE
 ```
 
-##### （2）调试iptables
-
-* 开启内核功能
-```shell
-modprobe nf_log_ipv4
-sysctl net.netfilter.nf_log.2=nf_log_ipv4
-```
-
-* 添加跟踪规则（只能在raw表中添加）
-```shell
-iptables -t raw -A PREROUTING xx(这里填需要跟踪的包的条件) -j TRACE
-iptables -t raw -A OUTPUT xx(比如：-s 1.1.1.1) -j TRACE
-```
-
-* 查看日志：/var/log/messages
-
-##### （3）实现端口映射
+#### 2.实现端口映射
 ```shell
 iptables -t nat -A PREROUTING -d <DST_IP> -p tcp --dport <DST_PORT> -j DNAT --to-destination <NEW_DST_IP>:<NEW_DST_PORT>
 ```
 
-##### （4）只允许访问外部，不允许外部访问（利用conntrack模块）
+#### 3.只允许访问外部，不允许外部访问（利用conntrack模块）
 ```shell
 iptables -A INPUT -p tcp -m conntrack --ctstate ESTABLISHED -j ACCEPT
 iptables -A OUTPUT -p tcp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT

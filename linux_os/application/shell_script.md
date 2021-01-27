@@ -1,10 +1,17 @@
 [toc]
 ### 基础内容
+
+shell中 `--` 表示选项的结束，即后面的都当参数处理
+
 #### 1.set
 ```shell
-set
-    -x	   #用于脚本调试
-    -e	   #只要脚本中的一个命令执行失败，立马退出
+set [-+选项] [-o 选项] [参数]
+
+#常用选项
+  -x	   #用于脚本调试
+  -e	   #只要脚本中的一个命令执行失败，立马退出
+
+set -- arg1 #即重置此shell的位置参数（$1=arg1）
 ```
 
 #### 2.预置变量
@@ -147,4 +154,95 @@ getent services ssh
 ```shell
 getent protocols
 getent protocols <协议号>
+```
+
+#### 11.for后面只有一个变量名，表示遍历位置参数
+```shell
+for xx                  
+do
+    echo $xx
+done
+```
+
+#### 12.非交互式执行命令，当需要多次输入，可以利用如下方式实现：
+```shell
+  echo -e "xx\nxx" | passwd root
+```
+
+#### 13.以指定用户身份执行命令
+
+* 且获得该用户的环境变量
+```shell
+su - 用户名 -c 命令
+```
+
+* 使用原用户的环境变量
+```shell
+su 用户 -c 命令
+```  
+
+#### 14.find 去除指定目录
+```shell
+find / -path '/tmp' -prune -o -iname 'test*' | grep -v '/tmp'
+
+#跳过/tmp目录，这个执行的结果为false
+#-o or
+```
+
+#### 15.替换字符串
+```shell
+  tr "xx" "xx"
+```
+
+#### 16.查看一个文件是否有硬连接
+```shell
+ll /etc/httpd/logs/error_log
+#-rw-r--r-- 2 root root 18961 Jul 28 21:03 /etc/httpd/logs/error_log
+#2代表有两个硬连接（加上本身）
+
+stat /etc/httpd/logs/error_log
+#看Links字段
+````
+
+#### 17. 截断一个 正被使用的 文件
+
+注意：不能直接删除该文件，即使删除也不会释放存储
+
+* 可以通过gdb来清空
+```shell
+gdb -p <PID>
+call ftruncate(<FD>,0)
+```
+
+* 用echo
+
+```shell
+echo > <FILE>
+```
+
+#### 18.查看系统支持的字符集
+```shell
+locale -a
+```
+设置字符集（**必须是上面存在的**）
+```shell
+export LANG="xx"
+```
+
+#### 19.`getconf` —— 获取系统的变量
+```shell
+getconf -a      #显示所有系统变量（比如 PAGESIZE，CLK_TCK等)
+#CLK_TCK这个变量用于计量与cpu有关的时间，标识一秒内cpu有多少次滴答（ticks）
+
+getconf xx    #显示具体变量的值
+```
+
+#### 20.kill父进程和其所有的子进程
+```shell
+kill -- -<PPID>
+```
+
+#### 21.强制卸载某个文件系统
+```shell
+umount -f <PATH>
 ```
