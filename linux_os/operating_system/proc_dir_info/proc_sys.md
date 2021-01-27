@@ -166,6 +166,20 @@ default：应用于之后创建的网卡
 不回复广播的icmp协议包（包括组播的）
 比如其他主机`ping 224.0.0.1`，该主机接收到icmp的组播包，不会进行回复
 
+##### （4）`/proc/sys/net/ipv4/all/rp_filter`     
+reverse path filter，反向路径过滤
+```
+原理：
+  一台主机（或路由器）从接口A收到一个包，其源地址和目的地址分别是10.3.0.2和10.2.0.2，即<saddr=10.3.0.2, daddr=10.2.0.2, iif=A>,
+  如果启用反向路径过滤功能，它就会以<saddr=10.2.0.2, daddr=10.3.0.2>为关键字去查找路由表，
+  如果得到的输出接口不为A，则认为反向路径过滤检查失败，它就会丢弃该包。
+```
+
 #### 4.`/proc/sys/net/core/somaxconn`
 限制了接收新 TCP 连接侦听队列的大小
 当服务器有很高的负载才需要设置这一项
+
+
+#### 5.`/proc/sys/net/bridge`
+##### （1）`/proc/sys/net/bridge/bridge-nf-call-iptables`
+iptables对规则也会对流经bridge的数据生效

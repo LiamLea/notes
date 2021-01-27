@@ -81,3 +81,18 @@ s/^/#/                  #给每行加上注释
 |数字|`[:digit:]`|
 |空格|`[:space:]`|
 |字母|`[:alpha:]`|
+
+***
+
+### awk
+
+#### 1.利用awk给一组数据加标题
+* 利用自带标题
+```shell
+awk 'NR==1{print};/xx/{print}' xx
+```
+
+* 自己设置标题
+```shell
+  awk 'BEGIN{print "title1 title2"}/xx/{print}' xx
+```

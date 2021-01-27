@@ -16,6 +16,8 @@
   wget --no-passive-ftp ftp://xx
 ```
 
+#### 2.用容器启动ftp时，需要把网络模式设为network，否则客户端无法用被动模式连接ftp服务器
+
 ***
 
 ### 配置
