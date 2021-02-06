@@ -51,9 +51,10 @@
 ```
 
 #### 3.循环
-```jinja2
+```python
 {% for xx in xx %}
 ...
+#{{ loop.index }}，能够当前获取循环的序号
 {% endfor %}
 ```
 

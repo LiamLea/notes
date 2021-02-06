@@ -28,6 +28,7 @@ fail: msg="xx"      #已失败的形式退出playbook
 ```
 
 #### 3.set_fact（在任务运行时，设置变量）
+能够修改跟主机相关的变量（比如在hosts文件中设置的变量），无法修改全局变量（比如通过-e引入的变量）
 ```yaml
 set_fact:
   <VARIABLE>: <VALUE>

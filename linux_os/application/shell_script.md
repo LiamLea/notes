@@ -79,17 +79,6 @@ last <USER>
 lastlog
 ```
 
-#### 5.awk高级用法
-##### （1）将命令的输出存入变量
-```shell
-awk '{"<COMMAND>"|getline <VARIABLE_NAME>;print <VARIABLE_NAME>}' <FILE>
-
-#<COMMAND>可以由位置变量组成，比如：
-# ps -o pid ax | awk '{"readlink /proc/"$1"/exe"|getline a;print a}'
-# awk '{"readlink /proc/22/exe"|getline a;print a}' <FILE>
-
-```
-
 #### 6.连接相关
 ##### （1）查看文件是否是硬连接
 ```shell
