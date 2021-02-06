@@ -14,14 +14,26 @@
 ***
 
 ### 配置
+
 #### 1.服务端：`/etc/chrony.conf`
+
 * 指定ntp server
+
 ```shell
 server <NTP_SERVER> iburst prefer
 #当一个远程NTP服务器不可用时，向它发送一系列的并发包进行检测
 #prefer优先使用该服务器
+
+#或者（用pool是通用的）
+#上面就可以写成：pool <NTP_SERVER> iburst prefer
+
+pool <domain_name> iburst
+#从该域名能够解析多个ntp server，从而能够同时与多个ntp server建立关联
 ```
+![](./imgs/ntp_01.png)
+
 * 权限设置
+
 ```shell
 #拒绝IPV4用户和#IPV6用户   
 restrict default kod nomodify notrap nopeer noquery  
@@ -37,7 +49,9 @@ restrict -6 ::1
 #本地网段授权访问
 restrict 192.168.100.0 mask 255.255.255.0 nomodify
 ```
+
 * 声明所在的层
+
 ```shell
 #127.127.1.0表示本机系统时间源
 #当没有时间同步来源的时候以自身的硬件时钟为准（如果有其他时间服务器，不会使用本地时钟）

@@ -208,3 +208,68 @@ var p1 = new(int)   //new会开辟新的内存空间
 都是用来分配内存的
 new用来给基本的数据类型分配内存，返回的是指针
 make用于给slice、map以及channel分配内存，返回的是数据
+
+#### 9.map（类似于字典）
+要初始化或者使用make
+```go
+m1 = make(map[<key_type>]<value_type>, <length>)   //如果容量不够，会自动扩容（最好给出合适的长度，这样避免扩容，提高效率）
+
+//遍历map
+for k,v := range m1 {
+  ...
+}
+
+//删除map指定key
+delete(m1, "<KEY>")
+```
+
+#### 10.func
+```go
+func <FUNC_NAME>(<ARGS>)(RETURN) {
+  ...
+}
+
+//举例
+func sum(x int, y int)(ret int) {
+  return x + y
+}
+
+//等价于，区别就是上面定义了一个ret变量，可以在函数中使用
+func sum(x int, y int) int {
+  //var ret int
+  return x + y
+}
+
+//返回多个值
+func f3(x int, y int)(int, int) {
+  return x + y, x - y
+}
+
+func f1(x int, y int) {
+  fmt.Println(x + y)
+}
+
+func f2(){
+  fmt.Println("hhhh")
+}
+```
+
+* 参数
+当参数中 连续多个参数的类型一致时，可以只保留后面的类型
+```go
+func f1(x, y, z int, m, n, string) int {
+  ...
+}
+```
+* 没有默认参数这个概念
+
+* defer
+用defer标识的语句，在函数返回之前执行，并且按照从下到上的顺序执行
+应用场景：释放某些资源（比如关闭连接）
+
+* 匿名函数（类似lamba）
+```go
+func(){
+  fmt.Println("hhhhh")
+}()
+```

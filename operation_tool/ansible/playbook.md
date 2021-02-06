@@ -54,8 +54,9 @@ tasks:
 动态加载，动态的好处就是可以在循环中多次加载执行
 ```yaml
 include: xx           #当加载play列表时，这是一个play，之后会摒弃该模块
-include_tasks: xx     #是一个task
-include_role: xx      #是一个task
+include_tasks: <TASK_PATH>       #是一个task
+include_role:         #是一个task
+  name: <ROLE_NAME>      
 include_vars: xx      #是一个task
 ```
 ##### （2）`import*	`		

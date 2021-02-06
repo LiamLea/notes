@@ -35,7 +35,7 @@ kubectl create secret tls ca-key-pair \
 ```
 ```yaml
 #issuer.yaml
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1alpha3
 kind: Issuer
 metadata:
   name: ca-issuer
@@ -46,12 +46,25 @@ spec:
 ```
 
 ##### （2）方式二：ClusterIssuer（全局证书签发机构）
+
+* 使用自己的证书
+```yaml
+apiVersion: cert-manager.io/v1alpha3
+kind: ClusterIssuer
+metadata:
+  name: ca-issuer
+spec:
+  ca:
+    secretName: ca-key-pair
+```
+
+* 使用第三方证书
 注意：
 如果利用这种方式，生成证书，证书可能一直处于waiting状态（即没有申请到）
 可能的原因是当前所在的域达到了申请次数
 ```yaml
 #issuer.yaml
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1alpha3
 kind: ClusterIssuer
 metadata:
   name: xx
@@ -74,9 +87,10 @@ spec:
 ```
 
 注意：
-* letsencrypt通过acme协议自动申请证书，其中包含两个sloving Challenge: http01,dns01,主要用来证明域名是属于你所有。
-  * http01的校验原理是给你域名指向的 HTTP 服务增加一个临时 location ，`Let’s Encrypt` 会发送 http 请求到 `http:///.well-known/acme-challenge/`，`YOUR_DOMAIN` 就是被校验的域名，`TOKEN`是 ACME 协议的客户端负责放置的文件，在这里 ACME 客户端就是 cert-manager，它通过修改 Ingress 规则来增加这个临时校验路径并指向提供 `TOKEN` 的服务。此方法仅适用于给使用 Ingress 暴露流量的服务颁发证书，并且不支持泛域名证书。
-  * dns01 的校验原理是利用 DNS 提供商的 API Key 拿到你的 DNS 控制权限， 在 Let’s Encrypt 为 ACME 客户端提供令牌后，ACME 客户端 (cert-manager) 将创建从该令牌和您的帐户密钥派生的 TXT 记录，并将该记录放在 `_acme-challenge.`。 然后 Let’s Encrypt 将向 DNS 系统查询该记录，如果找到匹配项，就可以颁发证书。此方法不需要你的服务使用 Ingress，并且支持泛域名证书。
+  * letsencrypt通过acme协议自动申请证书，其中包含两个sloving Challenge: http01,dns01,主要用来证明域名是属于你所有。
+    * http01的校验原理是给你域名指向的 HTTP 服务增加一个临时 location ，`Let’s Encrypt` 会发送 http 请求到 `http:///.well-known/acme-challenge/`，`YOUR_DOMAIN` 就是被校验的域名，`TOKEN`是 ACME 协议的客户端负责放置的文件，在这里 ACME 客户端就是 cert-manager，它通过修改 Ingress 规则来增加这个临时校验路径并指向提供 `TOKEN` 的服务。此方法仅适用于给使用 Ingress 暴露流量的服务颁发证书，并且不支持泛域名证书。
+    * dns01 的校验原理是利用 DNS 提供商的 API Key 拿到你的 DNS 控制权限， 在 Let’s Encrypt 为 ACME 客户端提供令牌后，ACME 客户端 (cert-manager) 将创建从该令牌和您的帐户密钥派生的 TXT 记录，并将该记录放在 `_acme-challenge.`。 然后 Let’s Encrypt 将向 DNS 系统查询该记录，如果找到匹配项，就可以颁发证书。此方法不需要你的服务使用 Ingress，并且支持泛域名证书。
+
 
 #### 2.生成证书(Certificate)
 本质就是**Secret**资源
