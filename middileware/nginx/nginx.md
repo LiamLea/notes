@@ -138,7 +138,15 @@ upstream <NAME> {
 }
 ```
 
-#### 4.继承
+#### 4.子层结构：`events`
+```shell
+events {
+  #一个worker process能够同时打开的最大连接数
+  worker_connections <number>;
+}
+```
+
+#### 5.继承
 child context会继承parent context的内容，但是可以进行覆盖
 
 ***
@@ -166,6 +174,7 @@ add_header <HEADER> <VALUE>;
 ```
 
 #### 2.常用变量
+[更多变量](https://nginx.org/en/docs/varindex.html)
 ```shell
 $http_host          #原http请求的Header中的Host字段（包括ip和port
 $host               #原http请求的Header中的Host字段（但不包括port信息）

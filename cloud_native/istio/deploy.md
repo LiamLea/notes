@@ -14,6 +14,24 @@ docker load -i istio_v1.5.0_images.tar.gz
 istioctl manifest apply --set profile=demo
 #demo配置安装了所有的组件
 ```
+安装时的更多配置参考：
+```shell
+istioctl profile list
+#demo
+#default
+# ...
+
+istioctl profile dump demo
+```
+[更多配置](https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/)
+比如：
+```shell
+#指定仓库地址
+--set hub=harbor.test.com:30443/istio
+
+#指定jarger地址
+--set values.global.tracer.zipkin.address=<jaeger-collector-address>:9411
+```
 ![](./imgs/deploy_01.png)
 
 #### 3.给default命名空间打标
