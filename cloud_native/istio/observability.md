@@ -6,5 +6,5 @@
 
 #### 1.三个维度
 * metrics
-* distributed tracing
+* distributed tracing（目前只支持http协议）
 * logs
