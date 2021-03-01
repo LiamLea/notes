@@ -54,3 +54,11 @@ update ...;
 * 表锁
   * 开销更大
   * 并发量更大
+
+#### 3.charset和collate
+|charset|collate|说明|
+|-|-|-|
+|utf8|utf8_bin|3字节utf8编码，区分大小|
+|utf8|utf8_general_ci|3字节utf8编码，不区分大小写|
+|utf8mb4|utf8mb4_bin|4字节utf8编码（可以存储表情），区分大小|
+|utf8mb4|utf8mb4_general_ci|4字节utf8编码（可以存储表情），不区分大小|
