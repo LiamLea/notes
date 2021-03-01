@@ -27,7 +27,7 @@ limit_conn_zone <key> zone=<name>:<size>;
 ```
 
 * limit_conn
-  * 上下文：http server location
+  * 上下文：http, server, location
 ```shell
 #设置连接数限制，会检查该内存区域内，自己的key对应的计数值，是否达到了限制值
 limit_conn <zone_name> <number>;
@@ -35,14 +35,14 @@ limit_conn <zone_name> <number>;
 ```
 
 * limit_conn_status
-  * 上下文：http server location
+  * 上下文：http, server, location
 ```shell
 #当达到限制时，返回的返回码
 limit_conn_status <return_code | default=503>;
 ```
 
 * limit_conn_log_level
-  * 上下文：http server location
+  * 上下文：http, server, location
 ```shell
 #当达到限制时，生成的日记的级别
 limit_conn_log_level <level | default=error>;

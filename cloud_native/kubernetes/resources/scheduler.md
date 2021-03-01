@@ -105,14 +105,31 @@ spec.tolerations
 
 ### 基本使用
 
-#### 1.给node打标签和打污点
+#### 1.给node打标签和打污点（永久）
 ```shell
-kubectl label nodes NODENAME KEY1=VALUE1
-kubectl taint nodes NODENAME KEY1=vAVLUE1:EFFECT
+kubectl label nodes <NODENAME> <KEY1>=<VALUE1>
+kubectl taint nodes <NODENAME> <KEY1>=<vAVLUE1>:<EFFECT>
 ```
 
 #### 2.删除标签和污点
 ```shell
-kubectl label nodes NODENAME 标签名-
-kubectl taint nodes NODENAME 污点名-
+kubectl label nodes <NODENAME> <标签名>-
+kubectl taint nodes <NODENAME> <污点名>-
+```
+
+#### 3.pod设置能够忍受的污点
+```yaml
+spec:
+  tolerations:
+  - key: "<KEY>"    #匹配指定key
+    operator: "<OPERATOR | default=Equal>"    #Exists 或者 Equal
+    #当key为空,operator必须为Exists，表示匹配所有taints
+    vlaue: <value>      #当为Equal时，才需要value字段，用于判断是否匹配
+    effect: <EFFECT>    #当effect为空，表示匹配所有effect
+```
+* 匹配所有tains（kube-proxy就设置了这个）
+```yaml
+spec:
+  tolerations:
+  - operator: "Exists"
 ```
