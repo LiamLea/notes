@@ -167,4 +167,16 @@ kubeadm init phase addon all --config <kubeadm-config>
 ```
 
 #### 3.`kubeadm alpha`
+
 ##### （1）重新生成证书：`kubeadm alpha certs renew`
+
+* 查看证书的到期时间
+
+```shell
+kubeadm alpha certs check-expiration
+```
+
+* 重新生成所有证书
+```shell
+kubeadm alpha certs renew all
+```

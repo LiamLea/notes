@@ -141,7 +141,7 @@ reboot:
 ```yaml
 yum:
   name: <PACKAGE>
-  state: <STATE>      #present、latest、absent
+  state: <STATE>      #present（当指定版本时，用present）、latest（安装最新的包）、absent
 ```
 
 ***
