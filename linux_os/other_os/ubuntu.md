@@ -15,6 +15,7 @@
 ```shell
 ln -fs /run/systemd/resolve/resolv.conf /etc/resolv.conf
 vim /etc/systemd/resolv.conf
+systemctl restart systemd-resolved
 ```
 
 ***

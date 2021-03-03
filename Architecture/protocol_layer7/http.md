@@ -1,6 +1,9 @@
-[toc]
 # HTTP
+
+[toc]
+
 ### 概述
+
 #### 1.HTTP协议特点
 * HTTP协议是**无状态**的
 为了追踪用户的身份和访问记录,就有了cookie和session
@@ -57,7 +60,16 @@ content
 * PUT - 操作是幂等的,所谓幂等是指不管进行多少次操作，结果都一样
 PUT是上传一个资源,用的少,不安全
 
-##### 7.模拟http请求
+#### 7.url分析
+
+##### （1）传递参数：`?<query_string>`
+```shell
+http://test.com/?<key1>=<value1>&<key2>=<value2>
+```
+
+##### （2）锚点：`#<anchor>`
+
+#### 8.模拟http请求
 （1）http/1.0
 ```shell
 exec 8<>/dev/tcp/10.0.36.1/80
@@ -73,7 +85,7 @@ echo -n -e "GET / HTTP/1.0\r\n\r\n" | nc 10.0.36.1 80
 echo -n -e "GET / HTTP/1.1\r\nHost:10.0.36.1\r\n\r\n" >&8
 ```
 
-#### 8.利用python模拟http服务端
+#### 9.利用python模拟http服务端
 ```python
 import socket
 
@@ -88,7 +100,7 @@ while True:
     conn.close()
 ```
 
-#### 9.超时时间
+#### 10.超时时间
 * `connectTimeout`
 建立tcp连接的超时时间
 </br>
@@ -121,6 +133,7 @@ Content-Type    #请求体的数据格式，常用的：application/json
 
 #### 1.重定向是客户端进行的
 服务端返回的信息包含重定向的内容，客户端会发送新的请求到重定向的地址
+
 ***
 
 ### cookie

@@ -25,17 +25,20 @@ For TCP: `proxy_pass backend:123`
 #### 3.内置变量
 [内置变量](https://nginx.org/en/docs/varindex.html)
 
-##### （1）`http_<header_name>`
+##### （1）`$http_<header_name>`
 获取某个请求头的值，`<header_name>`表示请求头的字段名（小写，短划线用下划线代替）
 比如：有一个header，`Aaa-b: 111`，则`$http_aaa_b`的值就是111
 ```shell
 $http_host          #http请求的Header中的Host字段（包括port）
 ```
 
-##### （2）`cookie_<cookie_name>`
+##### （2）`$arg_<arg_name>`和`$args`
+request line中传递的参数（即url中通过?传递的参数）
+
+##### （3）`$cookie_<cookie_name>`
 获取某个cookie的值，<cookie_name>为cookie的名字
 
-##### （3）其他常用变量
+##### （4）其他常用变量
 ```shell
 $host               #Header中的Host字段（但不包括port信息）
 $proxy_host         #当执行proxy_pass语句后，会添加proxy-host头在http请求中，然后将新的请求转发到后端
