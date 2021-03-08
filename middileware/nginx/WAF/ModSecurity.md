@@ -4,11 +4,38 @@
 
 ### 概述
 
+[参考文档](https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-%28v2.x%29)
+
 #### 1.ModSecurity的五个处理阶段
 ModSecurity会将rule放在其中一个阶段进行处理
+* 在 同一个phase 中的rule，会按照按照配置文件中的顺序依次执行
+* 随着进入后续的阶段，可用数据也会增加
+  * 比如 在phase 1只解析了请求头，所以只能获取请求头中的数据，在phase 2解析了请求体，所以能够获取请求头和请求体中的数据
+
 ![](./imgs/ModSecurity_01.jpg)
 
-##### （1）
+##### （1）phase 1：request headers
+当读取请求头后，立即处理在phase 1中的rules（此时请求体还没读取）
+* 在这个阶段一般做一些需要提前处理的rule
+  * 比如判断Content-Type的类型，从而决定如何解析请求体中的数据
+
+##### （2）phase 2：request body
+当读取请求体后，立即处理在phase 2中的rules
+* 一般对请求的处理都在这个阶段
+* 请求体默认支持的解析类型：
+  * application/x-www-form-urlencoded
+  * multipart/form-data
+  * text/xml
+  * 可扩展，参考下面的基础配置部分
+
+##### （3）phase 3: response headers
+在响应发送前读取请求头
+
+##### （4）phase 4：response body
+在响应发送前读取请求体
+
+##### （5）phase 5：logging
+无论如何都会经过这个阶段（即使在前面阶段drop了）
 
 ***
 

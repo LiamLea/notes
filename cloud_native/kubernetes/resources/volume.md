@@ -102,11 +102,14 @@ kubectl get pv <PV> -o yaml
   * 自动回收该pv失败了
 
 #### 5.StorageClass
+
+##### （1）基本概念
 * 默认pv是不属于任何StroageClass的
   * 创建pv时，设置storageClassName，将该pv划分为某一类中
   * 使用pv时，指定storageClassName，只会使用该类型中符合要求的pv
 * 利用StorageClass可以对pv进行分类，使用时指定StorageClass，就在该类型的pv中寻找符合要求的pv
-* 利用StorageClass可以实现动态pv
+
+##### （2）StorageClass 资源是用于实现动态pv的
 
 #### 6.动态pv
 * 当创建pvc后，会自动生成pv与之绑定
@@ -482,4 +485,128 @@ spec:
     requests:
       storage: 1Mi
 
+```
+
+#### 9.创建动态local pv
+
+##### （1）创建local pv provisioner
+```yaml
+---
+# Source: provisioner/templates/provisioner.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: local-provisioner-config
+  namespace: default
+data:
+  useNodeNameOnly: "true"
+  #下面那个名称（xxxx）很重要，需要根据这个创建storage class
+  storageClassMap: |
+    xxxx:      
+       hostDir: /mnt/disks-by-id
+       mountDir: /mnt/disks-by-id
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: local-volume-provisioner
+  namespace: default
+  labels:
+    app: local-volume-provisioner
+spec:
+  selector:
+    matchLabels:
+      app: local-volume-provisioner
+  template:
+    metadata:
+      labels:
+        app: local-volume-provisioner
+    spec:
+      serviceAccountName: local-storage-admin
+      containers:
+        - image: "quay.io/external_storage/local-volume-provisioner:v2.2.0"
+          imagePullPolicy: "Always"
+          name: provisioner
+          securityContext:
+            privileged: true
+          env:
+          - name: MY_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          volumeMounts:
+            - mountPath: /etc/provisioner/config
+            name: provisioner-config
+            readOnly: true
+          - mountPath: /mnt/disks-by-id
+            name: local-storage
+            mountPropagation: "HostToContainer"
+    volumes:
+      - name: provisioner-config
+        configMap:
+          name: local-provisioner-config
+      - name: local-storage
+        hostPath:
+          path: /mnt/disks-by-id
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+name: local-storage-admin
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: local-storage-provisioner-pv-binding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: local-storage-admin
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: system:persistent-volume-provisioner
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: local-storage-provisioner-node-clusterrole
+  namespace: default
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: local-storage-provisioner-node-binding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: local-storage-admin
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: local-storage-provisioner-node-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+```
+
+##### （2）创建storage class
+```yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: xxxx      #这个是根据上面的配置决定的（从而关联起来）
+
+#kubernetes.io/no-provisioner表示这是个动态loal pv
+provisioner: kubernetes.io/no-provisioner
+
+#WaitForFirstConsumer：当pod被调度后，才会创建pv与相应的pvc绑定
+#Immediate：立即将pvc和pv绑定
+volumeBindingMode: WaitForFirstConsumer   
+
+reclaimPolicy: Retain
 ```

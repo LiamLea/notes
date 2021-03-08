@@ -145,7 +145,8 @@ metadata:
   namespace: xx
 
   annotations:
-    #不能省略，指明使用nginx实现的ingress
+    #不能省略，指明使用哪个nginx
+    #启动nginx时，可以设置ingress class：--ingress-class
     kubernetes.io/ingress.class: "nginx"
 
     #使用clusterissuer
