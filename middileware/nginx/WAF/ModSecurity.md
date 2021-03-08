@@ -6,7 +6,14 @@
 
 [参考文档](https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-%28v2.x%29)
 
-#### 1.ModSecurity的五个处理阶段
+#### 1.专业术语
+* false negative
+漏报
+
+* false positive（false alarms）
+误报
+
+#### 2.ModSecurity的五个处理阶段
 ModSecurity会将rule放在其中一个阶段进行处理
 * 在 同一个phase 中的rule，会按照按照配置文件中的顺序依次执行
 * 随着进入后续的阶段，可用数据也会增加
@@ -36,6 +43,25 @@ ModSecurity会将rule放在其中一个阶段进行处理
 
 ##### （5）phase 5：logging
 无论如何都会经过这个阶段（即使在前面阶段drop了）
+
+#### 3.审计日志格式
+```python
+A: Audit log header (mandatory).
+B: Request headers.
+C: Request body (present only if the request body exists and ModSecurity is configured to intercept it. This would require SecRequestBodyAccess to be set to on).
+D: Reserved for intermediary response headers; not implemented yet.
+E: Intermediary response body (present only if ModSecurity is configured to intercept response bodies, and if the audit log engine is configured to record it. Intercepting response bodies requires SecResponseBodyAccess to be enabled). Intermediary response body is the same as the actual response body unless ModSecurity intercepts the intermediary response body, in which case the actual response body will contain the error message (either the Apache default error message, or the ErrorDocument page).
+F: Final response headers (excluding the Date and Server headers, which are always added by Apache in the late stage of content delivery).
+G: Reserved for the actual response body; not implemented yet.
+
+#主要看H，这里显示了经过的处理
+H: Audit log trailer.
+
+I: This part is a replacement for part C. It will log the same data as C in all cases except when multipart/form-data encoding in used. In this case, it will log a fake application/x-www-form-urlencoded body that contains the information about parameters but not about the files. This is handy if you don’t want to have (often large) files stored in your audit logs.
+J: This part contains information about the files uploaded using multipart/form-data encoding.
+K: This part contains a full list of every rule that matched (one per line) in the order they were matched. The rules are fully qualified and will thus show inherited actions and default operators. Supported as of v2.5.0.
+Z: Final boundary, signifies the end of the entry (mandatory).
+```
 
 ***
 
@@ -183,6 +209,7 @@ ARGS_GET    #query_string中的参数（即url中？后面的参数）
 ARGS_POST   #POST请求中body的参数
 ARGS        #ARGS_GET和ARGS_POST的集合
 REQUEST_HEADERS   #所有的请求头
+TX          #transient transaction collection，临时事务收集器，用于存储一些变量（里面的变量贯穿整个事务，且每个事务都相互独立的）
 ```
 
 ##### （2）`<OPERATOR>`
@@ -209,8 +236,11 @@ contains      #判断参数的值是否包含[VALUE]
 * 常用action
 ```shell
 id        #给rule分配一个唯一id（必须要写），id:11
-log       #当匹配成功后，会记录日志（nginx的error日志和modsecurity的audit日志)
+log       #当匹配成功后，会记录到nginx的error日志
+auditlog  #当匹配成功后，会记录到modsecurity的审计日志
 deny      #停止规则处理，并且拦截该事务
 status    #响应的状态码，status:403
 msg       #记录日志时会添加msg字段，msg:request is risk
+detectSQLi  #利用LibInjection检测，是否含有敏感语句
+detectXSS
 ```

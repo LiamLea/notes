@@ -487,7 +487,7 @@ spec:
 
 ```
 
-#### 9.创建动态local pv
+#### 9.创建动态local pv（新版本的k8s，不支持动态pv）
 
 ##### （1）创建local pv provisioner
 ```yaml
@@ -507,7 +507,7 @@ data:
        hostDir: /mnt/disks-by-id
        mountDir: /mnt/disks-by-id
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: local-volume-provisioner
@@ -525,24 +525,23 @@ spec:
     spec:
       serviceAccountName: local-storage-admin
       containers:
-        - image: "quay.io/external_storage/local-volume-provisioner:v2.2.0"
-          imagePullPolicy: "Always"
-          name: provisioner
-          securityContext:
-            privileged: true
-          env:
-          - name: MY_NODE_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: spec.nodeName
-          volumeMounts:
-            - mountPath: /etc/provisioner/config
-            name: provisioner-config
-            readOnly: true
-          - mountPath: /mnt/disks-by-id
-            name: local-storage
-            mountPropagation: "HostToContainer"
-    volumes:
+      - image: "quay.io/external_storage/local-volume-provisioner:v2.2.0"
+        name: provisioner
+        securityContext:
+          privileged: true
+        env:
+        - name: MY_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - mountPath: /etc/provisioner/config
+          name: provisioner-config
+          readOnly: true
+        - mountPath: /mnt/disks-by-id
+          name: local-storage
+          mountPropagation: "HostToContainer"
+      volumes:
       - name: provisioner-config
         configMap:
           name: local-provisioner-config
@@ -553,7 +552,7 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-name: local-storage-admin
+  name: local-storage-admin
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
