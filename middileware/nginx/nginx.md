@@ -44,6 +44,65 @@ $host               #Header中的Host字段（但不包括port信息）
 $proxy_host         #当执行proxy_pass语句后，会添加proxy-host头在http请求中，然后将新的请求转发到后端
 ```
 
+#### 4.http request经过的11个phases
+![](./imgs/nginx_01.jpg)
+
+##### （1）read phase
+读取请求
+
+##### （2）server rewrite phase
+执行在server块中定义的rewrite模块的内容
+
+##### （3）find config phase
+根据url选择location
+
+##### （4）rewrite phase
+执行在location块中定义的rewrite模块的内容
+
+##### （5）post rewrite phase
+当url在rewrite phase被改写，再次进入find config phase
+
+##### （6）preaccess phase
+访问控制预处理阶段（比如控制并发数、请求速率等等）
+
+##### （7）access phase
+访问控制阶段（比如认证、检查权限等）
+
+##### （8）post access phase
+访问控制后处理阶段，处理上述检查都通过的请求
+
+##### （9）precontent phase
+生成响应的预处理（比如：try_files）
+当在这个阶段生成了响应，则跳过content phase
+
+##### （10）content phase
+生成响应（比如index等等）
+当在这个阶段，某个语句生成了响应，则下面的语句就不会执行了（但不影响log phase阶段）
+
+##### （11）log phase
+记录日志
+
+#### 4.添加模块的方式
+
+##### （1）编译时添加
+从源码编译nginx，通过--add-module添加该模块，之后就不需要在配置文件中`load_module`了
+
+##### （2）将需要的模块编译成 动态模块
+
+* 已经装好了nginx，利用对应版本的nginx源码编译将该模块编译成动态块
+
+```shell
+./configure --with-compat --add-dynamic-module=<path>
+make modules
+cp obj/<xx>.so /etc/nginx/modules/
+```
+
+* 在配置文件中通过`load_module`添加该模块
+
+```shell
+load_module modules/<xx>.so;
+```
+
 ***
 
 ### 配置文件的结构
