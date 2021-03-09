@@ -65,7 +65,11 @@ Z: Final boundary, signifies the end of the entry (mandatory).
 
 ***
 
-### nginx加载ModSecurity动态库
+### nginx加载ModSecurity动态模块
+
+要么从源码编译nginx，通过--add-module添加该模块，
+要么之后编译ModSecurity模块，然后在配置文件中通过`load_module`添加该模块
+下面采用的是第二种方法
 
 #### 1.安装ModSecurity
 
