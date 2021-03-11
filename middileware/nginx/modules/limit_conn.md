@@ -1,13 +1,17 @@
-# ngx_http_limit_conn_module(ngx_stream_limit_conn_module)
+# limit connections
 
 [toc]
 
 ### 概述
 
-#### 1.作用
+#### 1.相关模块
+* ngx_http_limit_conn_module
+* ngx_stream_limit_conn_module
+
+#### 2.作用
 根据key进行计数（key要用变量设置，如果用常量设置，所有请求都是相同的key，则就是用于控制总的并发数，没意义），对 特定情况下的 并发连接数进行限制
 
-#### 2.连接计数
+#### 3.连接计数
 当前正在被处理的连接（而不是当前正被打开的连接数，worker_connections是统计的当前正被打开的连接数）
 
 ***
@@ -49,6 +53,7 @@ limit_conn_log_level <level | default=error>;
 ```
 
 #### 2.demo
+
 ##### （1）限制每个ip能够连接指定api的并发数
 ```shell
 limit_conn_zone "$binary_remote_addr/$uri" zone=addr:10m;   #当请求进来，会根据自身的"$binary_remote_addr/$uri"值，在addr内存空间中，进行计数
