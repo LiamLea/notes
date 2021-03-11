@@ -21,12 +21,16 @@ For TCP: `proxy_pass backend:123`
 #### 1.http proxy
 * `proxy_pass`
   * 上下文：location, if in location，limit_except
+
 ```python
-#与stream相似，区别：
 #  <PROTOCOL>可以为http、https
-#  <UPSTREAM>处可以换成<DOMIAN_OR_IP>:<PORT>
-#  <PATH>可以省略
-proxy_pass <PROTOCOL>://<UPSTREAM><PATH>;
+#  如果用主机名且能够解析出多个ip地址，则可以进行轮询转发到这些地址
+proxy_pass <PROTOCOL>://<UPSTREAM_or_HOST>[PATH]
+
+#传递的url:
+#  当没有[PATH]，则整个url都会传递过去
+#  当有[PATH]，则与location匹配的部分会被[PATH]替换，然后传递过去
+#  当location中使用正则时，proxy_pass后面就不能设置[PATH]
 ```
 
 * `proxy_http_version`
@@ -42,9 +46,8 @@ proxy_http_version <1.0 | 1.1>;
 * `proxy_pass`
   * 上下文：server
 ```python
-#可以指定该server中设置的upstream
-#也可以指定 <DOMAIN_OR_IP>:<PORT>，如果域名能够解析出多个ip地址，则可以进行轮询转发到这些地址
-proxy_pass <UPSTREAM>;
+#如果用主机名且能够解析出多个ip地址，则可以进行轮询转发到这些地址
+proxy_pass <UPSTREAM_or_HOST>;
 ```
 
 #### 3.转发websocket请求的配置

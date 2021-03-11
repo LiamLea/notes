@@ -32,16 +32,20 @@ if (<conndition>) {
   * 上下文：server, location, if
 ```shell
 rewrite <regex> <replcement> [flag];
+#只要url匹配<regex>，就会用<replcement>完全替换url
+#比如，url为/aaa/test1，<regex>为 test1，则能够匹配
+#<replcement>中可以使用正则的组变量：$1 $2等
+
 #flag:
-# redirect   返回码为302，告诉客户端，只是临时重定向
-# permanent  返回码为301，告诉客户端，是永久重定向
-# last       相当于conntinute，进行下一次重复（即根据新的uri，取匹配location）
-# break      不会执行rewrite相关内容，也不会根据新的url，取匹配location
+#  redirect   返回码为302，告诉客户端，只是临时重定向
+#  permanent  返回码为301，告诉客户端，是永久重定向
+#  last       相当于conntinute，进行下一次重复（即根据新的uri，取匹配location）
+#  break      不会执行rewrite相关内容，也不会根据新的url，去匹配location
 ```
 
 * break
   * 上下文: server, location, if
-  * 停止rewrite，即使rewrite了一个新的地址，也不会进行匹配了
+  * 停止rewrite，即使rewrite了一个新的地址，也不会进行匹配了，执行其他的非rewrite相关的语句
 </br>
 * return
   * 上下文：server, location, if

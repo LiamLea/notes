@@ -135,6 +135,9 @@ spec:
   * 当nginx处理请求时，会自动加载证书
 
 #### 1.清单文件
+
+##### （1）基本配置
+
 ```yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -185,6 +188,8 @@ spec:
       paths:
 
       #根据url，转发请求
+      # path默认是 前缀匹配，如果要用 正则匹配 需要在annotations中设置（要么都是正则匹配，要么都是前缀匹配）
+      # path注入到nginx配置文件中的顺序，按照path的长度，从上到下注入到nginx配置文件中的（而不是按照写在这里的顺序）
       - path: /		
         backend:
           serviceName: xx   #后端的pod是由该service代理的pod
@@ -199,6 +204,36 @@ spec:
     #指定已存在的secret，该server block中tls配置需要的 相关证书都存放在secret中
     #如果上面设置了颁发机构，则这里会自动生成该secret，不需要提前生成
     secretName: xx
+```
+
+##### （2）修改转发到后端的url
+* 需要添加`annotations`
+```yaml
+nginx.ingress.kubernetes.io/rewrite-target: <replcement>  #可以使用正则的组变量：$1，这个变量来自path中的正则匹配
+```
+
+* demo
+```yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    ...
+spec:
+  rules:
+  - host: aiops.dev.nari
+    http:
+      paths:
+      - path: /(.*)
+        backend:
+          serviceName: kangpaas-front
+          servicePort: 80
+     - path: /gate/(.*)
+       backend:
+         serviceName: kangpaas-gate
+         servicePort: 8093
+  ...
 ```
 
 #### 2.查看是否注入
