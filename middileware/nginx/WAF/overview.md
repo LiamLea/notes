@@ -14,7 +14,12 @@ web application firewall
 open web application security project core rule set
 为NGINX ModSecurity WAF提供规则，用于阻止相关攻击：
 * SQL Injection (SQLi)
-* Remote Code Execution (RCE)
-* Local File Include (LFI)
 * cross‑site scripting (XSS)
-* 更多的其他攻击
+* Local File Inclusion (LFI)
+* Remote File Inclusion (RFI)
+* PHP Code Injection
+* Java Code Injection
+* Unix/Windows Shell Injection
+* Scripting/Scanner/Bot Detection
+* Session Fixation
+* Metadata/Error Leakages

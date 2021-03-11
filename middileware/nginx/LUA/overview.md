@@ -2,10 +2,23 @@
 
 [toc]
 
+[参考资料](https://github.com/openresty?page=1)
+
 ### 概述
 
 #### 1.lua指令执行的顺序
 ![](./imgs/lua_01.png)
+
+#### 2.lua提供的功能模块
+
+* encrypted-session-nginx-module
+加密某个字段的值（比如可以加密cookie的值）
+
+* lua-resty-redis
+可以连接redis，将数据存入redis
+
+* lua-cjson
+处理json格式
 
 ***
 

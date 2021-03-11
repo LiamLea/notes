@@ -2,27 +2,7 @@
 
 [toc]
 
-### 概述
-
-#### 1.proxy protocol
-该协议，允许当nginx作为负载均衡时，可以传递客户端的原始信息
-开启proxy protocol
-```shell
-http {
-    #...
-    server {
-        listen 80   proxy_protocol;
-        listen 443  ssl proxy_protocol;
-        #...
-    }
-}
-```
-
-#### 2.`proxy_pass`能够代理的协议
-For HTTP: `proxy_pass http://backend;` 或者https
-For TCP: `proxy_pass backend:123`
-
-#### 3.内置变量
+#### 1.内置变量
 [内置变量](https://nginx.org/en/docs/varindex.html)
 
 ##### （1）`$http_<header_name>`
@@ -44,7 +24,7 @@ $host               #Header中的Host字段（但不包括port信息）
 $proxy_host         #当执行proxy_pass语句后，会添加proxy-host头在http请求中，然后将新的请求转发到后端
 ```
 
-#### 4.http request经过的11个phases
+#### 2.http request经过的11个phases
 ![](./imgs/nginx_01.jpg)
 
 ##### （1）read phase
@@ -82,7 +62,7 @@ $proxy_host         #当执行proxy_pass语句后，会添加proxy-host头在htt
 ##### （11）log phase
 记录日志
 
-#### 4.添加模块的方式
+#### 3.添加模块的方式
 
 ##### （1）编译时添加
 从源码编译nginx，通过--add-module添加该模块，之后就不需要在配置文件中`load_module`了
@@ -139,3 +119,53 @@ events {
 
 #### 2.继承
 child context会继承parent context的内容，但是可以进行覆盖
+
+#### 3.virtual servers
+在每个 流量处理上下文 中，都包含一个或多个server context，用于设置请求处理
+```python
+server {...}
+```
+
+##### （1）stream上下文中的server
+```python
+server {
+
+  #<ADDRESS>可以省略，<PORT>可以写一个范围，比如:80-82
+  #ssl表示所有与该端口的连接应该采用ssl模式
+  #udp表示监听在udp端口
+  #还有其他更多选项
+  listen <ADDRESS>:<PORT> [ssl] [udp];
+}
+```
+
+##### （2）http上下文中的server
+```python
+server {
+
+  #支持多个主机名
+  #主机名支持：
+  #   域名后缀，比如：.example.com 等价于 example.com和*.example.com
+  #   在域名的第一部分或最后一个部分使用通配符（*），比如：*.example.com
+  #   正则（~），
+  server_name <SERVER_NAME_1> <SERVER_NAME_2>;
+
+  #跟stream差不多
+  #这里的listen可以省略，<PORT>也可以省略，默认就是80
+  listen <ADDRESS>:<PORT> [ssl] [udp];
+}
+```
+
+* proxy protocol
+
+该协议，允许当nginx作为负载均衡时，可以传递客户端的原始信息
+开启proxy protocol
+```shell
+http {
+    #...
+    server {
+        listen 80   proxy_protocol;
+        listen 443  ssl proxy_protocol;
+        #...
+    }
+}
+```
