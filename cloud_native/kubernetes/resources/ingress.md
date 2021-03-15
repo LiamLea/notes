@@ -236,6 +236,23 @@ spec:
   ...
 ```
 
+##### （3）当后端是https协议时
+
+* proxy_pass https
+```yaml
+#添加注解，就相当于
+#proxy_pass https://
+nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+```
+
+* ssl passthrough（不推荐，开销大，而且只能根据主机名路由）
+  * 根据SNI（即主机名），选择后端，然后将tcp协议转发过去
+  * 所以七层的配置都不会生效
+  * 前提：nginx ingress controller需要`--enable-ssl-passthrough`
+```yaml
+nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+```
+
 #### 2.查看是否注入
 ```shell
 #进入重启内部

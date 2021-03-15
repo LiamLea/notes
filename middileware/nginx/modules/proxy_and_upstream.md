@@ -31,6 +31,8 @@ proxy_pass <PROTOCOL>://<UPSTREAM_or_HOST>[PATH]
 #  当没有[PATH]，则整个url都会传递过去
 #  当有[PATH]，则与location匹配的部分会被[PATH]替换，然后传递过去
 #  当location中使用正则时，proxy_pass后面就不能设置[PATH]
+
+#当proxy_pass到https协议时，需要设置证书，见下面的配置
 ```
 
 * `proxy_http_version`
@@ -40,6 +42,22 @@ proxy_pass <PROTOCOL>://<UPSTREAM_or_HOST>[PATH]
 proxy_http_version <1.0 | 1.1>;
 ```
 
+* `proxy_pass`到https协议     
+```shell
+#默认不检查证书
+proxy_ssl_verify <on | off | default=off>;
+
+
+#当检查证书时
+#检查深度
+#第一层，检查该证书的签署证书（看该是否在信任列表中）
+#第二层，检查签署证书的签署证书（看该是否在信任列表中）
+#依次类推
+proxy_ssl_verify_depth 0;   
+
+#当用的自签证书时，指定相应的ca文件
+proxy_ssl_trusted_certificate <file>
+```
 
 #### 2.stream proxy
 
