@@ -101,16 +101,43 @@ git push <REMOTE_REPO_NAME> :<REMOTE_BRANCH>
 ```
 
 #### 2.回滚操作
+##### （1）查看commit记录
 ```shell
 git logs                  #查看该版本即之前的版本
 git reflog                #查看所有的版本
-git reset --soft xx       #回滚到指定版本，但是当前的工作空间的内容不变
-                          #用于代码在code review阶段被打回时进行的操作
-git reset --hard xx       #回滚到指定版本，当前的工作空间的内容也会回滚
 
 #撤销某个提交
 git revert <id>
 git push
+```
+
+##### （2）回滚到指定commit
+```shell
+git reset --soft xx       #回滚到指定版本，但是当前的工作空间的内容不变
+                          #用于代码在code review阶段被打回时进行的操作
+git reset --hard xx       #回滚到指定版本，当前的工作空间的内容也会回滚
+
+#回滚本地仓库后，如果需要回滚远程仓库：
+#注意：master分支必须解除保护，不然无法push
+git push -f origin master
+```
+
+##### （3）利用revertc回滚（建议）
+这种方式相当于会多一个commit记录
+
+* 撤销单个commit
+
+```shell
+git revert <commit_id>
+```
+
+* 撤销多个commit
+
+```shell
+git revert --no-commit <commit_id_1>
+git revert --no-commit <commit_id_2>
+git revert --no-commit <commit_id_3>
+git commit -m "the commit message for all of them"
 ```
 
 #### 3.git stash（将修改的内容暂存起来，而不是提交到暂存区，不常用这种方式，而是用branch方式）
