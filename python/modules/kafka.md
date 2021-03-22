@@ -28,6 +28,16 @@ producer.send("<TOPIC>", b"<MSG>")    #发送的内容必须是二进制的
 producer.flush()
 ```
 
+* 直接指定发送的分区
+```python
+producer.send("<TOPIC>", b"<MSG>", partition = <NUM>)
+```
+
+* 根据key哈希到指定分区
+```python
+#定义key的哈希规则
+```
+
 #### 3.设置消费者
 ```python
 from kafka import KafkaConsumer

@@ -29,7 +29,7 @@ ADD src1 src2 ... dest           #与COPY类似，但是支持url路径
 ENV key1=value1 key2=value2 ...     #设置变量，变量会注入到生成的镜像中（即在运行容器中，就会有此变量）
                                     #变量也可被后面的指令引用
 
-ARG xx1 xx2 ...                 #可以引入外部变量：docker build --build-arg xx1=xx
+ARG VARIABLE[=DEFAULT]                  #可以引入外部变量：docker build --build-arg xx1=xx（一个ARG只能设置一个变量
 
 RUN 命令                        #表示命令在容器内运行，可以利用 && 连接多条命令
 

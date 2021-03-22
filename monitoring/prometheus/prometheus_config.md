@@ -302,7 +302,7 @@ kubernetes_sd_configs:
 
 ##### （3）5种action
 * replace
-  * 用`regex`匹配`source_labels`用`separator`连接起来的标签值
+  * 用`regex`匹配 `source_labels`用`separator`连接起来的标签值
     * 如果没有匹配到，不会发生替换
     * 如果匹配到，添加`target_label`这个标签，且值为`replacement`
 * keep
@@ -353,6 +353,53 @@ relabel_configs:
   replacement: <STRING | default = $1>
 
   action: <ACTION | default = replace>
+```
+
+* demo
+
+```yaml
+relabel_configs:
+
+#保留有prometheus.io/scrape这个annotation的pods
+- action: keep
+  regex: true
+  source_labels:
+  - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+
+#添加__metrics_path__标签，标签的内容为__meta_kubernetes_pod_annotation_prometheus_io_path这个标签的内容
+- action: replace
+  regex: (.+)
+  source_labels:
+  - __meta_kubernetes_pod_annotation_prometheus_io_path
+  target_label: __metrics_path__
+
+#添加__address__标签，标签的内容为__address__:__meta_kubernetes_pod_annotation_prometheus_io_port组合的内容
+- action: replace
+  regex: ([^:]+)(?::\d+)?;(\d+)
+  replacement: $1:$2
+  source_labels:
+  - __address__
+  - __meta_kubernetes_pod_annotation_prometheus_io_port
+  target_label: __address__
+
+
+#将pod的标签都添加进来
+- action: labelmap
+  regex: __meta_kubernetes_pod_label_(.+)
+
+
+#添加kubernetes_namespace标签，标签的内容为__meta_kubernetes_namespace标签的内容
+- action: replace
+  source_labels:
+  - __meta_kubernetes_namespace
+  target_label: kubernetes_namespace
+
+#添加kubernetes_pod_name标签，标签的内容为__meta_kubernetes_pod_name标签的内容
+- action: replace
+  source_labels:
+  - __meta_kubernetes_pod_name
+  target_label: kubernetes_pod_name
+
 ```
 
 ***
