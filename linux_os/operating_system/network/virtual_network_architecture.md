@@ -283,3 +283,51 @@ ip tuntap add tap0 mode tap
 |数量|单个|成对|
 |用途|虚拟网卡（跟物理网卡一样用）</br>进程如果想使用该网卡（比如获取发到该网卡的数据包），通过`/dev/net/tun`这个文件|用于连接，比如连接不同network namespace|
 |本质|虚拟的网卡（跟物理网卡功能一样）|像虚拟的一根线|
+
+***
+
+### MACVLAN
+
+#### 1.概述
+在一个物理网卡 虚拟 多个 网卡 每个网卡有自己的mac地址
+![](./imgs/macvlan_01.png)
+
+#### 2.macvlan有五种模式
+
+##### （1）bridge
+物理网卡相当于网桥，虚拟网卡可以通过物理网卡通信（即在一个vlan中）
+![](./imgs/macvlan_mode_01.png)
+
+##### （2）Private
+虚拟网卡相互独立，不能通信（也不能通过外部通信）
+![](./imgs/macvlan_mode_02.png)
+
+##### （3）VEPA（Virtual Ethernet Port Aggregator）
+![](./imgs/macvlan_mode_03.png)
+物理网卡将虚拟网卡的流量转发出去（不是转发到该物理网卡上的子网卡上），所以可以通过外部通信（比如支持hairpin模式的交换机、能够转发ip的路由等）
+
+##### （4）passthru
+只能创建一个虚拟网卡
+![](./imgs/macvlan_mode_04.png)
+
+##### （5）source
+只允许指定的源mac地址通过
+
+***
+
+### IPVLAN
+
+#### 1.概述
+与macvlan相似，虚拟网卡的mac都是一样的
+![](./imgs/ipvlan_01.png)
+
+#### 2.ipvlan有两种模式
+
+
+##### （1）l2模式
+物理网卡就像交换机一样
+![](./imgs/ipvlan_mode_01.png)
+
+##### （2）l3模式
+物理网卡就像路由器一样
+![](./imgs/ipvlan_mode_02.png)
