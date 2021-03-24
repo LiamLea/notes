@@ -41,3 +41,22 @@ echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
 
 ##### （4）node-to-node 网络
 通过tunnel（比如：vxlan、ipip等）
+
+***
+
+### 网络配置
+
+#### 1.flannel采用的技术
+
+##### （1）vxlan
+  叠加网络，利用隧道技术封装数据帧，从而能够实现很好的网络隔离
+
+##### （2）host-gw（也就是虚拟网桥）
+  物理网卡作为网关，当跨主机通信时，通过物理网卡路由
+  特点：性能最好，但是需要物理主机都必须在同一网络内
+
+##### （3)udp（性能差，现在已经不用）
+
+#### 2.利用calico实现网络策略
+安装calico后，会创建crd资源：NetworkPolicy
+用户可以自动该资源创建规则，从而实现网络策略

@@ -235,3 +235,10 @@ kill -- -<PPID>
 ```shell
 umount -f <PATH>
 ```
+
+#### 22.base64
+
+* base64编码
+```shell
+echo '<CONTENT>' | base64 -w 0    #wrap，0表示禁止换行
+```
