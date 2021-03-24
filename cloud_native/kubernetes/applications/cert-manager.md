@@ -29,7 +29,7 @@ Issuer只能在Issuer所在命名空间中签发证书
 ```shell
 #ca.crt和ca.key需要提前生成
 kubectl create secret tls ca-key-pair \
-   --cert=ca.crt \    
+   --cert=ca.crt \
    --key=ca.key \
    --namespace=default
 ```
@@ -55,6 +55,7 @@ metadata:
   name: ca-issuer
 spec:
   ca:
+    #这个secret要放在cert manager controller命名空间中
     secretName: ca-key-pair
 ```
 

@@ -42,6 +42,17 @@
 swapoff -a
 ```
 
+##### （5）设置网络参数
+```shell
+cat < EOF >> /etc/sysctl.conf
+net.bridge.bridge-nf-call-iptables=1
+net.bridge.bridge-nf-call-ip6tables=1
+net.ipv4.ip_forward=1
+EOF
+
+sysctl -p
+```
+
 #### 2.在所有节点上安装组件
 ```shell
 #设置docker-ce的yum源
@@ -54,17 +65,20 @@ kubectl
 ```
 
 #### 3.修改docker配置
-防止日志量越来越大，导致存储耗尽
+
 `vim /etc/docker/daemon.json`
 ```json
 {
+  //修改cgroup driver，默认使用的是cgroupfs，当系统的init进程是systemd，建议使用systemd，这样更稳定
+  "exec-opts": ["native.cgroupdriver=systemd"],
+
+  //防止日志量越来越大，导致存储耗尽
   "log-driver": "json-file",
   "log-opts": {
     "max-size": "10m",
     "max-file": "3"
   }
 }
-
 ```
 #### 4.设置相关服务开机自启（而不是现在就启动）
 ```shell
@@ -199,3 +213,13 @@ kubectl edit configmap kube-proxy -n kube-system
 kubectl edit configmap kube-proxy -n kube-system
 #找到mode这个选项，改成ipvs即可
 ```
+
+#### 3.centos7和flannel的vxlan模式存在bug
+几种解决方案：
+* 使用host-gw模式替换vxlan模式
+* 在每台机器上执行（重启就失效了）
+```shell
+ethtool --offload flannel.1 rx off tx off
+#查看ethtool --show-offload rx off tx off
+```
+* 或者换网络插件

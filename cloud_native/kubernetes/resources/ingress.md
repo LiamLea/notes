@@ -153,8 +153,9 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
 
     #使用clusterissuer
-    kubernetes.io/tls-acme: "true"
-    #指明证书颁发机构，会自动生成tls相关证书
+    cert-manager.io/cluster-issuer: xx
+
+    #或者使用issuer
     cert-manager.io/issuer: xx
 
     #默认开启tls后，所有http请求都会被重定向到https
