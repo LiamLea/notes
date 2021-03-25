@@ -13,7 +13,13 @@
 ##### （2）limits： `containers.resources.limits`
 
 * 限制，硬限制
-* 达到限制，该pod会被kill（**OOMKilled**）
+* 达到限制，container会被kill（**OOMKilled**），pod会被重新启动
+```shell
+kubecl describe ...
+#可以看到容器的状态
+#    Last State:     Terminated
+#      Reason:       OOMKilled
+```
 
 ```shell
 $ kubectl describe ...
