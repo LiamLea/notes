@@ -120,9 +120,11 @@ spec:
 ```yaml
 metadata:
   annotations:
-    #指明是否使用tls认证
-    kubernetes.io/tls-acme: "true"
-    #指明证书颁发机构，会自动生成tls相关证书
+    
+    #使用clusterissuer
+    cert-manager.io/cluster-issuer: xx
+
+    #或者使用issuer
     cert-manager.io/issuer: xx
 spec:
   rules: ...

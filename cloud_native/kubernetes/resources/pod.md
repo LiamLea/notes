@@ -76,8 +76,8 @@ httpGet|对**指定ip上的port**探测，发送**GET请求**到这个ip:port，
 ##### 4.3 三种情形下的探测
 情形|语句|影响字段|说明（未设置则默认探测成功）|探测失败|何时需要这种情形的探测|
 -|-|-|-|-|-
-启动探测|startupProbe|`Pod.status.containerStatuses.started`|探测容器是否**启动**，只有这这个探测成功才会进行其他情形的探测|会kill该容器|当启动过慢时，如果不设置启动探测，就会进行存活和就绪探测，结果因为还没启动完成导致探测失败，导致容器被kill，是不合理的
-存活探测|livenessProbe||探测容器是否**运行**|会kill该容器|当容器中的进程遇到问题或者不健康的状态时，**不会自行崩溃**
+启动探测|startupProbe|`Pod.status.containerStatuses.started`|探测容器是否**启动**，只有这这个探测成功才会进行其他情形的探测|会kill该container（不是pod），然后根据pod的restartPolicy决定是否对该container进行重启|当启动过慢时，如果不设置启动探测，就会进行存活和就绪探测，结果因为还没启动完成导致探测失败，导致容器被kill，是不合理的
+存活探测|livenessProbe||探测容器是否**运行**|会kill该container（不是pod），然后根据pod的restartPolicy决定是否对该container进行重启|当容器中的进程遇到问题或者不健康的状态时，**不会自行崩溃**
 就绪探测|readinessProbe|`Pod.status.containerStatuses.ready`|探测容器是否**准备好提供服务**|会将该pod的地址，从对应的service的endpoints中删除|如果要**仅在探测成功时**才开始**向 Pod 发送流量**
 
 #### 5.Init containers
