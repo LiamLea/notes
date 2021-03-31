@@ -2,6 +2,15 @@
 
 [toc]
 
+### 预备知识
+
+#### 1.时间序列
+How Data is Structured in a Time-Series Database?
+
+![](./imgs/tsdb_01.png)
+
+***
+
 ### 基础知识
 
 #### 1.prometheus特点
@@ -29,22 +38,29 @@
 #### 4.相关名词
 
 ##### （1）metric
-* 一个metric是一个**特征**（比如：1分钟负载、内存使用量等等）
+* 一个metric是一个**特征**
+* 比如：
+  * `node_memory_MemAvailable_bytes`（内存可用量）
+  * `node_cpu_seconds_total`（cpu使用时间）
+  * `http_requests_total`（http请求数）
 
 ##### （2）label
-* 标识不同**维度**的metric
-* 比如：
-  * 一分钟负载，可以利用label标识这个metric来自哪个实例
+* 标识**不同维度**的**metric**
+* 比如（`{<labels>}`)：
+  * `node_memory_MemAvailable_bytes{instance="192.168.1.1:9100"}`（192.168.1.1这个主机的内存可用量）
+  * `node_cpu_seconds_total{instance="192.168.1.1:9100，mode="idle"}`（192.168.1.1这个主机的cpu空闲时间）
 
-##### （3）时间序列（相当于监控项）
-* 由metric和label组成（具有**唯一**性）：`METRIC{<LABEL>="<VALUE>",...}`
-* 比如：
-  * `node_cpu_seconds_total{cpu="9",instance="3.1.4.232:9100",job="kubernetes-nodes",mode="idle"}`
+##### （3）sample
+* 一个sample就是 **时间戳 + 值**
 
-##### （4）instance
+##### （4）time series
+* 连续的sample就是time series
+* `<metric>{<labels>}`唯一标识一个时间序列
+
+##### （5）instance（target）
 * 能够抓取数据的endpoint
 
-##### （5）job
+##### （6）job
 * 具有相同目的的insance的集合
 * 举例：
   * job: api-server
@@ -52,9 +68,6 @@
     * instance 2: 1.2.3.4:5671
     * instance 3: 5.6.7.8:5670
     * instance 4: 5.6.7.8:5671
-
-##### （6）target（重要）
-* targets指采集目标，一个target就相当于一个endpoint
 
 #### 5.标签（label）
 

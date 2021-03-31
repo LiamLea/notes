@@ -29,7 +29,7 @@ by(LABEL)
 #得到每台服务器的所有cpu每1分钟，cpu处于dle增长的时间
 ```
 
-* `rate(METRIC[TIME])`
+* `rate(METRIC[TIME])`（当TIME >= 采集周期 时，则rate不会返回任何结果）
 ```shell
 (last值-first值)/时间差s
 #配合counter类型数据使用
@@ -39,3 +39,10 @@ by(LABEL)
 选出该指标项的前N个较大值
 </br>
 * `count(EXPRESSION)`
+
+#### 2.常用语句
+```shell
+count({instance=~".+"})by(instance)
+
+{instance="192.168.41.167:9100"}
+```

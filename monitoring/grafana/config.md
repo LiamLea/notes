@@ -7,6 +7,8 @@
 #### 1.通过反向代理访问grafana
 * conf/defaults.ini
 ```shell
+[server]
+
 #在前端给所有资源的目标地址 前面加一个前缀，但实际在后端的地址是没有前缀的
 root_url = %(protocol)s://%(domain)s:%(http_port)s/<prefix>
 

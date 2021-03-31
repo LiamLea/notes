@@ -138,3 +138,34 @@ upstream <NAME> {
   #其他配置基本都与stream上下文的一样
 }
 ```
+
+#### 6.http反向代理 需要注意 解码问题
+比如url中有`%`，**在location匹配前**会被解码成具体的字符，rewrite replcement默认使用的url就是解码后的url（如果需要原url，就需要用`$request_uri`这个变量
+
+解决方案：
+
+##### （1）`proxy_pass`后面不加任何url
+这样就不会发生url替换，即使在location匹配前发生了解码，然而传送到upstream的是未解码的内容
+```shell
+proxy_pass http://backend;
+```
+
+##### （2）利用`$request_uri`这个变量
+```shell
+rewrite ^ $request_uri;
+
+#进行自己想要的转换
+#比如：rewrite "(?i)/(argocd.*)" /$1 break;
+
+proxy_pass http://backend$uri;
+```
+
+
+##### （3）在ingress中的解决方案
+明确指定url进行替换，比如：
+```yaml
+...
+  nginx.ingress.kubernetes.io/rewrite-target: /argocd/api/v1/repositories/git%40$1%3A$2%2F$3
+...
+- path: /argocd/api/v1/repositories/git@(.*?):(.*?)/(.*)
+```

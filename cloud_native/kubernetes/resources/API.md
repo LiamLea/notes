@@ -43,6 +43,8 @@
 
 #### 3.扩展api的两种方式
 
+![](./imgs/api_02.png)
+
 ##### （1）通过CRD、operator
 [参考](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)
 * 通过CRD定义custome resource，即能够在etcd中存储和提取指定结构的数据
@@ -68,6 +70,37 @@ spec:
     port: 443
   version: v1beta1
   versionPriority: 100
+```
+
+***
+
+### 查看
+
+#### 1.列出所有apiVersion
+```shell
+kubectl api-versions
+```
+
+#### 2.列出所有apiReousrces
+```shell
+kubectl api-resources
+
+#NAME             资源的名称                              
+#SHORTNAMES       缩写
+#APIGROUP         api所在group             
+#NAMESPACED       是否是命名空间内的资源
+#KIND             资源类型
+```
+
+#### 3.访问api
+```shell
+kubectl get --raw "<url>"
+
+#比如查看所有namespace
+kubectl get --raw "/api/v1/namespaces"
+
+#比如：apis/apps/v1/namespaces/default/deployment
+#列出default命名空间中的所有deployment控制器
 ```
 
 ***

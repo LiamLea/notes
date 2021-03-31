@@ -11,7 +11,7 @@ kubectl edit secret argocd-secret -n argocd   #修改admin.password
 argocd-server
 
   #关闭https
-  --insecure 
+  --insecure
 
   #用于反向代理
   --basehref <PATH>   #返回资源的地址，比如：/argocd

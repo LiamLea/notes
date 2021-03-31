@@ -254,6 +254,15 @@ nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 nginx.ingress.kubernetes.io/ssl-passthrough: "true"
 ```
 
+##### （4）存在解码问题的解决方案
+明确指定url进行替换，比如：
+```yaml
+...
+  nginx.ingress.kubernetes.io/rewrite-target: /argocd/api/v1/repositories/git%40$1%3A$2%2F$3
+...
+- path: /argocd/api/v1/repositories/git@(.*?):(.*?)/(.*)
+```
+
 #### 2.查看是否注入
 ```shell
 #进入重启内部

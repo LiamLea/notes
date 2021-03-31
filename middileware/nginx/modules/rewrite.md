@@ -6,7 +6,7 @@
 
 #### 1.作用
 在server上下文中，相关语句会按照顺序执行
-在location上下文中，如果uri被rewirite了，会重新寻找location（最多重复10次）
+在location上下文中，**会将该location中的·所有rewrite相关语句拿出来先执行，其他语句暂时不执行**，当location中rewrite相关的语句都执行完后，如果uri被rewirite了，会重新寻找location（最多重复10次）
 
 ***
 
@@ -39,8 +39,8 @@ rewrite <regex> <replcement> [flag];
 #flag:
 #  redirect   返回码为302，告诉客户端，只是临时重定向
 #  permanent  返回码为301，告诉客户端，是永久重定向
-#  last       相当于conntinute，进行下一次重复（即根据新的uri，取匹配location）
-#  break      不会执行rewrite相关内容，也不会根据新的url，去匹配location
+#  last       相当于conntinute，结束此次处理过程（即下面rewrite相关语句不会再执行），根据新的url进行下一次匹配
+#  break      相当于break，即退出rewrite相关语句的执行（也不会根据新的url继续匹配了），执行location中其他语句
 ```
 
 * break
