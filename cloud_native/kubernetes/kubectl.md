@@ -1,8 +1,13 @@
-[toc]
+
 # kubectl
 apiserver的客户端程序，是k8s集群的管理入口
 
-### 配置文件：~/.kube/config
+[toc]
+
+### 配置
+
+#### 1.配置文件：`~/.kube/config`
+
 ```yaml
 apiVersion: v1
 kind: Config
@@ -44,7 +49,10 @@ contexts:
 current-context: <CONTEXT_NAME>
 ```
 
-### 创建资源
+***
+
+### 基本使用
+
 #### 1.创建service
 ```shell
 kubectl expose TYPE NAME \        #TYPE：控制器的类型，NAME：控制器名字必须是已存在的
@@ -52,68 +60,18 @@ kubectl expose TYPE NAME \        #TYPE：控制器的类型，NAME：控制器�
           --port=xx \             #service的端口号
           --target-port=xx        #target-port为容器的端口号
 ```
-***
-### 删除资源
-#### 1.删除所有evicted状态的pods
+
+#### 2.删除所有evicted状态的pods
 ```shell
 kubectl get pods --all-namespaces --field-selector 'status.phase==Failed' -o json | kubectl delete -f -
 ```
-#### 2.强制删除
+
+#### 3.强制删除
 ```shell
 kubectl delete ...  --force --grace-period=0
 ```
-***
-### 查询资源
-#### 1.列出所有apiVersion
-```shell
-kubectl api-versions
-```
-（1）apiVersion的结构
-* 核心群组
-  ```shell
-  v1
-  ```
-* 非核心群组
-  ```shell
-  <GROUP>/<VERSION>
 
-  #比如：appsys/v1
-  ```
-（2）url中的路径
-* 核心群组
-  ```shell
-  /api/v1/<RESOURCE>
-
-  #比如：/api/v1/namespaces
-  #列出所有的命令空间
-  ```
-* 非核心群组
-  ```shell
-  /apis/<GROUP>/<VERSION>/<RESOURCE>
-
-  #比如：apis/apps/v1/namespaces/default/deployment
-  #列出default命名空间中的所有deployment控制器
-  ```
-#### 2.列出所有apiReousrces
-```shell
-kubectl api-resources
-
-#NAME             资源的名称                              
-#SHORTNAMES       缩写
-#APIGROUP         api所在group             
-#NAMESPACED       是否是命名空间内的资源
-#KIND             资源类型
-```
-
-#### 3.访问api
-```shell
-kubectl get --raw "<url>"
-
-#比如查看所有namespace
-kubectl get --raw "/api/v1/namespaces"
-```
-
-#### 3.查看已创建的资源实例
+#### 4.查看已创建的资源实例
 ```shell
 kubectl get all         #不能获取指定命名空间下的全部资源
 
@@ -126,7 +84,8 @@ kubectl api-resources \
 #可以将过滤出的资源放入一个文件中
 #然后遍历每一个资源，进行kubectl get，从而获取该名称空间下的已创建的全部资源
 ```
-#### 4.查看已创建的某种资源实例
+
+#### 5.查看已创建的某种资源实例
 ```shell
 kubectl get xx
     -A               #获取所有命名空间下的
@@ -144,7 +103,8 @@ kubectl get xx
 #           KEY not in (VALUE1,...)
 #           !KEY  
 ```      
-#### 5.查看某个实例的详细信息
+
+#### 6.查看某个实例的详细信息
 ```shell
 kubectl describe TYPE NAME      #TYPE：资源类型，NAME：资源名称，查看某个资源的详细信息
 
@@ -157,7 +117,8 @@ kubectl get TYPE NAME
 #'{<JSONPATH>}xxx'
 #'{<JSONPATH}{"\n"}'
 ```
-#### 6.查询node节点的状态
+
+#### 7.查询node节点的状态
 ```shell
 kubectl describe nodes xx
 ```
@@ -168,7 +129,9 @@ kubectl describe nodes xx
 |DiskPressure|是否有磁盘压力||||||
 |PIDPressure |是否有pid压力||||||
 |Ready|是否准备就绪|
+
 ***
+
 ### 管理pods
 #### 1.创建pods
 ```shell
@@ -202,16 +165,21 @@ kubectl logs POD_NAME
             -p            #previous，查看该容器的上一个实例（常用于查询终止的容器的日志）
                           #当容器重新启动，kubelet会保留该容器上一个终止的实例
 ```
+
 ***
+
 ### 管理标签和污点
+
 #### 1.给资源打标签
 ```shell
 kubectl label TYPE NAME xx1=xx ... xxn=xx       
 ```
+
 #### 2.删除资源的某个标签
 ```shell
 kubectl label TYPE NAME 标签名-
 ```
+
 #### 3.给node打上污点
 ```shell
 kubectl taint nodes NODENAME KEY1=VAVLUE1:EFFECT
@@ -221,6 +189,7 @@ kubectl taint nodes NODENAME KEY1=VAVLUE1:EFFECT
 #   PreferNoSchedule    仅影响调度过程，不能容忍的pod实在找不到node，该node可以接收它
 
 ```
+
 #### 4.删除某个污点
 ```shell
 kubectl taint nodes NODENAME 污点名-
@@ -228,8 +197,11 @@ kubectl taint nodes NODENAME 污点名-
 #当使用这种方法无法删除时，使用下面命令删除
 #kubectl edit nodes NODENAME
 ```
+
 ***
+
 ### 其他操作
+
 #### 1.在某台master上开启代理
 ```shell
 kubectl proxy --address="0.0.0.0" --port=8080 --accept-hosts='^.*' --accept-paths='^.*'
@@ -241,6 +213,7 @@ kubectl proxy --address="0.0.0.0" --port=8080 --accept-hosts='^.*' --accept-path
 #可以直接使用下面的命令，无需开启代理
 # kubectl get --raw "/api/v1/namespaces"
 ```
+
 #### 2.查询发生的事件（用于排错）
 ```shell
 kubectl get events --sort-by=.metadata.creationTimestamp -n xx
