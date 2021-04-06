@@ -51,7 +51,7 @@ How Data is Structured in a Time-Series Database?
   * `node_cpu_seconds_total{instance="192.168.1.1:9100，mode="idle"}`（192.168.1.1这个主机的cpu空闲时间）
 
 ##### （3）sample
-* 一个sample就是 **时间戳 + 值**
+* 一个sample就是 **时间戳 + 值：`(t,v)`**
 
 ##### （4）time series
 * 连续的sample就是time series
@@ -88,11 +88,6 @@ How Data is Structured in a Time-Series Database?
 
 * histogram
 统计数据的分布情况
-
-#### 6.需要的资源
-
-##### （1）所需存储计算方式
-`needed_disk_space = retention_time_seconds * ingested_samples_per_second * bytes_per_sample`
 
 ***
 
