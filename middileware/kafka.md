@@ -269,5 +269,5 @@ auto_offset_reset = "earliest"
 enable_auto_commit = True
 
 #用于设置最少获取多少数据，当一条消息很小时，通过此配置能够提高效率
-  fetch.min.bytes = <NUM>
+fetch.min.bytes = <NUM>
 ```

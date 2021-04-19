@@ -147,7 +147,7 @@ user_list = session.query(Users).order_by(Users.name.desc()).all()
 subquery = session.query(Users).filter(Users.id > 2).subquery
 
 #在主查询中使用子查询的字段：subquery.c.字段名    （c代表Column）
-xx_list = session.query(xx).filter(subquery.c.name == "liyi")
+xx_list = session.query(xx).filter(subquery.c.name == "liyi").all()
 ```
 
 
@@ -163,6 +163,12 @@ session.commit()
 session.query(Users).filter(Users.id == 1).update({"name": "lier"})
 
 session.commit()
+```
+
+##### （6）`session.flush()`和`session.commit()`区别
+```shell
+session.flush() #flush之后，会在该事务中看到相应的修改
+session.commit()    #提交当前事务
 ```
 
 #### 5.将两张表建立关联

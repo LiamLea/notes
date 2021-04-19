@@ -43,7 +43,7 @@
   * docker-registry				
   用于设置私有仓库的账号密码
   * generic
-  * tls							
+  * tls			
   用于存放证书和私钥
 ```shell
 #一般通过命令生成相应配置文件模板或者直接创建

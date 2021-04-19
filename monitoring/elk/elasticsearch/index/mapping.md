@@ -38,15 +38,54 @@ mapping定义了document如何被索引和存储的
 每个**字段**都有一个**数据类型**，下面是常用的一些数据类型
 
 * text
-用于搜索（就是query时，可以用该字段进行搜索）
-</br>
+* numeric
+  * long
+  * float
+  * double
+  * ...
+* object
+* array（天然支持array类型）
+  * 天然支持array类型，因为一个字段可以存储多个值，比如类型为text的字段，可以存储多个text的值，如下：
+  ```json
+  {
+    "user": {
+      "name": ["liyi", "lier", "lisan"]
+    }
+  }
+  //查询：user.name: liyi 或者 user.name: lier 或者 user.name: lisan，都能查出这条记录
+  ```
+
+* nested（当数组中是对象时）
+  * 原始数据
+  ```json
+  {
+    "user": [
+      {
+        "id": "",
+        "name": ""
+      }
+    ]
+  }
+  ```
+  * mappings
+  ```json
+
+  "user": {
+    "type": "nested",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "text"
+      }
+    }
+  }
+  ```
 * keyword
 用于排序和聚合（能够根据这个字段，就是对搜索的结果，进行排序和聚合）
 </br>
 * date
-* long
-* float
-* double
 * boolean
 * ip
 
