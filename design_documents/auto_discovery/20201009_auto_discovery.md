@@ -488,6 +488,38 @@ primary_conninfo = 'host=192.168.41.163 port=5432 user=replicator password=kangp
 |oracle|11g</br>12c|centos7|
 |weblogic|10g</br>11g</br>12c|centos7|
 
+### 5.数据整合
+
+#### （1）前提
+原子表中需要加上task_id
+集群关系表需要加上task_id
+
+#### （2）执行时机
+在每个批次（子任务）扫描任务完成后
+
+#### （3）整合原子信息
+在原子表中找出task_id不是最新的原子，将该原子的base_info["status"]改为"DOWN"
+
+#### （4）建立集群关系
+根据cluster[0]["instance"]["listen"][0]去匹配原子的listen字段，从而初步建立集群关系
+
+#### （5）完善集群关系
+遍历cmdb_software_cluster_node表中的原子并且task_id必须为当前的，根据instance["listen"][0]去匹配原子表中的listen字段而且task_id必须为当前task_id，匹配后往集群关系表中插入该记录（如果不存在）
+
+#### （6）整合集群信息
+查询cmdb_software_cluster_node表（只处理当前的task_id）
+每次处理的最小单位为一个cluster，根据cluster_id，找出其所有的原子，进行数据整合
+每次处理的逻辑：
+* 创建一个临时列表list1，用于存放instance，临时变量v1
+* 遍历找出来的原子，先找出cluster字段为空的原子，存放在临时列表list2中
+* 遍历找出来的原子，再找出cluster字段不为空的原子
+  * v1=cluster[0]
+  * 遍历该原子的cluster[0]["instance"]
+    * 如果base_info["listen"][0] in instance["listen"],将该instance添加到临时列表中
+    * 遍历List2中的原子，如果为空的原子的base_info["listen"][0] in instance["listen"]，则将instance["listen"] = base_info["listen"] 和 instance["status"] = "UP"，然后将该instance添加到临时列表中，并且将该原子从临时列表list2剔除
+* v1["instance"]=list1
+* 遍历找出来的原子，将cluster[0] = v1
+
 ### 5.采集信息变更
 
 #### 5.1 基础概念

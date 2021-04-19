@@ -52,6 +52,11 @@ networking:
   dnsDomain: cluster.local
   serviceSubnet: 10.96.0.0/12
   podSubnet: 10.244.0.0/16
+
+#apiserver的相关配置
+apiServer:
+  extraArgs:
+    service-node-port-range: 1-65535
 ...
 ```
 

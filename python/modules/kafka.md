@@ -55,6 +55,7 @@ consumer = KafkaConsumer(*topics, **configs)
 #会监听在指定topic上，有一条数据就会循环一次
 for msg in consumer:
   print(msg)
+  consumer.commit()
 ```
 
 #### 4.创建AdminClient

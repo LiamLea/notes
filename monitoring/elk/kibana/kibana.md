@@ -1,10 +1,15 @@
 # kibana
+
 [toc]
+
 ### 基础概念
+
 #### 1.index patterns
 用于匹配es中的索引，即加载到kibana中来，可以使用通配符
 >比如：es中有以下索引：test-1，test-aaa，testindex  
 >可以利用test*匹配这些索引  
+
+如果某个index patterns的匹配的index的某个字段类型为string，但是之后把这个index删除了，新创建了index，新创建的index的那个字段类型为integer，这时需要刷新该index patterns，不然index patterns的该字段的类型还是为string
 
 #### 2.discovery
 可以显示匹配到的index中的日志

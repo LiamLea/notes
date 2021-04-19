@@ -47,7 +47,7 @@
 ```python
 from threading import Thread
 
-t = Thread(target = xx, args = (xx,))
+t = Thread(target = <FUNC_NAME>, args = (xx,))  #注意函数名后面不能加括号
 t.start()         #这是一个异步操作，不会阻塞
 t.ident           #获取线程id
 

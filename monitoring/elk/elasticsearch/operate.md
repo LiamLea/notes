@@ -25,6 +25,7 @@ curl -H "Content-Type: application/json" \
 ### 查询操作
 
 #### 1.index相关
+
 ##### （1）查询index的概述信息
 ```shell
 curl <IP>:<PORT>/_cat/indices?v
@@ -72,6 +73,7 @@ curl <IP>:<PORT>/<INDEX>/_search?pretty&size=<NUMBER>
 ```
 
 #### 2.高级查询
+
 ##### （1）基本语法
 ```shell
 curl -H "Content-Type: application/json" \
@@ -124,6 +126,20 @@ curl -H "Content-Type: application/json" \
       ]
     }
   }
+}
+```
+
+##### （3）查询nested类型数据
+```json
+{
+  "query": {
+      "nested": {
+        "path": "system.process",
+        "query": {
+            "match": { "system.process.pid": "3077"}
+        }
+      }
+    }
 }
 ```
 
