@@ -84,7 +84,7 @@ cat /proc/sys/kernel/pid_max
 ```
 （5）线程过多					
 ```shell
-cat /proc/sys/kernel/thereads_max
+cat /proc/sys/kernel/threads-max
 ```
 
 ##### 32./var/run和/var/lib

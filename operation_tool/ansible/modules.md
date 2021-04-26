@@ -1,7 +1,32 @@
 [toc]
 
 ### 概述
-#### 1.查看模块详情
+
+#### 1.collections（管理模块）
+
+##### （1）介绍
+collections是ansible管理modules的新的方式，即会分类进行管理，比如有以下类别：
+* ansible.builtin这个collection存放内置的模块，比如：copy、file等模块
+* Community.Kubernetes这个collection存放kubernetes相关的模块，比如：helm模块
+  * 使用：`community.kubernetes.helm`
+
+##### （2）利用ansible-galaxy管理collections
+```shell
+ansible-galaxy collection install <coleection_name> -p <install_path>
+
+#查看其中某个模块的使用，比如：
+ansible-doc community.kubernetes.helm
+```
+
+##### （3）collections搜索路径
+默认：`~/.ansible/collections`
+设置搜索路径：`ansible.cfg`
+```shell
+[defaults]
+collections_paths = <PATH>
+```
+
+#### 2.查看模块详情
 列出所有模块：`ansible-doc -l`
 查看具体模块的用法：`ansible-doc <MODULE>`
 查看具体模块的参数：`ansible-doc -s <MODULE>`（s：snippet）
@@ -223,4 +248,26 @@ blockinfile:
   block: |
     ...
     ...
+```
+
+***
+
+### kubernetes相关模块
+需要安装community.kubernetes collection
+
+#### 1.helm
+```yaml
+community.kubernetes.helm:
+  chart_ref: <path_or_url>
+  release_name: <name>
+  release_namespace: <namespace>
+  create_namespace: yes #默认为no
+  atomic: yes   #默认为no，如果未安装成功，不会发生任何更改
+  release_values: {}  #设置values.yaml中某些key的值
+#注意不能使用kafka.host这样设置变量
+#必须这样：
+#release_values：
+#  kafka:
+#    host: 3.1.5.19
+#    port: 19092
 ```

@@ -60,7 +60,7 @@ roles:
 
 #### ansible-glaxy命令（提供别人写好的role的网站）
 ```shell
-ansible-glaxy list            #列出存在的角色，搜索路径在ansible.cfg中定义了
-ansible-glaxy install 角色名   #从网站获得角色，安装在~/.ansible/roles/目录下
-ansible-glaxy remove 角色名
+ansible-glaxy role list            #列出存在的角色，搜索路径在ansible.cfg中定义了
+ansible-glaxy role install 角色名   #从网站获得角色，安装在~/.ansible/roles/目录下
+ansible-glaxy role remove 角色名
 ```

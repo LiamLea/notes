@@ -214,8 +214,13 @@ kubectl edit configmap kube-proxy -n kube-system
 #找到mode这个选项，改成ipvs即可
 ```
 
-#### 3.centos7和flannel的vxlan模式存在bug
-几种解决方案：
+#### 3.centos7和flannel的vxlan模式存在bug（ubuntu也存在bug）
+
+##### （1）存在的问题
+在centos上，宿主机访问pod的ip地址很慢
+在ubuntu上，hostNetwork: true和clusterPolicy: ClusterFirstWithHostNet，service域名解析失败
+
+##### （2）几种解决方案：
 * 使用host-gw模式替换vxlan模式
 * 在每台机器上执行（重启就失效了）
 ```shell

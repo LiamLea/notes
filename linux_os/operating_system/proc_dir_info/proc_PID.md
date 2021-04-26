@@ -56,6 +56,11 @@ getconf CLK_TCK
 #### `/proc/<PID>/fd/`
 该目录下存放该进程的文件描述符（链接到打开的文件）
 
+如果链接到的是socket，查看方式：
+需要注意：**如果该进程是通过容器启动的，需要切换到相应的netns中查看**
+* 可以通过`lsof -i -a -p <pid>`查看打开的套接字信息
+* 通过inode编号查找：`ll /proc/<pid>/fd/`会显示socket的inode号码：`996 -> 'socket:[33793093]'`，通过`ss -tuanpe | grep 33793093`查找到对应的套接字
+
 #### `/proc/<PID>/maps`
 该文件中存储了 被加载到该进程中的文件的 信息
 

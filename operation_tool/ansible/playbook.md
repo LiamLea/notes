@@ -134,6 +134,14 @@ with_items: <LIST>
      - {name: "lisan", group: "admin", password: "123"}
 ```
 
+* 遍历主机组
+```yaml
+- name: debug
+  debug:
+    msg: "{{ item }}"
+  with_items: "{{ groups['tidb'] }}"
+```
+
 #### 2.task通用语句
 ##### （1）错误处理：`ignore_errors`
 ```yaml
