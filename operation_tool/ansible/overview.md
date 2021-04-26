@@ -1,6 +1,9 @@
 # overview
+
 [toc]
+
 ### 概述
+
 #### 1.配置文件查找顺序（匹配即停止）
 * ANSIBLE_CONFIG变量定义的配置文件
 * ./ansible.cfg
@@ -80,6 +83,7 @@
 inventory = <INVENTORY>     #具体文件或者目录
 host_key_checking = False   #连接托管主机时,不需要输入yes
 library = <PATH>            #模块的搜索路径
+collections_paths = <PATH>  #collections的搜索路径
 ```
 
 #### 2.使用多个inventory

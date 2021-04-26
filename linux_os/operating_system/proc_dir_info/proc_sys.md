@@ -88,7 +88,7 @@ dmesg -c        #可以查看到读写的日志
 
 ### `/proc/sys/fs` —— 文件系统参数
 
-#### 1.`/pro/sys/fs/file-max`
+#### 1.`/proc/sys/fs/file-max`
   整个系统能最多能打开的文件描述符数量
 
 #### 2.`/proc/sys/fs/file-nr`
