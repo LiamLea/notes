@@ -159,6 +159,22 @@ reboot:
   reboot_timeout: <int | default=600>   #等待机器重启的时间，默认是600s   
 ```
 
+#### 4.selinux
+```yaml
+selinux:
+  state: disabled
+```
+
+##### 5.sysctl
+```yaml
+sysctl:
+  name: <KEY>
+  value: <VALUE>
+  sysctl_file: <default=/etc/sysctl.conf>
+  state: <present or absent>
+  reload: <BOOL | default=yes> #相当于sysctl -p
+```
+
 ***
 
 ### 包管理模块
@@ -234,8 +250,14 @@ template:
 对文件进行 行操作
 ```yaml
 lineinfile:
-  path: <PATH>          
-  inserafter: <REGEX>   #当为EOF，表示在文件末尾插入
+  path: <PATH>         
+
+  state: <STATE>        #present（默认）和absent
+  inserafter: <REGEX>   #匹配<REHEX>，在后面插入
+                        #当为EOF，表示在文件末尾插入
+
+  regexp: <REGEX>       #匹配<REHEX>，进行替换
+
   line: <STRING>
 ```
 

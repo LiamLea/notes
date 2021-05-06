@@ -20,7 +20,7 @@ systemctl restart systemd-resolved
 
 ***
 
-### 软件安装
+### 软件相关
 
 #### 1.下载软件包即其依赖
 ```shell
@@ -34,4 +34,23 @@ apt-get install <PACKAGE> --download-only
 #在包的目录下执行
 
 dpkg -i *
+```
+
+#### 3.关闭自动升级
+```shell
+#需要按照下面的顺序停止
+systemctl stop apt-daily.timer
+systemctl disable apt-daily.timer
+
+systemctl stop apt-daily-upgrade.timer
+systemctl disable apt-daily-upgrade.timer
+
+systemctl stop apt-daily
+systemctl disable apt-daily
+
+systemctl stop apt-daily-upgrade
+systemctl disable apt-daily-upgrade
+
+systemctl stop unattended-upgrades.service
+systemctl disable unattended-upgrades.service
 ```
