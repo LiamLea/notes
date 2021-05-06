@@ -46,6 +46,12 @@ echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
 
 ### 网络配置
 
+#### 1.网络插件的对比
+|插件名|flannel|calico|cannel|
+|-|-|-|-|
+|特点|简单|性能好，可以设置网络策略|结合flannel和calico（不再维护）|
+|实现方式|叠加网络（即封装）|通过BGP协议，没有进行封装，所以性能更好||
+
 #### 1.flannel采用的技术
 
 ##### （1）vxlan

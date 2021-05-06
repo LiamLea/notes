@@ -100,13 +100,16 @@ import_role: xx         #是一个task
   ```
 
 ##### （2）触发器：`notify`和`handlers`
+注意：默认所有tasks执行完，才会执行handlers中的任务，可以通过meta立即执行已经触发的handlers中的任务
 ```yaml
 tasks:
   - name: <NAME>
     <MODULE>: ...
+    notify: <TASK_NAME>
 
-    #当该task执行成功且造成了实际的改变,会运行handlers中指定的task
-    notify: <TASK_NAME>     
+  #当该task执行成功且造成了实际的改变,会运行handlers中指定的task
+  - name: reboot immediately
+     meta: flush_handlers
 
   - name: <NAME>
     <MODULE>: ...
@@ -140,6 +143,15 @@ with_items: <LIST>
   debug:
     msg: "{{ item }}"
   with_items: "{{ groups['tidb'] }}"
+```
+
+##### （4）循环：`until`
+```yaml
+...
+register: xx
+util: xx.rc != 0
+delay: 10       #失败后等待多长时间再次执行
+retries: 2      #重试的次数
 ```
 
 #### 2.task通用语句
