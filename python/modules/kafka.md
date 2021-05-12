@@ -41,6 +41,7 @@ producer.send("<TOPIC>", b"<MSG>", partition = <NUM>)
 #### 3.设置消费者
 ```python
 from kafka import KafkaConsumer
+from kafka.errors import CommitFailedError
 
 consumer = KafkaConsumer(*topics, **configs)
 
@@ -55,7 +56,12 @@ consumer = KafkaConsumer(*topics, **configs)
 #会监听在指定topic上，有一条数据就会循环一次
 for msg in consumer:
   print(msg)
-  consumer.commit()
+
+  #要保证上面的操作是幂等的，才能这样处理
+  try:
+    consumer.commit()
+  except CommitFailedError:
+    pass
 ```
 
 #### 4.创建AdminClient
