@@ -17,3 +17,15 @@
 * 然后将每个报文段封装为ip数据报
 * ip协议会根据MTU（Maximum Transmission Unit），会将ip数据报分为多个ip数据分片
 * 接收端会重组ip数据分片
+
+#### 3.网络架构的三层模型
+![](./imgs/overview_01.jpg)
+
+##### （1）Access layer（接入层）
+控制终端用户访问网络资源
+
+##### （2）Distribution layer（分发层/汇聚层）
+提供路由、过滤、管理等功能
+
+##### （3）Core layer（核心层）
+网络骨干网，负责传输大量流量

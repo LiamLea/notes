@@ -250,7 +250,11 @@ from kafka import KafkaConsumer
 consumer = KafkaConsumer(*topics, **configs)
 ```
 
-* configs：
+##### （1）基础概念
+* poll()
+轮询操作，当consumer监听一个topic时，会每隔一段时间去轮询一次，去获取消息
+
+##### （2）configs：
 ```python
 #指定kafka broker地址
   bootstrap_servers = <STRING or LIST>
@@ -269,5 +273,22 @@ auto_offset_reset = "earliest"
 enable_auto_commit = True
 
 #用于设置最少获取多少数据，当一条消息很小时，通过此配置能够提高效率
-fetch.min.bytes = <NUM>
+fetch.min.bytes = <INT|default=1>
+#如果没有满足最少数据量，则最多等待多长时间
+fetch.max.wait.ms = <INT|default=500>
+#用于设置最大获取数据，防止处理数据量过大，导致相关问题，比如：超时等
+fetch.max.bytes = <INT|default=52428800>
+
+
+#每次轮询最大获取的消息数量
+max.poll.records = <INT|default=500>
+#两次poll之前的时间间隔（默认5分钟），当超过这个时间，consumer就会被认为失败了，group会重新分配分区（但是session还是保持着的，因为有心跳检测机制，如果有其他消费者等着，则分区会分配给其他消费者，如果没有，consumer.commit()时会报错，捕获这个异常后能够继续处理）
+max.poll.interval.ms = <INT|default=300000>
+
+#server多久发送一次心跳检测包给consumer
+#设置的值必须小于session.timeout.ms
+heartbeat.interval.ms = <INT|default=3000>
+#发送心跳检测包后，等待回复的超时时间
+#如果超时了，server会将该consumer移除该group（即断开session连接）
+session.timeout.ms
 ```

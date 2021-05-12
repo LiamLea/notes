@@ -5,9 +5,12 @@
 ### 概述
 
 #### 1.需要实现的目标
-* 所有pods可以直接通信，无需NAT
-* 所有nodes可以直接通信，无需NAT
-* 同一个pod的内的容器共享netns
+|目标|方式|
+|-|-|
+| 同一个pod的内的容器通信 | 共享netns |
+| 不同主机上的pods可以直接通信，无需NAT | 通过tunnel |
+| pod与service的可以直接通信 | 通过iptables |
+| 所有nodes可以通信 | 本身node就需要可以通信 |
 
 #### 2.需要考虑的网络模型
 
@@ -22,7 +25,7 @@
 ![](./imgs/pod-to-pod_01.png)
 
 * 跨宿主机间的pod
-  * 通过隧道（比如：vxlan）
+  * 通过 **tunnel**（比如：vxlan）
 
 ![](./imgs/pod-to-pod_02.gif)
 
@@ -40,7 +43,7 @@ echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
 
 
 ##### （4）node-to-node 网络
-通过tunnel（比如：vxlan、ipip等）
+本身就需要能够通信
 
 ***
 
