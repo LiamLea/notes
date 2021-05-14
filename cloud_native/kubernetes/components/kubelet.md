@@ -75,6 +75,23 @@ kubectl get nodes xx -o yaml
 
 #### 1.DNS相关
 ```yaml
+#指定cluster内部使用的dns地址
 clusterDNS: <LIST>
-resolvCONF
+#指定cluster所在的域
+clusterDomain: <domain>
+
+#当DNS policy设置Default时，就会使用这个文件配置dns
+resolvConf: <resolv_file_path> #如果是redhaht系统，就设为//etc/resolv.conf
+```
+
+#### 2.network plugin相关
+```shell
+#指定使用的网络插件类型为cni
+--network-plugin=cni
+
+#指定cni的配置文件目录（当有多个文件时，按照字典顺序，读取第一个文件）
+--cni-conf-dir=/etc/cni/net.d   #默认：/etc/cni/net.d
+
+#指定cni类型插件的二进制可执行文件的目录（在上面的配置文件中，会指定具体使用哪些插件，会在该目录下寻找这些插件的二进制文件）
+--cni-bin-dir=/opt/cni/bin      #默认：/opt/cni/bin
 ```
