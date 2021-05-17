@@ -228,3 +228,7 @@ ethtool --offload flannel.1 rx off tx off
 #查看ethtool --show-offload rx off tx off
 ```
 * 或者换网络插件
+
+#### 4.更换网络插件后一定要重启机器
+因为更换网络插件后，网卡和路由会发生变化，然而旧的pod的ip还是根据之前的网络插件分配的，会导致pod间的网络不通
+残留的网络配置会导致各种各样的网络问题，进而导致各种其他问题

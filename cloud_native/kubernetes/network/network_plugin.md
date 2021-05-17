@@ -14,7 +14,7 @@
 |类别|说明|特点|
 |-|-|-|
 |cni plugins|只要能够实现 cni接口规范 的插件 都属于这个类型|功能丰富|
-|kubenet||功能单一|
+|kubenet||功能单一（不支持 cross-node网络 和 网络策略|
 
 #### 3.CNI
 container network interface，容器网络接口，是一种接口标准

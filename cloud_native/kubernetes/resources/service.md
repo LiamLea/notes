@@ -49,7 +49,17 @@
 * 将node上指定端口映射到该service上的指定端口
 
 ##### （3）LoadBalancer
-  用于在云上虚拟一个负载均衡器，进行调度
+前提：需要在云提供商或者支持external load balancers的环境中
+目前：就是能够通过public ip直接访问service，否则只能通过node ip访问service
+```shell
+$ kubectl get svc
+
+NAME         TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE
+nginx-1      LoadBalancer   10.104.90.5   <pending>     80:32037/TCP   2m10s
+
+#当分配一个ip给该service时，EXTERNAL-IP字段就为分配的public ip
+nginx-1      LoadBalancer   10.104.90.5   206.189.117.254   80:32037/TCP   2m36s
+```
 
 ##### （4）ExternalName
 * 能够使得集群内的pod能够与外界联系，这种类型的service就充当这个外出的桥梁
