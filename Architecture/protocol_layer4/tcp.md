@@ -27,6 +27,22 @@ cwnd：congestion window
 #### 5.TCP11中状态
 ![](./imgs/tcp_01.gif)
 
+#### 6.MTU and TCP MSS
+
+![](./imgs/tcp_mss_01.png)
+
+##### （1）MTU（maximum transmission unit）
+* 在网卡接口上设置，能够传输的单个ip包的大小（包括header，单位字节），默认为1500字节
+* 当ip包超过MTU的值，会被进行分片
+* 当收到ip会将包的大小与MTU值进行比较，
+  * 如果超了，会进行分片传输（当设置了'Don't Fragment'标志，则不会分片，ip包会被丢弃并告知发送者）
+
+##### （2）MSS（maximum segment size）
+* 在TCP header中的option中设置的（**根据MTU值计算出来的**），用于设置单个TCP包payload的数据量（字节），默认为1460字节
+* 封装协议的TCP MSS要小一些，因为有封装的头部，所以封装协议会损耗一定的性能
+* MSS值是在三次握手时确定的，会在SYN包中的option部分，声明MSS应该设为多少
+![](./imgs/tcp_mss_02.png)
+
 ***
 
 ### TCP头部

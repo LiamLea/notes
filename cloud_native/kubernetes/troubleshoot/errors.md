@@ -65,3 +65,6 @@ kubectl get ns <NAMESPACE> -o json > /tmp/temp.json
 ```shell
 kubectl replace --raw "/api/v1/namespaces/<NAMESPACE>/finalize" -f /tmp/temp.json
 ```
+
+#### 6.更换网络插件后一定要重启所有机器
+具体原因看deploy.md文件
