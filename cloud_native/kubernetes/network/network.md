@@ -49,8 +49,8 @@ echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
 |方式|特点|优点|缺点|
 |-|-|-|-|
 |overlay network|封装数据包|不依赖底层网络，只需要底层网络能通就行|1.轻微的性能影响</br>2.在cluster外部的网络，没有到pod的ip的路由|
-|none-overlay network|不封装数据包（直接路由）|1.性能更好</br>2.在cluster外部的网络能够直接访问pod ip，不需要通过service、ingress等|1.依赖底层网络，需要构建路由表（通过BGP）</br>2.pod的ip必须在整个网络中是唯一的  |
-|cross-subnet overlay network|跨subnet时，才进行封装|性能优于overlay network|需要构建路由表（通过BGP）|
+|none-overlay network|不封装数据包（直接路由）|1.性能更好</br>2.在cluster外部的网络能够直接访问pod ip，不需要通过service、ingress等|1.依赖底层网络，需要构建路由表（比如calico就是利用的BGP）</br>2.pod的ip必须在整个网络中是唯一的  |
+|cross-subnet overlay network|跨subnet时，才进行封装（上述两者的结合）|性能优于overlay network|需要构建路由表（通过BGP）|
 
 * cross-subnet overlay实现的方式
 ```shell
@@ -70,28 +70,3 @@ $ ip r
 ...
 
 ```
-
-***
-
-### 网络配置
-
-#### 1.网络插件的对比
-|插件名|flannel|calico|cannel|
-|-|-|-|-|
-|特点|简单|性能好，可以设置网络策略|结合flannel和calico（不再维护）|
-|实现方式|叠加网络（即封装）|通过BGP协议，没有进行封装，所以性能更好||
-
-#### 1.flannel采用的技术
-
-##### （1）vxlan
-  叠加网络，利用隧道技术封装数据帧，从而能够实现很好的网络隔离
-
-##### （2）host-gw（也就是虚拟网桥）
-  物理网卡作为网关，当跨主机通信时，通过物理网卡路由
-  特点：性能最好，但是需要物理主机都必须在同一网络内
-
-##### （3）udp（性能差，现在已经不用）
-
-#### 2.利用calico实现网络策略
-安装calico后，会创建crd资源：NetworkPolicy
-用户可以自动该资源创建规则，从而实现网络策略

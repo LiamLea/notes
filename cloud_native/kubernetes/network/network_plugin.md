@@ -20,6 +20,13 @@
 container network interface，容器网络接口，是一种接口标准
 定义了 网络插件 和 容器 之前的实现标准
 
+#### 4.常用CNI网络插件
+
+|CNI插件|overlay网络|none-overlay网络|cross-subnet overlay网络|
+|-|-|-|-|
+|calico|vxlan|host-gw（节点必须在同一个网段内）||
+|flannel|vxlan、ipip||cross-subnet vxlan、cross-subnet ipip|
+
 ***
 
 ### CNI配置
@@ -40,6 +47,8 @@ container network interface，容器网络接口，是一种接口标准
 
 [参考](https://github.com/containernetworking/cni/blob/master/SPEC.md)
 
+默认目录：`/etc/cni/net.d`
+生成方式：比如calico就是通过calico-config这个configmap生成的这个文件
 ```json
 {
   "name": "",

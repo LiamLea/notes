@@ -81,7 +81,22 @@ import_role: xx         #是一个task
 ***
 
 ### 使用
-#### 1.控制语句
+
+#### 1.使用jinja2的语法
+
+**参考python的jinja2模块，多运用内置函数**
+
+##### （1）复杂使用示例
+
+* example-1
+
+```yaml
+set_fact:
+  init_master: "{%- set myList = [] -%} {%- for i in groups.master -%} {{ myList.append({'name': i, 'priority': hostvars[i]['ansible_host'].split('.')[-1] | int}) }} {%- endfor -%} {{ (myList | sort(attribute='priority') | last)['name'].strip() }}"
+```
+
+#### 2.控制语句
+
 ##### （1）条件判断：`when`
 * when使用的表达式是原生的jinja2表达式，所以变量不需要加双括号
 
@@ -154,7 +169,8 @@ delay: 10       #失败后等待多长时间再次执行
 retries: 2      #重试的次数
 ```
 
-#### 2.task通用语句
+#### 3.task通用语句
+
 ##### （1）错误处理：`ignore_errors`
 ```yaml
 <MODULE>: ...
