@@ -68,3 +68,9 @@ kubectl replace --raw "/api/v1/namespaces/<NAMESPACE>/finalize" -f /tmp/temp.jso
 
 #### 6.更换网络插件后一定要重启所有机器
 具体原因看deploy.md文件
+
+
+#### 7.`Error response from daemon: Conflict.`
+容器冲突了，由于系统时间修改，导致有两个相同的容器，但是创建时间不同
+解决：
+删除冲突容器，如果不行，把这个pod先停掉，然后再删除相应的容器，再重新启动pod

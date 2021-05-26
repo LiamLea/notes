@@ -24,9 +24,23 @@
 类似文件夹，用于组织和存储event
 当event被消费，topic不会删除event
 可以设置保存event多长时间
-* topic是被分区的（默认只有一个分区：Partition 0）
-  * 根据event的key（key是由生产者指定的），将event哈希到指定分区
+
+##### （4）partition
+* topic会被划分为多个partition（用0，1，2...标识）
+  * 对于每个分区:
+    * 可以有多个副本，但有且仅有一个leader副本，当leader所在的broker宕机，会重新选择一个leader
+    * 在每个broker上，只能有一个副本（即副本数<=broker数量）
+    * 当访问某个分区时，会返回leader副本的broker的信息，然后连接被重定向到该broker
+  * 多个分区，会根据rebalance策略合理分布在broker上，可以分布在同一个broker上
+
+* 是为了实现并发
   * 同时消费多个分区，不能保证多个分区之间的顺序，只能保证一个分区内的数据是按顺序消费的
+
+* 根据event的key（key是由生产者指定的），将event哈希到指定分区
+
+* 3个broker，2个partition，3个replication
+![](./imgs/kafka_02.png)
+![](./imgs/kafka_03.png)
 
 #### 3.使用的安全协议
 |协议名|说明|
@@ -97,28 +111,63 @@
 ##### （2）client_id
 * 在同一个group中，client_id不能一样
 
+#### 7.工作原理
+
+* client访问某一个broker，该broker会返回metadata（包含adversied listener信息），然后连接会被重定向（即client访问该adversied listener建立连接）
+* topic会被划分为多个partition（用0，1，2...标识）
+  * 对于每个分区:
+    * 可以有多个副本，但有且仅有一个leader副本，当leader所在的broker宕机，会重新选择一个leader
+    * 在每个broker上，只能有一个副本（即副本数<=broker数量）
+    * 当访问某个分区时，会返回leader副本的broker的信息，然后连接被重定向到该broker
+  * 多个分区，会根据rebalance策略合理分布在broker上，可以分布在同一个broker上
+
 ***
 
 ### 集群（高可用）
 
-#### 1.概述
+#### 1.安装集群
 
-![](./imgs/kafka_02.png)
+##### （1）broker的要求
+* broker id必须不同
+* advertised.listeners必须不同
 
-##### （1）现象：
-无论访问哪一个broker，看到的内容都是一样的，包括分区和消息
+##### （2）在kubernets中安装kafka集群
+本质通过环境变量，从而使得每个pod的配置有所区别
 
-##### （2）原理
-* 集群时，分区其实被分配到各个broker上
-  * 只创建一个分区时，该分区数据只会存在一个broker上，该broker称为 该分区的leader broker
-  * 连接任意一个broker，会先获取leader broker信息，然后都会在leader broker上提交和获取offset
-  * 当leader broker宕机，则数据就会无法访问到
+* 当externalAccess enabled时，会预置下面这些环境变量：`kafka/templates/scripts-configmap.yaml`
+```shell
+HOSTNAME=$(hostname -s)   #${HOSTNAME}，比如：kafka-0
+ID=${HOSTNAME:(-1)}       #${ID}，比如：0
 
-* 要实现高可用：创建topic时，需要指定副本数
-  * 副本数 <= broker数量，否则创建时会报错
-  * 对于某一个分区而言，有一个leader broker，其余都是follwer broker（kafka会自动选择谁是leader，谁是follower）
-  * 所有读写操作都是在leader broker上进行的，follower broker会复制leader的数据和状态
-  * 所以当leader宕机，还可以继续使用
+EXTERNAL_ACCESS_IP={{ .Values.externalAccess.service.domain }}
+EXTERNAL_ACCESS_PORT=$(echo '{{ .Values.externalAccess.service.nodePort }}' | tr -d '[]' | cut -d ' ' -f "$(($ID + 1))")
+
+...
+```
+
+```yaml
+replicaCount: 3
+
+#每个pod会自动设置唯一的broker id
+brokerId: -1
+
+#需要注意：
+#使用容器内的环境变量，在chart中如何使用的，需要看具体使用的地方
+#如果在pod.spec.containers.env.value，语法：  $(<VAIRABLE_NAME>)
+#如果在shell中，语法：  ${<VAIRABLE_NAME>}
+listenerSecurityProtocolMap: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+listeners: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:$(EXTERNAL_ACCESS_PORT)
+advertisedListeners: INTERNAL://${MY_POD_NAME}.kafka-headless.kafka:9092,EXTERNAL://${EXTERNAL_ACCESS_IP}:${EXTERNAL_ACCESS_PORT}
+interBrokerListenerName: INTERNAL
+
+externalAccess:
+  enabled: true
+  service:
+    type: NodePort
+    port: 19092
+    domain: 3.1.5.249
+    nodePort: [19092,19093,19094]
+```
 
 ***
 
@@ -130,25 +179,37 @@
 
 ```shell
 #当前kafka server的id，在同一个集群中，id必须唯一
+#设为-1时，会自动设置一个唯一的broker id
 broker.id=<NUM>
 ```
 
 ##### （2）监听器设置
 
 ```shell
-#监听器名称 和 安全协议 之间的映射关系（相当于创建监听器）
-#为什么需要这个：如果同一个安全协议，应用到不同ip，需要有不同的策略
-#比如：通用设置 ssl.keystore.location，如果给指定监听器设置 listener.name.<NAME>.ssl.keystore.location
-listener.security.protocol.map=<NAME>:<PROTOCOL>,<NAME>:<PROTOCOL>
+#创建监听器：监听器名称 和 安全协议 之间的映射关系
+#为什么需要这个：因为每个监听器，需要有不同的策略（比如用于内部通信的就不需要ssl协议，用于外部通信的就需要用ssl协议:listener.name.<NAME>.ssl.keystore.location）
+listener.security.protocol.map=<LISTENER_NAME>:<PROTOCOL>,<LISTENER_NAME>:<PROTOCOL>
 
-#监听器列表，用于 指定监听的地址列表 或者 设置监听器的地址列表
-listeners=<PROTOCOL or LISTENER_NAME>://<IP>:<PORT>
+#设置 每个监听器 监听的地址（ip:port）
+listeners=<LISTENER_NAME>://<IP>:<PORT>
 
-#发布到zookeeper中的监听器信息列表
-#与本地设置的监听器不同：
-#   本地监听器可以设置0.0.0.0:9092，但是发布到zookeeper的监听器地址必须是一个可以访问的地址
-#   因为客户端会通过zookeeper获取到kafka的访问地址，从而实现高可用，即使某一台kafka挂了，还可以访问其他地址
-advertised.listeners=<PROTOCOL or LISTENER_NAME>://<IP>:<PORT>
+#broker之间用哪个监听器进行通信
+interBrokerListenerName=<LISTENER_NAME>
+
+#将 声明的监听器信息 发布到 zookeeper中
+#当client访问某个监听器时，broker会返回对应的元信息（包含 该监听器 声明的监听器信息），client就会使用 该监听器 声明的监听器信息 来建立连接）
+advertised.listeners=<LISTENER_NAME>://<IP>:<PORT>
+```
+
+* 示例
+```yaml
+listenerSecurityProtocolMap: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+
+listeners: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:19092
+
+advertisedListeners: INTERNAL://kafka.kafka:9092,EXTERNAL://3.1.5.249:19092
+
+interBrokerListenerName: INTERNAL
 ```
 
 ##### （3）topic默认配置
@@ -160,7 +221,10 @@ auto.create.topics.enable=true
 auto.leader.rebalance.enable
 
 #允许删除topic，否则无法删除任何topic
-delete.topic.enable==true
+delete.topic.enable=true
+
+#partition的副本数量
+default.replication.factor=<INT>      #默认使用初始化broker时设置的默认值
 ```
 
 ##### （4）zookeeper相关配置

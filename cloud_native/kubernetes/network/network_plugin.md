@@ -22,10 +22,10 @@ container network interface，容器网络接口，是一种接口标准
 
 #### 4.常用CNI网络插件
 
-|CNI插件|overlay网络|none-overlay网络|cross-subnet overlay网络|
-|-|-|-|-|
-|calico|vxlan|host-gw（节点必须在同一个网段内）||
-|flannel|vxlan、ipip||cross-subnet vxlan、cross-subnet ipip|
+|CNI插件|overlay网络|none-overlay网络|cross-subnet overlay网络|优点|
+|-|-|-|-|-|
+|flannel|vxlan|host-gw（节点必须在同一个网段内）|||
+|calico|vxlan、ipip||cross-subnet vxlan、cross-subnet ipip|1.IPAM更加灵活</br>2.支持网络策略</br>3.性能更好（比如：cross-subnet vxlan比vxlan性能更好）|
 
 ***
 
@@ -47,8 +47,8 @@ container network interface，容器网络接口，是一种接口标准
 
 [参考](https://github.com/containernetworking/cni/blob/master/SPEC.md)
 
-默认目录：`/etc/cni/net.d`
-生成方式：比如calico就是通过calico-config这个configmap生成的这个文件
+默认目录：`/etc/cni/net.d/`
+生成方式：比如calico就是，将calico-config这个configmap配置注入calico-node这个pod中，然后calico-node这个pod生成`10-calico.conflist`这个文件
 ```json
 {
   "name": "",

@@ -106,6 +106,12 @@ helm upgrade xx xx1         #xx1为chart名或者本地chart的路径
 
 #通过双括号注入,小数点开头表示从最顶层命名空间引用.
   {{ .OBJECT.Name }}		  
+
+#使用容器内的环境变量，在chart中如何使用的，需要看具体使用的地方
+#如果在pod.spec.containers.env.value，语法：
+  $(<VAIRABLE_NAME>)
+#如果在shell中，语法：
+  ${<VAIRABLE_NAME>}
 ```
 #### 2.helm内置对象
 ```shell

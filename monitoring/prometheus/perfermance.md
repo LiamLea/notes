@@ -41,6 +41,9 @@ write-ahead log，保证了head block中数据的安全，当prometheus重启后
 needed_disk_space = retention_time_seconds * ingested_samples_per_second * bytes_per_sample
 ```
 
+##### （2）所需要的内存
+利用压测工具进行压测，进行测试
+
 ***
 
 ### 压测
