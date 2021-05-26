@@ -125,6 +125,9 @@ spec:
     - name: xx
       mountPath: xx
 
+    #设置环境变量
+    env: []
+
   volumes:
   - name: xx
     configMap:
@@ -135,7 +138,41 @@ spec:
   dnsPolicy: ClusterFirstWithHostNet      #必须设置这一项，不然无法访问到service
 ```
 
-#### 2.探测
+#### 2.环境变量设置
+
+##### （1）常用于statefulSet
+因为每个pod都是唯一的，所以很多配置需要利用环境变量配置，从而保证每个pod的配置都不一样
+
+##### （2）环境变量的来源
+
+* 常量值
+```yaml
+#${V_1} = 1234
+- name: V_1
+  value: 1234
+```
+
+* 根据其他变量生成
+```yaml
+- name: V_2
+  value: aa$(V_1)bb   #${V_2}=aa$(V_1)bb
+- name: V_1
+  value: 1234
+- name: V_2
+  value: aa$(V_1)bb   #${V_2}=aa1234bb
+```
+
+* 从相关资源中获取
+    * configMap
+    从configmap中选择一个key，取得相应的值
+    * field
+    从pod的字段中选择，比如：`metadata.name`
+    * resourceField
+    从container的资源中选择，比如：`requests.cpu`
+    * secretKey
+    从当前namespace的secret中选择一个key，取得相应的值
+
+#### 3.探测
 每次探测有三种结果：Success，Failure，Unkown
 ```yaml
 readinessProbe:

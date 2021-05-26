@@ -44,9 +44,9 @@ spec:
 
     #配置ip pools（可配置多个）
     ipPools:
-    - cidr: 10.244.0.0/16   #classless inter-domain routing，五类别域间路由
-      blockSize: 26         #分配给每个节点的ip段的长度
-      encapsulation: VXLANCrossSubnet   #VXLAN、IPIP、IPIPCrossSubnet
+    - cidr: 10.244.0.0/16   #classless inter-domain routing，无类别域间路由（即kubeadm init时，设置的pod的cidr）
+      blockSize: 26         #将一个ip pool分为多个更小的block（每个block的网段长度）
+      encapsulation: VXLANCrossSubnet   #VXLAN、IPIP（需要开启bgp）、IPIPCrossSubnet
       natOutgoing: <bool | default=Enabled>    #访问集群外的地址会进行snat，将pod的ip转换为node的ip
       nodeSelector: all()    #指定该ip pool用于哪些node
 

@@ -35,13 +35,6 @@ point to point tunneling protocol
 * 由于PPTP本身无法与NAT配合使用，因此通常需要具有PPTP直通的路由器
 * 防火墙很容器组织 PPTP连接
 
-#### 5.passthrough
-是路由器的一个功能，如果没有这个功能，使用NAT的路由器无法转发VPN流量
-* 由于PPTP会加密网络层协议，导致NAT没有办法创建映射记录
-  * 因为NAT需要根据 源ip + 上层协议的状态（比如端口、icmp中的id），添加映射记录
-
-* passthrough 利用 源ip + gre中的call id，添加映射记录
-
 ***
 
 ### 使用

@@ -38,7 +38,7 @@
   * 分发路由条目到BGP peer
   * 配置BGP route reflector
 
-* conf（configuration management system）
+* confd（configuration management system）
   * 负责监听calico的数据库，当发生变化，更新BIRD相关的配置文件
 
 ##### （3）API相关组件
@@ -49,3 +49,21 @@
 ##### （4）其他组件
 * Dikastes
   * 用于再istio中配置网络策略
+
+#### 3.calico IPAM
+
+##### （1）可以生成多个ip pools
+pod cidr：`10.244.0.0/16`
+分成多个ip pools：`10.244.1.0/24`、`10.244.2.0/24`等
+
+##### （2）将一个ip pool分为多个更小的block
+
+```yaml
+ipPools:
+- cidr: 10.244.0.0/16
+  blockSize: 26
+  nodeSelector: all()
+```
+一个node可以关联多个block，提高ip的利用率
+当node上pods少时，分配一个block给这个node（按照flannel那种方式，此时就有很多ip浪费了，没有利用起来）
+当node上pods多（ip不够用）时，可以分配多个block给这个node
