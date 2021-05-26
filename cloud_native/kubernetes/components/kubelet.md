@@ -81,7 +81,7 @@ clusterDNS: <LIST>
 clusterDomain: <domain>
 
 #当DNS policy设置Default时，就会使用这个文件配置dns
-resolvConf: <resolv_file_path> #如果是redhaht系统，就设为//etc/resolv.conf
+resolvConf: <resolv_file_path> #如果是redhaht系统，就设为/etc/resolv.conf
 ```
 
 #### 2.network plugin相关
