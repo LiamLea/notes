@@ -185,3 +185,7 @@ kubeadm alpha certs check-expiration
 ```shell
 kubeadm alpha certs renew all
 ```
+
+***
+
+### 修改已有k8s集群的相关配置

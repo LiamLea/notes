@@ -71,9 +71,9 @@ $ ip r
 
 ```
 
-#### 4.node在不同网段的解决方案
-1.Calico can be configured to create IP-in-IP tunnel endpoints on each node for every subnet that is hosted on the node. Any packet that originated by the pod and is egressing the node, is encapsulated with the IP-in-IP header and the node IP address is used as the source. This way, the infrastructure router does not see the pod IP addresses.
+#### 4.node在不同网段且存在nat gateway 的解决方案
 
-The IP-in-IP tunneling brings in extra network throughput and latency due to additional packet processing at each endpoint to encapsulate and decapsulate packets. On bare metal, the overhead is not significant as certain network operations can be offloaded to the network interface cards. However, on virtual machines, the overhead can be significant and also affected by the number of CPU cores and network I/O technologies that are configured and used by the hypervisors. The additional packet encapsulation overhead can also be significant when smaller maximum transmission unit (MTU) sizes are used since it can introduce packet fragmentation. Jumbo frames must be enabled whenever possible.
-
-2.The second option is to make the infrastructure router aware of the pod network. You can do this by enabling BGP on the router and adding the nodes in the cluster as BGP peers. These steps allow the router and the hosts to exchange the route information between each other. The size of the cluster in this scenario can come into play as in the BGP mesh. Every node in the cluster is a peer of the router after enabling BGP on the router.
+利用IPIP封装方式
+* 不能使用VXLAN方式，因为VXLAN不兼容NAT
+* 还需要配置bgp，使其能通过NAT（具体看calico/config.md中的bgp配置）
+  * IPIP为什么依赖bgp：这样才能获取相关路由，否则不能通信
