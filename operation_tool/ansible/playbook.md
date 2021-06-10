@@ -160,13 +160,21 @@ with_items: <LIST>
   with_items: "{{ groups['tidb'] }}"
 ```
 
-##### （4）循环：`until`
+##### （4）循环直到某个条件成立：`until`
 ```yaml
 ...
 register: xx
-util: xx.rc != 0
+until: xx.rc != 0
 delay: 10       #失败后等待多长时间再次执行
 retries: 2      #重试的次数
+```
+
+##### （5）控制并发数（比如需要串行执行时）：`throttle`
+当`throttle: 1`时，这时就是串行执行的
+```yaml
+- name: debug
+  shell: sleep 1
+  throttle: 1
 ```
 
 #### 3.task通用语句

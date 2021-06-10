@@ -181,7 +181,14 @@ kubeadm init phase addon all --config <kubeadm-config>
 kubeadm alpha certs check-expiration
 ```
 
-* 重新生成所有证书
+* 重新生成除ca以外的所有证书
+  * 不会创建被删除的证书，只会更新已有的证书
+  * 不会生成kubelet连接apiserver用于身份识别的证书（`/etc/kubernetes/kubelet.conf`中的`user.client-certificate`和`user.client-key`），因为当证书快过期时，kubelet会自动更新证书
+  * 更新`/etc/kubernetes/pki/`目录下除ca的所有证书，和`/etc/kubernetes/`目录下的`admin.conf`、`controller-manager.conf`和`scheduler.conf`文件中的证书配置
+  * 这个命令**不会重新生成各种ca相关证书**，所以kubelet不需要重新加载证书，因为kubelet只需要指定ca证书就行
+    * 如果需要重新ca证书：`kubeadm init phase certs ...`，这里需要注意：所有节点的ca证书要一致，可以在一台主机上生成，然后拷贝到其他主机上
+  * 所有master节点，都需要执行一下这个命令
+  * 建议重启相关容器（etcd、apiserver、scheduler、controller），否则有可能不生效
 ```shell
 kubeadm alpha certs renew all
 ```
@@ -189,3 +196,42 @@ kubeadm alpha certs renew all
 ***
 
 ### 修改已有k8s集群的相关配置
+
+#### 1.修改controlplane endpoint
+
+* 导出kubeadm配置
+
+```shell
+kubeadm config view > kubeadm-config.yaml
+```
+
+* 修改配置：`vim kubeadm-config.yaml`
+```yaml
+apiServer:
+  #SAN：Subject Alternate Name
+  #如果还有其他需要添加到证书中的主机名或者ip，则在这里添加
+  certSANs:
+  - xx
+
+controlPlaneEndpoint: 3.1.5.219:6443
+#...
+```
+
+* 上传kubeadm的配置
+```shell
+kubeadm init phase upload-config all --config kubeadm-config.yaml
+```
+
+* 生成证书（每台master都执行）
+apiserver不需要重启，可能是程序会自动加载更新后的证书
+```shell
+#需要删除已有的证书
+rm /etc/kubernetes/pki/apiserver.{crt,key}
+kubeadm init phase certs apiserver --config kubeadm-config.yaml
+```
+
+* 修改其他组件指定的apiserver的地址，然后重启
+  * kubelet：`/etc/kubernetes/kubelet.conf`
+  * controller-manager：`/etc/kubernetes/controller-manager.conf`
+  * scheduler：`/etc/kubernetes/scheduler.conf`
+  * `/etc/kubernetes/admin.conf`
