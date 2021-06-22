@@ -83,3 +83,37 @@ my_topic = NewTopic(
 
 client.create_topics([my_topic])
 ```
+
+##### （1）管理consumer group
+
+* 查看所有的consumer group
+
+```python
+result = client.list_consumer_groups()
+
+print(json.dumps(result, indent = 2))
+```
+```shell
+kafka-consumer-groups.sh --bootstrap-server <IP:PORT> --list
+```
+
+* 查看某个consumer group的详细信息
+```python
+result = client.describe_consumer_groups(["<CONSUMER_GROUP>"]))
+result = client.list_consumer_group_offsets("<CONSUMER_GROUP>")
+```
+
+```shell
+kafka-consumer-groups.sh --bootstrap-server <IP:PORT>  --describe --group <CONSUMER_GROUP> --state
+kafka-consumer-groups.sh --bootstrap-server <IP:PORT>  --describe --group <CONSUMER_GROUP> --members
+kafka-consumer-groups.sh --bootstrap-server <IP:PORT>  --describe --group <CONSUMER_GROUP> --offsets
+```
+
+* 删除某个consumer group（当该group中有client正在消费时，无法删除）
+```python
+#返回删除结果
+result = client.delete_consumer_groups(["dev-kangpaas-monitormgnt-server-kangpaas-topic_batchformat_process"])
+```
+```shell
+kafka-consumer-groups.sh --bootstrap-server <IP:PORT>  --delete --group <CONSUMER_GROUP>
+```

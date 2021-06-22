@@ -349,10 +349,10 @@ max.poll.records = <INT|default=500>
 #两次poll之前的时间间隔（默认5分钟），当超过这个时间，consumer就会被认为失败了，group会重新分配分区（但是session还是保持着的，因为有心跳检测机制，如果有其他消费者等着，则分区会分配给其他消费者，如果没有，consumer.commit()时会报错，捕获这个异常后能够继续处理）
 max.poll.interval.ms = <INT|default=300000>
 
-#server多久发送一次心跳检测包给consumer
+#consumer多久发送一次心跳检测包给server
 #设置的值必须小于session.timeout.ms
 heartbeat.interval.ms = <INT|default=3000>
-#发送心跳检测包后，等待回复的超时时间
+#发送心跳检测包后，等待回复的超时时间（默认为10s，group.min.session.timeout.ms <= 可配置的范围 <= group.max.session.timeout.ms）
 #如果超时了，server会将该consumer移除该group（即断开session连接）
-session.timeout.ms
+session.timeout.ms = <INT|default=10000>
 ```
