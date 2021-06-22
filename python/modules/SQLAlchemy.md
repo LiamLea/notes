@@ -28,7 +28,7 @@ engine = create_engine(
     max_overflow = 2,       #连接池满时，最多再创建多少个连接
     pool_size = 5,          #连接池大小
     pool_timeout = 30,      #等待获取连接池中连接的时长，如果超时，则报错
-    pool_recycle = -1       #多久对连接池中的线程进行一次重置
+    pool_recycle = 3600       #多久对连接池中的线程进行一次重置，-1表示不重置
 )
 
 Session = sessionmaker(bind = engine)

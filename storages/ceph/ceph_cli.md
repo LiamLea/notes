@@ -86,3 +86,15 @@ ceph config dump
 ```shell
 ceph config set mon public_network <CIDR>   #声明monitor的网段，当node在这个网段内，才可以部署ceph-mon服务
 ```
+
+***
+
+### OSD相关
+
+#### 1.pool相关
+```shell
+ceph osd dump
+
+ceph osd pool ls detail
+ceph osd pool autoscale-status
+```
