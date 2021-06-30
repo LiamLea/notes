@@ -8,18 +8,38 @@
 * 接收者配置：`receiver`
 * 抑制配置：`inhibit_rules`
 
+#### 2.group
+用于对告警分组，当一定时间内有多条告警产生，会将同一个group的告警，通过一条消息发过去
+根据label和label的值进行分组，值相同的为一组
+
 ***
 
-### 全局配置
+### 配置
+
+#### 1.配置格式
+```yaml
+global:
+
+  <global>          #全局配置
+
+  receivers:        #接收者设置
+  - <receiver>
+
+  route: <route>    #路由配置
+
+  inhibit_rules:    #抑制规则配置
+  - <inhibit_rule>
+```
+
+#### 2.全局配置（`<global>`）
 全局的配置，在单个配置下可以覆盖全局的配置
 ```yaml
 http_config: <http_config>
 #等等
 ```
 
-***
 
-### receiver配置
+#### 3.receiver配置（`<receiver>`）
 
 ##### （1）基础配置
 ```yaml
@@ -48,7 +68,7 @@ http_config: <http_config | default = global.http_config>
 max_alerts: <NUM | default = 0>
 ```
 
-* 发送消息格式
+###### （3）发送消息格式
 这里只列出关键信息
 ```json
 {
@@ -65,19 +85,19 @@ max_alerts: <NUM | default = 0>
     {
       "status": "<resolved|firing>",  //resolved是告警恢复时发送的信息
                                       //firing是告警产生时发送的信息
-      "labels": "该条告警的labels",
-      "annotations": "该条告警的annatations",
+      "labels": {},                   //该条告警的labels
+      "annotations": {},              //该条告警的annatations
       "startsAt": "开始时间",
       "endsAt": "结束时间，0001-01-01T00:00:00Z这样表示，信息发送时，该告警未恢复",
-      "generatorURL": "url查看该告警的产生原因"
+      "generatorURL": "url查看该告警的产生原因",
+      "Fingerprint": "规则id，唯一标识产生该告警的规则"  
     }
   ]
 }
 ```
 
-***
+#### 4.route和group配置（`<route>`）
 
-### route和group配置
 路由树
 * 成功匹配上层路由后，才能继续匹配子路由
 
@@ -110,9 +130,7 @@ routes:
 - <route>   #这里的配置格式就是route的配置格式
 ```
 
-***
-
-### inhibit配置
+#### 5.inhibit配置（`<inhibit_rule>`）
 注意：当一个告警既匹配源告警又匹配目标告警，是不会被抑制的
 ```yaml
 inhibit_rules:

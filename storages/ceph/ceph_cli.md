@@ -96,5 +96,16 @@ ceph config set mon public_network <CIDR>   #声明monitor的网段，当node在
 ceph osd dump
 
 ceph osd pool ls detail
+
 ceph osd pool autoscale-status
+# SIZE            该pool存储的数据量（不包括副本的数据量）
+# TARGET SIZE     期望该pool存储的数据量（不包括副本的数据量）
+# RATE            是一个乘数（副本的数量），消耗真正的存储空间 = SIZE * RATE
+# RAW CAPACITY    真正的存储空间大小（但是实际能够存储的数据量达不到，因为存在副本数据）
+# RATIO           存储空间的使用率
+```
+
+#### 2.pg相关
+```shell
+ceph pg ls
 ```

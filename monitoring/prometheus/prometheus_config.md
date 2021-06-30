@@ -80,6 +80,11 @@ scape_configs:
   metrics_path: <URL_PATH>   #本质生成__metrics_path__元标签
                              #在这里配置优先级最低
                              #如果没有__metrics_path__元标签，默认为 /metrics
+                             
+  #设置传递的参数，<__address__>/<__metrics_path__>?<key1>=<string_1>&<key1>=<string_2>&<key2>=<string_3>
+  params:
+    <key1>: [<string_1>, <string_2>]
+    <key2>: [<string_3>]
 
   #用于解决server端的label和exporter端用户自定义label冲突的问题
   #默认为false，保留用户自定义的label
@@ -301,18 +306,21 @@ kubernetes_sd_configs:
 
 
 ##### （3）5种action
-* replace
-  * 用`regex`匹配 `source_labels`用`separator`连接起来的标签值
-    * 如果没有匹配到，不会发生替换
-    * 如果匹配到，添加`target_label`这个标签，且值为`replacement`
+* replace（默认）
+  * 用`regex`匹配 `source_labels`用`separator`连接起来的标签值，找到符合要求的target
+    * 如果没有找到，不会发生替换
+    * 如果找到，替换`target_label`这个标签的值为`replacement`
+
 * keep
-  * 用`regex`匹配`source_labels`用`separator`连
-    * 如果匹配到了，则保留该target
-    * 没有匹配到的都丢弃
+  * 用`regex`匹配`source_labels`用`separator`连接起来的标签值，找到符合要求的target
+    * 保留符合要求的target
+    * 丢弃不符合要求的target
+
 * drop
-  * 用`regex`匹配`source_labels`用`separator`连
-    * 如果匹配到了，则丢弃该target
-    * 没有匹配到的都保留
+  * 用`regex`匹配`source_labels`用`separator`连接起来的标签值，找到符合要求的target
+    * 丢弃符合要求的target
+    * 保留符合要求的target
+
 * labelmap
   * `regex`去匹配Target实例所有标签的名称
     * 将捕获到的内容作为为新的标签名称
