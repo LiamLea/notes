@@ -17,17 +17,18 @@
 ![](./imgs/overview_01.png)
 
 ##### （1）RADOS
-是ceph的存储系统
+是ceph的存储系统（对象存储）
 * 对象存储的格式
 ![](./imgs/overview_03.png)
 
 ##### （2）RBD（RADOS block device）
 基于RADOS对外提供块存储
-会虚拟出块设备，即数据会被分成多个小chunks，每个chunk是一个对象，然后进行存储
+一个image就是一个块设备，image会被分成多个同等大小的chunks，每个chunk是一个对象，然后存储到RADOS中
 
 ##### （3）file system
 基于RADOS对外提供文件系统
-数据的存取通过直接读写RADOS的data blocks，元数据存在另一个pool（通过MDS服务提供）
+需要至少两个pool：一个pool用于存储data（可以有多个data pool），另一个pool用于存储metadata
+数据的存取会被分成同等大小的chunks，每个chunk是一个object，存储在RADOS中，元数据存在另一个pool（通过MDS服务提供）
 ![](./imgs/overview_02.png)
 
 ##### （4）librados
@@ -42,22 +43,23 @@
 * ceph OSD（ceph-osd，object storage device）
   * 运行OSD服务，处理数据（包括存储、处理副本、恢复等等）
   * 提供其他OSD的状态给ceph-mon和ceph-mgr
-
+</br>
 * ceph monitor（ceph-mon）
-  * 用于**服务发现**：维护集群组件的映射（包括monitor的映射，manager的映射、OSD映射等）
-    * 组件之间的沟通需要使用这些映射，才能找到彼此，所以很重要
+  * 维护集群组件的映射（包括monitor的映射，manager的映射、OSD映射等）
+    * 映射中存储各个组件的信息和状态
   * 管理认证信息
 
 ##### （2）其他组件
 * ceph manager（ceph-mgr）
   * 对外暴露接口，用于管理和查看ceph集群
   * 监控ceph
-
+</br>
 * ceph MDS（ceph-mds，metadata server）
-给ceph文件系统存储元数据（块存储和对象存储不使用ceph-mds）
-
+  * 给ceph文件系统存储元数据（块存储和对象存储不使用ceph-mds）
+  * 一个文件系统（metadata pool），会有一个单独的MDS（和指定数量的standby MDS）
+</br>
 * rados gateway（RGW）
-对外提供对象存储接口，支持两种接口（S3和swift）
+  * 对外提供对象存储接口，支持两种接口（S3和swift）
 
 #### 4.目录规划
 * 日志路径：`/var/log/ceph/`
@@ -93,6 +95,8 @@ OSD使用的新的后端对象存储，以前的是filestore，即对象先写�
   * 消耗计算资源，读取性能低于replicated pool
 
 ##### （2）pool的相关参数
+
+* 创建pool时设置的参数
 ```shell
 <pg_num:int>    #该pool的placement group的数量
 <pgp_num:int>   #Placement Group for Placement，有效的placement group的数量，比如当提高了pool的pg_num，此时并不会进行rebalance，直到提高了pgp_num才会进行rebalance
@@ -100,6 +104,15 @@ OSD使用的新的后端对象存储，以前的是filestore，即对象先写�
 [replicated|erasure]  #该pool的类型，默认：replicated
 
 [--autoscale-mode=<on,off,warn>]    #该pool是否开启自动调节pg数量，默认：on
+```
+
+* 修改pool的参数
+```shell
+ceph osd pool set <pool_name> <key> <value>
+
+#size          副本的数量
+#min_szie      当副本数量低于这个值，就不能读写该pool中的object
+#allow_ec_overwrites true   将该pool设为erasure-coded pool
 ```
 
 ##### （3）pool需要与application关联
@@ -131,3 +144,23 @@ ceph osd pool application enable {pool-name} {application-name}
 * 当pg数量提升，数据恢复能力越强，因为当pg数量多，OSDs数量肯定也多，数据就会比较分散，当某个OSD挂掉，恢复也会较快
 * 当pg数量提升，hash的结果会越分散，数据分布会越均匀
 * 当pg数量提升，需要消耗更多的计算资源
+
+##### （4）基础概念
+* pgid：`<pool_id>.<hex>`
+  * 比如：`1.1f`
+* acting set 和 up set：`<osd_list>p<pool_id>`
+  * 比如：`[0,1,2]p1`表示该pg，与osd.0、osd.1和osd.2关联，与pool 1关联
+  * acting set 表示当前pg的状态
+  * up set表示变化后的pg的状态
+    * 比如pg关联的osd变化了，此时读写使用的还是acting set，当up set中的osd将acting set中osd的状态都迁移了，此时acting set才会变得跟up set一样
+
+##### （5）pg的状态
+[参考文档](https://docs.ceph.com/en/latest/rados/operations/pg-states/)
+
+* 常用的pg状态
+
+|状态|说明|
+|-|-|
+|active|可以处理对pg的请求|
+|clean|所有对象的副本数正常|
+|stale|pg的状态没有更新，处于一种未知状态|
