@@ -1,6 +1,16 @@
 [toc]
-### 安装
+
 [参考地址](https://github.com/iamseth/oracledb_exporter)
+
+### 容器启动
+```shell
+docker run -d --name oracledb_exporter -p 9161:9161 -e DATA_SOURCE_NAME=<USERNAME>/<PASSWD>@//<IP>:<PORT>/<SERVICE_NAME> iamseth/oracledb_exporter
+```
+
+***
+
+### 二进制安装
+
 #### 1.安装指定版本的 Oracle Instant Client Basic
 
 #### 2.安装oracledb_exporter

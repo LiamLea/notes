@@ -22,7 +22,8 @@ session = easysnmp.Session(
     hostname = "<HOST>",
     version = 2,
     community = "<COMMUNITY>",
-    use_sprint_value = True     #加了这个参数，跟用snmpwalk获取的输出是一样的，否则会将16进制的数据进行转码
+    use_sprint_value = True,     #加了这个参数，跟用snmpwalk获取的输出是一样的，否则会将16进制的数据进行转码
+    use_numeric = True          #输出的结果的oid都是数字，不会是说明文字，相当于snmpwalk -On选项
 )
 ```
 

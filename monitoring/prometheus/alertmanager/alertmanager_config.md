@@ -18,9 +18,7 @@
 
 #### 1.配置格式
 ```yaml
-global:
-
-  <global>          #全局配置
+  global: <global>    #全局配置
 
   receivers:        #接收者设置
   - <receiver>
@@ -68,8 +66,9 @@ http_config: <http_config | default = global.http_config>
 max_alerts: <NUM | default = 0>
 ```
 
-###### （3）发送消息格式
+##### （3）发送的告警格式
 这里只列出关键信息
+注意：resolved通过`{{ $value }}`取到的值不是最新的，这是prometheus的机制导致的，[参考](https://www.robustperception.io/why-do-resolved-notifications-contain-old-values)
 ```json
 {
   "groupKey": "用于唯一标识这个组",    //由标签和标签值生成
@@ -90,7 +89,7 @@ max_alerts: <NUM | default = 0>
       "startsAt": "开始时间",
       "endsAt": "结束时间，0001-01-01T00:00:00Z这样表示，信息发送时，该告警未恢复",
       "generatorURL": "url查看该告警的产生原因",
-      "Fingerprint": "规则id，唯一标识产生该告警的规则"  
+      "Fingerprint": "规则id，唯一标识产生该告警的规则（根据labels生成的指纹）"  
     }
   ]
 }
@@ -98,8 +97,14 @@ max_alerts: <NUM | default = 0>
 
 #### 4.route和group配置（`<route>`）
 
-路由树
+##### （1）路由树
 * 成功匹配上层路由后，才能继续匹配子路由
+
+##### （2）group
+* 当产生告警后，告警会加入相应的grouop中，然后告警的状态一直会存在该group中，当该group中所有告警的状态都变为reloved，才会清空该group中所有告警
+* 没有清空时，只要发送一次该group中告警的状态，就会包含reloved的状态的告警
+
+* 没有设置分组时，未分组的属于一组
 
 ```yaml
 #匹配alert（下面两种匹配方式可以同时使用）
@@ -109,7 +114,7 @@ match:    #完全匹配
 match_re:   #正则匹配
   <labelname>: <regexp>
 
-#是否继续匹配子路由
+#是否继续匹配后面的同级路由（对routes有效）
 continue: <boolean | default = false>
 
 #指定接收者的名称
@@ -118,9 +123,14 @@ receiver: <string>
 #指定用什么label进行分组（根据label的值进行分组，值相同的为一组）
 group_by:
 - <labelname>
-#准备发送一组alerts，需要等待的时间，为了一次能发送更多的告警
+
+#准备发送一组alerts，需要等待的时间，一次可以发送更多的告警
+#主要是为了抑制告警，因为这个告警的根因是另一个告警，但是这个告警先产生了，根因很快也会产生，所以等待一段时间，如果根因产生了，这个告警就会被抑制
 group_wait: <duration | default=30s>
-#同一组发送的时间间隔（当有新的告警加入该组）
+
+#同一组发送的时间间隔，距离上一次发送通知的间隔（当有新的告警加入该组）
+#注意：告警恢复也是新的告警
+#如果在这个期间，告警resolved，然后又firing，相当于没有新的告警
 group_interval: <duration | default=5m>
 #同一组发送的时间间隔（当没有新的告警加入该组）
 repeat_interval: <duration | default=4h>
@@ -131,7 +141,8 @@ routes:
 ```
 
 #### 5.inhibit配置（`<inhibit_rule>`）
-注意：当一个告警既匹配源告警又匹配目标告警，是不会被抑制的
+**注意**：当一个告警 既匹配源告警 又 匹配目标告警，是不会被抑制的
+
 ```yaml
 inhibit_rules:
   #匹配出目标告警（即需要被抑制的告警）

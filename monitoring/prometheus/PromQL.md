@@ -1,29 +1,113 @@
+# PromQL
+
 [toc]
-#### 1.常用公式
 
-##### （1）基本
-* 过滤
+### 概述
+
+#### 1.基础概念
+
+##### （1）vector（向量）
+时间序列 是按照 时间戳和值 顺序存放的，所以被称为向量
+
+#### 2.PromQL结果的数据类型
+
+##### （1）instant vector（瞬时向量）
+某一个时间点的样本值，比如：`node_cpu_seconds_total{mode="idle"}`
+
+##### （2）range vector（区间向量）
+某一个时间范围内的样本值，比如：`node_cpu_seconds_total{mode="idle"}[5m]`
+
+##### （3）scalar（标量）
+跟时间戳没有关系，只有一个值，比如：`count(node_cpu_seconds_total{mode="idle"})`
+
+#### 2.时间序列的选择器
+
+##### （1）instant vector selector
 ```shell
-METRIC{KEY=VALUE}
-#比如：node_cpu_seconds_total{mode="idle"}
-#得到cpu处于idle的总时间
+<METRIC>{<labels>}
 ```
 
+* `<labels>`完全匹配：`=`、`!=`
+  * 比如：`label=value`、`label!=value`
+* `<labels>`正则匹配
+  * 比如：`label=~regx`、`label!~regx`
 
-* 按标签分类
+##### （2）range vector selector
 ```shell
-by(LABEL)
-#比如：sum(increase(node_cpu_seconds_total{mode="idle"}[1m]))by(instance)
-#得到每台服务器的所有cpu每1分钟，cpu处于dle增长的时间
+(<EXPRESSION>)[<TIME>:<STEP>]
+#<TIME>指定最近多长时间
+#<STEP>步长可以忽略（嵌套查询时，外层的不能省略），默认为采样时间
 ```
 
-##### （2）统计
-* `sum(METRIC)`
+#### 3.向量 修饰符
+
+##### （1）`offset`
+
+* 将时间向过去移
 ```shell
-#把输出的结果集进行加和（因为可能有多个instance的数据）
-#比如：sum(increase(node_cpu_seconds_total{mode="idle"}[1m]))
-#得到所有服务器的所有cpu每1分钟，cpu处于idle增长的时间
+<METRIC>{<labels>} offset <TIME>
+(<EXPRESSION>)[<TIME>:<STEP>] offset <TIME>
 ```
+##### （2）`@`
+
+* 指定某个时间点，是unix timestamp，比如
+```shell
+http_requests_total @ 1609746000
+rate(http_requests_total[5m] @ 1609746000)
+```
+
+#### 4.operators（运算符）
+
+##### （1）算数运算符
+```shell
++
+-
+*
+/
+%
+^
+```
+
+##### （2）比较运算符
+```shell
+==
+!=
+>
+<
+>=
+<=
+```
+
+#### 5.聚合运算符
+
+##### （1）运算符
+```shell
+sum (calculate sum over dimensions)
+min (select minimum over dimensions)
+max (select maximum over dimensions)
+avg (calculate the average over dimensions)
+group (all values in the resulting vector are 1)
+stddev (calculate population standard deviation over dimensions)
+stdvar (calculate population standard variance over dimensions)
+count (count number of elements in the vector)
+count_values (count number of elements with the same value)
+bottomk (smallest k elements by sample value)
+topk (largest k elements by sample value)
+quantile (calculate φ-quantile (0 ≤ φ ≤ 1) over dimensions)
+```
+
+##### （2）语法
+```shell
+<aggr-operator>([parameter,] <vector expression>) [without|by (<label list>)]
+
+#parameter是某些聚合运算需要
+#(<label list>)格式：(label1, label2)
+```
+
+#### 6.函数
+[参考](https://prometheus.io/docs/prometheus/latest/querying/functions/)
+
+##### （1）常用函数
 
 * `increate(METRIC[TIME])`
 ```shell
@@ -32,12 +116,7 @@ last值-first值
 #得到每个cpu每1分钟，cpu处于idle增长的时间
 ```
 
-* `topk(N,METRIC)`
-选出该指标项的前N个较大值
-</br>
-* `count(EXPRESSION)`
-
-##### （3）速率相关
+##### （2）速率相关
 * `rate(METRIC[TIME])`（当TIME >= 采集周期 时，则rate不会返回任何结果）
 ```shell
 (last值-first值)/时间差s
@@ -63,7 +142,24 @@ last值-first值
   5分钟 rate：`(780-0)/(5*60)`
   5分钟 irate：`(780-720)/1*60)`
 
-#### 2.常用语句
+##### （3）`<aggregation>_over_time()`
+```shell
+avg_over_time(range-vector): the average value of all points in the specified interval.
+min_over_time(range-vector): the minimum value of all points in the specified interval.
+max_over_time(range-vector): the maximum value of all points in the specified interval.
+sum_over_time(range-vector): the sum of all values in the specified interval.
+count_over_time(range-vector): the count of all values in the specified interval.
+quantile_over_time(scalar, range-vector): the φ-quantile (0 ≤ φ ≤ 1) of the values in the specified interval.
+stddev_over_time(range-vector): the population standard deviation of the values in the specified interval.
+stdvar_over_time(range-vector): the population standard variance of the values in the specified interval.
+last_over_time(range-vector): the most recent point value in specified interval.
+```
+
+***
+
+### 使用
+
+#### 1.常用语句
 ```shell
 count({instance=~".+"})by(instance)
 
