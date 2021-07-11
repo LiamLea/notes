@@ -16,6 +16,7 @@
 #### 2.基本格式
 ```yaml
 #规则按组进行管理
+#同一个group中的规则顺序处理，不同group并行处理
 groups:
   - name: <group_name>
     rules:
@@ -54,8 +55,15 @@ alert: <NAME>
 #触发告警的表达式
 expr: <PromQL>
 
-#等待时长，在等待时间内，如果这个告警恢复了，则alerts处于pending状态（即未发送状态）
+#等待时长
+#在等待时间内，则alert处于active状态，
+#在等待时间内，如果这个告警恢复了，则alert处于pending状态（即未发送状态）
 for: <duration | default = 0s>
+
+
+#label和annotations可以使用的变量：
+#   {{ $labels.<labelname> }}
+#   {{ $value }}      表达式计算出来的值
 
 #添加或覆盖之前的标签（标签很重要，用于对告警进行分类）
 labels:
@@ -64,4 +72,8 @@ labels:
 #注释信息
 annotations:
   <LABEL>: <VALUE>
+#常用annotations:
+#   description: "描述信息"
+#   summary: "概述信息"
+#   value: '{{ $value }}'
 ```

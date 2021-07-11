@@ -123,6 +123,7 @@ options:
   -v            #version，指定snmp的版本（1 | 2c | 3）
   -c            #community，指定使用的团体名
   -l            #level，指定安全等级（noAuthNoPriv | authNoPriv | authPriv）
+  -On           #输出的oid都是数字，不是MIB resolutions
 ```
 
 * v1和v2c常用的：

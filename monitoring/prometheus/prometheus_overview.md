@@ -53,7 +53,7 @@ How Data is Structured in a Time-Series Database?
 ##### （3）sample
 * 一个sample就是 **时间戳 + 值：`(t,v)`**
 
-##### （4）time series
+##### （4）time series（也称为vector）
 * 连续的sample就是time series
 * `<metric>{<labels>}`唯一标识一个时间序列
 

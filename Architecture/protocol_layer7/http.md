@@ -114,7 +114,13 @@ while True:
 
 ***
 
-### HTTP常用请求头
+### HTTP请求头
+
+#### 1.注意事项
+
+##### （1）header的名字不能包含下划线
+
+#### 2.常用请求头
 ```shell
 From        #发起此请求的用户的邮件地址
 Host        #请求的目标服务器的host和port number
