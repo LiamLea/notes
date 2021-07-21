@@ -32,6 +32,9 @@ verbs跟在alias后面，用于执行相关操作
 |CREATE|创建一个实例|`ENVIRONMENT CREATE NAME="TEMP"; VARIABLEVALUE="NEW"`|
 |DELTE|删除一个实例|`PROCESS WHERE NAME="CALC.EXE" DELETE`|
 
+#### 3.使用的端口
+用RPC（端口135，是硬编码的，不允许修改）去协商，然后会在1024和65535之间选择一个随机的端口进行通信
+
 ***
 
 ### 使用
