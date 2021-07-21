@@ -225,7 +225,7 @@ b = 10
 </br>
 * `import m1; m1.func1()` <---> `import m1; getattr(m1, "func1")()`
 </br>
-* `func()` <----> `getattr(sys.modules["__main__"], "func")()`
+* `func()` <----> `getattr(sys.modules[__name__], "func")()`
 调用本模块的内容
 
 #### 3.利用反射机制可以实现，根据配置文件的配置，执行相应的内容

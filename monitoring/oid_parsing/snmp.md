@@ -106,6 +106,25 @@ snmpwalk  ...   .1.3.6.1.4.1.2021.9.1     #可以查看，有多少关于该分�
 pass <OID> 脚本         #<OID>为定义的oid，脚本比如：/bin/sh /usr/bin/test.sh
 ```
 
+#### 2.加载本地的mib库
+
+* 临时加载
+
+```shell
+snmptranslate -M +/root/snmp_exporter-main/generator/mibs -m ALL -Of .1.3.6.1.4.1.2011.2.23.291
+```
+
+* 永久加载
+```shell
+$ vim /etc/snmp/snmp.conf
+
+#注意目录不能mibs目录不能递归，只能是文件，不能是文件夹
+mibdirs +/root/snmp_exporter-main/generator/mibs
+mibreplacewithlatest  yes
+showMibErrors no
+mibs ALL
+```
+
 ***
 
 ### 常用指令
