@@ -30,7 +30,7 @@ session = easysnmp.Session(
 session = easysnmp.Session()
 
 # use_sprint_value = True,    加了这个参数，跟用snmpwalk获取的输出是一样的，否则会将16进制的数据进行转码
-# use_numeric = True          输出的结果的oid都是数字，不会是说明文字，相当于snmpwalk -On选项
+# use_numeric = True（不要用这个选项，并发的时候会报错）          输出的结果的oid都是数字，不会是说明文字，相当于snmpwalk -On选项
 # abort_on_nonexistent = True  当使用get方法时，oid不存在时，则会抛出easysnmp.exceptions.EasySNMPNoSuchObjectError异常
 # best_guess = 1 相当于-Ib，best_guess = 1 相当于-IB
 ```

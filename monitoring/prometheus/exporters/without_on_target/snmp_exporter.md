@@ -51,3 +51,23 @@ docker run -ti \
   -v "${PWD}:/opt/" \
   snmp-generator generate
 ```
+
+#### 2.启动snmp exporter
+
+#### 3.配置promethwus
+```yaml
+scrape_configs:
+  - job_name: 'snmp'
+    static_configs:
+      - targets: []   #指定采集目标
+    metrics_path: /snmp
+    params:
+      module: []    #指定模块（模块是在snmp.yml中设置的）
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9116  #snmp exporter的地址
+```

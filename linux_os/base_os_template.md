@@ -15,3 +15,10 @@
 |文件名|配置项|说明|
 |-|-|-|
 |sshd_config|UseDNS no</br>GSSAPIAuthentication no|能够快速连接ssh|
+
+### 需要关闭的服务
+|服务名|说明|
+|-|-|
+|NetworkManager|会影响相关网络的配置|
+|firewalld|防火墙|
+|selinux||

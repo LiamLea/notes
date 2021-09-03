@@ -144,7 +144,7 @@ user_list = session.query(Users).order_by(Users.name.desc()).all()
 * 子查询（subquery）
 将多个查询在一个查询中执行，比如将一个查询的结果用作另一个查询的条件
 ```python
-subquery = session.query(Users).filter(Users.id > 2).subquery
+subquery = session.query(Users).filter(Users.id > 2).subquery()
 
 #在主查询中使用子查询的字段：subquery.c.字段名    （c代表Column）
 xx_list = session.query(xx).filter(subquery.c.name == "liyi").all()
@@ -161,7 +161,11 @@ session.commit()
 ##### （5）修改
 ```python
 session.query(Users).filter(Users.id == 1).update({"name": "lier"})
+session.commit()
 
+#对于复杂的条件，不能在python中计算条件，需要先select结果到会话中，然后再进行修改
+#通过synchronize_session参数设置（默认为"evaluate"，即再python中计算条件）
+session.query(Users).filter(Users.id == 1).update({"name": "lier"}, synchronize_session = "fetch")
 session.commit()
 ```
 
