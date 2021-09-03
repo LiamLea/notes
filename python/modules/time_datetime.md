@@ -1,38 +1,70 @@
-[toc]
-# time模块
-### 概述
-#### 1.时间表示方式:
-* 时间戳: 1970-1-1 00:00:00到某一时间点之间的秒数
-* UTC时间:世界协调时
-* 9元组:返回一个元组,有9个属性
+# 时间相关模块
 
-### 使用
+[toc]
+
+### 概述
+
+#### 1.相关概念
+
+##### （1）时间戳
+某一时间点到`1970-1-1 00:00:00`之间的秒数
+
+##### （2）UTC/GMT
+* UTC：universal time coordinated
+* GMT：greenwich mean time
+
+就是0时区的时间
+
+##### （3）struct time（9元组）
+返回一个元组，有9个属性
+
+***
+
+### time模块
+
 #### 1.基本函数
-* 时间戳
+
+* 时间戳（返回类型：float）
+
 ```python
 time.time()
 ```
-* UTC
+
+* UTC（返回类型：string）
+
 ```python
 time.ctime()
 ```
-* 9元组:
-```python
-time.localtime()   
 
+* 9元组（返回类型：struct_time）
+
+```python
+#<secs>不填，默认为当前时间到1970-1-1 00:00:00到某一时间点之间的秒数
+#返回结果是struct_time
 #tm_year,tm_mon,tm_mday,tm_hout,tm_min,tm_sec,tm_wday,tm_yday
+
+#UTC时间
+time.gmtime(<secs>)
+
+#当前所在时区的时间
+time.localtime(<secs>)   
 ```
 
-#### 2.相互转换
-* 按特定格式输出 时间字符串,%a代表星期的缩写
+#### 2.struct_time 与 string 之间相关转换
+
+[表示方式](https://docs.python.org/3/library/time.html)
+
+##### （1）struct_time -> string
 ```python
 #f:format，tuple -> str
-strftime('%Y-%m-%d %H:%M:%S %a')
+#<struct_time>不填，默认是当前时间的struct_time
+time.strftime('%Y-%m-%d %H:%M:%S %a', <struct_time>)
 ```
-* 将 时间字符串 转换成9元组
+
+##### （2） string -> struct_time
 ```python
 #p:parse，str -> tuple
-strptime('2019-01-01','%Y-%m-%d')
+time.strptime('2019-01-01','%Y-%m-%d')
 ```
 
 #### 3.`time.sleep(0)`
@@ -40,8 +72,7 @@ strptime('2019-01-01','%Y-%m-%d')
 
 ***
 
-# datetime模块
-### 使用
+### datetime模块
 ```python
 t = datetime.datetime.now()    
 #t为datetime对象
@@ -58,4 +89,33 @@ datetime.datetime.strptime('2019-01-01','%Y-%m-%d')
 days = datetime.timedelta(days=100,hours=3)
 t = datetime.datetime.now()
 t-days
+```
+
+```python
+from dateutil import tz
+
+ctime = "2020-01-01 08:00:00+0000"
+t = datetime.datetime.strptime(ctime, "%Y-%m-%d %H:%M:%S%z")
+to_zone = tz.gettz("Asia/Shanghai")
+t2 = datetime.datetime.astimezone(t, to_zone)
+```
+
+***
+
+### dateutil模块
+
+#### 1.解析时间戳
+```python
+from dateutil import parser,tz
+ctime = "2021-06-30T07:49:05.683743418z"
+#返回的是struct time
+t = parser.parse(ctime)
+print(t.strftime('%Y-%m-%d %H:%M:%S') )
+
+#输出指定时区的结果
+#设置时区
+to_zone = tz.gettz("Asia/Shanghai")
+#获取新的struct time
+t2 = t.astimezone(to_zone)
+print(t2.strftime('%Y-%m-%d %H:%M:%S') )
 ```

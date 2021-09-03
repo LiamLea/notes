@@ -34,13 +34,13 @@ app = Flask("<应用名称>")
 
 #利用装饰器设置路由系统
 @app.route("<URL>")
-def func(host = "0.0.0.0", port = 80):
+def func():
   #构建响应报文
   reponse = jsonify(<DICT>)
   return reponse
 
 #运行该应用
-app.run()
+app.run(host = "0.0.0.0", port = 80)
 ```
 
 #### 2.配置app
