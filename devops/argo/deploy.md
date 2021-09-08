@@ -17,3 +17,5 @@ argocd-server
   --basehref <PATH>   #返回资源的地址，比如：/argocd
   --rootpath <PATh>   #真正的资源的地址，比如：/argocd
 ```
+
+#### 2.Argo CD Image Updater

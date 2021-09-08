@@ -21,19 +21,26 @@ How Data is Structured in a Time-Series Database?
 ![architecture](./imgs/overview_1.png)
 
 #### 3.组件
-* exporter
-  * 客户端程序，用于pull模式
-  * 以http-server的方式运行在后台
-</br>
-* pushgateway
-  * 客户端程序，用于push模式
-  * 用于设置自定义监控项
-  * 工作原理：
-  ```mermaid
-  graph LR
-  A[自定义脚本]-->|push采集到的数据|B[pushgateway]
-  B-->|push|C[prometheus]
-  ```
+
+##### （1） exporter
+* 客户端程序，用于pull模式
+* 以http-server的方式运行在后台
+
+##### （2）pushgateway
+* 客户端程序，用于push模式
+* 用于设置自定义监控项
+* 工作原理：
+```mermaid
+graph LR
+A[自定义脚本]-->|push采集到的数据|B[pushgateway]
+B-->|push|C[prometheus]
+```
+
+##### （3）alermanager
+负责处理告警，比如分组、抑制、往哪些发告警信息等等
+
+##### （4）kube-state-metrics
+将 k8s对象的状态 转换为 prometheus的监控指标（比如副本数等）
 
 #### 4.相关名词
 
