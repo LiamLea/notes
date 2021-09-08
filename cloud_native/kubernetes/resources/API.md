@@ -101,6 +101,10 @@ kubectl get --raw "/api/v1/namespaces"
 
 #比如：apis/apps/v1/namespaces/default/deployment
 #列出default命名空间中的所有deployment控制器
+
+#比如：查看metrics.k8s.io
+kubectl get --raw '/apis/metrics.k8s.io/v1beta1'
+kubectl get --raw '/apis/metrics.k8s.io/v1beta1/namespaces/default/pods'
 ```
 
 ***

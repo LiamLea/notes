@@ -8,31 +8,40 @@
 
 #### 1.systemd新特性
 * 系统引导时,服务并行启动
-* 按需激活
+* 按需激活（通过`<unit-name>.socket`实现）
+  * 首先启动`<unit-name>.socket`，会创建一个socket
+  * 当有请求到达该socket，会启动`<unit-name>.service`或者`<unit-name>@.socket`，并且把这个socket传递传递给service
 * 指定依赖关系，从而能够控制启动顺序
 
 #### 2.systemd units
 
 |unit类型|扩展名|描述|
 |-|-|-|
-|service|`.service`|定义系统服务（用于控制进程）|
-|socket|`.socket`||
-|timer|`.timer`||
+|service|`.service`|封装后台服务进程|
+|socket|`.socket`|封装socket|
+|timer|`.timer`|封装一个基于时间触发的动作|
 |target|`.target`|一系列unit的集合|
-|device|`.device`||
-|mount|`.mount`||
-|automount|`.automount`|
-|swap|`.swap`||
-|path|`.path`||
-|slice|`.slice`||
-|scope|`.scope`||
+|device|`.device`|封装一个设备文件|
+|mount|`.mount`|封装一个 文件系统 挂载点|
+|automount|`.automount`|封装一个 文件系统 自动挂载点|
+|swap|`.swap`|封装一个交换分区或交换文件|
+|path|`.path`|用于根据文件系统上特定对象的变化来启动其他服务|
+|slice|`.slice`|用于控制特定 CGroup 内(例如一组 service 与 scope 单元)所有进程的总体资源占用|
+|scope|`.scope`|它与 service 单元类似，但是由 systemd 根据 D-bus 接口接收到的信息自动创建， 可用于管理外部创建的进程|
+
+##### （1）socket unit：`<unit-name>.socket`
+可用于实现服务的 按需启动
+* 首先启动`<unit-name>.socket`，会创建一个socket，会监听在某个端口，用于接收请求数据
+* 当有请求到达该socket，会启动`<unit-name>.service`或者`<unit-name>@.socket`，并且把这个socket传递传递给service
+  * 所以该service必须有能够接收systemd传递的socket的能力（即实现systemd的相关接口）
 
 #### 3.systemd units文件位置
 |目录|说明|
 |-|-|
 |`/etc/systemd/system/`（优先级最高）|通常存放一下链接文件，链接到`/usr/lib/systemd/system/`目录中的unit文件|
+|`/run/systemd/system/`（优先级较高）|运行时创建的unit文件|
 |`/usr/lib/systemd/system/`|systemd units文件存放位置|
-|`/run/systemd/system/`|运行时创建的unit文件|
+
 
 #### 4.unit的依赖关系和启动顺序
 
@@ -50,20 +59,33 @@
 ##### （3）定义弱依赖：`Wants`
 `Wants`指定的units和当前unit，同时启动，如果其中某个unit启动失败，不影响当前unit
 
+##### （4）隐含依赖
+* 当service的Type=dbus时，有隐含依赖：
+  * `Requires=dbus.socket`和`After=dbus.socket`
+* 当service有同名的socket，则该service会隐含依赖该socket
+
 #### 5.unit模板（`<unit-name>@.<unit-type>`）
 可以根据该模板，创建多个实例
 该模板中可以使用相关变量（比如：`%i`表示实例的名称）
 ```shell
+#创建实例
 systemctl start <unit-name>@<instance-name>.<unit-type>
-systemctl status <unit-name>@<instance-name>.<unit-type>
 ```
 
 #### 6.特殊目录
 |目录|说明|
 |-|-|
-|`<unit-name>.<unit-type>.requires`目录下链接的unit文件|就相当于在`<unit-name>.<unit-type>`中`Requires=`指定的unit|
-|`<unit-name>.<unit-type>.wants`目录下链接的unit文件|就相当于在`<unit-name>.<unit-type>`中`Wants=`指定的unit|
-|`<unit-name>.<unit-type>.d`目录下的`xx.conf`文件|会补充主文件`<unit-name>.<unit-type>`中的配置|
+|`<unit-name>.<unit-type>.requires/`下的unit链接文件|就相当于在`<unit-name>.<unit-type>`中`Requires=`指定的unit|
+|`<unit-name>.<unit-type>.wants/`下unit链接文件|就相当于在`<unit-name>.<unit-type>`中`Wants=`指定的unit|
+|`<unit-name>.<unit-type>.d/`下的`xx.conf`文件|会补充主文件`<unit-name>.<unit-type>`中的配置|
+
+#### 7.unit日志
+参考log.md中systemd-log部分
+
+##### （1）查看某个unit的日志
+```shell
+journalctl -u <unit>
+```
 
 ***
 
@@ -88,7 +110,7 @@ systemctl status <unit-name>@<instance-name>.<unit-type>
 ##### （2）`[<unit type>]`
 
 
-##### （3）`[Install]`
+##### （3）`[Install]`（没有这个，service就是`static`的，不能enable）
 参考文档：
 * [systemd.unit](https://man7.org/linux/man-pages/man5/systemd.unit.5.html)
 
@@ -109,7 +131,7 @@ systemctl status <unit-name>@<instance-name>.<unit-type>
 |常用配置项（加粗为必须设置的）|说明|
 |-|-|
 |**Type**|服务启动类型|
-|**ExecStart**|启动服务的命令，可以结合`ExecStartPre`和`ExecStartPost`一起使用|
+|**ExecStart**|启动服务的命令（必须是绝对路径），可以结合`ExecStartPre`和`ExecStartPost`一起使用|
 |ExecStop|停止服务的命令，如果未设置会用`KillSignal`中设置的信号杀死所有进程，如果停止命令没有停止所有进程，剩下的进程根据`KillMode`的设置进行处理|
 |ExecReload|重载服务的命令，常用：`/bin/kill -HUP $MAINPID`|
 |Restart|服务的重启策略，常用：</br>`on-failure`，当服务异常退出时，则重启该服务|
@@ -117,13 +139,16 @@ systemctl status <unit-name>@<instance-name>.<unit-type>
 |PIDFile|pid文件位置（一般在`/run/`下），当type为`forking`时，建议指定，否则可能找不到相关进程的pid|
 
 ##### （1）Type的类型
+需要根据程序的具体启动形式，选择合适的Type
+* 比如`nginx -d`必须使用forking形式
+
 |Type|说明|
 |-|-|
 |`simple`（默认）|当`ExecStart`进程启动后，则认为该服务启动成功|
-|`forking`|当`ExecStart`进程调用了`fork()`且主进程退出，则认为该服务启动成功，且产生的子进程会作为该服务大的主进程|
-|`oneshot`|一次性的（即该service是`static`的，不能enable），只会执行一次（比如：初始化脚本）|
-|`dbus`|与`simple类似`，只不过进程获得了`BusName=`指定的D-bus名称之后，才认为该服务启动成功|
-|`notify`|与`simple类似`，只不过通过`sd_notify()`发送了消息后，才认为该服务启动成功|
+|`forking`|用于**会将自身切换到后台**的服务（比如：`nginx -d`命令）</br>当`ExecStart`进程调用了`fork()`且主进程退出，则认为该服务启动成功，且产生的子进程会作为该服务大的主进程|
+|`oneshot`|一次性的，只有当进程执行完才认为服务启动成功（比如：初始化脚本），如果进程一直在运行，则该服务一直处于activating状态|
+|`dbus`|用于需要在 D-Bus 系统总线上注册一个名字的服务</br>与`simple类似`，只不过进程获得了`BusName=`指定的D-bus名称之后，才认为该服务启动成功|
+|`notify`|用于会向systemd发送启动成功信息的服务（如果该服务不发送，则服务一直处于activating状态，systemd不认为其启动成功）</br>与`simple类似`，只不过通过`sd_notify()`发送了消息后，才认为该服务启动成功|
 |`idle`|与`simple类似`，延迟启动服务，当系统idle或者延迟了一定时间|
 
 
