@@ -197,12 +197,12 @@ scrape_configs:
 ```yaml
 - alert: host_interrupt_down
   annotations:
-    description: "\u7CFB\u7EDF\u4E2D\u65AD\u5DF2\u6062\u590D"
+    description: "主机中断"
     summary: host_status
-  expr: probe_success{job="icmp_probe"} == 1
+  expr: probe_success{job="icmp_probe"} == 0
   labels:
     service: host
-    severity: 0
+    severity: 1
 
 ```
 
@@ -258,7 +258,16 @@ scrape_configs:
 
 ##### （2）alertmanager配置
 ```yaml
+#定义消息接收者
+receivers:
+- name: default-receiver
+  webhook_configs:
+  - send_resolved: true
+    url: http://data-cleaning.aiops-dev/api/v1/resources/topics/prometheus/alert
+
 route:
+  #设置接收者
+  receiver: <receiver>    #在上面定义好的
   #设置分组
   group_by: ['service']
   group_interval: 10s

@@ -89,14 +89,42 @@ ceph config set mon public_network <CIDR>   #声明monitor的网段，当node在
 
 ***
 
-### OSD相关
+### OSD相关（osd需要特别关注）
 
-#### 1.pool相关
+#### 1.osd相关
+
+* 查看所有osd信息
 ```shell
 ceph osd dump
+```
 
+* 查看osd和device的关系
+```shell
+ceph device ls
+```
+
+* 查看device和host的关系
+```shell
+ceph device ls
+
+#如果上面这个命令，无法查询不到，使用下面的命令：
+ceph osd find <osd_id>  #<osd_id>就是数字
+```
+
+* 查看每个osd的存储资源使用情况
+```shell
+ceph osd df
+```
+
+#### 2.pool相关
+
+* 查看pool的基本信息
+```shell
 ceph osd pool ls detail
+```
 
+* 查看pool的使用情况（能看出ceoph存储资源的使用情况）
+```shell
 ceph osd pool autoscale-status
 # SIZE            该pool存储的数据量（不包括副本的数据量）
 # TARGET SIZE     期望该pool存储的数据量（不包括副本的数据量）
@@ -105,7 +133,14 @@ ceph osd pool autoscale-status
 # RATIO           存储空间的使用率
 ```
 
-#### 2.pg相关
+#### 3.pg相关
+
+* 查看所有pg信息
 ```shell
 ceph pg ls
+```
+
+* 查看pg在osd上的分布情况
+```shell
+ceph osd utilization
 ```
