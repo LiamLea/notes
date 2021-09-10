@@ -9,6 +9,8 @@
 * VRRP
 * health-check
 
+#### 2.priority值的范围：-245~245
+
 ***
 
 ### 配置
@@ -30,7 +32,7 @@ global_defs {
 #定义脚本
 #只有vrrp实例，track了指定的脚本，相应的脚本才会执行
 vrrp_script <CUSTOME_NAME> {
-  script "<PATH>"               #脚本的绝对路径
+  script "<COMMAND>"               #执行脚本时必须：/bin/bash <script_path>
   interval <INTEGER:1>          #调用脚本的频率，单位秒
   timeout <INTEGER>             #脚本超时时间，超时则认为执行失败
   weight <INTEGER:0>          #默认为0，表示脚本检测失败，则认为该vrrp实例状态是fail的
@@ -84,9 +86,53 @@ vrrp_instance <CUSTOME_NAME> {
     <INTERFACE_2> weight <INTEGER:0>    #权重的作用同脚本的
   }
 
-  notify_master "<PATH>"        #当状态切换为master时，执行脚本
-  notify_backup "<PATH>"        #当状态切换为backup时，执行脚本
-  notify_fault "<PATH>"         #当装她爱切换为fault时，执行脚本
-  notify "<PATH>"               #当状态切换时，执行脚本
+  notify_master "<COMMAND>"        #当状态切换为master时，执行
+  notify_backup "<COMMAND>"        #当状态切换为backup时，执行
+  notify_fault "<COMMAND>"         #当装她爱切换为fault时，执行
+  notify "<COMMAND>"               #当状态切换时，执行
+}
+```
+
+#### 3.demo
+
+##### （1）脚本:`check.sh`
+```shell
+#/bin/bash
+if [ `curl  --insecure -s --write-out  '%{http_code}' --output /dev/null -m 5 https://127.0.0.1:6443/healthz` == 200 ];then exit 0 ;else exit 1;fi
+#-m   max-time，设置超时时间
+```
+
+##### （2）`keepalived.conf`
+```shell
+vrrp_script health_check {
+    script "/bin/bash /etc/keepalived/check.sh"
+    interval 1
+    timeout 5
+    rise 3
+    fail 3
+    user root
+}
+
+vrrp_instance VI_1 {
+    state MASTER
+    virtual_router_id 249
+    priority 241
+    interface ens160
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    unicast_peer {
+        3.1.5.242
+        3.1.5.243
+    }
+    virtual_ipaddress {
+        3.1.5.249
+    }
+
+    track_script {
+      health_check
+    }
 }
 ```

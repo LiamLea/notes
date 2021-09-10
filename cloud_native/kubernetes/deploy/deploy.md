@@ -70,6 +70,7 @@ kubectl
 ```json
 {
   //修改cgroup driver，默认使用的是cgroupfs，当系统的init进程是systemd，建议使用systemd，这样更稳定
+  //这个选项导致docker重启后，镜像不能重启
   "exec-opts": ["native.cgroupdriver=systemd"],
 
   //防止日志量越来越大，导致存储耗尽
