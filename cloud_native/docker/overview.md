@@ -6,7 +6,14 @@
 
 ![](./imgs/overview_01.png)
 
-#### 1.docker隔离6种namespace
+#### 1.利用linux kernel的特性
+![](./imgs/overview_03.png)
+
+##### （1）namespaces特性
+能够使进程间的资源相互隔离
+
+* 6中namespace
+
 |namespace|说明|
 |-|-|
 |uts|unix timesharing system，主机名和域名的隔离|
@@ -15,6 +22,11 @@
 |pid|进程的隔离|
 |ipc|进程间通信的隔离|
 |net|网络的隔离|
+
+##### （2）cgroups（control groups）特性
+对进程进行**分组**，然后可以 **监视**  和 **限制** **指定组** 对各种**资源的使用**
+
+
 
 #### 2.docker组件
 ![](./imgs/overview_02.png)

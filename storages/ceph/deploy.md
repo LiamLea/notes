@@ -73,11 +73,35 @@ ceph orch host add <newhost> --labels _admin  #打上_admin标签，不打也行
 
 #### 5.创建osd
 ```shell
-#查看发现的磁盘
+#查看加入到集群中的磁盘或者通过osd.all-available-devices服务自动发现的磁盘
 ceph orch device ls
 
-#将磁盘加入ceph集群：一个磁盘对应一个osd服务
+#方式一：
+#部署osd.all-available-devices这个服务后，会自动发现device，并且会自动把这个磁盘加入到集群中
 ceph orch apply osd --all-available-devices
-#或者指定磁盘
+
+#方式二：
+#关闭osd.all-available-devices服务
+ceph orch apply osd --all-available-devices --unmanaged=true
+#当关闭osd.all-available-devices服务后，可以指定磁盘加入到集群
 ceph orch daemon add osd <HOST>:<DEVICE_PATH>
+```
+
+#### 6.删除某个osd
+```shell
+
+ceph osd rm <osd_id>
+#查看删除状态（直到PG数量降为0才算真正的删除）
+ceph orch osd rm status
+
+#等osd删除之后，执行这个命令清理磁盘，保证磁盘还可以再次使用
+ceph orch device zap <hostname> <device_path> --force
+```
+
+* 如果未删干净，请执行
+```shell
+#删除该osd的crush
+ceph osd crush remove <osd_id>
+#删除该osd的key
+ceph psd del <osd_id>
 ```

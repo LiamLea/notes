@@ -57,7 +57,7 @@ ceph orch apply <service_type> <HOST1,HOST2,HOST3,...>
 #### 4.管理存储设备：`ceph orch device`
 
 ```shell
-#列出发现的块设备
+#查看加入到集群中的磁盘或者通过osd.all-available-devices服务自动发现的磁盘
 ceph orch device ls   #--hostname=xx --wide --refresh
 ```
 
@@ -143,4 +143,33 @@ ceph pg ls
 * 查看pg在osd上的分布情况
 ```shell
 ceph osd utilization
+```
+
+***
+
+### debug
+
+#### 1.查看集群状态和原因
+```shell
+$ ceph status
+
+#列出集群的状态
+cluster:
+  id:     20870fc4-c996-11eb-8c25-005056b80961
+  health: HEALTH_OK     #如果状态不健康，下面会列出不健康的原因
+
+#列出各个组件的状态
+services:
+  mon: 3 daemons, quorum node-01,node-02,node-03 (age 90m)
+  mgr: node-01.lbvxfc(active, since 3M), standbys: node-02.czjeam
+  mds: 2/2 daemons up, 2 standby
+  osd: 6 osds: 6 up (since 8m), 6 in (since 8m)
+
+#列出数据的状态
+data:
+  volumes: 2/2 healthy          #创建的文件系统的状态
+  pools:   8 pools, 225 pgs
+  objects: 3.13k objects, 8.1 GiB
+  usage:   27 GiB used, 69 GiB / 96 GiB avail   #一共 96G，还剩 69G
+  pgs:     225 active+clean
 ```

@@ -27,7 +27,7 @@
 |swap|`.swap`|封装一个交换分区或交换文件|
 |path|`.path`|用于根据文件系统上特定对象的变化来启动其他服务|
 |slice|`.slice`|用于控制特定 CGroup 内(例如一组 service 与 scope 单元)所有进程的总体资源占用|
-|scope|`.scope`|它与 service 单元类似，但是由 systemd 根据 D-bus 接口接收到的信息自动创建， 可用于管理外部创建的进程|
+|scope|`.scope`|它与 service 单元类似，只不过是通过systemd的接口创建的|
 
 ##### （1）socket unit：`<unit-name>.socket`
 可用于实现服务的 按需启动
