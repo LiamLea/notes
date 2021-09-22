@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+#    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    cert-manager.io/cluster-issuer: {{ .Values.url.clusterissuer }}
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  name: "{{ .Values.url.system }}-kibana"
+  namespace: elastic
+spec:
+  rules:
+  - host: {{ .Values.url.host }}
+    http:
+      paths:
+      - backend:
+          serviceName: kibana-kibana
+          servicePort: 5601
+        path: /(kibana/.*)
+
+  tls:
+  - hosts:
+    - {{ .Values.url.host }}
+    secretName: "{{ .Values.url.host }}-ingress"

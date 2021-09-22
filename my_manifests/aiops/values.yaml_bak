@@ -1,0 +1,156 @@
+mysql:
+  ip: tidb-cluster-tidb.tidb-cluster
+  port: 4000
+  db_name: aiops_dev
+  username: root
+  password: kangpaas
+
+redis:
+  host: redis-master.redis
+  port: 6379
+  database: 1
+  password: cangoal
+
+scan:
+  version: 2.0.8
+  imagePullPolicy: Always
+  repository: harbor.test.com/aiops-nx/scripts
+  resources:
+    requests:
+      cpu: 5000m
+      memory: 1Gi
+    limits:
+      cpu: 32000m
+      memory: 8Gi
+
+cleaning_service:
+  version: 2.0.8
+  imagePullPolicy: Always
+  repository: harbor.test.com/aiops-nx/data-cleaning
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 1Gi
+    limits:
+      cpu: 16000m
+      memory: 4Gi
+
+kafka:
+  host: 3.1.4.220
+  port: 19092
+
+url:
+  host: aiops.dev.zdgt
+  system: aiops-dev
+  cn: aiops.dev.zdgt
+  clusterissuer: ca-issuer
+
+kangpaas:
+  version: 2.0.8
+  imagePullPolicy: Always
+  imagePullSecrets: my-harbor
+  eureka:
+    repository: harbor.test.com/aiops-nx/eureka
+    resources:
+      requests: 
+        memory: 512Mi
+      limits: 
+        memory: 1024Mi
+  gate:
+    repository: harbor.test.com/aiops-nx/gate
+    resources:
+      requests: 
+        memory: 2Gi
+      limits: 
+        memory: 2.2Gi
+  oauth:
+    repository: harbor.test.com/aiops-nx/oauth
+    resources:
+      requests: 
+        memory: 512Mi
+      limits: 
+        memory: 1024Mi
+  websocket:
+    repository: harbor.test.com/aiops-nx/websocket
+    resources:
+      requests: 
+        memory: 2Gi
+      limits: 
+        memory: 2.2Gi
+  job:
+    repository: harbor.test.com/aiops-nx/job
+    resources:
+      requests: 
+        memory: 512Mi
+      limits: 
+        memory: 1024Mi
+  systemmgnt:
+    repository: harbor.test.com/aiops-nx/systemmgnt
+    resources:
+      requests: 
+        memory: 512Mi
+      limits: 
+        memory: 1024Mi
+  standingbook:
+    repository: harbor.test.com/aiops-nx/standingbook
+    resources:
+      requests: 
+        memory: 4Gi
+      limits: 
+        memory: 5Gi
+  monitormgnt:
+    repository: harbor.test.com/aiops-nx/monitormgnt
+    resources:
+      requests: 
+        memory: 4Gi
+      limits: 
+        memory: 5Gi
+
+vantiq:
+  token: _f67RoN6baxHjw0kCWOTIIVuOTNv2cww6l1AEbTYIfU=
+
+prometheus_mgnt:
+  masternode:
+    ip: 3.1.4.220
+    username: nxyw
+    password: nxyw
+
+front:
+  image:
+    repository: harbor.test.com/aiops-nx/front
+    tag: 2.0.8
+    pullPolicy: Always
+    pullSecrets: my-harbor
+
+  config:
+    config.js: |
+      window.g = {
+        ApiUrl: 'https://aiops.dev.zdgt/gate',
+        WSIP: 'wss://aiops.dev.zdgt/websocket',
+        RegistCenter:"http://kangpaas-eureka:8091/",
+        isShowErrMsg: true,
+        pdf: 'https://pdf.aiops.staging.nari/static/UserGuide.pdf',
+        grafana: 'https://aiops.staging.nari/kibana',
+        Apis: 'https://aiops.dev.zdgt',
+        vantiq: 'https://aiops.dev.zdgt/data-cleaning',
+        vantiq_token: 'Bearer _f67RoN6baxHjw0kCWOTIIVuOTNv2cww6l1AEbTYIfU=',
+        contract: 'https://aiops.dev.zdgt/contract', // 运营中心
+        integrated_warning_home_page: "https://aiops.staging.nari:30443/kibana/app/kibana#/dashboard/32280630-5c59-11ea-976e-4bf4d9f25c64?_g=(refreshInterval%3A(pause%3A!t%2Cvalue%3A0)%2Ctime%3A(from%3Anow-15m%2Cto%3Anow))", // 综合告警首页 
+        unified_warning_query: "https://aiops.staging.nari:30443/kibana/app/kibana#/dashboard/c64e9d30-5eaf-11ea-976e-4bf4d9f25c64?_g=(refreshInterval%3A(pause%3A!t%2Cvalue%3A0)%2Ctime%3A(from%3A'2020-03-05T03%3A59%3A02.975Z'%2Cto%3Anow))", // 统一告警查询
+        log_retrieval: "https://aiops.staging.nari:30443/kibana/app/kibana#/discover/1c9bee10-5ea4-11ea-976e-4bf4d9f25c64?_g=(filters%3A!()%2CrefreshInterval%3A(pause%3A!t%2Cvalue%3A0)%2Ctime%3A(from%3Anow-20d%2Cto%3Anow))", // 日志检索
+        linux_monitor: "https://aiops.staging.nari:30443/grafana/d/9CWBz0bik/linuxjian-kong?orgId=1",
+        windows_monitor: "https://aiops.staging.nari:30443/grafana/d/7UlnHoGZz/windowszhu-ji-jian-kong?orgId=1", // Windows监控
+        switch_monitor: "https://aiops.staging.nari:30443/grafana/d/snmp0717/h3cjiao-huan-ji-jian-kong?orgId=1", // 交换机监控
+        weblogic_monitor: "https://aiops.staging.nari:30443/grafana/d/5yUwzbZWz/weblogic-server-dashboard?orgId=1",
+        oracle_monitor: "", // Oracle监控
+        load_balancing_monitor: "https://aiops.staging.nari:30443/grafana/d/0qA1rv4Gz/f5?orgId=1",
+        three_d_machine_room: "http://192.168.90.207:1661/tarsier-dcv/dcv/external/operation/poclogin?loginCode=admin&targetUrl=http://192.168.90.207:1661/tarsier-dcv/",
+        threerack: "https://aiops.staging.nari:30443/d3",
+        log_statistics: "https://aiops.staging.nari:30443/kibana/d/oFzK2XvGz/ri-zhi-tong-ji?orgId=1",
+        switch_log: "http://kibana.staging.nari:30080/kibana/goto/fe1e681ce737695c595c9ac95a23e8d4", // 交换机日志
+        firewall_log: "http://kibana.staging.nari:30080/kibana/goto/d6a6c417b993524c160f4253867f5326", // 防火墙日志
+        log_statistics_nginx: "https://aiops.staging.nari:30443/kibana/d/O19OT4DGk/nginxri-zhi-tong-ji?orgId=1",
+        log_statistics_oracle: "https://aiops.staging.nari:30443/kibana/d/HXu6OEDMz/oracleri-zhi-tong-ji?orgId=1&from=now-7d&to=now", //oracle log
+        alert_mgnt: "https://aiops.dev.zdgt/prometheus-mgnt",
+        message: 'https://aiops.dev.zdgt/message-mgnt', // 消息
+      }

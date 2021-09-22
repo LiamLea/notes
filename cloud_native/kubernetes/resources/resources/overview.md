@@ -73,23 +73,17 @@ spec.containers[].resources.requests.ephemeral-storage
 spec.containers[].resources.limits.ephemeral-storage
 ```
 
-#### 5.qos class（服务质量类型）
+#### 5.QoS class（服务质量类型）
 ```shell
 #通过下面命令查看
 kubectl describe pods xx
 ```
-##### （1）guaranteed（高优先级）
+##### （1）guaranteed
 该pod内每个容器都设置了requests和limits，并且：
-内存的requests == 内存的limits
-cpu的requests == 内存的limits
+  * `内存的requests == 内存的limits`
+  * `cpu的requests == cpu的limits`
 
-##### （2）burstable（中优先级）
+##### （2）burstable
 
-##### （3）besteffort（低优先级）
+##### （3）besteffort
 该pod内没有一个容器设置requests和limits
-
-**当资源不够用时，先杀死优先级的pod**
-
-#### 6.LimitRange 资源
-如果容器没有设置requests和limits，LimitRange资源会自动给该容器设置
-* LimitRange的作用范围是其所在namespace

@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: argocd-patch
+  namespace: argocd
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: ca-issuer
+    nginx.ingress.kubernetes.io/rewrite-target: /argocd/api/v1/repositories/git%40$1%3A$2%2F$3
+#    nginx.ingress.kubernetes.io/configuration-snippet: |
+#      rewrite ^ $request_uri;
+#    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  rules:
+  - host: {{ .Values.host }}
+    http:
+      paths:
+
+      - path: /argocd/api/v1/repositories/git@(.*?):(.*?)/(.*)
+        backend:
+          serviceName: argocd-server
+          servicePort: 80
+
+  tls:
+  - hosts:
+    - {{ .Values.host }}
+    secretName: k8s-ingress

@@ -1,0 +1,746 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contract
+data:
+  dbConnection.ini: |
+    [DEFAULT]
+    HOSTNAME = {{ .Values.mysql.ip }}
+    PORT = {{ .Values.mysql.port }}
+    DATABASE = {{ .Values.mysql.db_name }}
+    USERNAME = {{ .Values.mysql.username }}
+    PASSWORD = {{ .Values.mysql.password }}
+  settings.yaml: |
+    kafka_address: "{{ .Values.kafka.host }}:{{ .Values.kafka.port}}"
+    kafka_topic: topic_message
+    kafka_group: messagetest
+  foreign_url.ini: |
+    [DEFAULT]
+    GET_USER_URL = http://kangpaas-systemmgnt:8095/api/v1/security/staff/
+    GET_USER_LIST_URL = http://kangpaas-systemmgnt:8095/api/v1/security/staff/query
+    POST_REQUEST_HEADERS = {"content-type": "application/json"}
+    COMPANY_URL = http://kangpaas-systemmgnt:8095/api/v1/security/company/
+    GET_COMPANY_LIST_URL = http://kangpaas-systemmgnt:8095/api/v1/security/company/query
+    HEADERS = {"content-type": "application/json"}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: d3-room
+data:
+  setting.yaml: |
+    uino_ip: "192.168.90.58:1665"
+    kafka:
+      address: "{{ .Values.kafka.host }}:{{ .Values.kafka.port}}"
+      topic: topic_3d_change
+      asset_topic: topic_asset_link
+      asset_group: 3dtest
+      message_topic: "topic_message"
+  dbConnection.ini: |
+    [DEFAULT]
+    HOSTNAME = {{ .Values.mysql.ip }}
+    PORT = {{ .Values.mysql.port }}
+    DATABASE = {{ .Values.mysql.db_name }}
+    USERNAME = {{ .Values.mysql.username }}
+    PASSWORD = {{ .Values.mysql.password }}
+  foreign_url.ini: |
+    [DEFAULT]
+    Requests_Url = http://kangpaas-standingbook:8098
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: message-mgnt
+data:
+  dbConnection.ini: |
+    [DEFAULT]
+    HOSTNAME = {{ .Values.mysql.ip }}
+    PORT = {{ .Values.mysql.port }}
+    DATABASE = {{ .Values.mysql.db_name }}
+    USERNAME = {{ .Values.mysql.username }}
+    PASSWORD = {{ .Values.mysql.password }}
+  settings.yaml: |
+    kafka_address: {{ .Values.kafka.host }}:{{ .Values.kafka.port}}
+    kafka_topic: topic_message
+    kafka_group: messagetest
+  foreign_url.ini: |
+    [DEFAULT]
+    SendToAssignUser_URL = http://kangpaas-websocket:8078/api/v1/ws/sendToAssignUser
+    POST_REQUEST_HEADERS = {"content-type": "application/json"}
+    GETAuth_URL = http://kangpaas-systemmgnt:8095/api/v1/security/user/auth/all
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-mgnt
+data:
+  foreign_url.ini: |
+    [DEFAULT]
+    GET_DEVICE_LIST_URL = http://kangpaas-monitormgnt:8062/api/v1/monitormgnt/host/prometheus/translate
+    POST_REQUEST_HEADERS = {"content-type": "application/json"}
+    GET_ASSET_INFO_URL = http://kangpaas-standingbook:8098/api/v1/cmdb/asset/queryextend
+    UPDATE_ASSET_INFO_URL = http://kangpaas-standingbook:8098/api/v1/cmdb/asset
+    UPDATE_SYSTEM_INFO_URL = http://kangpaas-standingbook:8098/api/v1/appsys/system/prometheus/callback
+  settings.yaml: |
+    exporter:
+      linux: linux
+      windows: windows
+      switch: snmp_switch_exporter
+      apache: apache_exporter
+      tomcat: tomcat_exporter
+      weblogic: weblogic_exporter
+      mysql: mysql_exporter
+      oracle: oracledb_exporter
+      postgresql: postgresql
+      redis: redis_exporter
+      mongodb: mongodb_exporter
+    exporter_installation_path: /usr/sbin
+    exporter_port:
+      linux_port: 9100
+      windows_port: 9182
+      apache_port: 9117
+      tomcat_port: 30013
+      weblogic_port: 7001
+      mysql_port: 9104
+      oracle_port: 9161
+      postgresql_port: 9187
+      redis_port: 9121
+      mongodb_port: 9001
+    exportertask:
+      install_node_exporter: linux
+      install_mysqld_exporter: mysql_exporter
+      install_apache_exporter: apache_exporter
+      install_tomcat: tomcat_exporter
+      install_wls-exporter: weblogic_exporter
+      install_windows_exporter: windows
+      install_redis_exporter: redis_exporter
+      install_mongodb_exporter: mongodb_exporter
+      install_oracledb_exporter: oracledb_exporter
+      install_postgre_exporter: postgresql
+    kafka:
+      kafka_address: {{ .Values.kafka.host }}:{{ .Values.kafka.port}}
+      kafka_device_topic: topic_asset_change
+      kafka_device_group: devicetest
+      kafka_out_topic: topic_message
+      kafka_sys_topic: topic_appsys_monitor
+      kafka_sys_group: systest
+    masternode:
+      hostip: {{ .Values.prometheus_mgnt.masternode.ip }}
+      username: {{ .Values.prometheus_mgnt.masternode.username }}
+      password: {{ .Values.prometheus_mgnt.masternode.password }}
+      port: 22
+    prometheus_ns:
+      configmap: prometheus-server
+      namespace: monitor
+    default_rules:
+      Linux:
+        period: 30
+        host_cpuusage_high:
+          level1: 75
+          level2: 75
+          level3: 50
+          level4: 50
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        host_memoryusage_high:
+          level1: 90
+          level2: 75
+          level3: 50
+          level4: 50
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        host_filehandle_high:
+          level1: 90
+          level2: 75
+          level3: 50
+          level4: 50
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        host_filesystemusage_high:
+          level1: 90
+          level2: 80
+          level3: 70
+          level4: 70
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+      Windows:
+        period: 30
+        host_cpuusage_high:
+          level1: 75
+          level2: 75
+          level3: 50
+          level4: 50
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        host_memoryusage_high:
+          level1: 90
+          level2: 75
+          level3: 50
+          level4: 50
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        host_filesystemusage_high:
+          level1: 90
+          level2: 80
+          level3: 70
+          level4: 70
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+      Weblogic:
+        period: 30
+        atom_weblogic_connection_status:
+          level2: 1
+          condition: "!="
+          level2num: 3
+          enabled: 0
+        atom_weblogic_health_status:
+          level2: 1
+          condition: "!="
+          level2num: 2
+          enabled: 0
+        atom_weblogic_heapused:
+          level2: 95
+          level3: 85
+          level4: 70
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_weblogic_jdbc_pool_status:
+          level2: 1
+          condition: "!="
+          level2num: 3
+          enabled: 0
+        atom_weblogic_wls_threadpool_queue_length:
+          level1: 10
+          level2: 5
+          level3: 2
+          level4: 1
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_weblogic_wls_threadpool_stuck_thread_count:
+          level1: 10
+          level2: 5
+          level3: 2
+          level4: 1
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_weblogic_wls_jvm_process_cpu_load:
+          level1: 95
+          level2: 85
+          level3: 75
+          level4: 60
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_weblogic_wls_workmanager_pending_requests:
+          level1: 50
+          level2: 30
+          level3: 15
+          level4: 5
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_weblogic_wls_workmanager_stuck_thread_count:
+          level1: 10
+          level2: 5
+          level3: 2
+          level4: 1
+          condition: ">="
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_weblogic_wls_datasource_failed_repurpose_count:
+          level2: 50
+          level3: 5
+          level4: 1
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_weblogic_wls_datasource_failed_reserve_request_count:
+          level2: 50
+          level3: 2
+          level4: 1
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_weblogic_wls_datasource_failures_to_reconnect_count:
+          level2: 50
+          level3: 2
+          level4: 1
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_weblogic_wls_datasource_leaked_connection_count:
+          level2: 50
+          level3: 2
+          level4: 1
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_weblogic_wls_datasource_waiting_for_connection_current_count:
+          level2: 50
+          level3: 2
+          level4: 1
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_weblogic_wls_datasource_waiting_for_connection_failure_total:
+          level2: 100
+          level3: 10
+          level4: 1
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+      Oracle:
+        period: 30
+        atom_oracle_db_up:
+          level1: 1
+          condition: "!="
+          level1num: 4
+          enabled: 0
+        atom_oracle_table_usage:
+          level2: 98
+          level3: 85
+          level4: 75
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_oracle_extend_table_usage:
+          level2: 98
+          level3: 85
+          level4: 75
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_oracle_session_usage:
+          level2: 95
+          level3: 90
+          level4: 80
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_oracle_process_usage:
+          level2: 95
+          level3: 85
+          level4: 70
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_oracle_action_parse_comparaison:
+          level2: 90
+          level3: 85
+          level4: 70
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        atom_oracle_rollback_ratio:
+          level2: 30
+          level3: 25
+          level4: 10
+          condition: ">="
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+      Switch:
+        period: 60
+        device_huawei_switch_cpuusage_high:
+          level1: 90
+          level2: 80
+          level3: 70
+          level4: 50
+          condition: ">"
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_switch_memoryusage_high:
+          level1: 90
+          level2: 80
+          level3: 70
+          level4: 50
+          condition: ">"
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_switch_temperature_high:
+          level1: 90
+          level2: 80
+          level3: 70
+          level4: 50
+          condition: ">"
+          level1num: 4
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_switch_rcv_pkt_discard:
+          level3: 5
+          level4: 0.02
+          condition: ">="
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_switch_send_pkt_discard:
+          level3: 5
+          level4: 0.02
+          condition: ">="
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_switch_port_status:
+          level4: 1
+          condition: "!="
+          level4num: 1
+          enabled: 0
+        device_huawei_switch_rcv_pkt_errors:
+          level3: 5
+          level4: 0.02
+          condition: ">="
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_switch_send_pkt_errors:
+          level3: 5
+          level4: 0.02
+          condition: ">="
+          level3num: 2
+          level4num: 1
+          enabled: 0
+      Storage:
+        period: 60
+        device_huawei_storage_node_cpuusage:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_node_avg_cache_usage:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_nodeio_delay:
+          level2: 50
+          level3: 30
+          level4: 15
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_node_read_iops:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_node_write_iops:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_node_read_traffic:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_node_write_traffic:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_portio_delay:
+          level2: 50
+          level3: 30
+          level4: 15
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_port_read_iops:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_port_write_iops:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_port_read_traffic:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_port_write_traffic:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_lun_read_iops:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_lun_write_iops:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_lun_read_traffic:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_lun_write_traffic:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_cache_read_utilization:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_cache_write_utilization:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_cache_mirror_write_wtilization:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_pool_full_threshold:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_disk_temperature:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_disk_capacity_usage:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_controller_CPU_usage:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_controller_memory_usage:
+          level2: 85
+          level3: 75
+          level4: 50
+          condition: ">"
+          level2num: 3
+          level3num: 2
+          level4num: 1
+          enabled: 0
+        device_huawei_storage_controller_health_status:
+          level2: 1
+          condition: "!="
+          level2num: 3
+          enabled: 0
+        device_huawei_storage_disk_domain_health_status:
+          level2: 1
+          condition: "!="
+          level2num: 3
+          enabled: 0
+        device_huawei_storage_pool_health_status:
+          level2: 1
+          condition: "!="
+          level2num: 3
+          enabled: 0
+        device_huawei_storage_tier_health_status:
+          level2: 1
+          condition: "!="
+          level2num: 3
+          enabled: 0
+        device_huawei_storage_power_health_status:
+          level2: 1
+          condition: "!="
+          level2num: 3
+          enabled: 0
+        device_huawei_storage_fan_health_status:
+          level2: 1
+          condition: "!="
+          level2num: 3
+          enabled: 0
+        device_huawei_storage_BBU_health_status:
+          level2: 1
+          condition: "!="
+          level2num: 3
+          enabled: 0
+        device_huawei_storage_port_FC_health_status:
+          level2: 1
+          condition: "!="
+          level2num: 3
+          enabled: 0
+        device_huawei_storage_port_SAS_health_status:
+          level2: 1
+          condition: "!="
+          level2num: 3
+          enabled: 0

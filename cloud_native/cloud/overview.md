@@ -12,7 +12,7 @@
 |IaaS（infrastructure as a service）|提供基础设施，比如：存储、服务器等）|
 |PaaS（platform as a service）|提供平台|
 |SaaS（software as a service）|提供软件|
-|FaaS（function as a service）|也成为serverless computing，提供功能|
+|FaaS（function as a service）|也称为serverless，也称为事件驱动计算，动态分配资源来运行单个功能（本质上是微服务）|
 
 ##### （2）按照部署的方式分类
 |类型|说明|使用场景|

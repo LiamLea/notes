@@ -1,0 +1,285 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eureka
+data: 
+  application.yml: |
+    server:
+      port: 8091
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gate
+data:
+  application.yml: |
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka
+    
+    oauth:
+      server: http://kangpaas-oauth:8100/uaa
+    
+    server:
+      port: 8093
+    
+    spring:
+      redis:
+        database: {{ .Values.redis.database }}
+        host: {{ .Values.redis.host }}
+        port: {{ .Values.redis.port }}
+        password: {{ .Values.redis.password }}
+        timeout: 6000
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oauth
+data: 
+  application.yml: |
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+    
+    server:
+      port: 8100
+    
+    spring:
+      redis:
+        database: {{ .Values.redis.database }}
+        host: {{ .Values.redis.host }}
+        port: {{ .Values.redis.port }}
+        password: {{ .Values.redis.password }}
+        timeout: 6000
+
+      datasource:
+        groups: demo
+        demo:
+        - key: demo1
+          role: master
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: {{ .Values.mysql.username }}
+          password: {{ .Values.mysql.password }}
+          url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&allowPublicKeyRetrieval=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&allowMultiQueries=true
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: websocket
+data: 
+  application.yml: |
+    server:
+      port: 8099
+
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+    
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: job
+data:
+  application.yml: |
+    server:
+      port: 8079
+    
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+    
+    spring:
+      datasource:
+        groups: demo
+        demo:
+        - key: demo1
+          role: master
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: {{ .Values.mysql.username }}
+          password: {{ .Values.mysql.password }}
+          url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&allowPublicKeyRetrieval=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&allowMultiQueries=true
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: execute-record
+data: 
+  application.yml: |
+    server:
+      port: 8070
+    
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+    
+    spring:
+      redis:
+        database: {{ .Values.redis.database }}
+        host: {{ .Values.redis.host }}
+        port: {{ .Values.redis.port }}
+        password: {{ .Values.redis.password }}
+        timeout: 6000
+      kafka:
+        bootstrap-servers: {{ .Values.kafka.host }}:{{ .Values.kafka.port}}
+        consumer:
+          group-id: dev-autoop-execute-record
+    kafka:
+      names: discovery
+      discovery:
+        topic: topic_autoop_process
+      
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: maintain-object
+data:
+  application.yml: |
+    server:
+      port: 8062
+    
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+
+    spring:
+      redis:
+        database: {{ .Values.redis.database }}
+        host: {{ .Values.redis.host }}
+        port: {{ .Values.redis.port }}
+        password: {{ .Values.redis.password }}
+        timeout: 6000
+    
+      datasource:
+        groups: demo
+        demo:
+        - key: demo1
+          role: master
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: {{ .Values.mysql.username }}
+          password: {{ .Values.mysql.password }}
+          url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&allowPublicKeyRetrieval=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&allowMultiQueries=true
+
+    python:
+      url: http://scan-scripts
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: op-repository
+data:
+  application.yml: |
+    server:
+      port: 8098
+    
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+
+    spring:
+      redis:
+        database: {{ .Values.redis.database }}
+        host: {{ .Values.redis.host }}
+        port: {{ .Values.redis.port }}
+        password: {{ .Values.redis.password }}
+        timeout: 6000
+    
+      datasource:
+        groups: demo
+        demo:
+        - key: demo1
+          role: master
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: {{ .Values.mysql.username }}
+          password: {{ .Values.mysql.password }}
+          url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&allowPublicKeyRetrieval=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&allowMultiQueries=true
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: schedule-center
+data:
+  application.yml: |
+    server:
+      port: 8078
+    
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+
+    spring:
+      redis:
+        database: {{ .Values.redis.database }}
+        host: {{ .Values.redis.host }}
+        port: {{ .Values.redis.port }}
+        password: {{ .Values.redis.password }}
+        timeout: 6000
+    
+      datasource:
+        groups: demo
+        demo:
+        - key: demo1
+          role: master
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          username: {{ .Values.mysql.username }}
+          password: {{ .Values.mysql.password }}
+          url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&allowPublicKeyRetrieval=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&allowMultiQueries=true
+
+    python:
+      url: http://scan-scripts
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scan-service
+data: 
+  settings.yaml: |
+    server:
+      ip: 0.0.0.0
+      port: 8080
+
+    software:
+      load_modules:
+      - ApacheScan
+      - NginxScan
+      - OracleScan
+      - WeblogicScan
+      - MysqlScan
+      - TomcatScan
+      - PGScan
+
+    arguments:
+      threads: 75
+      processes: 10
+
+    kafka:
+      server: {{ .Values.kafka.host }}:{{ .Values.kafka.port}}
+      topic:
+        host_deploy: topic_autoop_os_config
+        software_deploy: topic_autoop_software_config
+        progress: topic_autoop_process
+
+    probe_service: 0
+    db_info:
+      host: {{ .Values.mysql.ip }}
+      port: {{ .Values.mysql.port }}
+      db_name: {{ .Values.mysql.db_name }}
+      user: {{ .Values.mysql.username }}
+      password: {{ .Values.mysql.password }}
+

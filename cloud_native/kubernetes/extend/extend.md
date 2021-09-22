@@ -1,9 +1,13 @@
 # 扩展
+
 [toc]
+
 ### 概述
+
 #### 1.custome resource
 自定义资源，是对kubernetes API的一种扩展（相当于添加新的api）
 定义数据格式，描述应用信息
+
 #### 2.custome controller
 根据crd，创建相应的应用
 将自定义资源和自定义控制器结合，自定义资源才能提供一个真正的声明式API

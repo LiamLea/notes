@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: contract-management
+  name: contract-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: contract-management
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: contract-management
+    spec:
+      containers:
+      - image: harbor.test.com/aiops-nx/contract_management:dev
+        name: contract-management
+        imagePullPolicy: Always
+        volumeMounts:
+                #        - name: mysql
+                #          mountPath: /usr/src/app/swagger_server/mysql/config/dbConnection.ini
+                #          subPath: dbConnection.ini
+        - name: mysql
+          mountPath: /etc/contract/dbConnection.ini
+          subPath: dbConnection.ini
+        - name: mysql
+          mountPath: /usr/src/app/swagger_server/common/constant/settings.yaml
+          subPath: settings.yaml
+        - name: mysql
+          mountPath: /etc/contract/foreign_url.ini
+          subPath: foreign_url.ini
+        ports:
+        - containerPort: 8082
+          protocol: TCP
+        resources: {}
+      volumes:
+      - name: mysql
+        configMap:
+          name: contract
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: contract-management
+  name: contract-managent
+spec:
+  ports:
+  - port: 8082
+    protocol: TCP
+    targetPort: 8082
+  selector:
+    app: contract-management

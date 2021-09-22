@@ -15,7 +15,7 @@
 
 ### 配置
 
-#### 1.服务端：`/etc/chrony.conf`
+#### 1.服务端：`/etc/ntp.conf`
 
 * 指定ntp server
 
@@ -59,9 +59,16 @@ server 127.127.1.0
 fudge 127.127.1.0 stratum <STRATUM_NUMBER>
 ```
 
-#### 2.客户端: `/etc/chrony.conf`
+#### 2.客户端: `/etc/ntp.conf`
 ```shell
 server <NTP_SERVER> iburst
+
+#server后面的其他选项：
+#   minpoll <num>   //设置最小poll时间为2^<num>秒
+#   maxpoll <num>   //设置最大poll时间为2^<num>秒
+
+#比如：
+#   server <NTP_SERVER> iburst maxpoll 6       
 ```
 
 ***
@@ -93,7 +100,7 @@ LOCAL(0)        .LOCL.          10 l   9h   64    0    0.000    0.000   0.000
   * 如果是`+`代表也有连上线，而且可作为下一个提供时间更新的候选者
 </br>
 * refid
-  ntp服务器的ntp服务器的标识，可能的值：
+  **ntp服务器的ntp服务器**的标识，可能的值：
   * `<IP>`，即ntp服务器使用的是ip为`<IP>`的ntp服务器
   * `.INIT.`，即还没有开始同步，也可以说是处于初始状态还没建立同步
   * `.LOCL.`，即本机 (当没有远程节点或服务器可用时）
@@ -104,17 +111,17 @@ ntp服务器所在的层
 * when
   几秒钟前曾经做过时间同步化更新的动作
 </br>
-* poll
+* poll（单位：秒）
   查询的时间间隔
 </br>
 * reach
   已经向上层NTP伺服器要求更新的次数
 </br>
-* delay
-  从本地机发送同步要求到ntp服务器的往返时间（单位为微秒）
+* delay（单位：微秒）
+  从本地机发送同步要求到ntp服务器的往返时间
 </br>
-* offset
-  * 主机通过NTP时钟同步与所同步时间源的时间偏移量，单位为毫秒
+* offset（单位：毫秒）
+  * 主机通过NTP时钟同步与所同步时间源的时间偏移量
   * offset越接近于0，主机和ntp服务器的时间越接近
 
 ##### （2）`ntpq -c associations`

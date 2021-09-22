@@ -1,6 +1,9 @@
 # pod
+
 [toc]
+
 ### 基础概念
+
 ```plantuml
 card "init containers" as a
 card "container执行启动命令" as e
@@ -58,12 +61,12 @@ Terminated|表明容器运行结束
 #### 4.container probes（ 容器 探测）
 探测是针对容器的，而不是pod
 
-##### 4.1 每次探测有三种结果
+##### （1）每次探测有三种结果
 * Success
 * Failure
 * Unkown
 
-##### 4.2 三种探针
+##### （2）三种探针
 
 探针|说明
 -|-
@@ -71,9 +74,9 @@ exec|**执行指定命令**，如果该命令退出码为0，表明探测成功
 tcpSocket|对**指定ip上的port**探测，如果这个ip上的**port**是**打开**的，表明探测成功
 httpGet|对**指定ip上的port**探测，发送**GET请求**到这个ip:port，如果**返回码在200~400之间**，表明探测成功
 
-</br>
 
-##### 4.3 三种情形下的探测
+##### （3）三种情形下的探测
+
 情形|语句|影响字段|说明（未设置则默认探测成功）|探测失败|何时需要这种情形的探测|
 -|-|-|-|-|-
 启动探测|startupProbe|`Pod.status.containerStatuses.started`|探测容器是否**启动**，只有这这个探测成功才会进行其他情形的探测|会kill该container（不是pod），然后根据pod的restartPolicy决定是否对该container进行重启|当启动过慢时，如果不设置启动探测，就会进行存活和就绪探测，结果因为还没启动完成导致探测失败，导致容器被kill，是不合理的
@@ -82,11 +85,11 @@ httpGet|对**指定ip上的port**探测，发送**GET请求**到这个ip:port，
 
 #### 5.Init containers
 
-##### 5.1 特点
+##### （1）特点
 * 总是运行到完成
 * 多个init containers必须按顺序执行，init containers完成后才能运行其他容器
 
-##### 5.2 使用init containers的好处
+##### （2）使用init containers的好处
 * init containers可以提供一些运维工具，如：sed、awk等
 * Init 容器提供了一种机制来阻塞或延迟应用容器的启动，直到满足了一组先决条件。一旦前置条件满足，Pod内的所有的应用容器会并行启动
 
@@ -103,6 +106,18 @@ Init:N/M|有M个初始化容器，只有N个初始化容器执行成功
 Init:Error|有一个初始化容器执行失败
 Init:CrashLoopBackOff|有一个初始化容器多次执行失败
 PodInitializing</br>Running|所有初始化容器都执行成功
+
+#### 8.priority和preemption
+
+##### （1）priority
+用于设置pod的优先级，调度时，优先级高的pod会根据抢占策略（preemption policy）进行调度
+如果pod不指定优先级的话，默认为0
+
+##### （2）preemption policy
+* Never
+  * 不影响已经调度的pods
+* PreemptLowerPriority（默认）
+  * 影响已经调度的pods
 
 ***
 

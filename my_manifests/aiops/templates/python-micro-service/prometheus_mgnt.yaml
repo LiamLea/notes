@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: prometheus-management
+  name: prometheus-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-management
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: prometheus-management
+    spec:
+      containers:
+      - image: harbor.test.com/aiops-nx/prometheus_mgnt:dev
+        name: prometheus-management
+        imagePullPolicy: Always
+        volumeMounts:
+                #        - name: mysql
+                #          mountPath: /usr/src/app/swagger_server/mysql/config/dbConnection.ini
+                #          subPath: dbConnection.ini
+        - name: config
+          mountPath: /etc/prometheus_mgnt/foreign_url.ini
+          subPath: foreign_url.ini
+        - name: config
+          mountPath: /usr/src/app/settings.yaml
+          subPath: settings.yaml
+        ports:
+        - containerPort: 8083
+          protocol: TCP
+        resources: {}
+      volumes:
+      - name: config
+        configMap:
+          name: prometheus-mgnt
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: prometheus-management
+  name: prometheus-management
+spec:
+  ports:
+  - port: 8083
+    protocol: TCP
+    targetPort: 8083
+  selector:
+    app: prometheus-management

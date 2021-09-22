@@ -1,0 +1,252 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kangpaas-execute-record
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kangpaas-execute-record
+  template:
+    metadata:
+      labels:
+        app: kangpaas-execute-record
+    spec:
+      containers:
+      - name: kangpaas-execute-record
+        image: "{{ .Values.kangpaas.execute_record.repository }}:{{ .Values.kangpaas.version }}"
+        imagePullPolicy: {{ .Values.kangpaas.imagePullPolicy }}
+        resources:
+          requests: 
+            memory: {{ .Values.kangpaas.execute_record.resources.requests.memory }}
+          limits: 
+            memory: {{ .Values.kangpaas.execute_record.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /kangpaas/application.yml
+          subPath: application.yml
+      {{- if .Values.kangpaas.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.kangpaas.imagePullSecrets }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: execute-record
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kangpaas-execute-record
+spec:
+  selector:
+    app: kangpaas-execute-record
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8070
+    targetPort: 8070
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kangpaas-maintain-object
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kangpaas-maintain-object
+  template:
+    metadata:
+      labels:
+        app: kangpaas-maintain-object
+    spec:
+      containers:
+      - name: kangpaas-maintain-object
+        image: {{ .Values.kangpaas.maintain_object.repository }}:{{ .Values.kangpaas.version }}
+        imagePullPolicy: {{ .Values.kangpaas.imagePullPolicy }}
+        resources:
+          requests: 
+            memory: {{ .Values.kangpaas.maintain_object.resources.requests.memory }}
+          limits: 
+            memory: {{ .Values.kangpaas.maintain_object.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /kangpaas/application.yml
+          subPath: application.yml
+      {{- if .Values.kangpaas.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.kangpaas.imagePullSecrets }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: maintain-object
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kangpaas-maintain-object
+spec:
+  selector:
+    app: kangpaas-maintain-object
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8062
+    targetPort: 8062
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kangpaas-op-repository
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kangpaas-op-repository
+  template:
+    metadata:
+      labels:
+        app: kangpaas-op-repository
+    spec:
+      containers:
+      - name: kangpaas-op-repository
+        image: {{ .Values.kangpaas.op_repository.repository }}:{{ .Values.kangpaas.version }}
+        imagePullPolicy: {{ .Values.kangpaas.imagePullPolicy }}
+        resources:
+          requests: 
+            memory: {{ .Values.kangpaas.op_repository.resources.requests.memory }}
+          limits: 
+            memory: {{ .Values.kangpaas.op_repository.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /kangpaas/application.yml
+          subPath: application.yml
+      {{- if .Values.kangpaas.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.kangpaas.imagePullSecrets }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: op-repository
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kangpaas-op-repository
+spec:
+  selector:
+    app: kangpaas-op-repository
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8098
+    targetPort: 8098
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kangpaas-schedule-center
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kangpaas-schedule-center
+  template:
+    metadata:
+      labels:
+        app: kangpaas-schedule-center
+    spec:
+      containers:
+      - name: kangpaas-schedule-center
+        image: {{ .Values.kangpaas.schedule_center.repository }}:{{ .Values.kangpaas.version }}
+        imagePullPolicy: {{ .Values.kangpaas.imagePullPolicy }}
+        resources:
+          requests: 
+            memory: {{ .Values.kangpaas.schedule_center.resources.requests.memory }}
+          limits: 
+            memory: {{ .Values.kangpaas.schedule_center.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /kangpaas/application.yml
+          subPath: application.yml
+      {{- if .Values.kangpaas.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.kangpaas.imagePullSecrets }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: schedule-center
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kangpaas-schedule-center
+spec:
+  selector:
+    app: kangpaas-schedule-center
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8078
+    targetPort: 8078
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scan-scripts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scan-scripts
+  template:
+    metadata:
+      labels:
+        app: scan-scripts
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: scan-scripts
+        image: {{ .Values.scan.repository }}:{{ .Values.scan.version }}
+        imagePullPolicy: {{ .Values.scan.imagePullPolicy }}
+        resources:
+          requests: 
+            cpu: {{ .Values.scan.resources.requests.cpu }}
+            memory: {{ .Values.scan.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.scan.resources.limits.cpu }}
+            memory: {{ .Values.scan.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /usr/local/scan_service/settings.yaml
+          subPath: settings.yaml
+      {{- if .Values.kangpaas.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.kangpaas.imagePullSecrets }}
+      {{- end }}
+      
+      volumes:
+      - name: config
+        configMap:
+          name: scan-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scan-scripts
+spec:
+  selector:
+    app: scan-scripts
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
