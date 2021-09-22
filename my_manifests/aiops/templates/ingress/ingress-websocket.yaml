@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: "{{ .Values.url.system }}-websocket"
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: {{ .Values.url.clusterissuer }}
+    #    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    #    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+spec:
+  rules:
+  - host: {{ .Values.url.host }}
+    http:
+      paths:
+      - path: /websocket/(.*)
+        backend:
+          serviceName: kangpaas-websocket
+          servicePort: 8078
+  tls:
+  - hosts:
+    - {{ .Values.url.host }}
+    secretName: "{{ .Values.url.system }}-ingress"

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kangpaas-eureka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kangpaas-eureka
+  template:
+    metadata:
+      labels:
+        app: kangpaas-eureka
+    spec:
+      nodeName: node-9
+      containers:
+      - name: kangpaas-eureka
+        image: harbor.test.com/kangpaas/eureka:2.0.3
+        resources:
+          requests:
+            memory: 500Mi
+          limits:
+            memory: 500Mi

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: d3-room
+  name: d3-room
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: d3-room
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: d3-room
+    spec:
+      containers:
+      - image: harbor.test.com/aiops-nx/3d_machine_room:dev
+        name: 3d-machine-room
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 30080
+          protocol: TCP
+        volumeMounts:
+        - name: config
+          mountPath: /etc/3d_machine_room/dbConnection.ini
+          subPath: dbConnection.ini
+        - name: config
+          mountPath: /usr/src/app/swagger_server/setting.yaml
+          subPath: setting.yaml
+        - name: config
+          mountPath: /etc/3d_machine_room/foreign_url.ini
+          subPath: foreign_url.ini
+
+      volumes:
+      - name: config
+        configMap:
+          name: d3-room
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: d3-room
+  name: d3-service
+spec:
+  ports:
+  - port: 30080
+    protocol: TCP
+    targetPort: 30080
+  selector:
+    app: d3-room

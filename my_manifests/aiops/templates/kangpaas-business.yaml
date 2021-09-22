@@ -1,0 +1,259 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kangpaas-systemmgnt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kangpaas-systemmgnt
+  template:
+    metadata:
+      labels:
+        app: kangpaas-systemmgnt
+    spec:
+      containers:
+      - name: kangpaas-systemmgnt
+        image: {{ .Values.kangpaas.systemmgnt.repository }}:{{ .Values.kangpaas.version }}
+        imagePullPolicy: {{ .Values.kangpaas.imagePullPolicy }}
+        resources:
+          requests: 
+            memory: {{ .Values.kangpaas.systemmgnt.resources.requests.memory }}
+          limits: 
+            memory: {{ .Values.kangpaas.systemmgnt.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /kangpaas/application.yml
+          subPath: application.yml
+      {{- if .Values.kangpaas.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.kangpaas.imagePullSecrets }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: systemmgnt
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kangpaas-systemmgnt
+spec:
+  selector:
+    app: kangpaas-systemmgnt
+  type: NodePort
+  ports:
+  - name: http
+    port: 8095
+    targetPort: 8095
+    nodePort: 30095
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kangpaas-standingbook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kangpaas-standingbook
+  template:
+    metadata:
+      labels:
+        app: kangpaas-standingbook
+    spec:
+      containers:
+      - name: kangpaas-standingbook
+        image: {{ .Values.kangpaas.standingbook.repository }}:{{ .Values.kangpaas.version }}
+        imagePullPolicy: {{ .Values.kangpaas.imagePullPolicy }}
+        resources:
+          requests: 
+            memory: {{ .Values.kangpaas.standingbook.resources.requests.memory }}
+          limits: 
+            memory: {{ .Values.kangpaas.standingbook.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /kangpaas/application.yml
+          subPath: application.yml
+      {{- if .Values.kangpaas.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.kangpaas.imagePullSecrets }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: standingbook
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kangpaas-standingbook
+spec:
+  selector:
+    app: kangpaas-standingbook
+  type: NodePort
+  ports:
+  - name: http
+    port: 8098
+    targetPort: 8098
+    nodePort: 30096
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kangpaas-monitormgnt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kangpaas-monitormgnt
+  template:
+    metadata:
+      labels:
+        app: kangpaas-monitormgnt
+    spec:
+      containers:
+      - name: kangpaas-monitormgnt
+        image: {{ .Values.kangpaas.monitormgnt.repository }}:{{ .Values.kangpaas.version }}
+        imagePullPolicy: {{ .Values.kangpaas.imagePullPolicy }}
+        resources:
+          requests: 
+            memory: {{ .Values.kangpaas.monitormgnt.resources.requests.memory }}
+          limits: 
+            memory: {{ .Values.kangpaas.monitormgnt.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /kangpaas/application.yml
+          subPath: application.yml
+      {{- if .Values.kangpaas.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.kangpaas.imagePullSecrets }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: monitormgnt
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kangpaas-monitormgnt
+spec:
+  selector:
+    app: kangpaas-monitormgnt
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8062
+    targetPort: 8062
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scan-scripts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scan-scripts
+  template:
+    metadata:
+      labels:
+        app: scan-scripts
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: scan-scripts
+        image: {{ .Values.scan.repository }}:{{ .Values.scan.version }}
+        imagePullPolicy: {{ .Values.scan.imagePullPolicy }}
+        resources:
+          requests: 
+            cpu: {{ .Values.scan.resources.requests.cpu }}
+            memory: {{ .Values.scan.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.scan.resources.limits.cpu }}
+            memory: {{ .Values.scan.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /usr/local/scan_service/settings.yaml
+          subPath: settings.yaml
+      {{- if .Values.kangpaas.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.kangpaas.imagePullSecrets }}
+      {{- end }}
+      
+      volumes:
+      - name: config
+        configMap:
+          name: scan-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scan-scripts
+spec:
+  selector:
+    app: scan-scripts
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-cleaning
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-cleaning
+  template:
+    metadata:
+      labels:
+        app: data-cleaning
+    spec:
+      containers:
+      - name: data-cleaning
+        image: {{ .Values.cleaning_service.repository }}:{{ .Values.cleaning_service.version }}
+        imagePullPolicy: {{ .Values.cleaning_service.imagePullPolicy }}
+        resources:
+          requests:
+            cpu: {{ .Values.cleaning_service.resources.requests.cpu }}
+            memory: {{ .Values.cleaning_service.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.cleaning_service.resources.limits.cpu }}
+            memory: {{ .Values.cleaning_service.resources.limits.memory }}
+        volumeMounts:
+        - name: config
+          mountPath: /usr/local/data_cleaning_service/settings.yaml
+          subPath: settings.yaml
+      {{- if .Values.kangpaas.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.kangpaas.imagePullSecrets }}
+      {{- end }}
+
+      volumes:
+      - name: config
+        configMap:
+          name: data-cleaning
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-cleaning
+spec:
+  selector:
+    app: data-cleaning
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80

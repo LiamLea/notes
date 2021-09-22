@@ -1,0 +1,374 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eureka
+data: 
+  application.yml: |
+    server:
+      port: 8091
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gate
+data:
+  application.yml: |
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka
+    
+    oauth:
+      server: http://kangpaas-oauth:8100/uaa
+    
+    server:
+      port: 8093
+    
+    spring:
+      profiles:
+        active: dev
+
+    
+    ---
+    spring:
+      profiles: dev
+      redis:
+        database: {{ .Values.redis.database }}
+        host: {{ .Values.redis.host }}
+        port: {{ .Values.redis.port }}
+        password: {{ .Values.redis.password }}
+        timeout: 6000
+
+      datasource:
+        username: {{ .Values.mysql.username }}
+        password: {{ .Values.mysql.password }}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oauth
+data: 
+  application.yml: |
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+    
+    server:
+      port: 8100
+    
+    spring:
+      profiles:
+        active: dev
+
+    ---
+    spring:
+      profiles: dev
+      redis:
+        database: {{ .Values.redis.database }}
+        host: {{ .Values.redis.host }}
+        port: {{ .Values.redis.port }}
+        password: {{ .Values.redis.password }}
+        timeout: 6000
+
+      datasource:
+        username: {{ .Values.mysql.username }}
+        password: {{ .Values.mysql.password }}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&characterEncoding=UTF-8
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: websocket
+data: 
+  application.yml: |
+    server:
+      port: 8078
+
+    spring:
+      profiles:
+        active: dev
+    
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+    
+    ---
+    spring:
+      profiles: dev
+      kafka:
+        bootstrap-servers: {{ .Values.kafka.host }}:{{ .Values.kafka.port}}
+        consumer:
+          group-id: dev-aiops-websocket
+    
+      datasource:
+        url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&allowMultiQueries=true
+        driverClassName: com.mysql.cj.jdbc.Driver
+        username: {{ .Values.mysql.username }}
+        password: {{ .Values.mysql.password }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: job
+data:
+  application.yml: |
+    server:
+      port: 8079
+    
+    spring:
+      profiles:
+        active: dev
+    
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+    
+    ---
+    spring:
+      profiles: dev
+      datasource:
+        username: {{ .Values.mysql.username }}
+        password: {{ .Values.mysql.password }}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: systemmgnt
+data: 
+  application.yml: |
+    server:
+      port: 8095
+    
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+    
+    spring:
+      profiles:
+        active: dev
+
+    ---
+    spring:
+      profiles: dev
+      redis:
+        database: {{ .Values.redis.database }}
+        host: {{ .Values.redis.host }}
+        port: {{ .Values.redis.port }}
+        password: {{ .Values.redis.password }}
+        timeout: 6000
+    
+      datasource:
+        username: {{ .Values.mysql.username }}
+        password: {{ .Values.mysql.password }}
+        driver-class-name: com.mysql.cj.jdbc.Driver   
+        url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8
+      rabbitmq:
+        host: 127.0.0.1
+        username: kangpaas
+        password: kangpaas
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: standingbook
+data:
+  application.yml: |
+    server:
+      port: 8098
+    
+    eureka:
+      instance:
+        prefer-ip-address: true
+        instance-id: ${spring.cloud.client.ipAddress}:${spring.application.name}:${server.port}
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+    
+    spring:
+      profiles:
+        active: dev
+
+    ---
+    spring:
+      profiles: dev
+      kafka:
+        bootstrap-servers: {{ .Values.kafka.host }}:{{ .Values.kafka.port}}
+        consumer:
+          group-id: dev-aiops-standingbook
+      redis:
+        database: {{ .Values.redis.database }}
+        host: {{ .Values.redis.host }}
+        port: {{ .Values.redis.port }}
+        password: {{ .Values.redis.password }}
+        timeout: 6000
+
+      datasource:
+        url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&allowMultiQueries=true
+        driverClassName: com.mysql.cj.jdbc.Driver
+        username: {{ .Values.mysql.username }}
+        password: {{ .Values.mysql.password }}
+
+      rabbitmq:
+        host: 127.0.0.1
+        username: kangpaas
+        password: kangpaas
+    
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:                                                                                      
+  name: monitormgnt
+data:
+  application.yml: |
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://kangpaas-eureka:8091/eureka/
+    
+    server:
+      port: 8062
+
+    phyTopo:
+      # 指定了topo请求url
+      topo-url: http://192.168.90.210:8081/topology/
+    
+    spring:
+      profiles:
+        active: dev
+
+    ---
+    spring:
+      profiles: dev
+      redis:
+        database: {{ .Values.redis.database }}
+        host: {{ .Values.redis.host }}
+        port: {{ .Values.redis.port }}
+        password: {{ .Values.redis.password }}
+        timeout: 6000
+    
+      datasource:
+        username: {{ .Values.mysql.username }}
+        password: {{ .Values.mysql.password }}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://{{ .Values.mysql.ip }}:{{ .Values.mysql.port }}/{{ .Values.mysql.db_name }}?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&allowMultiQueries=true&sessionVariables=sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'
+      rabbitmq:
+        host: 127.0.0.1
+        username: kangpaas
+        password: kangpaas
+      kafka:
+        bootstrap-servers: {{ .Values.kafka.host }}:{{ .Values.kafka.port}}
+        consumer:
+          group-id: dev-aiops-monitor
+
+    scan:
+      # kafka 服务器
+      kafkaServer: {{ .Values.kafka.host }}:{{ .Values.kafka.port}}
+      linux:
+        # kafka topic
+        kafkaTopic: topic_os_config
+      windows:
+        # kafka topic
+        kafkaTopic: topic_windows_config
+      atomic:
+        # 原子系统
+        kafkaTopic: topic_software_config
+      switch:
+        kafkaTopic: topic_network_device_config
+    #      取消spring boot admin 安全认证
+      loadBalance:
+        kafkaTopic: topic_f5_config
+
+      url: http://scan-scripts:80
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scan-service
+data: 
+  settings.yaml: |
+    server:
+      ip: 0.0.0.0
+      port: 8080
+
+    software:
+      load_modules:
+      - ApacheScan
+      - NginxScan
+      - OracleScan
+      - WeblogicScan
+      - MysqlScan
+      - TomcatScan
+      - PGScan
+
+    arguments:
+      threads: 75
+      processes: 10
+
+    kafka:
+      server: {{ .Values.kafka.host }}:{{ .Values.kafka.port}}
+      topic:
+        host_deploy: topic_os_config
+        software_deploy: topic_software_config
+        progress: topic_discovery_process
+
+    db_info:
+      host: {{ .Values.mysql.ip }}
+      port: {{ .Values.mysql.port }}
+      db_name: {{ .Values.mysql.db_name }}
+      user: {{ .Values.mysql.username }}
+      password: {{ .Values.mysql.password }}
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: data-cleaning
+data:
+  settings.yaml: |
+    server:
+      ip: 0.0.0.0
+      port: 80
+
+    arguments:
+      threads: 20
+      clean_interval: 7200
+
+    kafka:
+      bootstrap_servers: {{ .Values.kafka.host }}:{{ .Values.kafka.port}}
+      config:
+        consumer:
+          group_id: "data_cleaning_service"
+          client_id: "client_1"
+          auto_offset_reset: "earliest"
+          enable_auto_commit: False
+      topic:
+        consumer:
+          host_config: topic_os_config
+          software_config: topic_software_config
+        producer:
+          batch_process: topic_batchformat_process
+          standingbook_os_and_atom: topic_format_data
+          standingbook_cluster: topic_cluster_change
+          message_mgnt: topic_message
+
+    db_info:
+      host: {{ .Values.mysql.ip }}
+      port: {{ .Values.mysql.port }}
+      db_name: {{ .Values.mysql.db_name }}
+      user: {{ .Values.mysql.username }}
+      password: {{ .Values.mysql.password }}
+    service:
+      alert_translation: http://kangpaas-monitormgnt:8062/api/v1/monitormgnt/host/warningAdapt

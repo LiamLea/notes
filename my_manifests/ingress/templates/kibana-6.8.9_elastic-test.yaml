@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kibana-6.8.9
+  namespace: elastic-test
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: ca-issuer
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+  - host: {{ .Values.host }}
+    http:
+      paths:
+
+      - path: /(kibana-6.8.9(/.*)?$)
+        backend:
+          serviceName: kibana-6-8-9-kibana
+          servicePort: 5601
+
+  tls:
+  - hosts:
+    - {{ .Values.host }}
+    secretName: k8s-ingress

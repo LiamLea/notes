@@ -1,0 +1,120 @@
+mysql:
+  ip: mysql-primary.mysql
+  port: 3306
+  db_name: autoop_dev
+  username: kangpaas
+  password: kangpaas
+
+redis:
+  host: redis-master.redis
+  port: 6379
+  database: 8
+  password: cangoal
+
+scan:
+  version: dev
+  imagePullPolicy: Always
+  repository: harbor.test.com/autoop/scripts
+  resources:
+    requests:
+      cpu: 5000m
+      memory: 1Gi
+    limits:
+      cpu: 32000m
+      memory: 8Gi
+
+kafka:
+  host: kafka.kafka
+  port: 9092
+
+url:
+  host: autoop.dev.zdgt
+  system: autoop-dev
+  cn: autoop.dev.zdgt
+  clusterissuer: ca-issuer
+
+kangpaas:
+  version: dev
+  imagePullPolicy: Always
+  imagePullSecrets: my-harbor
+  eureka:
+    repository: harbor.test.com/autoop/eureka
+    resources:
+      requests: 
+        memory: 512Mi
+      limits: 
+        memory: 1024Mi
+  gate:
+    repository: harbor.test.com/autoop/gate
+    resources:
+      requests: 
+        memory: 512Mi
+      limits: 
+        memory: 1Gi
+  oauth:
+    repository: harbor.test.com/autoop/oauth
+    resources:
+      requests: 
+        memory: 1Gi
+      limits: 
+        memory: 1.2Gi
+  websocket:
+    repository: harbor.test.com/autoop/websocket
+    resources:
+      requests: 
+        memory: 1Gi
+      limits: 
+        memory: 1.2Gi
+  job:
+    repository: harbor.test.com/autoop/job
+    resources:
+      requests: 
+        memory: 1Gi
+      limits: 
+        memory: 1.2Gi
+
+  execute_record:
+    repository: harbor.test.com/autoop/execute-record
+    resources:
+      requests: 
+        memory: 1Gi
+      limits: 
+        memory: 1.2Gi
+
+  maintain_object:
+    repository: harbor.test.com/autoop/maintain-object
+    resources:
+      requests: 
+        memory: 1Gi
+      limits: 
+        memory: 1.2Gi
+
+  op_repository:
+    repository: harbor.test.com/autoop/op-repository
+    resources:
+      requests: 
+        memory: 1Gi
+      limits: 
+        memory: 1.2Gi
+
+  schedule_center:
+    repository: harbor.test.com/autoop/schedule-center
+    resources:
+      requests: 
+        memory: 1Gi
+      limits: 
+        memory: 1.2Gi
+
+front:
+  image:
+    repository: harbor.test.com/autoop/front
+    tag: dev
+    pullPolicy: Always
+    pullSecrets: my-harbor
+
+  config:
+    config.js: |
+      window.g = {
+        baseURL: 'https://autoop.dev.zdgt/gate',
+        ws: 'wss://autoop.dev.zdgt/websocket'
+      }

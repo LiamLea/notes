@@ -102,9 +102,14 @@ EvictionPressureTransitionPeriod: 180   #是 kubelet 从压力状态中退出之
 * 当pod的ephemeral storage**超过**启动时设置的**limit**时，**该pod**会被**驱逐**
 * 当node上的**ephemeral storage过低**时，node会给自己打上**short on local storage** **污点**，不能忍受这个污点的pods会被驱逐
 
-#### 6.影响pod的优先级的因素（优先级低的先被驱逐）
+#### 6.影响驱逐哪些pod的因素
 
-##### （1）qos class
-详细见overview.md
+##### （1）影响因素
+* pod的资源使用率是否超过requests（所以与Qos有关）和资源使用情况
+* pod的优先级
 
-##### （2）pod的资源使用量
+##### （2）驱逐算法
+* 优先驱逐 资源使用量超过requests的pods
+  * 根据pod的优先级和使用量的多少，进一步确定pod的驱逐顺序
+* 最后驱逐 资源使用量小于requests的pods
+  * 根据pod的优先级，进一步确定pod的驱逐顺序

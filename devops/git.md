@@ -1,7 +1,12 @@
+# GIT
+
 [toc]
+
 ### 概述
+
 #### 1.git特点
 * 利用COW(写时复制技术)
+
 #### 2.流程
 ```plantuml
 database a [
@@ -23,6 +28,7 @@ c-->d:"git push"
 ![](./imgs/git_01.png)
 
 #### 3.引用——Refs（references）
+
 ##### （1）概念
 * 引用是一类文件，用于保存commit的哈希值
 
@@ -41,7 +47,9 @@ c-->d:"git push"
 简写：`<REMOTE_BRANCH>`
 
 ***
+
 ### 配置
+
 #### 1.配置文件（优先级由小到大）
 * 系统级别（system）：一般在系统配置文件目录下
 * 当前用户级别（global）：`~/.gitconfig`
@@ -75,6 +83,7 @@ c-->d:"git push"
 ***
 
 ### 命令
+
 #### 1.基本操作
 ```shell
 git remote add <REMOTE_REPO_NAME> <URL>       #添加一个远程仓库，起名为：<NAME>
@@ -101,6 +110,7 @@ git push <REMOTE_REPO_NAME> :<REMOTE_BRANCH>
 ```
 
 #### 2.回滚操作
+
 ##### （1）查看commit记录
 ```shell
 git logs                  #查看该版本即之前的版本
@@ -183,4 +193,28 @@ git push
 
 #切换到指定标签
 git checkout  <TAG>
+```
+
+#### 6.迁移操作（从一个库迁移到另一个库）
+
+##### （1）首先拉取需要迁移的库
+```shell
+git clone <repository_url>
+cd <repository>
+```
+
+##### （2）添加需要迁移到的库
+```shell
+git remote add <new_name> <new_repository_url>
+```
+
+##### （3）pull其他分支
+```shell
+git checkout -b <branch_name> origin/<branch_name>
+```
+
+##### （4）push指定分支到新的库
+```shell
+#这里的<branch_name>需要是已经pull的分支，参考上一步骤
+git push <new_name> <branch_name>:<branch_name>
 ```

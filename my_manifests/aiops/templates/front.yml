@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kangpaas-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kangpaas-front
+  template:
+    metadata:
+      labels:
+        app: kangpaas-front
+    spec:
+      containers:
+      - name: kangpaas-nginx
+        image: {{ .Values.front.image.repository }}:{{ .Values.front.image.tag }}
+        imagePullPolicy: {{ .Values.front.image.pullPolicy }}
+        volumeMounts:
+        - name: config
+          mountPath: /usr/share/nginx/html/static/config.js
+          subPath: config.js
+      {{- if .Values.front.image.pullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.front.image.pullSecrets }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: js-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kangpaas-front
+spec:
+  selector:
+    app: kangpaas-front
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
