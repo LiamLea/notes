@@ -7,14 +7,14 @@ master/node架构，master一般设为3个（高可用）
 用于暴露kubernetes的API（是整个集群对外的接口）
 </br>
 * scheduler 	                     
-负责调度资源
+监视apiserver，负责调度资源
 </br>
 * controller-manager                 
 用于管理控制器，控制器用于管理pod（控制器有多种）
 
 #### 2.node核心组件
 * kubelet                            
-管理pod，接收和执行master的任务
+监视apiserver，管理pod
 </br>
 * docker                             
 容器引擎
