@@ -45,7 +45,7 @@
 
 ![](./imgs/api_02.png)
 
-##### （1）通过CRD、operator
+##### （1）通过CRD
 [参考](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)
 * 通过CRD定义custome resource，即能够在etcd中存储和提取指定结构的数据
 * custome controllers能够根据这些数据，从而进行某些操作
@@ -76,9 +76,13 @@ spec:
 
 ### 查看
 
-#### 1.列出所有apiVersion
+#### 1.列出所有的api
 ```shell
+#列出的形式是apiVersion：<group_name>/<version>
 kubectl api-versions
+
+#列出的形式是apiService：<version>.<group_name>
+kubectl get apiservices
 ```
 
 #### 2.列出所有apiReousrces
@@ -93,6 +97,8 @@ kubectl api-resources
 ```
 
 #### 3.访问api
+* 核心组：`/api/v1/`
+* 非核心组：`/apis/<group_name>/<version>/`
 ```shell
 kubectl get --raw "<url>"
 
@@ -107,26 +113,9 @@ kubectl get --raw '/apis/metrics.k8s.io/v1beta1'
 kubectl get --raw '/apis/metrics.k8s.io/v1beta1/namespaces/default/pods'
 ```
 
-***
-
-### 扩展api
-
-#### 1.自定义一个api（CRD）
-```yaml
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: <plural>.<GROUP_NAME>   #这里必须跟下面保持一致
-spec:
-
-  #命名组api，/apis/<GROUP_NAME>/<VERSION>
-  group: <GROUP_NAME>   
-  version: <VERSION>    
-
-  names:
-    kind: <KIND>          #用于清单文件中指定的Kind
-    plural: <plural>  #用于url访问，/apis/<GROUP_NAME>/<VERSION>/<plural>
-    shortNames:
-    - <shortNames>        #比如：Service可以缩写为svc
-  scope: <scope>          #Namespaced或者Cluster
+#### 4.watch api
+只要加上参数`?watch=true`
+```shell
+#比如watch pods资源
+kubectl get --raw "/api/v1/pods?watch=true"
 ```

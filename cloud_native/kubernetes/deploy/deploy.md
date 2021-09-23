@@ -118,8 +118,7 @@ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 vim /etc/kubernetes/manifests/kube-apiserver.yaml
 ```
 ```yaml
-#允许kubernetes扩展API
---enable-aggregator-routing=true
+#暂时没什么要修改的
 ```
 
 #### 7.安装网络插件

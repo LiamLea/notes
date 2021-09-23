@@ -6,7 +6,7 @@
 
 #### 1.controller定义
 * **监视**集群的状态，**调整**集群的状态到**更接近** **期望**的状态
-  * 通过监视apiserver，从而监视集群的状态
+  * 通过**监视apiserver**，从而监视集群的状态
   * controller中的spec字段 就是 期望的状态
 
 #### 2.owner and dependent
