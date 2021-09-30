@@ -114,7 +114,8 @@ vrrp_script health_check {
 }
 
 vrrp_instance VI_1 {
-    state MASTER
+    state BACKUP  #当设置成nopreempt时，就必须是BACKUP
+    nopreempt   #表示当高优先级加入时，该ip不会漂移过去，这样保证了稳定性（如果高优先级一会成功一会失败）
     virtual_router_id 249
     priority 241
     interface ens160
