@@ -50,11 +50,11 @@
 
 #### 5.overlay2驱动
 
-##### 5.1 特点
+##### （1） 特点
 * image的每一层，都会在`/var/lib/docker/overlay2/`目录下生成一个目录
 * 启动容器后，会在`/var/lib/docker/overlay2/`目录下生成一个目录（即**可写层**），会将**overlay文件系统** **挂载** 在该目录下的`merged`目录上
 
-##### 5.2`/var/lib/docker/overlay2/<id>/`目录下可能有的内容
+##### （2）`/var/lib/docker/overlay2/<id>/`目录下可能有的内容
 
 |目录或文件|说明|
 |-|-|
@@ -63,10 +63,17 @@
 |lower（文件）|记录 下面所有层的 id</br>根据层的id，查看层的内容：`ll /var/lib/docker/overlay2/l/`|
 |link（文件）|记录 当前层的 id</br>根据层的id，查看层的内容：`ll /var/lib/docker/overlay2/l/`|
 
+##### （3）根据overlay2的`<id>`获取`<container_id>`
+```shell
+docker inspect `docker ps -qa` > /tmp/a.txt
+#然后去/tmp/a.txt中查找`<id>`
+```
+
 #### 6.docker registry
 一个registry可以存在多个repository（一般一个软件有一个repository，里面存储该软件不通版本的镜像）
 repository可分为"顶层仓库"和"用户仓库"
 用户仓库名称格式：用户名/仓库名
+
 
 #### 7.打包镜像
 可以打包多个镜像

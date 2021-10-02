@@ -74,3 +74,9 @@ kubectl replace --raw "/api/v1/namespaces/<NAMESPACE>/finalize" -f /tmp/temp.jso
 容器冲突了，由于系统时间修改，导致有两个相同的容器，但是创建时间不同
 解决：
 删除冲突容器，如果不行，把这个pod先停掉，然后再删除相应的容器，再重新启动pod
+
+
+
+#### 8.`pleg is not healthy`
+可能的原因：
+* 有些容器卡了，需要手动清理

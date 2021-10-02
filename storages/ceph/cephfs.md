@@ -101,3 +101,8 @@ ceph fs set <fd_name> <key> <value>
 #max_mds <num | default=1>      ranks的数量（即active mds的数量），数量越多，mds的负载就会被分担，进而能够提高mds的性能
 #standby_count_wanted <num | default=1>     设置副本数
 ```
+
+#### 4.删除文件系统
+```shell
+ceph fs rm <fs_name> --yes-i-readlly-mean-it
+```

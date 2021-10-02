@@ -153,8 +153,8 @@ s     #session leader
 ```
 
 ##### （2）`%CPU`
-当为100%时，表示该进程一直在使用CPU
-当为50%时，表示该进程有一半时间在使用CPU
+当为100%时，表示该进程使用1个CPU
+当为50%时，表示该进程使用0.5个CPU
 ```shell
 (process CPU time / process duration) * 100
 

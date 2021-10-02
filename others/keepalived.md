@@ -109,7 +109,7 @@ vrrp_script health_check {
     interval 1
     timeout 5
     rise 3
-    fail 3
+    fall 3
     user root
 }
 

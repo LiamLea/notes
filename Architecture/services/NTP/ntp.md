@@ -1,4 +1,5 @@
 # NTP（Network Time Protocol）
+
 [toc]
 
 ### 概述
@@ -74,10 +75,11 @@ server <NTP_SERVER> iburst
 ***
 
 ### 查询ntp状态
-#### ntpq命令格式
-#### 1.格式
+
+#### 1.ntpq命令格式
+
 ```shell
-ntp -c <COMMAND>
+ntpq -c <COMMAND>
 ```
 
 #### 2.ntpq常用命令
@@ -142,3 +144,9 @@ rv：read variables，读取变量，有三类 相关变量：
 * 系统变量（当assid为0时，获取的是系统变量）
 * 服务器变量（当assid为非0时，获取的是指定服务器的变量）
 * 时钟变量（`ntpq -c cv`，获取的是时钟变量(clock variables)）
+
+
+#### 3.chronyc命令
+```shell
+chronyc sources -v
+```
