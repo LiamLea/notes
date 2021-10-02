@@ -19,7 +19,7 @@
 ##### （1）为k8s组件预留资源
 ```yaml
 kubeReserved:
-  cpu: 100m
+  cpu: 1000m
   memory: 1Gi
   ephemeral: xx
 ```
@@ -27,7 +27,7 @@ kubeReserved:
 ##### （2）为系统（非k8s组件）预留资源
 ```yaml
 systemReserved:
-  cpu: 100m
+  cpu: 1000m
   memory: 1Gi
   ephemeral: xx
 ```

@@ -55,6 +55,8 @@ helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 
 * 安装
 ```shell
+#当无法采集到所在node的 指标时，需要将网络模式设为host
+
 helm install metrics-server stable/metrics-server -n kube-system \
   --set args[0]="--kubelet-port=10250" \
   --set args[1]="--kubelet-insecure-tls" \

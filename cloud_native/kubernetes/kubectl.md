@@ -28,7 +28,8 @@ clusters:
 users:
 - name: <CUSTOME_USER_NAME>
   user:
-    #当用证书连接时，需要这样设置
+    #当用normal user认证时，需要这样设置
+    #证书内容需要进行base64编码：cat xx | base64 | tr -d '\n'
     client-certificate-data: <CERTIFICATE>
     client-key-data: <PRIVATE_KEY>
 

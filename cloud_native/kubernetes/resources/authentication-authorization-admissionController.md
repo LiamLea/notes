@@ -1,13 +1,17 @@
-[toc]
-# authentication（认证）
-### 概述
-#### 1.认证
-访问k8s集群需要先经过apiServer的认证
-因此需要一个 账号 和 密码（即令牌）
+# RBAC
 
-有两类账号：
-* UserAccount，用户访问使用的账号
-* ServiceAccount，内部服务访问使用的账号
+[toc]
+
+### Authentication（认证）
+
+[参考文档](https://kubernetes.io/docs/reference/access-authn-authz/authentication/)
+
+#### 1.两类用户
+
+|类型|用途|创建方式|认证方式|
+|-|-|-|-|
+|normal user|用户访问使用的账号|k8s没有相应的资源来管理normal user（即不能通过相关api创建user）|需要 用k8s的CA签署的证书（CN=用户名或者O=组名）进行认证|
+|serviceaccount|内部服务访问使用的账号|可用用过k8s资源管理|通过token（存放在secret中）进行认证|
 
 #### 2.特点
 * 每个namespace中都有一个默认的Secret资源，存储的是token，用于认证
@@ -15,24 +19,34 @@
 * ServiceAccount可以绑定docker-registry类型的secrets
 从而可以指定使用其他仓库
 
-### 使用
-#### 1.创建serviceaccount
+#### 3.使用serviceaccount
+##### （1）创建serviceaccount
 ```shell
 kubectl create serviceaccount 账号名
 
 #创建ServiceAccount资源后，会自动生成一个用于 认证 的Secret，并与该ServiceAccount绑定
 ```
-#### 2.指定pod使用哪个账号
+##### （2）指定pod使用哪个账号
 ```shell
 spec.ServiceAcountName
 
 #pod使用指定ServiceAccount，会挂载相应的Secret
 ```
 
+#### 4.认证方式
+
+##### （1）x509证书认证
+用k8s的证书签署的证书，且CN=用户名或者O=组名（可以有多个O），来进行验证
+
+##### （2）请求头携带token
+```shell
+Authorization: Bearer 31ada4fd-adec-460c-809a-9e56ceb75269
+```
+
 ***
 
-# authorization（授权）
-### 概述
+### authorization（授权）
+
 #### 1.常用的授权插件：
 * Node
 * ABAC：attribute-based access control
@@ -44,12 +58,16 @@ spec.ServiceAcountName
 * 命名空间级别
 
 #### 3.相关资源
+
 ##### （1）Role（命名空间级别资源）				
 属于某个命名空间的role
+
 ##### （2）ClusterRole（集群级别资源）		
 属于集群的role
+
 ##### （3）RoleBinding（命名空间级别资源）
 用于**在某个namespace中**，将**此namesoace中**的某个role（包括ClusterRole）与指定namespace中的某个serviceaccount绑定
+
 ##### （4）ClusterRoleBinding（集群级别资源）
 用于**在集群级别**，将某个ClusterRole与某个serviceaccount绑定
 
@@ -67,9 +85,9 @@ spec.ServiceAcountName
 * delete（用于单个资源）
 * deletecollection（用于集合）
 
-### 使用
+#### 5.使用
 
-#### 1.定义角色
+##### （1）定义角色
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -90,7 +108,7 @@ rules:
   - xx            #比如：get,list,watch
 ```
 
-#### 2.将角色与账号（包括UserAccount和ServieAccount）绑定
+##### （2）将角色与账号（包括UserAccount和ServieAccount）绑定
 * 通过ClusterRoleBinding绑定
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -130,27 +148,26 @@ subjects:             #指定需要绑定的账号
   kind: ServiceAccount        #还可以填User和Group
   name: xx
 ```
-***
-# admissionController（准入控制）
 
 ***
 
-# demo
-### 使得某个Pod有权限管理整个k8s集群
+### demo
+
+#### 使得某个Pod有权限管理整个k8s集群
 
 比如：使用某个有权限的serviceaccount的token即可登录到dashboard
       （启动dashboard这个pod时不必指定serviceaccount）
 
-#### 1.首先创建一个serviceaccount
+##### （1）首先创建一个serviceaccount
 ```shell
 kubectl create serviceaccount xx -n xx
 ```
 
-#### 2.绑定cluster-admin这个角色（这个角色是创建集群时生成的，所以不需要额外创建角色了）
+##### （2）绑定cluster-admin这个角色（这个角色是创建集群时生成的，所以不需要额外创建角色了）
 ```shell
 kubectl create clusterrolebinding xx \
 	  --clusterrole=cluster-admin \
 	  --serviceaccount=<NAMESPACE>:<SERVICEACCOUNT>
 ```
-#### 3.获取该serviceaccount的secret，从而获取token
+##### （3）获取该serviceaccount的secret，从而获取token
 利用该token即可登录dashboard
