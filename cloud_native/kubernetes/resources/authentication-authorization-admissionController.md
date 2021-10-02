@@ -141,7 +141,8 @@ roleRef:              #指定需要绑定的role
   name: xx
 
 
-#账号需要与RoleBinding在同一个命名空间
+#ServiceAccount需要与RoleBinding在同一个命名空间
+#User不需要跟命名空间没关系（所以建议使用User）
 subjects:             #指定需要绑定的账号
 - apiGroup: ""        #当kind为ServiceAccount时，apiGroup为：""，即核心组
                       #当kind为User或Group时，apiGroup为：rbac.authorization.k8s.io
