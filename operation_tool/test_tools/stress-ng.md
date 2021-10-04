@@ -8,19 +8,19 @@
 stress-ng -c <核数>     #核数如果为4，则会创建4个进程，每个进程用满一个核
 ```
 
-#### 2.模拟高内存
+#### 2.模拟高内存（会触发OOM）
 
-##### （1）模拟高内存（会触发OOM）
+* 原理：持续运行`malloc()`和`free()`
+
 ```shell
-stress-ng --brk 2 --stack 2 --bigheap 2
+stress-ng -m <NUM> --vm-bytes <BYTES> --vm-hang 3600   
+#-m表示开启多少个进程，每个进程消耗那么多vm
+#--vm-hang就是多久执行free
 ```
 
-##### （2）模拟高虚拟内存（不会触发OOM）
-* 原理：持续运行`malloc()`和`free()`
+#### 3.模拟高内存（OOM且系统卡死）
 ```shell
-stress-ng -m <NUM> --vm-bytes <BYTES> --vm-keep   
-#-m表示开启多少个进程，每个进程消耗那么多vm
-#--vm-keep就是占用内存，不重新分配
+stress-ng --brk 4 --stack 4 --bigheap 4
 ```
 #### 3.模拟高I/O（测试文件系统）
 * 原理：持续写、读和删除临时文件

@@ -10,7 +10,10 @@
 数据的存取会被分成同等大小的chunk，每个chunk是一个object，存储在RADOS中，元数据存在另一个pool（通过MDS服务提供）
 ![](./imgs/overview_02.png)
 
-#### 2.术语
+#### 2.使用注意事项
+* 支持 `ReadWriteMany`
+
+#### 3.术语
 
 * fscid
 file system cluster id，用于标识每个ceph的文件系统
@@ -19,7 +22,7 @@ file system cluster id，用于标识每个ceph的文件系统
 是一个数字，从0开始，相当于active mds的编号
 在一个文件系统中，rank的数量就是当前active mds的数量（即正在提高服务的mds的数量），数量越多，mds性能越好，因为工作负载被分担了
 
-#### 3.fileout（布局）
+#### 4.fileout（布局）
 fileout是cephfs中文件的属性，决定了文件的内容在RADOS中存储
 ```shell
 getfattr -n ceph.file.layout <file_path>

@@ -10,6 +10,9 @@
 一个image就是一个块设备，image会被分成多个同等大小的chunks，每个chunk是一个对象，然后存储在RADOS中
 image是thin provision（精简置备），即不会立即分配这么多物理存储给image，当使用到时才会分配
 
+#### 2.使用注意事项
+* 只支持 `ReadWriteOnce`
+
 ***
 
 ### 操作
@@ -63,6 +66,8 @@ lsblk
 ```shell
 #如果mount了，需要先unmount
 rbd device unmap /dev/rbd0
+
+#如果还不能unmap，使用该参数：-o force
 ```
 
 #### 4.k8s使用rbd

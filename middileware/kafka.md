@@ -129,7 +129,7 @@
 
 ##### （1）broker的要求
 * broker id必须不同
-* advertised.listeners必须不同
+* 每个broker的都需要一个唯一的访问地址（即advertised.listeners必须不同）
 
 ##### （2）在kubernets中安装kafka集群
 本质通过环境变量，从而使得每个pod的配置有所区别
@@ -164,7 +164,6 @@ externalAccess:
   enabled: true
   service:
     type: NodePort
-    port: 19092
     domain: 3.1.5.249
     nodePort: [19092,19093,19094]
 ```
@@ -174,6 +173,9 @@ externalAccess:
 ### 配置
 
 #### 1.broker配置
+
+* broker id必须不同
+* 每个broker的都需要一个唯一的访问地址（即advertised.listeners必须不同）
 
 ##### （1）基本配置
 
@@ -201,13 +203,35 @@ interBrokerListenerName=<LISTENER_NAME>
 advertised.listeners=<LISTENER_NAME>://<IP>:<PORT>
 ```
 
-* 示例
+* broker-1 示例
 ```yaml
 listenerSecurityProtocolMap: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
 
 listeners: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:19092
 
-advertisedListeners: INTERNAL://kafka.kafka:9092,EXTERNAL://3.1.5.249:19092
+advertisedListeners: INTERNAL://kafka-0.kafka:9092,EXTERNAL://3.1.5.249:19092
+
+interBrokerListenerName: INTERNAL
+```
+
+* broker-2 示例
+```yaml
+listenerSecurityProtocolMap: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+
+listeners: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:19093
+
+advertisedListeners: INTERNAL://kafka-1.kafka:9092,EXTERNAL://3.1.5.249:19093
+
+interBrokerListenerName: INTERNAL
+```
+
+* broker-3 示例
+```yaml
+listenerSecurityProtocolMap: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+
+listeners: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:19094
+
+advertisedListeners: INTERNAL://kafka-2.kafka:9092,EXTERNAL://3.1.5.249:19094
 
 interBrokerListenerName: INTERNAL
 ```

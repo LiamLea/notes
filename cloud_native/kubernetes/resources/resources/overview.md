@@ -13,14 +13,11 @@
 ##### （2）limits： `containers.resources.limits`
 
 * 限制，硬限制
-* 达到限制，container会被kill（**OOMKilled**），pod会被重新启动
-```shell
-kubecl describe ...
-#可以看到容器的状态
-#    Last State:     Terminated
-#      Reason:       OOMKilled
-```
 
+##### （3）达到limits后触发容器的OOM
+* 容器会被删掉，然后重新创建
+* pod会进入`OOMKilled`状态，然后重启
+* 当重启次数过多，则pod的状态变为：`CrashLoopBackOff`
 ```shell
 $ kubectl describe ...
 
@@ -28,6 +25,12 @@ $ kubectl describe ...
 Last State:     Terminated
     Reason:       OOMKilled
 ```
+
+##### （4）未达到limits而触发系统的OOM
+系统会停止相关进程，可能导致容器报错退出，如果是这种情况：
+* 容器会被删掉，然后重新创建
+* pod会进入`ERROR`状态，然后重启
+* 当重启次数过多，则pod的状态变为：`CrashLoopBackOff`
 
 #### 2.cpu单位
 最好用`m`表示，因为1m是最小精度

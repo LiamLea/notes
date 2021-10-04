@@ -77,6 +77,14 @@ kubectl replace --raw "/api/v1/namespaces/<NAMESPACE>/finalize" -f /tmp/temp.jso
 
 
 
-#### 8.`pleg is not healthy`
+#### 8.`kubelet：pleg is not healthy`
 可能的原因：
-* 有些容器卡了，需要手动清理
+* 容器发送错误、死锁等，需要手动清理
+* 主机上的pods过多（导致pleg检查查过三分钟）
+* kubelet和pod之前的网络存在问题
+
+
+#### 9.`Orphaned pod found：but volume subpaths are still present on disk`
+* 现象：出现了孤儿pod，即pod无法被删除
+* 原因：pv被删除了，然而该pod仍然挂载着该volume
+* 解决：手动卸载该volume
