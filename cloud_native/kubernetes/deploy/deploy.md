@@ -81,6 +81,7 @@ kubectl
   }
 }
 ```
+
 #### 4.设置相关服务开机自启（而不是现在就启动）
 ```shell
 systemctl restart docker
@@ -113,12 +114,18 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
-#### 6.配置apiserver
-```shell
-vim /etc/kubernetes/manifests/kube-apiserver.yaml
-```
+#### 6.修改所有的kubelet配置然后重启
+
+* 下面的预留资源一定要配置，能够保证k8s节点不会因为资源使用过量，而导致卡死等情况
 ```yaml
-#暂时没什么要修改的
+#为k8s组件预留资源
+kubeReserved:
+  cpu: 1000m
+  memory: 1Gi
+#为系统（非k8s组件）预留资源
+systemReserved:
+  cpu: 1000m
+  memory: 1Gi
 ```
 
 #### 7.安装网络插件

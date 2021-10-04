@@ -39,7 +39,7 @@ evictionHard:
     memory.available:  "200Mi"    #当memory可用量为小于等于200M时，开始强制终止某些pods
 #...
 ```
-[清单格式](https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/kubelet/config/v1beta1/types.go)
+[清单格式](https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/)
 
 #### 3.通过configmap动态配置
 （1）前提条件是，kubelet启动时开起了允许动态配置
@@ -94,4 +94,22 @@ resolvConf: <resolv_file_path> #如果是redhaht系统，就设为/etc/resolv.co
 
 #指定cni类型插件的二进制可执行文件的目录（在上面的配置文件中，会指定具体使用哪些插件，会在该目录下寻找这些插件的二进制文件）
 --cni-bin-dir=/opt/cni/bin      #默认：/opt/cni/bin
+```
+
+#### 3.kubelet预留资源
+
+##### （1）为k8s组件预留资源
+```yaml
+kubeReserved:
+  cpu: 1000m
+  memory: 1Gi
+  ephemeral: xx
+```
+
+##### （2）为系统（非k8s组件）预留资源
+```yaml
+systemReserved:
+  cpu: 1000m
+  memory: 1Gi
+  ephemeral: xx
 ```
