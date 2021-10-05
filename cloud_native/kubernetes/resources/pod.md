@@ -143,6 +143,39 @@ spec:
     #设置环境变量
     env: []
 
+    #设置资源
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 200Mi
+      limits:
+        cpu: 1000m
+        memory: 200Mi
+
+    #存活探测（如果未设置，则认为是存活的）
+    livenessProbe:
+      httpGet:
+        path: /healthy
+        port: 9090
+        scheme: HTTP
+      initialDelaySeconds: 30   #启动后多久进行liveness探测
+      periodSeconds: 15         #多久执行一次探测
+      failureThreshold: 3       #连续失败3次，则认为探测失败
+      successThreshold: 1       #连续成功1次，则认为探测成功
+      timeoutSeconds: 30        #一次探测的超时时长
+
+    #就绪探测（如果未设置，则认为是就绪的）
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 9090
+        scheme: HTTP
+      initialDelaySeconds: 30   #启动后多久进行readiness探测
+      periodSeconds: 5
+      failureThreshold: 3
+      successThreshold: 1
+      timeoutSeconds: 4
+
   volumes:
   - name: xx
     configMap:
