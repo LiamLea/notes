@@ -72,3 +72,33 @@ spec:
       tolerations:
       - operator: "Exists"
 ```
+
+##### 3.模拟大量进程
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stress
+
+  template:
+    metadata:
+      labels:
+        app: stress
+    spec:
+      containers:
+      - name: stress
+        image: polinux/stress-ng
+        args:
+        - "-c"
+        - "1000"
+        - "-l"
+        - "0"
+      nodeName: master-3
+      tolerations:
+      - operator: "Exists"
+```

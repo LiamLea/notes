@@ -117,7 +117,7 @@ last值-first值
 ```
 
 ##### （2）速率相关
-* `rate(METRIC[TIME])`（当TIME >= 采集周期 时，则rate不会返回任何结果）
+* `rate(METRIC[TIME])`（当TIME <= 采集周期 时，则rate不会返回任何结果）
 ```shell
 (last值-first值)/时间差s
 #配合counter类型数据使用

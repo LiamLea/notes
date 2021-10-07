@@ -30,3 +30,8 @@ stress-ng -d <NUM> --hdd-write-size <BYTES> -i <NUM>
 #--hdd-write-size每个负载写的数据量
 #-i：开启<NUM>个负载，执行sync()
 ```
+
+#### 4.模拟大量进程
+```shell
+stress-ng -c 500 -l 0
+```
