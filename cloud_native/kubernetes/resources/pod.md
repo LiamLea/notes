@@ -135,6 +135,12 @@ spec:
     image: xx
     imagePullPolicy: xx
 
+    #用于给出信息（不影响容器暴露的端口）
+    ports:
+    - containerPort: <port>
+      protocol: TCP   #TCP、UDP或者SCTP
+
+
     #挂在逻辑卷
     volumeMounts:
     - name: xx

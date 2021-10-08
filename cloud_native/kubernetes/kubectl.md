@@ -219,3 +219,12 @@ kubectl proxy --address="0.0.0.0" --port=8080 --accept-hosts='^.*' --accept-path
 ```shell
 kubectl get events --sort-by=.metadata.creationTimestamp -n xx
 ```
+
+***
+
+### 常用命令
+
+#### 1.查询所有Pods的requests和limits
+```shell
+kubectl get pods -n aiops-dev -o custom-columns="Name:metadata.name,CPU-request:spec.containers[*].resources.requests.cpu"
+```
