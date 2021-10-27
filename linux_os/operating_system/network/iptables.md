@@ -67,7 +67,7 @@ target也可以是某条chain
 |LOG|用于记录日志，可以在DROP之前，进行LOG，进行查看DROP掉了哪些|
 
 #### 7.数据包流程图
-![](./imgs/iptables_01.png)
+![](./imgs/iptables_01_new.png)
 
 #### 8.`iptables -nL`格式解析
 ![](./imgs/iptables_02.png)

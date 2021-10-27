@@ -26,11 +26,13 @@ func main(){
 
 #### 2.类就是通过结构实现的
 ```go
+//定义类：
 type Book struct {
 	name string
 	auth string
 }
 
+//定义类的方法：
 func (this *Book) getAuth() {
 	fmt.Println(this.auth)
 
@@ -61,10 +63,11 @@ func main() {
 }
 ```
 
-#### 4.多态的实现：`interface`
+#### 4.通过接口实现多态：`interface`
+interface是一种**类型**，用于**抽象方法**，只要实现了里面定义的所有抽象方法，则该类就是interface类型
 ```go
 type AnimalIF interface {
-  Sleep()
+  Sleep(int)    //Sleep这个函数需要传入一个int类型的参数
   GetColor()
   GetType()
 }
