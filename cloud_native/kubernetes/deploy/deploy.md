@@ -119,14 +119,24 @@ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 
 * 下面的预留资源一定要配置，能够保证k8s节点不会因为资源使用过量，而导致卡死等情况
 ```yaml
+#1.20版本之前需要这样设置
+featureGates:
+  SupportNodePidsLimit: true
+  SupportPodPidsLimit: true
+
+#一个pod最多使用多少pid
+PodPidsLimit: 1000
+
 #为k8s组件预留资源
 kubeReserved:
   cpu: 1000m
   memory: 1Gi
+  pid: "100"    #注意必须要加引号
 #为系统（非k8s组件）预留资源
 systemReserved:
   cpu: 1000m
   memory: 1Gi
+  pid: "100"    #注意必须要加引号
 ```
 
 #### 7.安装网络插件
