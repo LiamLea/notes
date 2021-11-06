@@ -10,7 +10,7 @@
 |数据库（postgresql）|存储配置等信息|
 |minio|提供对象存储服务|
 |GitLab/Gitaly|后台服务，专门负责访问磁盘以高效处理 git 操作，并缓存耗时操作。所有的 git 操作都通过 Gitaly 处理|
-|GitLab/Sidekiq|后台任务，主要负责发送电子邮件。任务需要来自 Redis|
+|GitLab/Sidekiq|后台任务处理，负责异步处理后台的任务|
 |GitLab/Unicorn|Gitlab 自身的 Web 服务器，包含了 Gitlab 主进程，负责处理快速/一般任务|
 |GitLab/GitLab Shell|用于 SSH 交互|
 |GitLab/Migrations|用于数据库迁移|

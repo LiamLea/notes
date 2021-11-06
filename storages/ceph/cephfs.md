@@ -109,3 +109,48 @@ ceph fs set <fd_name> <key> <value>
 ```shell
 ceph fs rm <fs_name> --yes-i-readlly-mean-it
 ```
+
+#### 5.k8s使用ceph-fs
+
+##### （1）下载ceph-csi-cephfs chart
+
+##### （2）根据实际情况修改api（这是一个bug）
+* 查看csidriver的api
+```shell
+kubectl explain CSIDriver
+#VERSION:  storage.k8s.io/v1beta1
+```
+* 修改文件
+```shell
+vim ceph-csi-rbd/templates/csidriver-crd.yaml
+#这里的是 apiVersion: storage.k8s.io/betav1，所以需要修改一下
+```
+
+##### （3）修改values.yaml
+* 集群信息
+```yaml
+csiConfig:
+- clusterID: 20870fc4-c996-11eb-8c25-005056b80961   #这里的id可以随便写，只要在这里是唯一的就行
+  monitors:   #monitor的地址
+  - "3.1.5.51:6789"
+```
+
+* 集群凭证信息
+```yaml
+secret:
+  create: true
+  name: csi-rbd-secret
+  userID: admin     #用户名
+  userKey: AQC0fsFggv9kLRAAM7JN9TusO+1WB9nZUpVmQg==   #用户的key
+  encryptionPassphrase: test_passphrase
+```
+
+* storage class信息
+```yaml
+storageClass:
+  create: true
+  name: csi-rbd-sc
+  clusterID: 20870fc4-c996-11eb-8c25-005056b80961 #刚刚在集群信息中设置的id
+  fsName: k8s-fs
+  pool: pool: cogiot-dev-cephfs   #存储数据的pool
+```
