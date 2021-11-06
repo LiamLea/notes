@@ -131,15 +131,6 @@ docker exec -it xx /bin/bash -c '命令'
 ```shell
 tar -Pzcf docker.tar.gz /var/lib/docker/overlay2/*
 ```
-（2）docker镜像加速
-
-docker cn 或者 阿里云加速器 或者 中国科技大学
-```shell
-#vim /etc/docker/daemon.json
-  {
-      "registry-mirrors": ["http://registry.docker-cn.com"]
-  }
-```
 
 #### 3.网络相关
 （1）启动容器时利用`--net=xx`指定使用的网络模式
@@ -170,6 +161,17 @@ cat /sys/class/net/xx/flags
 ```shell
 /etc/docker/daemon.json
 ```
+
+#### 5.docker镜像加速
+
+docker cn 或者 阿里云加速器 或者 中国科技大学
+```shell
+#vim /etc/docker/daemon.json
+  {
+      "registry-mirrors": ["http://registry.docker-cn.com"]
+  }
+```
+
 
 ***
 

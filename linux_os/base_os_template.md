@@ -22,3 +22,4 @@
 |NetworkManager|会影响相关网络的配置|
 |firewalld|防火墙|
 |selinux||
+|cloud-init|`touch /etc/cloud/cloud-init.disabled`|
