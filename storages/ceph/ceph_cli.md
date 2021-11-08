@@ -31,7 +31,7 @@ ceph orch host rm <HOST>
 |_no_autotune_memory|不会自动对daemon的内存进行调整|
 |_admin|会拷贝`/etc/ceph/ceph.conf`和`/etc/ceph/ceph.client.admin.keyring`这两个文件到这个节点上，从而能够使用ceph等客户端命令控制集群|
 
-#### 3.管理服务：`ceph orch <ACTION> <service_type>`
+#### 3.管理service：`ceph orch <ACTION> <service_type>`
 
 ##### （1）查看服务状态
 ```shell

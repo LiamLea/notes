@@ -32,6 +32,8 @@ rbd ls <pool_name>
 
 #查看某个image的信息
 rbd info <pool_name>/<image_name>
+#查看image的使用情况
+rbd disk-usage <pool_name>/<image_name>
 
 #扩容
 rbd resize --size <int> <pool_name>/<image_name>  #--size扩容后的大小
@@ -115,3 +117,11 @@ storageClass:
   pool: rbd-lil-1   #当使用的是replicated pool时，这里指定pool的名字
 # data_pool: ""     #当使用的是erasure pool时，在这里指定pool的名字
 ```
+
+##### （4）创建pool
+storageClass中指定的pool需提前创建好
+```shell
+ceph osd pool create <pool_name>
+```
+
+##### （5）安装

@@ -20,6 +20,60 @@
   * 需要确保操作系统能支持这种情况
   * 总的OSD驱动吞吐量不应该超过网络带宽
 
+#### 3.orchestrator
+[参考](https://docs.ceph.com/en/latest/mgr/orchestrator/)
+是ceph-mgr的一个模块，负责对ceph的服务进行编排，
+* 将主机加入到ceph集群中，orchestrator就能发现主机上的设备，从而自动部署相关服务到该主机上（比如自动部署mon、mds、osd等）
+* orchestrator也会利用外部的项目Rook
+![](./imgs/orchestrator_01.png)
+
+#### 4.基础概念
+* service type
+服务类型（`mon|mgr|rbd-mirror|crash|alertmanager|grafana|node-exporter|prometheus`），一个服务类型有多个service
+* service
+具体的服务，比如osd这个服务类型下，有osd.all-available-devices等服务，
+一个服务可能多个daemon（即进程）
+* daemon
+即进程
+* placement
+placement指定需要部署的数量、部署到哪些机器上等，即orchestrator会将服务编排到这些主机上
+
+* unmanaged
+当服务被设置unmanaged，表示该服务不受orchestrator管理（即不会自动编排）
+
+#### 5.orchestrator管理service
+通过声明式api管理
+```shell
+ceph orch ls --export
+```
+```yaml
+#指定服务类型
+service_type: mon
+#指定服务
+service_name: mon
+#选择需要部署的数量，部署在哪些主机上
+placement:
+  count: 3
+  host_pattern: "mon*"
+---
+service_type: mgr
+service_name: mgr
+placement:
+  host_pattern: "mgr*"
+---
+service_type: osd
+service_name: osd
+service_id: default_drive_group
+placement:
+  host_pattern: "osd*"
+data_devices:
+  all: true
+```
+```shell
+#部署或者更新service
+ceph orch apply -i xx.yaml
+```
+
 ***
 
 ### 安装步骤
@@ -113,29 +167,30 @@ cephadm -v bootstrap \
 * 生成配置文件：`/etc/ceph/ceph.conf`
 * 给该机器打上`_admin`标签（有这个标签的机器，都会拷贝`/etc/ceph/ceph.conf`和`/etc/ceph/ceph.client.admin.keyring`这两个文件）
 
-#### 4.将其他节点加入集群
+#### 4.将其他节点orchestrator
 ```shell
 #将公钥拷贝到需要加入的机器
 ssh-copy-id -f -i /etc/ceph/ceph.pub root@<HOST>
 
-#将机器加入集群
-#其实加入的机器还没有启动任何服务，只是能够通过cephadm操作这些机器
+#将机器加入orchestartor，就能发现设备并自动编排ceph的服务
 ceph orch host add <newhost> --labels _admin  #打上_admin标签，不打也行，主要是为了在其他节点上也能够使用ceph命令，因为ceph需要依赖`/etc/ceph/ceph.conf`和`/etc/ceph/ceph.client.admin.keyring`这两个文件
 ```
 
-#### 5.创建osd
+#### 5.添加osd
 ```shell
-#查看加入到集群中的磁盘或者通过osd.all-available-devices服务自动发现的磁盘
+#查看通过orchestrator自动发现的磁盘
 ceph orch device ls
 
 #方式一：
-#部署osd.all-available-devices这个服务后，会自动发现device，并且会自动把这个磁盘加入到集群中
+#利用osd服务类型的all-available-devices这个服务：
+#osd.all-available-devices会自动在可用的磁盘上启动osd
 ceph orch apply osd --all-available-devices
 
 #方式二：
-#关闭osd.all-available-devices服务
+#表示orchestrator不再管理osd服务类型的all-available-devices这个服务（即不会自动编排）
+#需要手动添加osd
 ceph orch apply osd --all-available-devices --unmanaged=true
-#当关闭osd.all-available-devices服务后，可以指定磁盘加入到集群
+#手动添加osd
 ceph orch daemon add osd <HOST>:<DEVICE_PATH>
 ```
 
