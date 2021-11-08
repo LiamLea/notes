@@ -22,8 +22,8 @@ file system cluster id，用于标识每个ceph的文件系统
 是一个数字，从0开始，相当于active mds的编号
 在一个文件系统中，rank的数量就是当前active mds的数量（即正在提高服务的mds的数量），数量越多，mds性能越好，因为工作负载被分担了
 
-#### 4.fileout（布局）
-fileout是cephfs中文件的属性，决定了文件的内容在RADOS中存储
+#### 4.file layout（布局）
+file layout是cephfs中文件的属性，决定了文件的内容在RADOS中如何存储
 ```shell
 getfattr -n ceph.file.layout <file_path>
 ```
@@ -34,11 +34,21 @@ getfattr -n ceph.file.layout <file_path>
 |pool|指定存储在哪个data pool中|
 |object_size|指定文件的内容被分成多大的chunk（每个chunk存储为一个RADOS object）|
 
+#### 5.volume和subvolume
+
+* volume 就是一个文件系统
+* subvolume 就是该文件系统中的一个目录
+* subvolumegroup 也是该文件系统中的一个目录
+  * 当subvolume属于某个group时，则subvolume对应的目录就在该group对应的目录之下
+  * group用于配置一些属性（比如：file layout、文件的mode等等），则在该group中的subvolume会继承该属性
+
 ***
 
 ### 使用
 
-#### 1.创建文件系统
+只使用一个volume，创建多个subvolume
+
+#### 1.创建volume
 可以利用下面的方式创建多个文件系统，但是需要开启支持多文件系统配置
 ```shell
 #默认是开启的
@@ -66,7 +76,43 @@ ceph fs new <fs_name> <metadata_pool> <data_pool>
 ceph fs volume create <fs_name>
 ```
 
-#### 2.挂载cephfs
+#### 2.管理文件系统
+
+* 查看文件系统
+
+```shell
+ceph fs ls
+ceph fs dump
+ceph fs volume ls
+ceph fs status
+```
+
+* 配置文件系统
+```shell
+ceph fs set <fd_name> <key> <value>
+#max_mds <num | default=1>      ranks的数量（即active mds的数量），数量越多，mds的负载就会被分担，进而能够提高mds的性能
+#standby_count_wanted <num | default=1>     设置副本数
+```
+
+* 删除文件系统
+```shell
+ceph fs rm <fs_name> --yes-i-readlly-mean-it
+```
+
+* 管理subvolume
+```shell
+#查看fs
+ceph fs volume ls
+
+#查看subvolumegroup
+ceph fs subvolumegroup ls <fs_name>
+
+#查看volume
+ceph fs subvolume ls <fs_name> <subvolumegroup_group_name>
+ceph fs subvolume info <fs_name> <subvolume_name> <subvolumegroup_group_name>
+```
+
+#### 3.挂载cephfs
 
 ##### （1）前提准备
 * 生成ceph.conf文件
@@ -94,23 +140,7 @@ ceph fs authorize <fs_name> client.<USER> <path> rw
 mount -t ceph <mon_ip_list>:<path> <mount_point> -o name=<USER_NAME>,secret=<USER_SECRET>,fs=<fs_name>
 ```
 
-
-#### 3.管理文件系统
-```shell
-ceph fs ls
-ceph fs dump
-
-ceph fs set <fd_name> <key> <value>
-#max_mds <num | default=1>      ranks的数量（即active mds的数量），数量越多，mds的负载就会被分担，进而能够提高mds的性能
-#standby_count_wanted <num | default=1>     设置副本数
-```
-
-#### 4.删除文件系统
-```shell
-ceph fs rm <fs_name> --yes-i-readlly-mean-it
-```
-
-#### 5.k8s使用ceph-fs
+#### 4.k8s使用ceph-fs
 
 ##### （1）下载ceph-csi-cephfs chart
 
@@ -151,6 +181,13 @@ storageClass:
   create: true
   name: csi-rbd-sc
   clusterID: 20870fc4-c996-11eb-8c25-005056b80961 #刚刚在集群信息中设置的id
-  fsName: k8s-fs
-  pool: pool: cogiot-dev-cephfs   #存储数据的pool
+  fsName: ceph-fs     #需要已经存在的volume
 ```
+
+##### （4）创建volume
+storageClass中指定的fsName需要提前创建好
+```shell
+ceph fs volume create <fsName>
+```
+
+##### （5）安装
