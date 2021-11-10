@@ -190,3 +190,8 @@ modinfo /lib/modules/3.10.0-957.el7.x86_64/kernel/drivers/net/bonding/bonding.ko
 #### 54.ping 本地的任何ip，其实都是ping的`127.0.0.1`
 
 #### 55.`docker restart` 和 `docker restart`都不会清除docker中的临时数据
+
+#### 56.buff和cache
+
+buff是将内存当磁盘用
+cache是将数据存储在内存中，加快数据的访问

@@ -10,6 +10,25 @@
 mysqld <启动参数> --verbose --help
 ```
 
+#### 2.查看连接情况
+* 查看过往连接情况
+```shell
+show status like 'Con%'
+```
+
+* 查看当前连接情况
+```shell
+show status like 'Threads%';
+show processlist;
+```
+
+#### 3.查看内存使用情况
+```shell
+show status like 'Innodb_page_size';  #默认16k
+
+show status like 'Innodb_buffer_pool_pages%';
+```
+
 ***
 
 ### 操作json类型

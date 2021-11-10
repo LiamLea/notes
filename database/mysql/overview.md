@@ -62,3 +62,12 @@ update ...;
 |utf8|utf8_general_ci|3字节utf8编码，不区分大小写|
 |utf8mb4|utf8mb4_bin|4字节utf8编码（可以存储表情），区分大小|
 |utf8mb4|utf8mb4_general_ci|4字节utf8编码（可以存储表情），不区分大小|
+
+#### 4.内存
+
+##### （1）InnoDB buffer pool
+The InnoDB buffer pool is a memory area that holds cached InnoDB data for tables, indexes, and other auxiliary buffers.
+a recommended innodb_buffer_pool_size value is 50 to 75 percent of system memory.
+A buffer pool that is too small may cause excessive churning as pages are flushed from the buffer pool only to be required again a short time later.
+
+A buffer pool that is too large may cause swapping due to competition for memory.
