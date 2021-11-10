@@ -8,7 +8,7 @@
 
 ##### （1）image
 一个image就是一个块设备，image会被分成多个同等大小的chunks，每个chunk是一个对象，然后存储在RADOS中
-image是thin provision（精简置备），即不会立即分配这么多物理存储给image，当使用到时才会分配
+image默认是thin provision（精简置备，安装时可以设为厚置备），即不会立即分配这么多物理存储给image，当使用到时才会分配
 
 #### 2.使用注意事项
 * 只支持 `ReadWriteOnce`
@@ -114,14 +114,27 @@ storageClass:
   create: true
   name: csi-rbd-sc
   clusterID: 20870fc4-c996-11eb-8c25-005056b80961 #刚刚在集群信息中设置的id
-  pool: rbd-lil-1   #当使用的是replicated pool时，这里指定pool的名字
+  pool: rbd-replicated-pool   #当使用的是replicated pool时，这里指定pool的名字
 # data_pool: ""     #当使用的是erasure pool时，在这里指定pool的名字
+  volumeNamePrefix: "dev-csi-vol-"    #设置创建的image的前缀（最好设置，当有多个环境时，能够区分）
+                                      #csi-dev-vol-大概意思：这是dev环境中，通过csi创建的image
 ```
 
 ##### （4）创建pool
 storageClass中指定的pool需提前创建好
 ```shell
-ceph osd pool create <pool_name>
+ceph osd pool create rbd-replicated-pool
 ```
 
 ##### （5）安装
+
+##### （6）其他能力（提供了统一的接口，即k8s屏蔽后端存储的差异）
+需要各种后端存储实现CSI接口，这样就能进行统一
+* resize（扩容能力）
+* snapshot（快照能力，包括恢复快照的能力）
+  * 需要安装snap-controller
+* attachment（将volume从某台节点上attch/detach的能力）
+[参考](https://github.com/ceph/ceph-csi/tree/devel/docs)
+
+##### （7）static pv创建
+[参考](https://github.com/ceph/ceph-csi/blob/devel/docs/static-pvc.md)

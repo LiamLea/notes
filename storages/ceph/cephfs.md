@@ -182,12 +182,70 @@ storageClass:
   name: csi-rbd-sc
   clusterID: 20870fc4-c996-11eb-8c25-005056b80961 #刚刚在集群信息中设置的id
   fsName: ceph-fs     #需要已经存在的volume
+  volumeNamePrefix: "dev-csi-vol-"    #设置创建的subvolume的前缀（最好设置，当有多个环境时，能够区分）
+                                      #csi-dev-vol-大概意思：这是dev环境中，通过csi创建的subvolume
 ```
 
 ##### （4）创建volume
 storageClass中指定的fsName需要提前创建好
 ```shell
-ceph fs volume create <fsName>
+ceph fs volume create ceph-fs
 ```
 
 ##### （5）安装
+
+##### （6）其他能力（提供了统一的接口，即k8s屏蔽后端存储的差异）
+需要各种后端存储实现CSI接口，这样就能进行统一
+* resize（扩容能力）
+* snapshot（快照能力，包括恢复快照的能力）
+  * 需要安装snap-controller
+* attachment（将volume从某台节点上attch/detach的能力）
+[参考](https://github.com/ceph/ceph-csi/tree/devel/docs)
+
+##### （7）static pv创建
+[参考](https://github.com/ceph/ceph-csi/blob/devel/docs/static-pvc.md)
+```shell
+ceph fs subvolumegroup create ceph-fs testGroup
+ceph fs subvolume create ceph-fs testSubVolume testGroup --size=1073741824
+```
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-test-2
+spec:
+  accessModes:
+  - ReadOnlyMany
+  capacity:
+    storage: 1Gi
+  csi:
+    driver: cephfs.csi.ceph.com
+    #ceph的凭证信息
+    nodeStageSecretRef:
+      name: csi-cephfs-secret
+      namespace: ceph-csi-fs
+    #下面的信息必须写对，有些地方必须加双引号
+    volumeAttributes:
+      clusterID: "80c547dc-3e0a-11ec-b136-461e74e24081"
+      fsName: "ceph-fs"
+      staticVolume: "true"
+      #volume的路径
+      rootPath: /volumes/testGroup/testSubVolume
+    #随便写
+    volumeHandle: pv-test-2   
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+  storageClassName: test
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-test-2
+spec:
+  storageClassName: test
+  accessModes: ["ReadOnlyMany"]
+  resources:
+    requests:
+      storage: 1Gi
+```

@@ -133,6 +133,13 @@ ceph osd pool autoscale-status
 # RATIO           存储空间的使用率
 ```
 
+* 删除有数据的pool
+```shell
+ceph config set mon mon_allow_pool_delete true
+ceph osd pool rm <pool_name> <pool_name> --yes-i-really-really-mean-it
+ceph config set mon mon_allow_pool_delete false
+```
+
 #### 3.pg相关
 
 * 查看所有pg信息
