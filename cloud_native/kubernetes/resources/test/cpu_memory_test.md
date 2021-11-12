@@ -38,7 +38,6 @@ spec:
       nodeName: master-3
       tolerations:
       - operator: "Exists"
-
 ```
 
 #### 2.模拟持续高内存（OOM且系统卡死）
