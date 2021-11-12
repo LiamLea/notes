@@ -27,10 +27,12 @@
 
 #### 2.kmem（kernel memory）
 * 概念
-系统使用的内存
+内核使用的内存
+* 主要包括
+  * stack pages（创建进程使用的内存开销）
+  * slab pages（slab cache，内核用于缓存的内存，这里会用的比较多）
 * 作用
-开启kmem后，kmem的使用量就会被计入
-为了能够限制某个资源对内核内存的使用（比如某个容器内，创建一个进程，这个创建进程使用的栈的开销是没有计入在该容器中的，而是计入在系统使用的内存中的，有了kmem，则能够计入在该容器中）
+开启kmem后，kmem的使用量就会被计入（就可以限制该pod使用的内核内存，主要是缓存使用）
 * 现状
 在内核4.0之前，不稳定，会造成内存泄漏
 
@@ -85,7 +87,8 @@ $ cat <path>/memory.usage_in_bytes
 ```
 
 ##### （4）docker stats查出来的值（不包含cache）
-`rss + memory.kmem.usage_in_bytes`
+`rss + memory.kmem.usage_in_bytes + cache - inactive_file（即memory.usage_in_bytes - inactive_file）`
+当内存使用量增加，kmem中用于缓存的内存会被拿过来使用
 
 #### 3.关闭cgroup的kmem
 ```shell

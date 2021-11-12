@@ -1,4 +1,7 @@
 `/proc` —— 伪文件系统，内核相关数据
+
+[参考](https://www.kernel.org/doc/html/latest/admin-guide/sysctl/)
+
 * `/proc/<PID>/` —— 进程信息  
 </br>
 * `/proc/sys/` —— 内核有关参数  

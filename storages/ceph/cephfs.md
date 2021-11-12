@@ -204,10 +204,25 @@ ceph fs volume create ceph-fs
 
 ##### （7）static pv创建
 [参考](https://github.com/ceph/ceph-csi/blob/devel/docs/static-pvc.md)
+
+* 主要在nodeStageSecretRef中指定的secret中添加userid等信息，才能够使用静态pv
+```shell
+ kubectl edit secret csi-cephfs-secret  -n ceph-csi-fs
+```
+```yaml
+data:
+  userID: xx
+  userKey: xx
+...
+```
+
+* 创建好subvolume
 ```shell
 ceph fs subvolumegroup create ceph-fs testGroup
 ceph fs subvolume create ceph-fs testSubVolume testGroup --size=1073741824
 ```
+
+* 创建静态pv
 ```yaml
 apiVersion: v1
 kind: PersistentVolume

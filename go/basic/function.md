@@ -80,7 +80,7 @@ func main() {
 //defer 111
 ```
 
-#### 4.万能类型：`interface{}`
+#### 4.万能类型（空接口）：`interface{}`
 ```go
 //可以接收任意类型的数据
 func myFunc(arg interface{}) {
@@ -93,4 +93,23 @@ func myFunc(arg interface{}) {
 func myFunc(arg interface{}) {
   value, ok := arg.(string)   //判断arg是否为string类型
 }
+```
+
+#### 5.接收可变数量的参数：`...`
+```go
+//表示可以传入多个interface{}类型的参数，这些参数会存放在args这个数组中
+func myFunc(args ...inteface{}){
+
+}
+```
+
+* 传入参数
+```go
+a := []string{"aa", "bbb"}
+
+//a...表示将数组拆开传入
+myFunc(a...)
+
+//相当于
+myFunc("aa", "bbb")
 ```
