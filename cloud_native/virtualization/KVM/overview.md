@@ -8,6 +8,12 @@
 
 
 #### 2.构建KVM虚拟化服务器平台
+|依赖技术|说明|所需软件|
+|-|-|-|
+|kvm（kernel virtual machine）|能够 将linux 转换成 hypervisor（需要CPU的支持,采用硬件辅助虚拟化技术）|kvm_intel内核模块|
+|qemu（quick emulation）|是一个虚拟化的仿真工具,通过ioctl与内核kvm交互完成对硬件的虚拟化支持|qemu-kvm|
+|libvirt（library virtualization）|虚拟化管理工具，提供接口对qemu、kvm等进行管理|libvirt-daemo</br>libvirt-daemon-driver-qemu（libvirtd 连接 qemu 的驱动）</br>libvirt-client|
+
 ##### （1）主要软件包
 * qemu-kvm	:为 kvm 提供底层仿真支持
 * libvirt-daemon	:libvirtd 守护进程,管理虚拟机

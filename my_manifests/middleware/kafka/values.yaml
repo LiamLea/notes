@@ -12,8 +12,8 @@
 ## ref: https://hub.docker.com/r/bitnami/kafka/tags/
 ##
 image:
-  registry: harbor.test.com/kafka
-  repository: kafka
+  registry: harbor.test.com
+  repository: bitnami/kafka
   tag: 2.4.0-debian-10-r25
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -338,7 +338,7 @@ affinity: {}
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: 
+resources:
   requests:
     memory: 4Gi
     cpu: 2000m
@@ -375,8 +375,8 @@ metrics:
     ## ref: https://hub.docker.com/r/bitnami/kafka-exporter/tags/
     ##
     image:
-      registry: harbor.test.com/prometheus
-      repository: kafka-exporter
+      registry: harbor.test.com
+      repository: bitnami/kafka-exporter
       tag: 1.2.0-debian-10-r23
       pullPolicy: IfNotPresent
       ## Optionally specify an array of imagePullSecrets.

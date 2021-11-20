@@ -1,7 +1,7 @@
 [toc]
 
 ### 修改网络配置
-
+[参考](https://wiki.debian.org/NetworkConfiguration#Starting_and_Stopping_Interfaces)
 #### 1.配置文件
 * 旧的版本
   * `/etc/network/interfaces`
@@ -53,4 +53,5 @@ systemctl disable apt-daily-upgrade
 
 systemctl stop unattended-upgrades.service
 systemctl disable unattended-upgrades.service
+reboot
 ```

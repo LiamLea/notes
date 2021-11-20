@@ -12,8 +12,8 @@
 ## ref: https://hub.docker.com/r/bitnami/zookeeper/tags/
 ##
 image:
-  registry: harbor.test.com/kafka
-  repository: zookeeper
+  registry: harbor.test.com
+  repository: bitnami/zookeeper
   tag: 3.5.7-debian-10-r0
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -240,8 +240,8 @@ metrics:
   enabled: true
 
   image:
-    registry: harbor.test.com/prometheus
-    repository: zookeeper-exporter
+    registry: harbor.test.com
+    repository: bitnami/zookeeper-exporter
     tag: 0.1.3-debian-10-r17
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.

@@ -27,6 +27,7 @@ hypervisor装在操作系统上（一般用于测试和实验环境）
 
 * Oracle VM VirtualBox
 * VMware Workstation
+* qemu hypervisor
 
 
 #### 3.虚拟机分配

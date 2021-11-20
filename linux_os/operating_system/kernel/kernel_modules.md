@@ -28,5 +28,5 @@ man modules-load.d
 
 * 永久加载ip_gre模块
 ```shell
-echo ip_gre > /etc/modules-load.d/my.conf
+echo ip_gre >> /etc/modules-load.d/my.conf
 ```
