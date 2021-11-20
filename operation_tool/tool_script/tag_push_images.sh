@@ -1,3 +1,4 @@
+```shell
 #!/bin/bash
 
 #please set variables depending on your environment
@@ -23,3 +24,4 @@ if [ -n "$match_pattern" ];then
     docker push ${my_registry}${localImage}
   done
 fi
+```
