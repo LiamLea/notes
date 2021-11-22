@@ -174,17 +174,27 @@ var p1 = new(int)   //new会开辟新的内存空间
 *p1 = 100
 ```
 
-#### 6.命名规则
-注意下面只是一个共识，并不是强制要求
-* 如果一个方法名首字母大写，代表该方法可以被其他包导入并访问
-* 如果类名、属性名、方法名 首字母大写，表示对外（其他包）可以访问
-
-#### 7.定义一个新的类型：type
+#### 6.定义一个新的类型：type
 ```go
 type <new_type_name> <underlying_type>
 ```
 
-#### 8.new和make
+#### 7.new和make
 都是用来分配内存的
-new用来给基本的数据类型分配内存，返回的是指针
-make用于给slice、map以及channel分配内存，返回的是数据
+new会指向已经初始化的内存空间，返回的是指针
+make分配内存并初始化，返回的是数据（一般用于slice、map以及channel）
+
+```go
+s1 := make([]int, 10)     //等价于s1 := new([10]int)
+s2 := new([]int)
+fmt.Println(s1)
+fmt.Println(s2)
+//[0 0 0 0 0 0 0 0 0 0]
+//&[]
+```
+
+#### 8.反射:`reflect`
+```go
+reflect.TypeOf(xx)    //获取对象的类型等信息
+reflect.ValueOf(xx)   //获取对象的值
+```

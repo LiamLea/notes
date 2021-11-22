@@ -133,7 +133,7 @@ func myFunc(arg interface{}) {
 var m1 map[string]interface{}
 ```
 
-###### （4）接口类型断言
+##### （4）接口类型断言
 ```go
 //val,ok=xx.(<type>)   xx是一个接口，第一个参数返回该接口的值，第二个参数返回判断的结果
 func assert(a interface{}) {

@@ -41,6 +41,7 @@ C-->D
 
 ### 配置
 #### 1.基本配置
+
 ##### （1）设置input
 ```yaml
 #当使用模块时，就将input设为false
@@ -51,7 +52,16 @@ filebeat.inputs:
 #设置索引
 #最好将ilm关闭，因为ilm匹配不到这个索引，会自动生成一个内容为空的索引
 ```
-##### （2）导入kibana dashboard
+
+##### （2）processor
+```yaml
+#当input是docker时，可以利用这个加上一些其他信息（Container ID、Name、Image、Labels），可以对日志进行区分
+processors:
+- add_docker_metadata:
+    host: "unix:///var/run/docker.sock"
+```
+
+##### （3）导入kibana dashboard
 ```yaml
 setup.dashboards.enabled: true
 #设置可视化的索引，dashboard是由一个个可视化组成的
@@ -59,7 +69,8 @@ setup.dashboards.index: "xx"
 setup.kibana:
   host: "IP:PORT"
 ```
-##### （3）output
+
+##### （4）output
 ```yaml
 output.elasticsearch:
   hosts: ["IP:PORT"]
