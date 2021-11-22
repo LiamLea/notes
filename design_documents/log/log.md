@@ -1,15 +1,82 @@
+# log设计文档
+
 [toc]
-### 格式
+
+### filebeat采集
+
+#### 1.输出到kafka中的日志格式
+```shell
+"labels": {
+  "app_id": "应用id（唯一），logstash根据这个确定日志发送到哪个index",
+  "app_name": "应用名称",
+  "app_env": "所在环境，比如：dev",
+  "log_type": "日志类型，logstash需要根据此类型选择合适的解析形式，比如：nginx_access"
+}
+"message": ""
+```
+
+#### 2.filebeat的配置
+
+注意：multiline要在这里处理
+
+```yaml
+- type: container
+  paths:
+  - /var/log/containers/*.log
+  exclude_files: ['^filebeat.*']
+  processors:
+  - add_kubernetes_metadata:
+      host: ${NODE_NAME}
+      matchers:
+      - logs_path:
+          logs_path: "/var/log/containers/"
+
+- type: log
+  paths:
+  - "/var/log/cogiot/iot-network-backend/*/*.log"
+  fields:
+    labels:
+      app_id: iot-network-backend_test-sub
+      app_name: iot-network-backend
+      app_env: test-sub
+      log_type: nginx_access
+  fields_under_root: true
+
+processors:
+- add_labels:
+    labels:
+      app_id: iot-account-backend_test-sub
+      app_name: iot-account-backend
+      app_env: test-sub
+      log_type: nginx_err
+    when:
+     and:
+     - equals:
+         kubernetes.container.name: iot-account-backend
+     - equals:
+         kubernetes.namespace: tot
+
+output.kafka:
+  hosts: ["10.172.0.103:39092", "10.172.0.103:39093", "10.172.0.103:39094"]
+  topic: 'all-logs_topic'
+```
+
+***
+
+### logstash清洗
+
+#### 1.清洗后的格式
 ```shell
 "@timestamp": "2020-06-23T07:07:17.000Z",
 
-"fields": {
-    "type": "nginx_access"    #用filebeat采集时设置的类型
-},
+"labels": {
+  "app_id": "应用id（唯一），logstash根据这个确定日志发送到哪个index",
+  "app_name": "应用名称",
+  "app_env": "所在环境，比如：dev",
+  "log_type": "日志类型，logstash需要根据此类型选择合适的解析形式，比如：nginx_access"
+}
 
-"level": "",
-
-"type": "日志类型",
+"level": "日志级别",
 
 "host": {
     "ip": "主机ip",
@@ -35,11 +102,15 @@
     "http_version": "",
     "bytes_sent": "",
     "status": "",
-    "user_agent": ""
+    "user_agent": "",
+    "params": "请求中的参数",
+    "trace_id": "请求链的id"
 }
 
 "message": ""
 ```
+
+***
 
 ### 相关grok
 #### 1.nginx access
