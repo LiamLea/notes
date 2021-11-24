@@ -48,7 +48,7 @@ processors:
       app_id: iot-account-backend_test-sub
       app_name: iot-account-backend
       app_env: test-sub
-      log_type: nginx_err
+      log_type: iot_log
     when:
      and:
      - equals:
