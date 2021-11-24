@@ -1,4 +1,4 @@
-# kafka
+x`xx# kafka
 
 [toc]
 
@@ -167,6 +167,83 @@ externalAccess:
     domain: 3.1.5.249
     nodePort: [19092,19093,19094]
 ```
+
+#### 2.安全配置
+
+##### （1）只设置SASL认证
+
+* 其中相关listener协议要设置SASL_PLAIN
+
+```shell
+vim kafka/values.yaml
+```
+
+```yaml
+extraEnvVars:
+  - name: KAFKA_BROKER_USER
+    value: "admin"
+  - name: KAFKA_BROKER_PASSWORD
+    value: "123456"
+  - name: KAFKA_OPTS
+    value: "-Djava.security.auth.login.config=/opt/bitnami/kafka/conf/kafka_jaas.conf"
+```
+
+* python连接
+```python
+producer = KafkaProducer(bootstrap_servers = "tajlmt0law.cogiot.net:39093", security_protocol = "SASL_PLAINTEXT", sasl_mechanism = "PLAIN", sasl_plain_username="admin", sasl_plain_password="123456")
+```
+
+##### （2）设置SSL和SASL
+* 上面只设置SASL的配置就不需要了
+* 当使用私有ca签发的证书时，SASL可以不用设置，客户端需要设置trust证书，其实也算一种认证了
+* 注意修改相关listener的协议
+
+* 创建jks secret
+[jks创建的方式参考](../security/network_security/Encryption/certificate.md)
+```shell
+kubectl create secret generic jks-secret --from-file=kafka.keystore.jks=./server.jks  --from-file=kafka.truststore.jks=./truststore.jks -n kafka
+```
+
+* 修改kafka配置
+```shell
+vim kafka/values.yaml
+```
+
+```yaml
+auth:
+  ## Switch to enable the kafka authentication.
+  enabled: true
+  ## Enable SSL to be used with brokers and consumers
+  ssl: true
+
+  ## Name of the existing secret containing the certificate files that will be used by Kafka.
+  certificatesSecret: jks-secret
+  ## Password for the above certificates if they are password protected.
+  certificatesPassword: "123456"
+
+  ## Kafka client user.
+  brokerUser: admin
+  ## Kafka client password.
+  brokerPassword: "123456"
+```
+
+* client连接
+  * 可以使用truststore.jks（其中存放了ca证书）
+    * jaas.conf
+    ```shell
+    org.apache.kafka.common.security.plain.PlainLoginModule required
+    username="admin"
+    password="Cogiot_Kafka@2021";
+    ```
+  * 可以直接使用ca证书
+  ```python
+  producer = KafkaProducer(bootstrap_servers = "tajlmt0law.cogiot.net:39093",
+                        security_protocol = "SASL_SSL",
+                        sasl_mechanism = "PLAIN", sasl_plain_username="admin",sasl_plain_password="Cogiot_Kafka@2021",
+                        ssl_cafile = r"C:\Users\bong-li\Downloads\new-jks\ca.crt", ssl_password="123456",
+                        ssl_check_hostname=False
+                         )
+  ```
 
 ***
 
@@ -379,4 +456,42 @@ heartbeat.interval.ms = <INT|default=3000>
 #发送心跳检测包后，等待回复的超时时间（默认为10s，group.min.session.timeout.ms <= 可配置的范围 <= group.max.session.timeout.ms）
 #如果超时了，server会将该consumer移除该group（即断开session连接）
 session.timeout.ms = <INT|default=10000>
+```
+
+#### 4.安全配置
+
+##### （1）认证配置：SASL（simple authentication and security layer）
+SASL利用jaas（Java Authentication and Authorization Service）文件，设置账号密码
+
+* SASL机制：PLAIN、GSSAPI等
+
+* JAAS文件格式
+```shell
+#提供给broker使用的SASL配置
+KafkaServer {
+  #表明使用的是PALIN机制
+  org.apache.kafka.common.security.plain.PlainLoginModule required
+
+  #broker连接其他broker使用的SASL配置   
+  username="user"
+  password="bitnami"
+
+  #broker作为服务端的SASL配置
+  user_user1="password1"   #表示可以用 user1/password1 客户端这个账号进行认证
+}
+
+#提供给broker连接zookeeper使用的SASL配置（如果kafka和zookeeper之间没有SASL，则这个配置也不会被使用）
+KafkaClient {
+  #表明使用的是PALIN机制
+  org.apache.kafka.common.security.plain.PlainLoginModule required
+
+  #broker连接zookeeper使用的SASL配置   
+  username="user"
+  password="bitnami"
+}
+```
+
+* 启动kafka时，需要加一个参数
+```shell
+-Djava.security.auth.login.config=/etc/kafka/kafka_client_jaas.conf
 ```

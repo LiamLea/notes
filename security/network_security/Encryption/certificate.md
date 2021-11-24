@@ -29,11 +29,12 @@ ca机构根据CSR请求对相应公钥进行签名
 * TLS是国际组织发布的标准
 
 #### 3.命名规范
-* 私钥的后缀一般为：.key
-* 公钥的后缀一般为：.pub
-* 证书的后缀一般为：.crt
-* ca证书的一般名为：ca.crt
-* 请求的后缀一般为：.csr
+* 私钥的后缀一般为：`.key`
+* 公钥的后缀一般为：`.pub`
+* 证书的后缀一般为：`.crt`
+* ca证书的一般名为：`ca.crt`
+* 请求的后缀一般为：`.csr`
+* 经过base64 encode后的密钥：`.pem`
 
 #### 5.x509 v3证书可以支持多个域名
 SAN：Subject Alternative Name
@@ -94,6 +95,77 @@ openssl x509 -req -in <SERVER.CSR> \
         -CAcreateserial \
         -days 3650 -out <SERVER.CRT> \
         -extfile v3.ext       #需要增加这个选项
+```
+
+***
+
+### jks（java keystore）
+
+#### 1.有两个密钥库
+
+|keystore|truststore|
+|-|-|
+|用于存储自己的证书（私钥、公钥）|用于存储信任的证书（一般存放ca证书），或者其他证书（比如客户端的一个的证书是没有经过新的ca签署的，则服务端需要把这个证书放入到truststore中，才会信任这个证书）|
+
+#### 1.创建jks
+
+* 创建ca证书
+```shell
+(umask 077;openssl genrsa -out ca.key)
+openssl req -new -x509 -key ca.key -out ca.crt -days 3650
+```
+
+* 创建服务端证书并用ca签署
+```shell
+(umask 077;openssl genrsa -out server.key)  
+openssl req -new -key server.key -out server.csr -subj '/CN=xx'
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key  -CAcreateserial -days 3650 -out server.crt
+```
+
+* 创建keystore
+```shell
+keytool -keystore KeyStore.jks -alias localhost -validity 3650 -genkey -keyalg RSA
+```
+
+* 导入私有证书
+```shell
+openssl pkcs12 -export -in server.crt -inkey server.key -out server.p12
+
+keytool -importkeystore -srckeystore server.p12 -srcstoretype PKCS12 -destkeystore server.jks -deststoretype JKS  -srcalias 1 -destalias localhost
+```
+
+* 导入信任的证书（比如ca证书）
+```shell
+keytool -importcert -file ca.crt -keystore truststore.jks -alias "caroot"
+```
+
+#### 2.查看jks中的证书
+```shell
+keytool -v -list -keystore <keystore>
+```
+
+#### 3.生成jks的脚本
+[脚本地址](https://raw.githubusercontent.com/confluentinc/confluent-platform-security-tools/master/kafka-generate-ssl.sh)
+
+#### 4.从jks中提取pem格式证书的脚本
+* 提取出来的证书没有密码
+```shell
+#!/bin/bash
+keyStore="kafka.keystore.jks"
+password="123456"
+alias="caroot"
+outputFolder="./"
+
+echo $keyStore
+echo "Generating certificate.pem"
+keytool -exportcert -alias $alias -keystore $keyStore -rfc -file $outputFolder/certificate.pem -storepass $password
+
+echo "Generating key.pem"
+keytool -v -importkeystore -srckeystore $keyStore -srcalias $alias -destkeystore $outputFolder/cert_and_key.p12 -deststoretype PKCS12 -storepass $password -srcstorepass $password
+openssl pkcs12 -in $outputFolder/cert_and_key.p12 -nodes -nocerts -out $outputFolder/key.pem -passin pass:$password
+
+echo "Generating CARoot.pem"
+keytool -exportcert -alias $alias -keystore $keyStore -rfc -file $outputFolder/CARoot.pem -storepass $passwor
 ```
 
 ***
