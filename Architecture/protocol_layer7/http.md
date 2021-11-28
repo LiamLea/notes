@@ -13,15 +13,12 @@
 * 一个页面一般包含多个资源,每个资源都需要单独的请求
 
 #### 2.HTTP/1.0 和 HTTP/1.1 比较
-* HTTP/1.0，**短链接**
-一次连接就是一个 Request 一个 Respons
-</br>
-* HTTP/1.1，**长连接**
-  * 有一个keep-alive，在一个HTTP连接中，可以发送多个Request，接收多个Response，在一定时间内没有请求，才断开连接
-  * 增加Host字段
-</br>
-* HTTP/1.1协议开始,使用**MIME标准**
-不仅仅可以输出文本文件,还有其他的文件类型（MIME:multipurpose internet mail extensions,定义了多种文件类型）
+
+|http版本|连接特点|其他特点|
+|-|-|-|
+|HTTP/1.0|短链接||
+|HTTP/1.1|长连接（多个http连接可以复用同一个tcp连接，但**不能同时**）|使用MIME标准,不仅仅可以输出文本文件,还有其他的文件类型（MIME:multipurpose internet mail extensions,定义了多种文件类型）|
+|HTTP/2.0|多路复用（多个http连接可以**同时**使用同一个tcp连接）||
 
 #### 3.一次http请求的过程
 ```mermaid

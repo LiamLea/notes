@@ -97,8 +97,12 @@ func myFunc(arg interface{}) {
 
 #### 5.接收可变数量的参数：`...`
 ```go
-//表示可以传入多个interface{}类型的参数，这些参数会存放在args这个数组中
+//表示参数类型是切片，且切片的元素类型是interface{}
 func myFunc(args ...inteface{}){
+
+}
+
+func myFunc2(args ...string){
 
 }
 ```
@@ -108,8 +112,10 @@ func myFunc(args ...inteface{}){
 a := []string{"aa", "bbb"}
 
 //a...表示将数组拆开传入
-myFunc(a...)
+//注意：只能用于函数的接收参数也是可变参数（即切片），且类型要一致）
+//参考：https://stackoverflow.com/questions/12990338/cannot-convert-string-to-interface
+myFunc2(a...)
 
 //相当于
-myFunc("aa", "bbb")
+myFunc2("aa", "bbb")
 ```

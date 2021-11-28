@@ -129,9 +129,13 @@ for data := range c {   //会阻塞
 }
 ```
 
-##### （4）处理多个channel：`select`
-注意在select中，不会阻塞（即当出现阻塞情况则代表不符合条件）
-会从中**随机**选择一个服务要求的case执行
+##### （4）channel multiplexing（处理多个channel）：`select`
+
+select工作原理（多路复用）：
+* 一个case就是一个外部通道，select维护着自己的一个通道（队列）
+* 某个case的条件满足了，就会放入到select的通道中
+* 执行select时，select会从自己的通道中，拿取case，如果其中没有case，则会用自己设置的default（如果没有设置default，就会阻塞）
+
 ```go
 for {
   select {
