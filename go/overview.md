@@ -91,7 +91,9 @@ replace (
 ```shell
 cd <go_project>
 
-go build -o <EXEC_FILE_NAME>   #o:objective，生成可执行文件的名字
+#o:objective，生成可执行文件的名字
+#<go_file>如果不指定，则会选择当前目录下的所有.go文件
+go build -o <EXEC_FILE_NAME>  <go_file>   
 
 #有两步，先执行go build，然后将可执行文件移动到`$GOPATH/bin/`目录下
 go install

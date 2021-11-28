@@ -78,7 +78,7 @@ kubectl
   "log-driver": "json-file",
   "log-opts": {
     "max-size": "10m",
-    "max-file": "3"
+    "max-file": "5"
   }
 }
 ```
@@ -137,6 +137,10 @@ systemReserved:
   cpu: 1000m
   memory: 1Gi
   pid: "100"    #注意必须要加引号
+
+#日志的默认配置
+containerLogMaxSize: 10Mi
+containerLogMaxFiles: 5
 ```
 
 #### 7.安装网络插件

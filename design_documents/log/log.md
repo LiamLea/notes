@@ -1,16 +1,31 @@
-# log设计文档
+# Log Collection Design
 
 [toc]
+
+### 设计
+
+#### 1.采集流程设计
+
+* filebeat采集日志，并进行multiline处理，然后发往kafka
+* logstash从kafka中读取日志，并进行清洗，后存入es
+
+#### 2.index设计
+* 每个应用会分配一个app_id，是一个唯一的值，格式：`<app_name>_<app_env>_<addtition>_<log_type>`
+* 每个应用的index就是其app_id
+* 在kibana中，可以使用index pattern进行index聚合
+
+***
 
 ### filebeat采集
 
 #### 1.输出到kafka中的日志格式
 ```shell
 "labels": {
-  "app_id": "应用id（唯一），logstash根据这个确定日志发送到哪个index",
   "app_name": "应用名称",
   "app_env": "所在环境，比如：dev",
-  "log_type": "日志类型，logstash需要根据此类型选择合适的解析形式，比如：nginx_access"
+  "addtition": "用于补充设置app_id的唯一性（可以利用namespace进行补充）",
+  "log_type": "日志类型(访问日志、运行日志、错误日志等)，logstash需要根据此类型选择合适的解析形式，比如：access",
+  "host": "主机名（如果在容器内就是容器名或者pod名）"
 }
 "message": ""
 ```
@@ -20,41 +35,81 @@
 注意：multiline要在这里处理
 
 ```yaml
+filebeat.inputs:
+#采集所有容器的日志
 - type: container
   paths:
   - /var/log/containers/*.log
   exclude_files: ['^filebeat.*']
+  fields:
+    labels:
+      app_env: test-sub
+  fields_under_root: true
+
   processors:
   - add_kubernetes_metadata:
-      host: ${NODE_NAME}
       matchers:
       - logs_path:
           logs_path: "/var/log/containers/"
 
+  #给容器的日志加上标签
+  - copy_fields:
+      fields:
+      - from: kubernetes.container.name
+        to: labels.app_name
+      - from: kubernetes.namespace
+        to: labels.addtition
+      - from: kubernetes.pod.name
+        to: labels.host
+      fail_on_error: false
+      ignore_missing: true
+
+  - add_labels:
+      labels:
+        log_type: iot_app
+      when:
+        or:
+        - contains:
+            kubernetes.pod.name: "iot-network-backend"
+        - contains:
+            kubernetes.pod.name: "iot-account-backend"
+
+#添加宿主机上的某些日志
 - type: log
   paths:
   - "/var/log/cogiot/iot-network-backend/*/*.log"
   fields:
     labels:
-      app_id: iot-network-backend_test-sub
       app_name: iot-network-backend
       app_env: test-sub
-      log_type: nginx_access
+      addition: ""
+      log_type: access
+      host: xx
   fields_under_root: true
 
-processors:
-- add_labels:
-    labels:
-      app_id: iot-account-backend_test-sub
-      app_name: iot-account-backend
-      app_env: test-sub
-      log_type: iot_log
-    when:
-     and:
-     - equals:
-         kubernetes.container.name: iot-account-backend
-     - equals:
-         kubernetes.namespace: tot
+#通过empty将需要采集的日志挂载出来，然后在宿主机就能通过指定路径读取改日志
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      templates:
+      - condition:
+          or:
+          - contains:
+              kubernetes.pod.name: "iot-network-backend"
+          - contains:
+              kubernetes.pod.name: "iot-account-backend"
+        config:
+        - type: log
+          paths:
+          - "/var/lib/kubelet/pods/*/volumes/kubernetes.io~empty-dir/volume-log/*/*.log"
+          fields:
+            labels:
+              app_name: ${data.kubernetes.container.name}
+              app_env: test-sub
+              addtition: ${data.kubernetes.namespace}
+              log_type: access
+              host: ${data.kubernetes.pod.name}
+          fields_under_root: true
 
 output.kafka:
   hosts: ["10.172.0.103:39092", "10.172.0.103:39093", "10.172.0.103:39094"]
@@ -73,25 +128,11 @@ output.kafka:
   "app_id": "应用id（唯一），logstash根据这个确定日志发送到哪个index",
   "app_name": "应用名称",
   "app_env": "所在环境，比如：dev",
-  "log_type": "日志类型，logstash需要根据此类型选择合适的解析形式，比如：nginx_access"
+  "log_type": "日志类型(访问日志、运行日志、错误日志等)，logstash需要根据此类型选择合适的解析形式，比如：access",
+  "host": "主机名（如果在容器内就是容器名或者pod名）"
 }
 
 "level": "日志级别",
-
-"host": {
-    "ip": "主机ip",
-    "hostname": "主机名",
-    "model": "型号",
-    "architecture": "x86_64",
-    "os": {
-      "kernel": "2.6.32-431.el6.x86_64",
-      "codename": "Final",
-      "platform": "centos",
-      "version": "6.5 (Final)",
-      "family": "redhat",
-      "name": "CentOS"
-    },
-},
 
 "request": {
     "remote_addr": "192.168.10.128",
@@ -113,7 +154,8 @@ output.kafka:
 ***
 
 ### 相关grok
-#### 1.nginx access
+
+#### 1.access log
 * 样例数据
 ```
 192.168.41.9 - - [28/May/2020:11:34:37 +0800] "GET / HTTP/1.1" 200 623 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36" 1.000
