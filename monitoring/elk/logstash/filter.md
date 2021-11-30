@@ -46,8 +46,8 @@ fingerprint {
 }
 ```
 
-#### 4.mutate
-改变字段，包括增加、删除、重命名、分割等
+#### 4.mutate和prune
+改变字段，包括增加、删除、重命名、分割等（prune可以指定保留哪些字段）
 
 * 重命名某个字段
 ```shell
@@ -146,6 +146,7 @@ grok {
 ```
 
 ##### （2）常用内置pattern
+[查看更多](https://github.com/logstash-plugins/logstash-patterns-core/blob/main/patterns/ecs-v1/grok-patterns)
 使用：`%{<PATTERN_NAME>:<FILED_NAME>}`
 ```python
 IP          #用于匹配所有ip地址包括ipv4和ipv6
@@ -153,7 +154,7 @@ MAC         #用于匹配MAC
 IPORHOST    #用于匹配 ip地址 或者 主机名
 HOSTPORT    #用于匹配 %{IPORHOST}:%{POSINT}这种形式的数据
 
-NUMBER      #用于匹配 数字
+NUMBER      #用于匹配 数字（包括小数）
 WORD        #用于匹配 单词
 
 PATH        #用于匹配 绝对路径
