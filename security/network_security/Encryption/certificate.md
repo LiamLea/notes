@@ -65,7 +65,7 @@ openssl req -new -x509 -key <CA.KEY> -out <CA.CRT> -days 3650
 openssl req -new -key <SERVER.KEY> -out <SERVER.CSR> -subj '/CN=xx'
 
 #CN很重要！！！！
-#CN（Common Name）一定要和访问的域名设置成一样
+#CN（Common Name）一定要匹配访问的域名（比如：要my1.local.com和my2.local.com，CN就可以写为*.local.com）
 ```
 （2）签署证书请求文件，生成数字证书
 ```shell
