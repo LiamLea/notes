@@ -7,7 +7,11 @@
 #### 1.安装
 
 ##### （1）下载chart
-[地址](https://github.com/apache/skywalking-kubernetes/tree/master/chart/skywalking)
+[参考](https://github.com/apache/skywalking-kubernetes)
+```shell
+helm repo add skywalking https://apache.jfrog.io/artifactory/skywalking-helm
+helm fetch skywalking/skywalking
+```
 
 ##### （2）配置
 ```shell

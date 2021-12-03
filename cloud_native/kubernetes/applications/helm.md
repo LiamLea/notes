@@ -113,12 +113,14 @@ helm upgrade xx xx1         #xx1为chart名或者本地chart的路径
 #如果在shell中，语法：
   ${<VAIRABLE_NAME>}
 ```
-#### 2.helm内置对象
+#### 2.helm内置对象和内置变量
 ```shell
   Release           #release相关属性
   Chart             #Chart.yaml文件中定义的内容
   Values            #values.yaml文件中定义的内容
 ```
+[内置变量](https://helm.sh/docs/chart_template_guide/builtin_objects/)
+
 #### 3.判断语句
 ```yaml
 #if语句

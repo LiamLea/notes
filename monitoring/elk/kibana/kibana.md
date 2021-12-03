@@ -26,17 +26,17 @@ t          代表字段的类型为文本
 在discovery、visualize和dashboard中都可以使用
 ![](./imgs/filter_01.png)
 
-#### 4.visualize（可视化）
+#### 4.aggregation（在visualize中配置）相关概念
 根据index patterns，找到对应Index，从而将该index中的数据用某些图形展示出来
 一个visualize就是一个图形面板
 
 ##### （1）buckets
-相当于分类器，一个类别就是一个桶，将属于同一类的document放入同一个桶中
+相当于**分类器**，一个类别就是一个桶，将属于同一类的document放入同一个桶中
 * 比如 时间分类器，每个时间点是一个桶，一个桶内是这个时间点的document集合  
 * 比如 词条分类器（terms），给定一个字段，该字段中的每一个值作为一个类别
 
 ##### （2）metrics
-对每个桶中的document进行相关统计
+对**每个桶中的document**进行相关**统计**
 * 比如 统计每个类别中document的数量（count）  
 * 比如 统计每个类别中document的某个字段的值的总量，是将一个类别中所有document的这个字段的值相加得到的（sum）  
 
@@ -57,15 +57,45 @@ t          代表字段的类型为文本
 * split series是在一个坐标轴上
 * split chart是一个类别在一个坐标轴上
 
-#### 4.dashboard
+#### 5.常用metric aggregation
+用于documents的指标
+
+|metric aggregation|description|
+|-|-|
+|median|中值|
+|percentiles|比如设为90，查询到的值为x，表示：`90%的值 <= x <= 10%的值`（中值就相当于50th percentiles）|
+|percentile ranks|比如为90，查询到的值为x（百分比），表示：`x%的值 <= 90 <= (100-x)%的值`
+
+#### 6.常用bucket aggregation
+用于聚合bucket中的documents
+|bucket aggregation|description|
+|-|-|
+|date histogram|按照时间分类|
+|term|按照某个字段的值分类|
+
+##### （1）bucket aggregation的排序（order）问题
+* 比如有一下数据
+```shell
+doc1: {a:"1", b:"12", c:"33"}
+doc2: {a:"2", b:"2", c:"3"}
+doc3: {a:"3", b:"21", c:"31"}
+doc4: {a:"1", b:"22", c:"33"}
+doc5: {a:"2", b:"24", c:"34"}
+doc6: {a:"1", b:"22", c:"33"}
+```
+比如采用term聚合方式（字段选a），一个term的值就是一个类别，则上面就能分为3类
+order的方式比如设为document的数量，按照降序排列，size为1，表示会对这3类计算其中的documents的数量，然后按照降序排列，size为1表示只展示document最多的那一类的指标聚合（这里就是a: "1"的指标聚合）
+
+#### 7.dashboard
 由一个个visualize组成
 
-#### 5.kibana的数据存储
+#### 8.kibana的数据存储
 kibana的数据存储在es中的.kibana索引下
 
 ***
 
 ### 基本操作
+
 #### 1.创建index patterns
 （1）创建Index patterns
 
