@@ -4,7 +4,12 @@
 
 ### 概述
 
-#### 1.metric分类
+#### 1.所有的指标都来自kubelet cadvisor
+```shell
+kubectl get --raw "/api/v1/nodes/node-1/proxy/metrics/cadvisor"
+```
+
+#### 2.metric分类
 
 ##### （1）两类指标
 
@@ -21,7 +26,7 @@
 |自定义metric api|`custom.metrics.k8s.io`|prometheus-adapter||
 |外部metric api|`external.metrics.k8s.io`|prometheus-adapter||
 
-#### 2.查看各个api中的指标
+#### 3.查看各个api中的指标
 
 ##### （1）查看`metrics.k8s.io` api
 ```shell

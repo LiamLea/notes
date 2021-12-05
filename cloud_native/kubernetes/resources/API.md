@@ -105,6 +105,9 @@ kubectl get --raw "<url>"
 #比如查看所有namespace
 kubectl get --raw "/api/v1/namespaces"
 
+#查看cadvisor中的指标
+kubectl get --raw "/api/v1/nodes/node-1/proxy/metrics/cadvisor"
+
 #比如：apis/apps/v1/namespaces/default/deployment
 #列出default命名空间中的所有deployment控制器
 
