@@ -95,10 +95,12 @@ lsof -i -a -p <PID>   #-a就是and
 ***
 
 ### dd
+
 #### 1.特点
 * 用**指定大小的块**拷贝一个文件，并在拷贝的同时进行指定的**转换**
 * 能够复制磁盘的分区、文件系统等
 * 当block size设置合适时，读取效率很高
+
 #### 2.命令
 ```shell
 dd if=输入文件 of=输出文件
@@ -107,10 +109,29 @@ dd if=输入文件 of=输出文件
 bs=xx         #设置读入/输出的 块大小 为 xx 个字节
 count=xx      #仅拷贝xx个块
 ```
+
 #### 3.应用
-* 彻底清空磁盘
+
+##### (1) backup the entire disk or partition
+```shell
+#<path> should be another filesystem path in case the capacity isn't enough
+#<file> can be a disk(such as /dev/sdb) or a file(such as xx.img)
+dd if=/dev/sda of=<path>/<file>
+#note: this also will copy the filesystem uuid，you need to generate uuid to use them at the same host
+#xfs filesystem to generate new uuid: xfs_admin -U generate  /dev/sdc1
+```
+
+##### (2) format(clean) disk
 ```shell
 dd if=/dev/zero of=/dev/sda
+```
+
+##### (3) convert data
+```shell
+dd if=/dev/sda of=<path>/<file> conv=noerror,sync
+#the coomand use to copy disk even though there are some demanged blocks
+#noerror - continue when encounter errors
+#sync - used together with noerror and will patch demanged blocks with NULs
 ```
 
 ***

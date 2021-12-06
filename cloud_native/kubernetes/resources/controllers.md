@@ -153,6 +153,12 @@ spec:
 * pod有唯一的网络标识（即域名，需要**headless service**）
   * 该pod所在的域由该headless service标识
   * 所以pod的域名为：`<POD_NAME>.<SERVICE_NAME>.<NAMESPACE>.svc.<CLUSTERNAME>`
+</br>
+* 当pod所在的node宕机或者跟master失去连接后
+  * pod不会转移（因为防止由于网络原因，导致两个同样的pod存在）
+  * 解决：
+    * 确保不会同时存在两个同样的pod情况下，强制delete那个pod
+    * 或者修复有问题的那个节点
 
 ##### （2）为什么pod是有状态的
 * 每个pod都有一个唯一的标识符，和volume绑定时使用的是这个标识符
