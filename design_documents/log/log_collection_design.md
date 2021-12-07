@@ -21,10 +21,11 @@
   * 通过emptyDir将需要采集的日志挂载出来
 * 方法二（建议）
   * 通过link file将日志文件链接到stdout或者stderr，需要日志的文件名一样
+  * 还有一点需要注意：多行处理这里就会比较复杂
   ```shell
   #比如，制作镜像时，指定一下
-  ln -s /proc/1/fd/1 /var/log/a.log
-  ln -s /proc/1/fd/1 /var/log/b.log
+  ln -fs /proc/1/fd/1 /var/log/a.log
+  ln -fs /proc/1/fd/1 /var/log/b.log
   ```
 
 #### 4.日志的分类
@@ -151,6 +152,8 @@ processors:
 output.kafka:
   hosts: ["10.172.0.103:39092", "10.172.0.103:39093", "10.172.0.103:39094"]
   topic: 'all-logs_topic'
+  partition.round_robin:
+    reachable_only: true    #当有partition不可达，数据会发送到可到达的partition
 ```
 
 ***
@@ -285,6 +288,7 @@ output {
   elasticsearch {
     hosts => "<IP:PORT>"
     index => "%{[labels][app_id]}"
+    timeout => 240    #240 sec, when es performance is poor
   }
 }
 ```
