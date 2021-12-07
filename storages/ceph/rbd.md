@@ -17,14 +17,18 @@ image默认是thin provision（精简置备，安装时可以设为厚置备）�
 
 ### 操作
 
-#### 1.创建image
+#### 1.创建pool
 ```shell
 ceph osd pool create <pool_name>
 rbd pool init <pool_name>
+```
+
+#### 2.创建image
+```shell
 rbd create --size <int> <pool_name>/<image_name>  #--size的单位是M
 ```
 
-#### 2.管理image
+#### 3.管理image
 
 ```shell
 #查看该pool中的所有image
@@ -44,7 +48,7 @@ rbd resize --size <int> --allow-shrink <pool_name>/<image_name>
 rdb remove <pool_name>/<image_name>
 ```
 
-#### 3.利用内核使用rbd
+#### 4.利用内核使用rbd
 
 ##### （1）提前准备
 * 需要存在rbd命令（安装ceph-common）
@@ -72,7 +76,7 @@ rbd device unmap /dev/rbd0
 #如果还不能unmap，使用该参数：-o force
 ```
 
-#### 4.k8s使用rbd
+#### 5.k8s使用rbd
 
 ##### （1）下载ceph-csi-rbd chart
 
