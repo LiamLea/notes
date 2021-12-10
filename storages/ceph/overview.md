@@ -78,6 +78,8 @@ OSD使用的新的后端对象存储，以前的是filestore，即对象先写�
 将一个对象分成多个data chunks（k）和coding chunks（m）,存放在不同的OSD上（`crush-failure-domain=host`存放在不同的host的OSD上，`crush-failure-domain=rack`存放在不同的rack上的OSD上），能够忍受m个OSD故障
 恢复需要一定的时间，该时间是线性增长的
 
+![](./imgs/overview_04.png)
+
 ##### （3）CRUSH map
 用于计算 对象 存储的位置，避免需要维护查询表的方式，从而提高性能
 

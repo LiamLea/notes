@@ -89,9 +89,16 @@ c-->d:"git push"
 git remote add <REMOTE_REPO_NAME> <URL>       #添加一个远程仓库，起名为：<NAME>
 git status                        #查看 工作区 文件状态，有哪些文件没有上传到暂存区
 git add .                         #将变化的内容上传到暂存区
-git commit -m '该版本的详细说明'   #将暂存区的内容上传到本地仓库         
+git commit -m '该版本的详细说明'   #将暂存区的内容上传到本地仓库   
+
+#创建一个本地分支并同步远程的分支
+git checkout -b <new-local-branch> origin/tieta-v2.2.0.0   
+#查看本地分支详情
+git branch -v    
+#将当前分支，推送到远程某个分支
+git push origin tieta-v2.2.0.0-lil
 ```
-</br>
+
 ##### （1）将本地仓库的`<LOCAL_BRANCH>`分支 提交到名为`<REMOTE_REPO_NAME>`的远程仓库的`<REMOTE_BRANCH>`分支
 ```shell
 git push <REMOTE_REPO_NAME> <LOCAL_BRANCH>:<REMOTE_BRANCH>

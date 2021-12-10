@@ -117,18 +117,17 @@ while True:
 
 ##### （1）header的名字不能包含下划线
 
-#### 2.常用请求头
-```shell
-From        #发起此请求的用户的邮件地址
-Host        #请求的目标服务器的host和port number
-X-Forwarded-For     #用于标识源ip地址（是一种标准）
-                    #但这个请求头需要手动设置（默认不会有这个请求头）
-                    #比如前面有一层负载，需要在前面负载中设置一下，用真正的client ip设置X-Forwarded-For请求头
-                    #后端记录日志时，需要设置日志的格式用x-forwarded-for头
-Cookie      #用于存储所有cookie，一个cookie的格式：<KEY>=<VALUE>;
+##### （2）不区分大小写
 
-Content-Type    #请求体的数据格式，常用的：application/json
-```
+#### 2.常用请求头
+
+|headers（case insensitive）|description|detial|
+|-|-|-|
+|Host|请求的host的地址（domain name or ip）||
+|Cookie|用于存储所有cookie，一个cookie的格式：`<KEY>=<VALUE>;`||
+|Content-Type|请求体的数据格式，常用的：`application/json`||
+|X-Forwarded-*|当经过了反向代理时，会用这个标识代理前的一些信息|比如：X-Forwarded-For 用于标识源ip地址（是一种标准）,但这个请求头需要手动设置（默认不会有这个请求头）,比如前面有一层负载，需要在前面负载中设置一下，用真正的client ip设置X-Forwarded-For请求头,后端记录日志时，需要设置日志的格式用x-forwarded-for头|
+|X-Original-*|当经过了反向代理时，会用这个标识一些原始的header的信息||
 
 ***
 

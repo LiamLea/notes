@@ -8,10 +8,12 @@ curl -H "Content-Type: application/json" \
 ```
 
 #### 2.批量插入
+
 ```shell
 curl -H "Content-Type: application/json" \
 -XPOST <IP>:<PORT>/<INDEX>/_bulk --data-binary "@<JSON_FILE>"
 ```
+
 * `<JSON_FILE>`的格式
 ```json
 {"index": {"_id": "1"}}
