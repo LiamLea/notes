@@ -18,7 +18,7 @@ server:
   # rewrite，则kibana服务端接收到这个地址，会进行一个rewrite，即删除这个前缀
   #     这样，删除前缀的这步在kibana做了，而上面是在反向代理那里做的
   #     建议使用这种方式，这样不通过反向代理就能够访问了
-  server.rewriteBasePath: <boolean | default=false>
+  rewriteBasePath: <boolean | default=false>
 ```
 
 * 注意如果kibana是部署在k8s上的 且 修改了basePath并进行了rewrite

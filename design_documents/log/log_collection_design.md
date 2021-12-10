@@ -21,7 +21,7 @@
   * 通过emptyDir将需要采集的日志挂载出来
 * 方法二（建议）
   * 通过link file将日志文件链接到stdout或者stderr，需要日志的文件名一样
-  * 还有一点需要注意：多行处理这里就会比较复杂
+  * 注意：这种方式不适合处理多行的情况
   ```shell
   #比如，制作镜像时，指定一下
   ln -fs /proc/1/fd/1 /var/log/a.log
@@ -82,7 +82,7 @@ filebeat.inputs:
       app_name: "app名称"
       addition: "附加信息"
       timezone: "时区"
-      host: xx
+      host: "主机名"
   fields_under_root: true
 
 #通过emptyDir将需要采集的日志挂载出来，然后在宿主机就能通过指定路径读取改日志
@@ -99,7 +99,7 @@ filebeat.autodiscover:
         config:
         - type: log
           paths:
-          - "/var/lib/kubelet/pods/${data.kubernetes.pod.uid}/volumes/kubernetes.io~empty-dir/volume-log/*/*.log"
+          - "/var/lib/kubelet/pods/${data.kubernetes.pod.uid}/volumes/kubernetes.io~empty-dir/volume-log/*.log"
 
         - type: container
           paths:
@@ -183,6 +183,7 @@ output.kafka:
     "request_path": "",
     "request_time": <float>, #"请求时间（毫秒）(float类型)"
     "request_host": "访问地址",
+    "http_referer": "从哪个地址跳转的",
     "http_version": "",
     "bytes_sent": <int>, #"发送的字节数（整数类型）"
     "status": <int> , #"返回码（整数类型）"
@@ -212,9 +213,10 @@ filter {
   grok{
     match => {
       "message" => [
-        "%{IP:[request][remote_addr]}.*?\[%{HTTPDATE:logtime}\]\s+\"%{WORD:[request][request_method]}\s+%{URIPATH:[request][request_path]}(?:\?*(?<[request][params]>\S+))?\s+HTTP/%{NUMBER:[request][http_version]}\"\s+%{INT:[request][status]}\s+%{NOTSPACE:[request][bytes_sent]}(?:\s+\"(?<[request][host]>.*?)\")?(?:\s+\"(?<[request][user_agent]>.*?)\")?(?:\s*%{NUMBER:[request][request_time]})?",
-        "\[%{TIMESTAMP_ISO8601:logtime}\].*?\[%{UUID:trace_id}\].*?\[%{LOGLEVEL:level}\s*\].*?\[(?<module>\S+)\]\s*--\s*(?<message>.*)",
-        "%{DATESTAMP:logtime}\s+\[%{LOGLEVEL:level}\]\s%{POSINT:pid}#%{NUMBER:tid}:\s(?<message>.*)"  
+        "%{IP:[request][remote_addr]}.*?\[%{HTTPDATE:logtime}\]\s+\"%{WORD:[request][request_method]}\s+%{URIPATH:[request][request_path]}(?:\?*(?<[request][params]>\S+))?\s+HTTP/%{NUMBER:[request][http_version]}\"\s+%{INT:[request][status]}\s+%{NOTSPACE:[request][bytes_sent]}(?:\s+\"(?<[request][http_referer]>.*?)\")?(?:\s+\"(?<[request][user_agent]>.*?)\")?(?:\s*%{NUMBER:[request][request_time]})?",
+        "\[%{TIMESTAMP_ISO8601:logtime}\].*?\[(?<trace_id>.*?)\].*?\[%{LOGLEVEL:level}\s*\].*?\[(?<module>\S+)\]\s*--\s*(?<message>.*)",
+        "%{DATESTAMP:logtime}\s+\[%{LOGLEVEL:level}\]\s%{POSINT:pid}#%{NUMBER:tid}:\s(?<message>.*)",
+        "%{TIMESTAMP_ISO8601:logtime}\s+\[(?<module>\S+)\]\s+%{LOGLEVEL:level}\s+(?<message>.*)"
       ]
     }
     overwrite => ["message"]
@@ -266,7 +268,7 @@ filter {
 
   #清洗时间（如果清洗失败，使用默认时间）
   date {
-     match => ["logtime", "dd/MMM/yyyy:HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss"]
+     match => ["logtime", "dd/MMM/yyyy:HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss,SSS"]
      target => "@timestamp"
      timezone => "%{[labels][timezone]}"
   }
@@ -275,7 +277,7 @@ filter {
   prune {
     whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$"]
     add_field => {
-      "[labels][app_id]" => "%{[labels][app_name]}-%{[labels][app_env]}-%{[labels][addition]}-%{[labels][log_type]}"
+      "[labels][app_id]" => "%{[labels][app_name]}-%{[labels][app_env]}-%{[labels][addition]}-%{[labels][log_type]}_log-%{+YYYY.MM.dd}"
     }
     remove_field => [ "[labels][timezone]" ]
   }
@@ -283,7 +285,7 @@ filter {
 
 output {
   #stdout用于测试
-  #stdout { codec => json }
+  #stdout {}
 
   elasticsearch {
     hosts => "<IP:PORT>"
@@ -316,7 +318,7 @@ output {
 
 ```python
 #通用格式（如果有其他格式，需要继续增加解析规则）
-"%{IP:[request][remote_addr]}.*?\[%{HTTPDATE:logtime}\]\s+\"%{WORD:[request][request_method]}\s+%{URIPATH:[request][request_path]}(?:\?*(?<[request][params]>\S+))?\s+HTTP/%{NUMBER:[request][http_version]}\"\s+%{INT:[request][status]}\s+%{NOTSPACE:[request][bytes_sent]}(?:\s+\"(?<[request][host]>.*?)\")?(?:\s+\"(?<[request][user_agent]>.*?)\")?(?:\s*%{NUMBER:[request][request_time]})?"
+"%{IP:[request][remote_addr]}.*?\[%{HTTPDATE:logtime}\]\s+\"%{WORD:[request][request_method]}\s+%{URIPATH:[request][request_path]}(?:\?*(?<[request][params]>\S+))?\s+HTTP/%{NUMBER:[request][http_version]}\"\s+%{INT:[request][status]}\s+%{NOTSPACE:[request][bytes_sent]}(?:\s+\"(?<[request][http_referer]>.*?)\")?(?:\s+\"(?<[request][user_agent]>.*?)\")?(?:\s*%{NUMBER:[request][request_time]})?"
 ```
 
 #### 2.app日志
@@ -329,7 +331,7 @@ output {
 
 * grok
 ```shell
-"\[%{TIMESTAMP_ISO8601:logtime}\].*?\[%{UUID:trace_id}\].*?\[%{LOGLEVEL:level}\s*\].*?\[(?<module>\S+)\]\s*--\s*(?<message>.*)"
+"\[%{TIMESTAMP_ISO8601:logtime}\].*?\[(?<trace_id>.*?)\].*?\[%{LOGLEVEL:level}\s*\].*?\[(?<module>\S+)\]\s*--\s*(?<message>.*)"
 ```
 
 ##### （2）解析规则二
@@ -341,4 +343,56 @@ output {
 * grok
 ```shell
 "%{DATESTAMP:logtime}\s+\[%{LOGLEVEL:level}\]\s%{POSINT:pid}#%{NUMBER:tid}:\s(?<message>.*)"
+```
+
+##### （3）解析规则三
+* 样例数据
+```shell
+2021-12-10 08:03:23,870 [elastic-apm-server-reporter] INFO  co.elastic.apm.agent.report.IntakeV2ReportingEventHandler - Backing off for 36 seconds (+/-10%)
+```
+
+* grok
+```shell
+"%{TIMESTAMP_ISO8601:logtime}\s+\[(?<module>\S+)\]\s+%{LOGLEVEL:level}\s+(?<message>.*)"
+```
+
+***
+
+### 性能优化
+
+#### 1.采集优化
+kafka划分多个分区，filebeat将日志采集通过roundrobin的方式放入各个分区
+一个分区利用一个logstash去采集
+
+#### 2.es优化
+
+##### （1）jvm heap优化
+设为内存的一半（最高不超过30G左右）
+
+#### 3.logstash优化
+
+##### （1）jvm heap优化
+不要超过内存的75%（需要结合batch size进行合理的设置）
+
+##### （2）batch size优化
+一个worker每次处理的event数量（默认为125），当日志量大，这个数值是远远不够的
+可以设为1000或者更高（需要结合内存进行考虑）
+
+#### 3.配置示例
+
+* es
+分配了8c/16G
+```yaml
+esJavaOpts: "-Xmx8g -Xms8g"
+```
+
+* logstash
+分配了2c/4G
+```yaml
+logstashConfig:
+  logstash.yml: |
+    http.host: 0.0.0.0
+    pipeline.batch.size: 1000
+
+logstashJavaOpts: "-Xmx2g -Xms2g"
 ```
