@@ -175,6 +175,7 @@ output.kafka:
 "level": "日志级别",
 "trace_id": "请求链的id",
 "module": "哪个模块（代码）产生的日志",
+"origin_message": "清洗前的消息内容",
 "message": "",
 
 "request": {
@@ -202,14 +203,21 @@ input {
   kafka {
     bootstrap_servers => "10.172.0.103:39092,10.172.0.103:39093,10.172.0.103:39094"
     topics => ["all-logs_topic"]
-    auto_offset_reset => "earliest"
+    auto_offset_reset => "latest"
     group_id => "logstash-test-1"
     codec => json
   }
 }
 
 filter {
-  #进行grok清洗
+
+  mutate{
+    add_field => {
+      "origin_message" => "%{message}"
+    }
+  }
+
+  #进行grok清洗（匹配即停止）
   grok{
     match => {
       "message" => [
@@ -275,7 +283,7 @@ filter {
 
   #统一清洗
   prune {
-    whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$"]
+    whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$"]
     add_field => {
       "[labels][app_id]" => "%{[labels][app_name]}-%{[labels][app_env]}-%{[labels][addition]}-%{[labels][log_type]}_log-%{+YYYY.MM.dd}"
     }
@@ -360,6 +368,8 @@ output {
 
 ### 性能优化
 
+目标：消费的速度必须大于采集的速度，否则日志的内容就会滞后
+
 #### 1.采集优化
 kafka划分多个分区，filebeat将日志采集通过roundrobin的方式放入各个分区
 一个分区利用一个logstash去采集
@@ -392,7 +402,7 @@ esJavaOpts: "-Xmx8g -Xms8g"
 logstashConfig:
   logstash.yml: |
     http.host: 0.0.0.0
-    pipeline.batch.size: 1000
+    pipeline.batch.size: 3000
 
-logstashJavaOpts: "-Xmx2g -Xms2g"
+logstashJavaOpts: "-Xmx3g -Xms3g"
 ```
