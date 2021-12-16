@@ -1,6 +1,10 @@
+# traffic management
+
 [toc]
+
 ### VirtualService
 用于设置路由规则，将匹配的流量路由到指定destination（在k8s中destination一般就是service，也可以是ip地址或是可以解析的域名）
+
 #### 1.特点
 * 首先匹配流量的来源
 * 可以路由七层和四层的流量
@@ -162,11 +166,14 @@ spec:
   - address: 2.2.2.2
   - address: 3.3.3.3
 ```
+
 ### unknown 和 passthroughcluster 和 BlackHole
 * 当不知道的外部流量进来时，则标识来源为**unknown**
 * 当流量发往外部不知道的服务时，则标记为目的为**passthroughcluster** 或者 **blackholw**
 当允许流量外出时，为**passthroughcluster**
 当不允许流量外出时，为**blackhole**
+
+
 ### 更多流量治理（无需修改代码）
 #### 1.timeout
 设置envoy proxy等待响应超过这个时间，则认为超时（即失败）

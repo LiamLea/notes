@@ -62,7 +62,8 @@
   "app_env": "所在环境，比如：dev",
   "addition": "用于补充设置app_id的唯一性（可以利用namespace进行补充）",
   "timezone": "当无法通过日志匹配出时区时，需要指定时区（如果不指定默认为UTC时区）",
-  "host": "主机名（如果在容器内就是容器名或者pod名）"
+  "host": "主机名（如果在容器内就是容器名或者pod名）",
+  "source": "日志来源（默认为container，表示来源于容器），file表示来源于文件，加上这个字段可用于后续做一些处理"
 }
 "message": ""
 ```
@@ -83,6 +84,7 @@ filebeat.inputs:
       addition: "附加信息"
       timezone: "时区"
       host: "主机名"
+      source: "file"
   fields_under_root: true
 
 #通过emptyDir将需要采集的日志挂载出来，然后在宿主机就能通过指定路径读取改日志
@@ -100,6 +102,10 @@ filebeat.autodiscover:
         - type: log
           paths:
           - "/var/lib/kubelet/pods/${data.kubernetes.pod.uid}/volumes/kubernetes.io~empty-dir/volume-log/*.log"
+          fields:
+            labels:
+              source: "file"
+          fields_under_root: true
 
         - type: container
           paths:
@@ -134,6 +140,12 @@ processors:
     when:
       not:
         has_fields: ['labels.timezone']
+- add_labels:
+    labels:
+      source: container
+    when:
+      not:
+        has_fields: ['labels.source']
 
 - copy_fields:
     fields:
@@ -169,7 +181,8 @@ output.kafka:
   "app_name": "应用名称",
   "app_env": "所在环境，比如：dev",
   "log_type": "日志类型(访问日志:access_、错误日志:error_、应用日志:app_等)，logstash需要根据此类型选择合适的解析形式，比如：access，当log_type为raw时，表示不需要清洗",
-  "host": "主机名（如果在容器内就是容器名或者pod名）"
+  "host": "主机名（如果在容器内就是容器名或者pod名）",
+  "source": "日志来源（默认为container，表示来源于容器），file表示来源于文件"
 },
 
 "level": "日志级别",
