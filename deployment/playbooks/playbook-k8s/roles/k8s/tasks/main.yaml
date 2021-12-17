@@ -1,0 +1,35 @@
+- name: setup docker
+  include_role: 
+    name: docker
+
+- name: install k8s components on debian
+  include_tasks: debian.yaml
+  when: ansible_distribution_file_variety == "Debian"
+
+- name: install k8s components on redhat
+  include_tasks: redhat.yaml
+  when: ansible_distribution_file_variety == "RedHat"
+
+- name: enable kubelet
+  service: 
+    name: kubelet
+    enabled: True
+
+- name: install helm
+  copy:
+    src: helm
+    dest: /usr/sbin/
+    mode: 0777
+  when: inventory_hostname in groups["master"]
+
+- name: install keepalived
+  include_role:
+    name: keepalived
+  when: inventory_hostname in groups["master"]
+
+- name: setup k8s cluster
+  include_tasks: setup_k8s.yaml
+
+- name: init k8s
+  include_tasks: init_k8s.yaml
+  when: inventory_hostname in groups["work_master"]

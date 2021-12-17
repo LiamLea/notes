@@ -19,6 +19,18 @@
 
 ![](./imgs/routine_01.jpeg)
 
+#### 3.context接口
+用于处理多个goroutine之前 与数据、信号等相关的操作
+该接口定义了4个方法
+```go
+type Context interface {
+  Deadline()(deadline time.Time, ok bool)
+  Done() <-chan struct{}
+  Err() error
+  Value(key interface{}) interface{}
+}
+```
+
 ***
 
 ### 使用
@@ -203,3 +215,26 @@ func main() {
 	wg.Wait()
 }
 ```
+
+#### 5.context
+
+##### (1) introduction
+```go
+type Context interface {
+  Deadline()(deadline time.Time, ok bool)
+
+  //when a context is canceled，the Done() channel will get the cancel signal
+  Done() <-chan struct{}  
+
+  Err() error
+  Value(key interface{}) interface{}
+}
+```
+* Context type is used to carry deadlines,cancellation signals and other request-scoped values accross goroutines
+* when a Context is canceled,all Contexts derived from it are also canceled(means Done() channel will get a cancel signal)
+
+##### （2）`Background()`和`TODO()`
+这两个函数返回的是empty Context
+当不清楚是否需要Context，可以使用`TODO()`产生一个Context，传递进goroutine，但不使用，如果以后需要的话可以使用
+
+##### （3）

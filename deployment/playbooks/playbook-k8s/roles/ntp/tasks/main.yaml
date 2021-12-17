@@ -1,0 +1,34 @@
+- name: check ntp service
+  shell: systemctl status ntpd || systemctl status ntp
+  ignore_errors: True
+  register: ntp_service
+
+- name: install ntp on debian
+  include_tasks: install_on_debian.yaml
+  when: ansible_distribution_file_variety == "Debian"
+
+- name: install ntp on redhat
+  include_tasks: install_on_redhat.yaml
+  when: ansible_distribution_file_variety == "RedHat"
+
+- block:
+  - name: copy ntp server config
+    template:
+      src: ntp-server.conf.j2
+      dest: /etc/ntp.conf
+    when: inventory_hostname in groups["ntp_server"]
+  - name: copy ntp client config
+    template:
+      src: ntp-client.conf.j2
+      dest: /etc/ntp.conf
+    when: inventory_hostname not in groups["ntp_server"]
+  - name: start  ntp service
+    service: 
+      name: "{{ item }}"
+      state: started
+      enabled: true
+    with_items:
+    - ntp
+    - ntpd
+    ignore_errors: true
+  when: ntp_service.rc != 0

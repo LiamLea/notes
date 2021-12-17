@@ -1,0 +1,2 @@
+task_id: 2
+workdir: "~/ansible_{{task_id}}"

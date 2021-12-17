@@ -1,0 +1,14 @@
+- name: check docker-ce
+  shell: docker --version
+  ignore_errors: True
+  register: docker_installed
+- block:
+  - name: install docker-ce
+    yum:
+      name: "docker-ce-{{docker.version}}"
+      state: present
+  - name: stop docker-ce
+    service:
+      name: docker
+      state: stopped
+  when: docker_installed.rc != 0

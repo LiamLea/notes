@@ -1,0 +1,22 @@
+- name: copy mysql chart
+  copy:
+    src: mysql
+    dest: "{{ workdir }}"
+    force: no
+
+- name: install mysql
+  community.kubernetes.helm:
+    chart_ref: "{{ workdir }}/mysql"
+    release_name: mysql
+    release_namespace: mysql
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image:
+        repository: "{{ mysql.repository }}"
+      auth:
+        rootPassword: "{{ mysql.root_password }}"
+      service:
+        nodePort: "{{ mysql.node_port }}"
+      persistence:
+        storageClass: "{{ storage_class }}"

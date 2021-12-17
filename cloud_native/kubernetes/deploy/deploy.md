@@ -91,7 +91,7 @@ systemctl enable docker kubelet
 
 #### 5.初始化master节点
 ```shell
-##kubeadm config images list
+##kubeadm config images list --kubernetes-version=<kubeadm-version>
 ##可以先拉取镜像，再初始化
 
 kubeadm init --control-plane-endpoint=<VIP_OR_DNS>:<PORT> \   

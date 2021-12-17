@@ -16,6 +16,8 @@
 ### kubeadm使用
 
 #### 1.配置kubeadm
+* 可以配置init配置、cluster配置、kubelet配置、apiServer配置等等
+[参考](https://kubernetes.io/docs/reference/config-api/kubeadm-config.v1beta2/)
 ```shell
 #生成默认配置
 kubeadm config print init-defaults > /tmp/kubeadm.conf

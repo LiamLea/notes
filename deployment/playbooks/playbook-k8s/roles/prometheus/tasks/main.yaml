@@ -1,0 +1,4 @@
+- name: setup prometheus
+  include_tasks: setup_prometheus.yaml
+  when: inventory_hostname in groups["work_master"]
+

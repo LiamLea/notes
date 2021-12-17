@@ -1,0 +1,35 @@
+vrrp_script health_check {
+    script "/bin/bash /etc/keepalived/check.sh"
+    interval 1
+    timeout 5
+    rise 3
+    fall 3
+    user root
+}
+
+vrrp_instance VI_1 {
+    state BACKUP
+    nopreempt
+    virtual_router_id {{ keepalived.id }}
+    priority {{ ansible_host.split(".")[-1].strip() }}
+    interface {{  ansible_default_ipv4.interface }}
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    unicast_peer {
+    {% for host in groups["master"] -%}
+    {% if hostvars[host]["ansible_host"] != ansible_host %}
+    {{ hostvars[host]["ansible_host"]}}
+    {% endif %}
+    {%- endfor -%}
+    }
+    virtual_ipaddress {
+        {{ keepalived.vip }}
+    }
+    track_script {
+      health_check
+    }
+}
+

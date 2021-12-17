@@ -1,0 +1,31 @@
+- name: check kube packages
+  shell: kubelet --version
+  ignore_errors: True
+  register: kube_installed
+
+- name: install kubeadm kubelet kubectl
+  yum:
+    name:
+    - "kubeadm-{{ kubernetes.version }}"
+    - "kubelet-{{ kubernetes.version }}"
+    - "kubectl-{{ kubernetes.version }}"
+    state: present
+  
+  when: kube_installed.rc != 0
+
+- name: check nfs-client
+  shell: showmount --version
+  ignore_errors: True
+  register: nfs_client_installed
+
+- name: install nfs-client
+  yum:
+    name: nfs-utils
+    state: present
+  when: nfs_client_installed.rc != 0
+
+- name: install pyyaml
+  yum:
+    name: PyYAML
+    state: present
+  when: inventory_hostname in groups["work_master"]
