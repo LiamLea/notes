@@ -1,0 +1,54 @@
+- name: exec debian tasks
+  include_tasks: "debian.yaml"
+  when: ansible_distribution_file_variety == "Debian"
+
+- name: exec redhat tasks
+  include_tasks: "redhat.yaml"
+  when: ansible_distribution_file_variety == "RedHat"
+
+- name: time sync
+  include_role: 
+    name: ntp
+
+- name: set hostname
+  hostname:
+    name: "{{inventory_hostname}}"
+
+- name: set hosts
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+
+- name: turn off swap
+  shell: swapoff -a;sed -ri 's/(^[^[:space:]#]+\s+\S+\s+swap\s+)/#\1/' /etc/fstab
+
+- block:
+  - name: create directory ssh
+    file:
+      name: "~/.ssh"
+      state: directory
+
+  - name: copy id_rsa
+    copy:
+      src: id_rsa
+      dest: "~/.ssh"
+      mode: 0600
+
+  - name: copy id_rsa.pub
+    copy:
+      src: id_rsa.pub
+      dest: "~/.ssh"
+  when: inventory_hostname in groups["master"]
+
+- name: create directory ssh
+  file:
+    name: "/root/.ssh"
+    state: directory
+
+- name: copy authorized_keys
+  copy:
+    src: authorized_keys
+    dest: "/root/.ssh"

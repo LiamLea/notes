@@ -1,0 +1,38 @@
+[master]
+master-2 ansible_host=3.1.5.242 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
+master-1 ansible_host=3.1.5.241 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
+master-3 ansible_host=3.1.5.243 ansible_user=root ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
+
+[node]
+node-1 ansible_host=3.1.5.244 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
+node-2 ansible_host=3.1.5.245 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
+node-3 ansible_host=3.1.5.246 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
+node-4 ansible_host=3.1.5.251 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
+node-5 ansible_host=3.1.5.252 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
+node-6 ansible_host=3.1.5.253 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
+node-7 ansible_host=3.1.5.214 ansible_user=root ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
+node-8 ansible_host=3.1.4.214 ansible_user=root ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
+
+[k8s:children]
+master
+node
+
+[work_master]
+master-3
+
+[registry]
+docker-registry ansible_host=3.1.5.238 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal registry_host=docker.repo.local
+
+[nfs]
+docker-registry nfs_path=/mnt/nfs-k8s
+
+[tidb]
+node-4 block_device=sdb
+node-5 block_device=sdb
+node-6 block_device=sdb
+
+[prometheus]
+#node-7 block_device=sdb
+
+[ntp_server]
+master-1

@@ -11,7 +11,7 @@ docker load -i istio_v1.5.0_images.tar.gz
 
 #### 2.安装istio
 ```shell
-istioctl manifest apply --set profile=demo
+istioctl install --set profile=demo -y
 #demo配置安装了所有的组件
 ```
 安装时的更多配置参考：

@@ -1,0 +1,107 @@
+- name: set sysctl
+  sysctl:
+    name: "{{ item }}"
+    value: '1'
+  with_items:
+  - "net.ipv4.ip_forward"
+  - "net.bridge.bridge-nf-call-iptables"
+  - "net.bridge.bridge-nf-call-ip6tables"
+
+- name: check k8s cluster
+  shell: ss -tulnp src :10250 | grep 10250
+  ignore_errors: True
+  register: k8s_setup
+
+- name: set variable init_master
+  set_fact:
+    init_master: "{%- set myList = [] -%} {%- for i in groups.master -%} {{ myList.append({'name': i, 'priority': hostvars[i]['ansible_host'].split('.')[-1] | int}) }} {%- endfor -%} {{ (myList | sort(attribute='priority') | last)['name'].strip() }}"
+
+
+#- block:
+#  
+#  - name: copy images
+#    copy: 
+#      src: "{{kubernetes.version}}/images.tar.gz"
+#      dest: /tmp/
+#  
+#  - name: load images
+#    shell: docker load -i /tmp/images.tar.gz
+#  
+#  - name: remove images file
+#    file:
+#      path: /tmp/images.tar.gz
+#      state: absent
+#
+#  when: k8s_setup.rc != 0
+  
+- block:
+
+  - name: copy kubeadm conf
+    template:
+      src: kubeadm.conf.j2
+      dest: /etc/kubernetes/kubeadm.conf
+
+  - name: init first master
+    shell: |
+      kubeadm init --config /etc/kubernetes/kubeadm.conf
+      mkdir ~/.kube || echo ""
+      cp -f /etc/kubernetes/admin.conf ~/.kube/config
+
+  - name: create calico dir
+    file:
+      path: /etc/kubernetes/calico
+      state: directory
+
+  - name: copy calico yaml
+    template:
+      src: "{{ item }}"
+      dest: /etc/kubernetes/calico
+    with_items:
+    - tigera-operator.yaml
+    - custom-resources.yaml
+
+  - name: install calico operator
+    shell: kubectl apply -f tigera-operator.yaml
+    args:
+      chdir: /etc/kubernetes/calico
+  
+  - name: install calico
+    shell: kubectl apply -f custom-resources.yaml
+    args:
+      chdir: /etc/kubernetes/calico
+    register: calico_installed
+    until: calico_installed.rc == 0
+    delay: 10
+    retries: 2
+#  - name: copy flannel yaml
+#    template:
+#      src: kube-flannel.yaml.j2
+#      dest: /etc/kubernetes/manifests/kube-flannel.yaml
+#
+#  - name: install flannel
+#    shell: kubectl apply -f /etc/kubernetes/manifests/kube-flannel.yaml
+
+  when: k8s_setup.rc != 0 and inventory_hostname == init_master
+
+- name: get join command
+  shell: kubeadm token create --print-join-command
+  register: join_command
+  when: inventory_hostname == init_master
+
+- name: get cert key
+  shell: kubeadm init phase upload-certs --upload-certs | tail -1
+  register: cert_key
+  when: inventory_hostname == init_master
+    
+- name: init other master
+  shell: |
+    {{ hostvars[init_master]['join_command'].stdout }} --certificate-key {{ hostvars[init_master]['cert_key'].stdout }} --control-plane --apiserver-advertise-address={{ ansible_host }} --apiserver-bind-port=6443 || exit 1
+    mkdir ~/.kube || echo ""
+    cp -f /etc/kubernetes/admin.conf ~/.kube/config || echo ""
+  throttle: 1
+  when: k8s_setup.rc != 0 and inventory_hostname in groups["master"] and inventory_hostname != init_master
+
+- name: init node 
+  shell: "{{ hostvars[init_master]['join_command'].stdout }}"
+  when: k8s_setup.rc != 0 and inventory_hostname in groups["node"]
+

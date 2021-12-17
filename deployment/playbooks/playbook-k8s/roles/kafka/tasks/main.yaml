@@ -1,0 +1,35 @@
+#- name: create kafka namespace
+#  shell: kubectl create ns kafka
+#  ignore_errors: True
+
+- name: create workdir
+  file:
+   path: "{{ workdir }}"
+   state: directory
+
+- name: copy kafka charts
+  copy:
+    src: kafka
+    dest: "{{ workdir }}"
+    force: no
+
+- name: install kafka
+  community.kubernetes.helm:
+    chart_ref: "{{ workdir }}/kafka"
+    release_name: kafka
+    release_namespace: kafka
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      zookeeper:
+        image:
+          registry: "{{ kafka.zookeeper.repository.rsplit('/', 1)[0] }}"
+          repository: "{{ kafka.zookeeper.repository.rsplit('/', 1)[-1] }}"
+      image:
+        registry: "{{ kafka.repository.rsplit('/', 1)[0] }}"
+        repository: "{{ kafka.repository.rsplit('/', 1)[-1] }}"
+      replicaCount: "{{ kafka.replicas }}"
+      externalAccess:
+        service:
+          domain: "{{ kafka.ip }}"
+          nodePort: "{{ kafka.node_port }}"

@@ -1,0 +1,29 @@
+- name: stop firewall
+  service:
+    name: ufw
+    state: stopped
+    enabled: False
+
+- name: stop automatic upgrades
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: False
+  with_items:
+  - apt-daily.timer
+  - apt-daily-upgrade.timer
+  - apt-daily.service
+  - apt-daily-upgrade.service
+  - unattended-upgrades.service
+
+- name: config repo
+  shell: |
+    export DEBIAN_FRONTEND=noninteractive
+    sed -i "s@http://.*archive.ubuntu.com@http://repo.huaweicloud.com@g" /etc/apt/sources.list
+    sed -i "s@http://.*security.ubuntu.com@http://repo.huaweicloud.com@g" /etc/apt/sources.list
+    apt-get -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+    curl -fsSL https://repo.huaweicloud.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+    add-apt-repository "deb [arch=amd64] https://repo.huaweicloud.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+    curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
+    echo "deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
+    apt update

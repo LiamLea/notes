@@ -1,0 +1,51 @@
+- block:
+  - name: check data directory
+    stat:
+      path: /mnt/tidb
+    register: data_dir_info
+  
+  - block:
+    - name: create vg
+      shell: "vgcreate tidb /dev/{{ block_device }}"
+    - name: create lv
+      shell: "lvcreate -l 100%VG tidb -n data"
+    - name: format lvs
+      shell: mkfs.xfs /dev/tidb/data
+    - name: create tidb dir
+      file:
+        path: /mnt/tidb
+        state: directory
+    - name: mount tidb
+      mount:
+        src: /dev/mapper/tidb-data
+        path: /mnt/tidb
+        state: mounted
+        fstype: xfs
+        boot: True
+    - name: create pd dir
+      file:
+        path: /mnt/tidb/pd
+        state: directory
+    - name: create tikv dir
+      file:
+        path: /mnt/tidb/tikv
+        state: directory
+    when: data_dir_info.stat.exists == False or (data_dir_info.stat.exists == True and data_dir_info.stat.isdir == False)
+  when: inventory_hostname in groups["tidb"]
+
+- block:
+  - name: create pvs dir
+    file:
+      path: "{{ workdir }}/pvs"
+      state: directory
+  
+  - name: copy tidb local pv template
+    template:
+      src: tidb_local_pv.yaml.j2
+      dest: "{{ workdir }}/pvs/tidb_local_pv.yaml"
+  
+  - name: install local pv
+    shell: kubectl apply -f tidb_local_pv.yaml
+    args:
+      chdir: "{{ workdir }}/pvs"
+  when: inventory_hostname in groups["work_master"]  

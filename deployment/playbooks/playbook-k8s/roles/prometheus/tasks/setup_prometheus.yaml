@@ -1,0 +1,34 @@
+- name: copy prometheus charts
+  copy:
+    src: prometheus
+    dest: "{{ workdir }}"
+
+- name: install prometheus
+  community.kubernetes.helm:
+    chart_ref: "{{ workdir }}/prometheus"
+    release_name: prometheus
+    release_namespace: monitor
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      alertmanager:
+        image:
+          repository: "{{ prometheus.alertmanager.repository }}"
+      configmapReload:
+        prometheus:
+          image:
+            repository: "{{ prometheus.configmapReload.repository }}"
+        alertmanager:
+          image:
+            repository: "{{ prometheus.configmapReload.repository }}"
+      nodeExporter:
+        image:
+          repository: "{{ prometheus.nodeExporter.repository }}"
+      pushgateway:
+        image:
+          repository: "{{ prometheus.pushgateway.repository }}"
+      server:
+        image:
+          repository: "{{ prometheus.repository }}"
+        persistentVolume:
+          storageClass: "{{ prometheus.storage_class }}"

@@ -1,0 +1,5 @@
+[newer-rpm]
+name=newer-rpm
+baseurl=https://repo.ius.io/7/x86_64/
+gpgcheck=0
+enabled=1

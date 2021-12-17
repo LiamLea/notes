@@ -8,7 +8,7 @@ my_registry=harbor.test.com
 match_pattern="t1.harbor.com|t2.harbor.com"
 
 
-images=$(docker images | grep -vE ^$my_registry | awk 'NR!=1{print $1":"$2}')
+images=$(docker images | grep -vE ^$my_registry | grep -vE $match_pattern | awk 'NR!=1{print $1":"$2}')
 ## retag images and then push to my-registry
 for image in ${images}; do
   docker image tag ${image} ${my_registry}/${image}

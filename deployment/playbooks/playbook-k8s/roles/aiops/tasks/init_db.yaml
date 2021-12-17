@@ -1,0 +1,15 @@
+- name: copy db scripts
+  copy:
+    src: db_scripts
+    dest: "{{ workdir }}"
+
+- name: copy init scripts
+  template:
+    src: init.j2
+    dest: "{{ workdir }}/init.sh"
+    mode: 0777
+
+- name: init database
+  shell: /bin/bash init.sh
+  args:
+    chdir: "{{ workdir }}"

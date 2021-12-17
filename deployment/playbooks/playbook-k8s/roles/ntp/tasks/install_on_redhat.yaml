@@ -1,0 +1,11 @@
+- name: check nfs ntp installed
+  shell: rpm -qa | grep ntp
+  ignore_errors: True
+  register: ntp_installed
+
+- name: install ntp
+  yum:
+    name: ntp
+    state: present
+  when: ntp_installed.rc != 0
+

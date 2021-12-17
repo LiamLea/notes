@@ -1,0 +1,28 @@
+- name: create workdir
+  file:
+   path: "{{ workdir }}"
+   state: directory
+
+- name: copy grafana
+  copy:
+    src: grafana
+    dest: "{{ workdir }}"
+    force: no
+
+- name: create namespace
+  shell: kubectl create ns monitor
+  ignore_errors: True
+
+- name: install grafana
+  shell: kubectl apply -f grafana-deploy.yaml
+  args:
+    chdir: "{{ workdir }}/grafana"
+
+- name: copy grafana db
+  shell: "kubectl cp grafana.db `kubectl get pods -n monitor -l  app=grafanatest | awk 'NR!=1{print $1}'`:/var/lib/grafana -n monitor && kubectl rollout restart deploy/grafanatest -n monitor"
+  args:
+    chdir: "{{ workdir }}/grafana"
+  register: copy_status
+  until: copy_status.rc == 0
+  delay: 10
+  retries: 2

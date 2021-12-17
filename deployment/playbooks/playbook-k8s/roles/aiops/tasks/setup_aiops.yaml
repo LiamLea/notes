@@ -1,0 +1,17 @@
+- name: copy aiops charts
+  copy:
+    src: aiops
+    dest: "{{ workdir }}"
+
+- name: install aiops
+  community.kubernetes.helm:
+    chart_ref: "{{ workdir }}/aiops"
+    release_name: aiops
+    release_namespace: aiops
+    create_namespace: yes
+    atomic: no
+    release_values:
+      mysql:
+        db_name: "{{ aiops.database }}"
+      redis:
+        password: "{{ redis.password }}"

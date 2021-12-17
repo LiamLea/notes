@@ -1,0 +1,131 @@
+- name: create workdir
+  file:
+    path: "{{ workdir }}"
+    state: directory
+
+- name: copy basic charts
+  copy:
+    src: basic_charts
+    dest: "{{ workdir }}"
+    force: no
+#  unarchive:
+#    src: basic_charts.tar.gz
+#    dest: "{{ workdir }}"
+
+#install metrics-server
+- name: check metrcis-server
+  shell: a=`kubectl get pods -A -l app=metrics-server || echo 1`;if [ -z $a ];then exit 1;fi
+  register: metrics_server_installed
+  ignore_errors: True
+
+- name: install metrics-server
+  community.kubernetes.helm:
+    chart_ref: "{{ workdir }}/basic_charts/metrics-server"
+    release_name: metrics-server
+    release_namespace: kube-system
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image:
+        repository: "{{ metrics_server.repository }}"
+  when: metrics_server_installed.rc != 0 
+
+
+#install cert-manager
+- name: check cert-manager
+  shell: a=`kubectl get pods -A -l app=cert-manager || echo 1`;if [ -z $a ];then exit 1;fi
+  register: cert_manager_installed
+  ignore_errors: True
+
+- block:
+  - name: install cert-manager
+    community.kubernetes.helm:
+      chart_ref: "{{ workdir }}/basic_charts/cert-manager"
+      release_name: cert-manager
+      release_namespace: cert-manager
+      create_namespace: yes
+      atomic: yes
+      release_values:
+        image:
+          repository: "{{ cert_manager.controller.repository }}"
+        cainjector:
+          image:
+            repository: "{{ cert_manager.cainjector.repository }}"
+        webhook:
+          image:
+            repository: "{{ cert_manager.webhook.repository }}"
+
+  - name: copy pki
+    copy: 
+      src: pki
+      dest: "{{ workdir }}"
+  - name: create tls secret
+    shell: kubectl create secret tls ca-key-pair --cert=ca.crt --key=ca.key --namespace=cert-manager
+    args:
+      chdir: "{{ workdir }}/pki"
+  - name: create clusterIssuer
+    shell: kubectl apply -f issuer.yaml
+    args:
+      chdir: "{{ workdir }}/pki"
+    register: result
+    until: result.rc == 0
+    delay: 5
+    retries: 20
+  when: cert_manager_installed.rc != 0
+
+
+#install nginx-ingress
+- name: check nginx-ingress
+  shell: a=`kubectl get pods -A -l app=nginx-ingress || echo 1`;if [ -z $a ];then exit 1;fi
+  register: nginx_ingress_installed
+  ignore_errors: True
+
+- block:
+  - name: install nginx-ingress
+    community.kubernetes.helm:
+      chart_ref: "{{ workdir }}/basic_charts/nginx-ingress"
+      release_name: nginx-ingress
+      release_namespace: nginx-ingress
+      create_namespace: yes
+      atomic: yes
+      release_values:
+        controller:
+          image:
+            repository: "{{ nginx_ingress.controller.repository }}"
+        defaultBackend:
+          image:
+            repository: "{{ nginx_ingress.defaultBackend.repository }}"
+  when: nginx_ingress_installed.rc != 0
+
+
+#install nfs provisioner
+#- name: when nfs avaiable
+#  set_fact:
+#    nfs_server: "{{ nfs.server }}"
+#    nfs_path: "{{ nfs.path }}"
+#
+#- name: when nfs not avaiable
+#  set_fact:
+#    nfs_server: "{{ hostvars[groups['nfs'][0]]['ansible_host'] }}"
+#    nfs_path: "/"
+#  when: nfs.server == "" or nfs.path == ""
+#
+#- name: check nfs-provisioner
+#  shell: a=`kubectl get pods -A -l app=nfs-client-provisioner || echo 1`;if [ -z $a ];then exit 1;fi
+#  register: nfs_provisioner_installed
+#  ignore_errors: True
+#
+#- name: install nfs-provisioner
+#  community.kubernetes.helm:
+#    chart_ref: "{{ workdir }}/basic_charts/nfs-client-provisioner"
+#    release_name: nfs-client
+#    release_namespace: default
+#    create_namespace: yes
+#    atomic: yes
+#    release_values:
+#      image:
+#        repository: "{{ nfs_provisioner.repository }}"
+#      nfs:
+#        server: "{{ nfs_server }}"
+#        path: "{{ nfs_path }}"
+#  when: nfs_provisioner_installed.rc != 0

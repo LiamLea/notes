@@ -1,0 +1,2 @@
+docker:
+  insecure-registries: ["docker.repo.local:5000"]
