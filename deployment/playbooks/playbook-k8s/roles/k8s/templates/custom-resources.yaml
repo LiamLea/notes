@@ -15,3 +15,5 @@ spec:
       encapsulation: IPIPCrossSubnet
       natOutgoing: Enabled
       nodeSelector: all()
+  nodeAddressAutodetectionV4:
+    cirds: {{ calico.nodeAddressAutodetectionV4.cidrs | to_yaml }}

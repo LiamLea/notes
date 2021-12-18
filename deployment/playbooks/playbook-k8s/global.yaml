@@ -6,6 +6,10 @@ ntp:
   - ntp1.aliyun.com
   - 210.72.145.44
 
+dns:
+- 114.114.114.114
+- 8.8.8.8
+
 registry: 3.1.4.126
 
 kubernetes:
@@ -14,6 +18,9 @@ kubernetes:
 
 calico:
   repository: "{{ registry }}"
+  nodeAddressAutodetectionV4:
+    cidrs:
+    - "3.1.4.0/24"
 
 keepalived:
   id: 120
