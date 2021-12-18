@@ -7,7 +7,8 @@
   remote_user: <USER>
   gather_facts: <BOOLEAN>
   become: <BOOLEAN>             #是否利用sudo切换身份
-
+  become_method: sudo
+  become_flags: "-i"
   tasks:
   - name: <NAME>
     <MODULE>: ...

@@ -42,13 +42,18 @@ spec:
   #配置网络
   calicoNetwork:
 
-    #配置ip pools（可配置多个）
+    #配置ip pools（当比Kubeadm init指定的pod网段小，可以配置多个ippool）
     ipPools:
     - cidr: 10.244.0.0/16   #classless inter-domain routing，无类别域间路由（即kubeadm init时，设置的pod的cidr）
       blockSize: 26         #将一个ip pool分为多个更小的block（每个block的网段长度）
       encapsulation: VXLANCrossSubnet   #VXLAN、IPIP（需要开启bgp）、IPIPCrossSubnet
       natOutgoing: <bool | default=Enabled>    #访问集群外的地址会进行snat，将pod的ip转换为node的ip
       nodeSelector: all()    #指定该ip pool用于哪些node
+
+    #用于自动发现calico绑定的网卡（一定要设置，不然默认随机）
+    nodeAddressAutodetectionV4:
+      cidrs:
+      - "3.1.4.241/24"
 
     #默认是Enabled
     #关闭后，路由条目不是通过bgp协议更新了，而是通过数据存储中获取

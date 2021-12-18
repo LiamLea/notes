@@ -7,7 +7,7 @@
   when: ansible_distribution_file_variety == "RedHat"
 
 - name: time sync
-  include_role: 
+  include_role:
     name: ntp
 
 - name: set hostname
@@ -21,6 +21,11 @@
     owner: root
     group: root
     mode: 0644
+
+- name: config  dns
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
 
 - name: turn off swap
   shell: swapoff -a;sed -ri 's/(^[^[:space:]#]+\s+\S+\s+swap\s+)/#\1/' /etc/fstab
