@@ -28,7 +28,7 @@
 
 ##### （2）calico-node pod中的组件
 
-* flelix
+* felix
   * 网卡管理
   * 路由管理
   * ACL管理

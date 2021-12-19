@@ -28,6 +28,13 @@ spec:
 ```
 
 #### 2.Installation
+
+**注意**：
+* 当已经安装了，然后修改相关配置后，需要考虑影响，从而做相关操作（比如删除网卡或重启网络）
+
+* 有些配置在这里改不会生效，需要修改其他文件（比如切换隧道模式，要修改FelixConfiguration）
+
+
 ```yaml
 apiVersion: operator.tigera.io/v1
 kind: Installation
@@ -50,10 +57,10 @@ spec:
       natOutgoing: <bool | default=Enabled>    #访问集群外的地址会进行snat，将pod的ip转换为node的ip
       nodeSelector: all()    #指定该ip pool用于哪些node
 
-    #用于自动发现calico绑定的网卡（一定要设置，不然默认随机）
+    #配置如何发现 用于路由的ip（一定要指定，否则默认随机，可能选到其他的ip）
     nodeAddressAutodetectionV4:
       cidrs:
-      - "3.1.4.241/24"
+      - "3.1.4.0/24"
 
     #默认是Enabled
     #关闭后，路由条目不是通过bgp协议更新了，而是通过数据存储中获取

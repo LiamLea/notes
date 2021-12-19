@@ -12,8 +12,8 @@ spec:
     ipPools:
     - blockSize: 26
       cidr: 10.244.0.0/16
-      encapsulation: IPIPCrossSubnet
+      encapsulation: {{ calico.encapsulation }}
       natOutgoing: Enabled
       nodeSelector: all()
-  nodeAddressAutodetectionV4:
-    cirds: {{ calico.nodeAddressAutodetectionV4.cidrs | to_yaml }}
+    nodeAddressAutodetectionV4:
+      cidrs: {{ calico.nodeAddressAutodetectionV4.cidrs | to_yaml }}

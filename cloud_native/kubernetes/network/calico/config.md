@@ -2,6 +2,18 @@
 
 [toc]
 
+### calicoctl
+
+有些是能够通过kubectl查看的，有些是不能的（安装了calico的apiserver就都可以了）
+#### 1.查看pod的网卡信息
+```shell
+./calicoctl get WorkloadEndpoint -A
+./calicoctl get WorkloadEndpoint -n kube-system -o yaml
+./calicoctl get node -o yaml
+```
+
+***
+
 ### 配置bgp
 
 #### 1.默认配置
@@ -72,4 +84,35 @@ protocol bgp Node_3_1_4_254 from bgp_template {
   source address 3.1.4.114;  # The local address we use for the TCP connection
 }
 
+```
+
+***
+
+### 配置Felix
+
+#### 1.FelixConfiguration配置文件
+* 比如切换隧道模式，需要修改这个文件（同时也要修改installtion配置）
+
+```shell
+kubectl edit FelixConfiguration default
+```
+```yaml
+apiVersion: crd.projectcalico.org/v1
+kind: FelixConfiguration
+metadata:
+  name: default
+spec:
+  ipipEnabled: true
+```
+
+***
+
+### 配置calico-node
+
+#### 1.配置用于路由的ip
+直接指定ip，不通过自动发现（nodeAddressAutodetectionV4）
+
+```shell
+calicoctl patch node <node_name> \
+  --patch='{"spec":{"bgp": {"ipv4Address": "10.0.3.127/24"}}}'
 ```

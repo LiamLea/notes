@@ -18,6 +18,7 @@ kubernetes:
 
 calico:
   repository: "{{ registry }}"
+  encapsulation: IPIP
   nodeAddressAutodetectionV4:
     cidrs:
     - "3.1.4.0/24"
