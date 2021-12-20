@@ -1,3 +1,0 @@
-#!/bin/basg
-
-a= "as"
