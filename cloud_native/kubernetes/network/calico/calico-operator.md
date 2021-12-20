@@ -32,7 +32,7 @@ spec:
 **注意**：
 * 当已经安装了，然后修改相关配置后，需要考虑影响，从而做相关操作（比如删除网卡或重启网络）
 
-* 有些配置在这里改不会生效，需要修改其他文件（比如切换隧道模式，要修改FelixConfiguration）
+* 有些配置在这里改不会生效，需要修改其他文件（比如切换隧道模式，要修改ippool）
 
 
 ```yaml
@@ -50,10 +50,11 @@ spec:
   calicoNetwork:
 
     #配置ip pools（当比Kubeadm init指定的pod网段小，可以配置多个ippool）
+    #每个ippool都需要指定隧道模式（不同的ippool可以用不同的隧道模式）
     ipPools:
     - cidr: 10.244.0.0/16   #classless inter-domain routing，无类别域间路由（即kubeadm init时，设置的pod的cidr）
       blockSize: 26         #将一个ip pool分为多个更小的block（每个block的网段长度）
-      encapsulation: VXLANCrossSubnet   #VXLAN、IPIP（需要开启bgp）、IPIPCrossSubnet
+      encapsulation: IPIP   #VXLAN、IPIP（需要开启bgp）、IPIPCrossSubnet
       natOutgoing: <bool | default=Enabled>    #访问集群外的地址会进行snat，将pod的ip转换为node的ip
       nodeSelector: all()    #指定该ip pool用于哪些node
 
@@ -64,7 +65,7 @@ spec:
 
     #默认是Enabled
     #关闭后，路由条目不是通过bgp协议更新了，而是通过数据存储中获取
-    bgp: Disabled
+    bgp: Enabled
 
     #配置mtu的值
     mtu: <int>    #不设置的话，默认calico会执行mtu自动检测，设置合适的值

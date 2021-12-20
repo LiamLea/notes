@@ -91,7 +91,6 @@ protocol bgp Node_3_1_4_254 from bgp_template {
 ### 配置Felix
 
 #### 1.FelixConfiguration配置文件
-* 比如切换隧道模式，需要修改这个文件（同时也要修改installtion配置）
 
 ```shell
 kubectl edit FelixConfiguration default
@@ -102,7 +101,7 @@ kind: FelixConfiguration
 metadata:
   name: default
 spec:
-  ipipEnabled: true
+  ...
 ```
 
 ***

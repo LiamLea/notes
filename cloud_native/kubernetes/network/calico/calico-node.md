@@ -20,6 +20,7 @@ calico-node容器运行在每个node上，用于提供网络能力
 
 ##### （1）ip pool相关配置
 ```shell
+#当新创建ippool时，隧道模式用这里配置的
 #这两个只能启用其中一个，有三种值：Always, CrossSubnet, Never
 CALICO_IPV4POOL_IPIP    #默认Always
 CALICO_IPV4POOL_VXLAN   #默认Never
