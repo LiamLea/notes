@@ -260,6 +260,7 @@ ethtool --offload flannel.1 rx off tx off
 ##### （1）需要清空原先网络插件的配置
 * `rm -rf /etc/cni/net.d`
 * `ip link delete <INTERFACE>`
+  * ipip tunnel需要这样删除：`rmmod ipip`
 * `systemctl restart network`
 
 ##### （2）安装新的网络插件
