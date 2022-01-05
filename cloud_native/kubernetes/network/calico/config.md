@@ -9,7 +9,12 @@
 ```shell
 ./calicoctl get WorkloadEndpoint -A
 ./calicoctl get WorkloadEndpoint -n kube-system -o yaml
+```
+
+##### 2.查看用于路由的ip
+```shell
 ./calicoctl get node -o yaml
+#bgp.ipv4Address字段
 ```
 
 ***
@@ -114,4 +119,5 @@ spec:
 ```shell
 calicoctl patch node <node_name> \
   --patch='{"spec":{"bgp": {"ipv4Address": "10.0.3.127/24"}}}'
+#修改bgp.ipv4Address后，addresses.CalicoNodeIP也会跟着修改
 ```

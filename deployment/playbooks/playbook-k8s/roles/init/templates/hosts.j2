@@ -1,7 +1,9 @@
-127.0.0.1 localhost
 {% for host in groups['all'] %}
 {{ hostvars[host]['ansible_host'] }} {{ host }}
 {% endfor %}
 {% if groups["registry"] %}
 {{ hostvars[groups["registry"][0]]["ansible_host"] }} {{ hostvars[groups["registry"][0]]["registry_host"] }}
 {% endif %}
+{% for host in hosts %}
+{{ host["ip"] }} {{ host["hostname"] | join(" ") }}
+{% endfor %}

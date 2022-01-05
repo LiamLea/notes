@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := run
 
-ansible_image = docker.repo.local:5000/ansible:2.10
+ansible_image = bongli/ansible:2.10
 ansible_dir = $(shell pwd)
 
 .PHONY := docker
