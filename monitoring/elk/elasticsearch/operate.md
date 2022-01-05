@@ -145,18 +145,16 @@ curl -H "Content-Type: application/json" \
 }
 ```
 
+#### 3.集群相关
 
-#### 3.节点相关
-##### （1）查看单个节点状态
+##### (1) 查看集群状态
 ```shell
-curl IP:PORT/_cat/health
+curl IP:PORT/_cluster/health?pretty
+
 #查看分片的状态
 curl IP:PORT/_cat/shards
-```
 
-#### 4.集群相关
-###### （1）查看集群状态
-```shell
+#查看index
 curl IP:PORT/_cluster/health?level=indices
 ```
 
