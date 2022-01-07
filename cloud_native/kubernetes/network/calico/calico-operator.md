@@ -11,6 +11,8 @@
 
 ### operator配置
 
+[参考](https://projectcalico.docs.tigera.io/reference/installation/api)
+
 #### 1.ImageSet
 指定使用的镜像（用默认的就行）
 ```yaml
