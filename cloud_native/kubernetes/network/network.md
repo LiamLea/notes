@@ -44,6 +44,12 @@ echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
 ##### （4）node-to-node 网络
 本身就需要能够通信
 
+##### （5）outside-to-service/pod
+会对非cluster-cidr的源地址进行masquerade，然后就相当于node-to-service/pod
+
+##### （6）pod-to-outside
+会对源地址进行masquerade
+
 #### 3.实现cross-node pods的通信方式
 
 |方式|特点|优点|缺点|

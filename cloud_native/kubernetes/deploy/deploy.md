@@ -107,6 +107,10 @@ kubeadm init --control-plane-endpoint=<VIP_OR_DNS>:<PORT> \
 #control-plane-endpoint是kubelet等组件访问apiserver的访问点
 #所以要实现服务的高可用，这个endpoint需要是个vip，不然无法实现高可用
 
+#--pod-network-cidr=10.244.0.0/16，用于设置kube-proxy中的pod的cidr
+#这个不会影响pod的地址（影响pod的地址的是网络插件）
+#但是这个会影响iptables的相关配置，所以网络插件设置的pod的cidr必须和这里一致
+
 #还有其他设置：
 #  --service-dns-domain=cluster.local
 # ...
@@ -143,19 +147,27 @@ containerLogMaxSize: 10Mi
 containerLogMaxFiles: 5
 ```
 
-#### 7.安装网络插件
-**注意**：
-* 安装后需要通过`ip r`去**检查路由**（因为可能pod网络不通，也不报错）
-* 使用**calico**时，一定要**指定网卡**（具体参考calico的自动发现网卡配置）
+#### 7.安装calico（注意版本）
 
 参考官网的安装步骤
 
-**注意要修改pod cidr同上面我们设置的**
-```shell
-wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-vim kube-flannel.yml
-kubectl apply -f kube-flannel.yml  
-```
+##### （1）注意版本
+* 不同的calico版本，只在**指定k8s版本**和**指定操作系统**上测试过
+  * 所以安装前，需要确认k8s版本，然后安装合适的calico版本
+[参考](https://projectcalico.docs.tigera.io/getting-started/kubernetes/requirements)
+* 不同的calico版本，配置也有所区别
+
+
+##### （2）指定网卡
+* 使用**calico**时，一定要**指定网卡**（具体参考calico的自动发现网卡配置）
+
+##### （3）pod的cidr
+* 这里设置的pod的cidr 必须跟 **kube-proxy中的cluster-cidr** **一致**
+  * 网络插件这里设置的pod的cidr影响的是pod的地址
+  * kube-proxy设置的pod的cidr影响的是iptables规则
+
+##### （4）验证是否可用
+* 安装后需要通过`ip r`去**检查路由**（因为可能pod网络不通，也不报错）
 
 #### 8.添加node节点
 
