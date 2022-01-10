@@ -211,7 +211,10 @@ kubeadm reset
 
 #该节点要清理干净的话：
 rm -rf /etc/cni/net.d
+iptables -t nat -F
+iptables -t mangle -F
 iptables -F
+iptables -X
 ipvsadm --clear
 rm -rf $HOME/.kube/config
 

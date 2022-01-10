@@ -2,16 +2,35 @@
 
 [toc]
 
-### 备份
+### etcdctl命令格式
+
+**下面用到etcdtl都简写了**
+
+```shell
+docker run --rm -it \
+  --network host -v /etc/kubernetes:/etc/kubernetes -v /var/lib:/var/lib -e ETCDCTL_API=3  \
+  <image> \
+  etcdctl --endpoints="127.0.0.1:2379"  --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/peer.crt  --key=/etc/kubernetes/pki/etcd/peer.key \
+  <command>
+```
+
+***
+
+### 备份数据
 
 #### 1.备份etcd数据
 ```shell
-etcdtl <connect_to_etcd> snapshot save <backup_file>
+
+docker run --rm -it \
+  --network host -v /etc/kubernetes:/etc/kubernetes -v /var/lib:/var/lib -e ETCDCTL_API=3  \
+  <image> \
+  etcdctl --endpoints="127.0.0.1:2379"  --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/peer.crt  --key=/etc/kubernetes/pki/etcd/peer.key \
+  snapshot save /var/lib/etcd.bak
 
 #查看备份文件的状态：etcdctl snapshot status <back_file>
 ```
 
-#### 2.备份kubeadm-config配置文件
+#### 2.备份kubeadm-config配置文件（如果从0恢复最好备份）
 如果没有备份，可以通过先恢复etcd数据，然后获取kubeadm-config配置文件的内容
 ```shell
 kubectl get cm -n kube-system kubeadm-config -o yaml > /tmp/kubeadm-config.yaml
@@ -19,34 +38,117 @@ kubectl get cm -n kube-system kubeadm-config -o yaml > /tmp/kubeadm-config.yaml
 
 ***
 
-### 恢复master
+### 在现有集群上进行恢复
 
-**注意**：如果有多个master，恢复其中一个（并且修改etcd的member的peer address，参考恢复etcd集群数据），然后其他master重置，重新加入就行了
+* master需要按照一定的顺序恢复
 
-#### 1.重置master（不是必须，如果原先的master只是数据需要恢复，这步可以不执行）
+|顺序|如何判断|
+|-|-|
+|第一个master|查看etcd的manifests文件，没有`--initial-cluster-state=existing`这个参数|
+|第二个master|查看etcd的manifests文件，`--initial-cluster=master-1=https://3.1.4.121:2380,master-3=https://3.1.4.123:2380`，包含第一个master|
+|第三个master|查看etcd的manifests文件，`--initial-cluster=master-1=https://3.1.4.121:2380,master-2=https://3.1.4.122:2380,master-3=https://3.1.4.123:2380`，包含第一个和第二个master|
+|第n个master|依次类推|
+
+* 注意下面是https协议，不是http协议
+
+#### 1.其他master需要停止
+* 在其他master上执行（除了第一个master）
 ```shell
-kubeadm reset
-
-#根据上面的kubeadm-config中的ClusterStatus，设置<FLAGS>
-#删除Kubeadm-config中内容，只留下ClusterConfiguration的内容
-kubeadm init <FLAGS> --config /tmp/kubeadm-config.yaml
-
-scp /etc/kubernetes/admin.conf ~/.kube/config
-#查看：kubectl get nodes
+systemctl stop kubelet
+systemctl stop docker
+rm -rf /var/lib/etcd
 ```
 
-#### 2.恢复etcd数据（重要）
+#### 2.恢复第一个master
+init节点（指定的是初始化节点，即etcd的manifests中没有`--initial-cluster-state=existing`这个参数）
+
+##### （1）恢复etcd数据
 
 ```shell
-rm -rf /var/lib/etcd/
-etcdctl snapshot restore <backup_file> --data-dir=/var/lib/etcd/
+#暂停etcd并删除数据
+systemctl stop kubelet
+docker stop <etcd_container>
+rm -rf /var/lib/etcd
 
-#验证：
-#   kubectl get nodes
-#刚开始node都是ready状态，因为etcd保存的状态都是ready，所以需要等一会，等node状态更新
+#恢复数据
+etcdctl snapshot restore /var/lib/etcd.bak --data-dir=/var/lib/etcd/
+
+#重启etcd
+systemctl restart kubelet
+
+#修改etcd的member（因为恢复后，member信息会发生变化，需要修改）
+etcdctl member list
+#输出：8e9e05c52164694d, started, master-3, http://localhost:2380, https://3.1.4.123:2379
+etcdctl member update 8e9e05c52164694d --peer-urls=https://3.1.4.123:2380
 ```
 
-#### 3.修改etcd中的旧数据
+##### （2）验证
+```shell
+etcdctl member list
+kubectl get nodes
+```
+
+#### 3.恢复第二个master
+
+##### （1）需要在etcd中添加member
+```shell
+etcdctl member add master-1 --peer-urls=https://3.1.4.121:2380
+```
+* 注意：执行这条命令后，etcd可能会报错，导致apiserver不可用，不用管，等启动第二个etcd就好了
+
+##### （2）重启服务
+```shell
+rm -rf /var/lib/etcd
+systemctl restart docker
+systemctl restart kubelet
+```
+
+#### 4.按顺序恢复其他master
+参照恢复第二个master的步骤
+
+#### 5.node节点不需要做任何操作
+
+***
+
+### 从0恢复
+
+#### 1.初始换第一个master
+
+##### （1）选择其中一个master，进行初始化
+```shell
+kubeadm init --config kubeadm.conf
+#kubeadm.conf这个文件是 kubeadm-config这个configmap中的ClusterConfiguration内容
+#如果没有备份kubeadm-config，可以先随便kubeadm init，然后恢复etcd的数据，然后获取其配置
+```
+
+##### （2）恢复etcd数据
+
+```shell
+#暂停etcd并删除数据
+systemctl stop kubelet
+docker stop <etcd_container>
+rm -rf /var/lib/etcd
+
+#恢复数据
+etcdctl snapshot restore /var/lib/etcd.bak --data-dir=/var/lib/etcd/
+
+#重启etcd
+systemctl restart kubelet
+
+#修改etcd的member（因为恢复后，member信息会发生变化，需要修改）
+etcdctl member list
+#输出：8e9e05c52164694d, started, master-1, http://localhost:2380, https://3.1.4.121:2379
+etcdctl member update 8e9e05c52164694d --peer-urls=https://3.1.4.121:2380
+```
+
+##### （3）验证
+```shell
+etcdctl member list
+kubectl get nodes
+```
+
+#### 2.修改旧数据
+
 ##### （1）cluster-info中的ca证书
 ```shell
 cat /etc/kubernetes/pki/ca.crt | base64 -w 0
@@ -55,27 +157,40 @@ cat /etc/kubernetes/pki/ca.crt | base64 -w 0
 kubectl edit cm cluster-info -n kube-public
 ```
 
-***
+##### （2）kubeadm-coonfig中的ClusterStatus
+```shell
+kubectl edit cm -n kube-system kubeadm-config
+#修改ClusterStatus中的内容，将其他master信息删除，只保留初始化的这个master信息
+```
 
-### 恢复node
+#### 3.添加其他master节点
 
-#### 1.在master上执行
+##### （1）获取加入命令
 ```shell
 kubeadm token create --print-join-command
-#kubeadm join 3.1.5.15:6443 --token frukt8.gq7efeghzgdyvgel     --discovery-token-ca-cert-hash sha256:35dab95442124ab06306becb0531907b37267a6029441c3fe0b59a485155c963
+kubeadm init phase upload-certs --upload-certs
 ```
 
-#### 2.恢复node
-##### （1）方式一：不重置node，即正在运行的pod不会受到影响
+##### （2）加入该集群
 ```shell
-rm -rf /etc/kubernetes/pki /var/lib/kubelet/pki
-kubeadm join phase kubelet-start ...
+kubeadm join xx --token xx --discovery-token-ca-cert-hash xx \
+                --control-plane --certificate-key xx \
+                --apiserver-advertise-address=<IP> \
+                --apiserver-bind-port=<PORT> -v=5
+
+mkdir -p $HOME/.kube
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
-##### （2）方式二：重置node节点
-```shell
-kubeadm reset
+#### 4.加入node
 
-#join时kubeadm的配置是从kubeadm-config这个configmap中获取的
-kubeadm join ...
+##### （1）获取token用于加入该集群（在初始化节点上执行）
+```shell
+kubeadm token create --print-join-command
+```
+
+##### （2）加入该集群
+```shell
+#这个命令来自上面的结果
+kubeadm join ...			
 ```

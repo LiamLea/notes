@@ -1,3 +1,7 @@
+# etcd
+
+[toc]
+
 ### 集群概述
 
 #### 1.集群节点必须是奇数个
@@ -10,8 +14,12 @@
 
 ### 集群搭建
 
+需要注意的内容：
+* `--initial-cluster-state=existing`
+* 注意协议是http还是https
 #### 1.启动第一个etcd
 ```shell
+#注意第一个节点，一定不能加这个参数：--initial-cluster-state=existing
 ./etcd  \
         #基础配置
         --name=<NAME> \    #该节点的名称，随便取,，默认用主机名
