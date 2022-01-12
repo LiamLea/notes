@@ -158,6 +158,15 @@ ceph osd utilization
 
 ***
 
+### 权限相关
+
+#### 1.列出所有账号、密码和权限
+```shell
+ceph auth ls
+```
+
+***
+
 ### debug
 
 #### 1.查看集群状态和原因
