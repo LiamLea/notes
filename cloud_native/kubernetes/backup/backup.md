@@ -20,12 +20,7 @@ docker run --rm -it \
 
 #### 1.备份etcd数据
 ```shell
-
-docker run --rm -it \
-  --network host -v /etc/kubernetes:/etc/kubernetes -v /var/lib:/var/lib -e ETCDCTL_API=3  \
-  <image> \
-  etcdctl --endpoints="127.0.0.1:2379"  --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/peer.crt  --key=/etc/kubernetes/pki/etcd/peer.key \
-  snapshot save /var/lib/etcd.bak
+etcdctl snapshot save /var/lib/etcd.bak
 
 #查看备份文件的状态：etcdctl snapshot status <back_file>
 ```
