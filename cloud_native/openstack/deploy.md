@@ -22,6 +22,7 @@
 * kolla-ansible版本
 * openstack版本
 * 操作系统版本
+  * 需要根据openstack版本确定（[参考安装文档](https://docs.openstack.org/kolla-ansible/train/user/support-matrix)）
   * 建议选择ubuntu系统进行安装，因为选择centos时，容易出现一些包的错误
 * 每个版本之间都有依赖关系，比如特定kolla-ansible版本只能部署特定的openstack版本，特定的openstack版本只能装在特定的操作系统上
 [参考](https://docs.openstack.org/releasenotes/kolla-ansible/)

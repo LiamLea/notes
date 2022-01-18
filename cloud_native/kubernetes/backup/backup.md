@@ -35,7 +35,7 @@ kubectl get cm -n kube-system kubeadm-config -o yaml > /tmp/kubeadm-config.yaml
 
 ### 在现有集群上进行恢复
 
-* master需要按照一定的顺序恢复
+* master需要**按照一定的顺序恢复**
 
 |顺序|如何判断|
 |-|-|

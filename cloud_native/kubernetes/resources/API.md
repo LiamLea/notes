@@ -19,7 +19,7 @@
 
 #### 1.在top-level分类
 
-##### （1）核心组
+##### （1）核心组（没有group name）
 * 由于历史原因，核心组没有按照`/apis/<GROUP_NAME>/<VERSION>`这样的格式
 `/api/v1`
 
@@ -32,13 +32,13 @@
 
 #### 2.有三类api version
 
-##### （1）alpha
+##### （1）Alpha (experimental)
 未来可能丢弃这个api（比如`v1alpha1`）
 
-##### （2）beta
+##### （2）Beta (pre-release)
 该api在测试阶段，未来可能发生改变（比如`v2beta3`）
 
-##### （3）stable
+##### （3）	GA (generally available, stable)
 该api是稳定的（比如`v1`）
 
 #### 3.扩展api的两种方式
