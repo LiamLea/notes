@@ -32,13 +32,15 @@
 
 ##### （2）version skew
 [参考](https://kubernetes.io/releases/version-skew-policy/)
-比如master-1的apiserver版本是1.22，那么master-2的apiserver的版本只能是1.21、1.22或者1.23，最多只能差一个minor version
+比如在一个k8s集群中，最新的apiserver版本是1.22，那么其他的apiserver的版本只能是1.21或1.22，最多只能差一个minor version
 * 目的：能够实现k8s的**滚动升级**
   * 所以，升级时，不能跨越多个minor version
 
 
 #### 3.升级后的影响
 * 所有pods都会重启，因为container spec的hash值变了
+* 一些API会被弃用
+  * [弃用api查询](https://kubernetes.io/docs/reference/using-api/deprecation-guide/)
 
 ***
 
