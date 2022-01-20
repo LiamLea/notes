@@ -29,3 +29,15 @@
 
 ##### （3）Core layer（核心层）
 网络骨干网，负责传输大量流量
+
+#### 3.session相关概念
+
+##### (1) session endpoint
+ip:port
+
+##### (2) session
+一对session endpoints组成session
+
+##### (3) session direction
+对于TCP，根据SYN判断
+对于UDP，根据谁发送第一个数据包判断

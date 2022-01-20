@@ -16,6 +16,7 @@
 #### 2.解决nat的问题
 
 ##### （1）解决问题1：NAT traversal
+下面只是某一种NAT traversal
 tunnel封装后，用udp再封装一层，到了endpoint后，先解封装，然后处理tunnel的封装
 
 ##### （2）解决问题2：passthrough
