@@ -64,6 +64,8 @@ reboot
 ##### （1）安装ansible所需依赖
 ```shell
 yum -y install python3-devel libffi-devel gcc openssl-devel python3-libselinux
+
+#apt-get -y install python-dev libffi-dev gcc libssl-dev python-selinux python-setuptools python3-venv
 ```
 
 ##### （2）在虚拟环境中安装python包依赖
@@ -90,10 +92,11 @@ forks=100
 ```shell
 mkdir -p /etc/kolla
 cp -r /root/kolla-env/share/kolla-ansible/etc_examples/kolla/* /etc/kolla
+
+mkdir /root/kolla-deployment
+cd /root/kolla-deployment
 cp /root/kolla-env/share/kolla-ansible/ansible/inventory/* ./
 ```
-
-
 
 #### 4.配置清单文件（@ansible）
 ```shell
@@ -170,6 +173,10 @@ enable_cinder: "yes"
 #  设置hypervisor类型（默认为：kvm）
 #  当openstack安装在虚拟机上时，这里用qemu，用kvm会有问题
 nova_compute_virt_type: "kvm"
+
+#glance配置
+glance_backend_ceph: "yes"
+glance_backend_file: "no"
 ```
 
 #### 7.使用ceph
@@ -280,4 +287,24 @@ openstack router add subnet demo-router demo-subnet
 #在demo-router路由器上创建一个端口，并将该端口加入到外部网络的子网中
 #该端口的地址 就是 该子网中可分配地址的随机一个
 openstack router set --external-gateway public1 demo-router
+```
+
+***
+
+### 添加节点
+
+#### 1.添加controller
+
+```shell
+kolla-ansible -i ./multinode bootstrap-servers --limit control
+kolla-ansible -i ./multinode pull --limit <new_host>
+kolla-ansible -i ./multinode deploy --limit control
+```
+
+#### 2.添加compute
+
+```shell
+kolla-ansible -i ./multinode bootstrap-servers --limit <new_host>
+kolla-ansible -i ./multinode pull --limit <new_host>
+kolla-ansible -i ./multinode deploy --limit <new_host>
 ```

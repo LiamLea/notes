@@ -13,3 +13,28 @@ iface ens33 inet static
 ```
 
 * 重启服务：`systemctl restart networking`
+
+#### 2.安装一些基础软件
+```shell
+apt-get -y install vim sudo curl gnupg software-properties-common
+```
+
+#### 3.修改易用配置
+
+* 修改vim配置
+
+```shell
+find / -iname defaults.vim
+
+#修改找出来的文件
+vim defaults.vim
+#set mouse-=a
+```
+
+* 修改bash配置
+```shell
+$ vim /etc/bash.bashrc
+
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+```
