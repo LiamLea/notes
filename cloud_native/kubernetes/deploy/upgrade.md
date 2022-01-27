@@ -42,6 +42,17 @@
 * 一些API会被弃用
   * [弃用api查询](https://kubernetes.io/docs/reference/using-api/deprecation-guide/)
 
+#### 4.升级的主要步骤
+
+* 升级控制平面
+  * etcd (all instances)
+  * kube-apiserver (all control plane hosts)
+  * kube-controller-manager
+  * kube-scheduler
+* 升级其他节点
+* 升级客户端kubectl
+* 根据新版本的API变化，调整manifests和其他资源
+
 ***
 
 ### upgrade

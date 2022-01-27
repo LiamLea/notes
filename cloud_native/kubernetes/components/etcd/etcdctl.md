@@ -10,6 +10,28 @@
 export ETCDCTL_API=3
 ```
 
+* v2 api只能操作etcd v2 data
+[etcdctl v2](https://chromium.googlesource.com/external/github.com/coreos/etcd/+/HEAD/etcdctl/READMEv2.md)
+
+```shell
+docker run --rm -it \
+--network host -v /etc/kubernetes:/etc/kubernetes -v /var/lib:/var/lib -e ETCDCTL_API=2 \
+<image> \
+etcdctl --endpoints="https://127.0.0.1:2379"  --ca-file=/etc/kubernetes/pki/etcd/ca.crt --cert-file=/etc/kubernetes/pki/etcd/peer.crt  --key-file=/etc/kubernetes/pki/etcd/peer.key \
+ls --recursive
+```
+
+* v3 api只能操作etcd v3 data
+
+```shell
+docker run --rm -it \
+  --network host -v /etc/kubernetes:/etc/kubernetes -v /var/lib:/var/lib -e ETCDCTL_API=3  \
+  <image> \
+  etcdctl --endpoints="127.0.0.1:2379"  --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/peer.crt  --key=/etc/kubernetes/pki/etcd/peer.key \
+  <command>
+```
+
+
 #### 2.基础命令
 ```shell
 etcdctl --version
@@ -30,7 +52,7 @@ etcdctl put <KEY> <VALUE>
 
 * 查询所有key和值
 ```shell
-etcdctl get --prefix ""
+etcdctl get "" --prefix
 ```
 
 * 读取key和其对应的值
@@ -56,19 +78,19 @@ etcdctl get foo foo3
 
 * 按前缀读取
 ```shell
-etcdctl get --prefix <PREFIX>
+etcdctl get <key> --prefix
 ```
 
 * 读取大于等于key的
 ```shell
 #会读取大于等于bc的key（比如：bd、dxx、exx等）
-etcdctl get --from-key bc
+etcdctl get bc --from-key
 ```
 
 * 访问 指定版本 的 指定key
 ```shell
 #<NUM>为版本号，0表示最新版本（1表示最旧版本，数字越大，版本越新）
-etcdctl get --rev=<NUM> --prefix <PREFIX>
+etcdctl get <key> --rev=<NUM> --prefix
 ```
 
 *  查询现在是哪个版本
@@ -157,7 +179,8 @@ etcdctl lock <LOCK,名字随便取> <COMMAND>
 --key=/etc/kubernetes/pki/etcd/peer.key
 ```
 
-#### 11.快照相关（能够保存、恢复 某个时间点的状态）
+#### 11.快照相关（只能用于v3数据）
+能够保存、恢复 某个时间点的状态
 
 * 生成快照（保存当前状态，需要能够连接etcd服务器）
 ```shell
@@ -175,7 +198,21 @@ etcdctl snapshot status test.db
 etcdctl snapshot restore test.db --data-dir=<DIR>
 ```
 
-#### 11.集群有关
+* 恢复集群
+恢复集群的部分参考k8s的backup
+
+#### 12.备份v2数据（同时也能备份v3数据）
+```shell
+ETCDCTL_API=2 etcdctl backup --data-dir /var/lib/etcd/ --backup-dir /backupdir
+```
+
+* 恢复
+将备份的数据移动到具体目录下
+
+* 恢复集群
+恢复集群的部分参考k8s的backup
+
+#### 13.集群有关
 
 ##### （1）查询集群信息
 
