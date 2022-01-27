@@ -27,3 +27,16 @@
 ```shell
 vim /etc/kubernetes/manifests/kube-apiserver.yaml
 ```
+
+#### 3.关于etcd的配置
+```shell
+--etcd-servers <stringSlice>
+--etcd-cafile <string>
+--etcd-certfile <string>
+--etcd-keyfile <string>
+
+--etcd-prefix <string | default: "/registry">
+
+#默认使用的etcd v3 data存储格式，也可以设置成etcd2
+--storage-backend <string | default: "etcd3">
+```

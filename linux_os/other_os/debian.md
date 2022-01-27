@@ -16,7 +16,7 @@ iface ens33 inet static
 
 #### 2.安装一些基础软件
 ```shell
-apt-get -y install vim sudo curl gnupg software-properties-common
+apt-get -y install vim sudo curl gnupg software-properties-common sshpass parted
 ```
 
 #### 3.修改易用配置

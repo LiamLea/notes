@@ -137,6 +137,16 @@ kolla-genpwd
 ```
 
 #### 6.配置：`/etc/kolla/globals.yml`
+
+* 注意：当不同主机的变量不一样时（比如网卡名不一样），需要 **注释** `globals.yaml`中的配置，然后在inventory配置相应的变量
+  * 比如：
+  ```shell
+  [control]
+  host-2 ... network_interface=enp2s0
+
+  [network]
+  host-1 ... network_interface=enp5s0
+  ```
 ```yaml
 #  设置镜像，下面的这些配置决定了镜像的名称：kolla/ubuntu-source-xx:train
 kolla_base_distro: "ubuntu"
@@ -146,10 +156,10 @@ kolla_install_type: "source"
 #openstack_tag: "{{ openstack_release ~ openstack_tag_suffix }}"
 #openstack_tag_suffix: "{{ '' if base_distro != 'centos' or ansible_distribution_major_version == '7' else  '-centos8' }}"
 
-#  配置加速镜像源，安装docker时进行配置
-docker_custom_config:
-  registry-mirrors:
-  - http://registry.docker-cn.com
+#  配置加速镜像源，安装docker时进行配置（下面这个地址比较慢，不用添加）
+# docker_custom_config:
+#  registry-mirrors:
+#  - http://registry.docker-cn.com
 
 #  指定私有仓库
 docker_registry: xx
@@ -181,8 +191,8 @@ glance_backend_file: "no"
 
 #### 7.使用ceph
 
-注意：ceph osd数量**至少是两个**，否则ceph无法使用，导致相关服务无法使用
-
+注意：ceph osd数量**至少是3个**，因为pool的默认副本数为3，如果osd数量小于3，会导致ceph不可用
+如果要修改ceph的配置（比如默认的副本数等），[参考这里](https://docs.openstack.org/kolla-ansible/queens/reference/ceph-guide.html)
 * 修改`/etc/kolla/globals.yml`
 ```yaml
 enable_ceph: "yes"
@@ -282,11 +292,31 @@ openstack router create demo-router
 openstack router add subnet demo-router demo-subnet
 ```
 
-* 在路由器上创建一个端口，并将该端口加入到外部子网中
+* 将外部网络的某个地址设置为路由器的默认网关
+![](./imgs/deploy_04.png)
+或者通过下面的命令行
 ```shell
 #在demo-router路由器上创建一个端口，并将该端口加入到外部网络的子网中
 #该端口的地址 就是 该子网中可分配地址的随机一个
 openstack router set --external-gateway public1 demo-router
+```
+
+#### 11.创建没有限制的security group
+instance必须要配置，不配置的话默认禁止所有请求
+![](./imgs/deploy_05.png)
+
+
+#### 12.从host能够ping instance（默认不可以）
+
+##### （1）分配floating ip
+
+##### （2）在host上配置路由
+* 比如网络架构如下，只要在host上添加如下路由
+
+![](./imgs/deploy_06.png)
+
+```shell
+ip route add 10.172.0.0/16 via 10.10.10.68
 ```
 
 ***
@@ -308,3 +338,21 @@ kolla-ansible -i ./multinode bootstrap-servers --limit <new_host>
 kolla-ansible -i ./multinode pull --limit <new_host>
 kolla-ansible -i ./multinode deploy --limit <new_host>
 ```
+
+***
+
+### trouble shooting
+
+#### 1.检查时，python sdk报错
+将目标机上的python换成python3
+```shell
+ln -fs /usr/bin/python3 /usr/bin/python
+```
+然后再次执行任务
+```shell
+kolla-ansible -i ./multinode bootstrap-servers
+kolla-ansible -i ./multinode prechecks
+```
+
+#### 2.创建instance时，Sending discover failed（通过dhcp获取ip失败）
+需要具体查看日志：`/var/log/kolla/neutron/neutron-dhcp-agent.log`和`/var/log/kolla/neutron/dnsmasq.log`

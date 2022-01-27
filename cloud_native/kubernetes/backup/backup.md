@@ -103,6 +103,19 @@ systemctl restart kubelet
 
 #### 5.node节点不需要做任何操作
 
+#### 6.更简单的恢复方法
+* 上面的恢复方法步骤比较通用，当恢复etcd v2 data后，能利用上述方法恢复k8s集群
+* 下面这种方法只试用etcd v3 data
+[参考](https://www.mirantis.com/blog/everything-you-ever-wanted-to-know-about-using-etcd-with-kubernetes-v1-6-but-were-afraid-to-ask/)
+```shell
+#其中的参数能够通过etcd manifests查到
+ETCDCTL_API=3 etcdctl snapshot restore BACKUP_FILE \
+--name $ETCD_NAME--initial-cluster "$ETCD_INITIAL_CLUSTER" \
+--initial-cluster-token “$ETCD_INITIAL_CLUSTER_TOKEN” \
+--initial-advertise-peer-urls $ETCD_INITIAL_ADVERTISE_PEER_URLS \
+--data-dir $ETCD_DATA_DIR
+```
+
 ***
 
 ### 从0恢复
