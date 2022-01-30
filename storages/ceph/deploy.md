@@ -10,7 +10,7 @@
 |组件（per daemon）|CPU|RAM|STORAGE|
 |-|-|-|-|
 |OSD|1|4G|根据存储需求|
-|MON|2|24G|60G|
+|MON|2|2-4G|60G|
 |MDS|2|2G|忽略|
 
 #### 2.部署建议

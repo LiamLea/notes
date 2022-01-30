@@ -184,9 +184,7 @@ enable_cinder: "yes"
 #  当openstack安装在虚拟机上时，这里用qemu，用kvm会有问题
 nova_compute_virt_type: "kvm"
 
-#glance配置
-glance_backend_ceph: "yes"
-glance_backend_file: "no"
+#glance配置，enable ceph后默认使用rbd作为后端存储
 ```
 
 #### 7.使用ceph
@@ -210,20 +208,34 @@ parted <disk> -s -- mklabel gpt mkpart KOLLA_CEPH_OSD_BOOTSTRAP_BS 1 -1
 #### 8.进行部署
 ```shell
 kolla-ansible -i ./multinode bootstrap-servers
-kolla-ansible -i ./multinode prechecks
+  kolla-ansible -i ./multinode prechecks
 #可以提前准备镜像：kolla-ansible -i ./multinode pull
 kolla-ansible -i ./multinode deploy
 ```
 
-#### 9.使用openstack
+#### 9.修改配置解决相关bug
+
+##### （1）解决无法从volume-based image创建volume的问题
+* 修改所有controller的`/etc/kolla/glance-api/glance-api.conf`
 ```shell
-#安装openstack客户端
-pip install python-openstackclient
+#修改下面的两个配置
+[glance_store]
+default_store = rbd
+stores = rbd
+...
+```
+
+* 重启所有controller的glance-api这个容器
+
+#### 10.使用openstack
+```shell
+#安装openstack客户端(注意client版本，可能跟openstack版本不兼容)
+pip install python-openstackclient==5.5.1
 #生产admin-openrc.sh文件
 kolla-ansible post-deploy
 ```
 
-#### 10.执行一个demo
+#### 11.执行一个demo
 ```shell
 source /etc/kolla/admin-openrc.sh
 #会创建example networks、images等待
@@ -301,12 +313,12 @@ openstack router add subnet demo-router demo-subnet
 openstack router set --external-gateway public1 demo-router
 ```
 
-#### 11.创建没有限制的security group
+#### 12.创建没有限制的security group
 instance必须要配置，不配置的话默认禁止所有请求
 ![](./imgs/deploy_05.png)
 
 
-#### 12.从host能够ping instance（默认不可以）
+#### 13.从host能够ping instance（默认不可以）
 
 ##### （1）分配floating ip
 
