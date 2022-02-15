@@ -4,7 +4,12 @@
 
 ### 概述
 
-#### 1.grid computing vs cloud computing
+#### 1.cloud native
+![](./imgs/overview_03.png)
+
+[参考](https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/definition#modern-design)
+
+#### 2.grid computing vs cloud computing
 |criteria|grid computing|cloud computing|
 |-|-|-|
 |目的|大规模的计算|降低成本，增加回报|
@@ -21,4 +26,4 @@
 * cloud computing
 ![](./imgs/overview_02.png)
 
-#### 2.一个虚拟机不能跨多个物理机
+#### 3.一个虚拟机不能跨多个物理机

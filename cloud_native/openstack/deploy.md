@@ -208,7 +208,7 @@ parted <disk> -s -- mklabel gpt mkpart KOLLA_CEPH_OSD_BOOTSTRAP_BS 1 -1
 #### 8.进行部署
 ```shell
 kolla-ansible -i ./multinode bootstrap-servers
-  kolla-ansible -i ./multinode prechecks
+kolla-ansible -i ./multinode prechecks
 #可以提前准备镜像：kolla-ansible -i ./multinode pull
 kolla-ansible -i ./multinode deploy
 ```
