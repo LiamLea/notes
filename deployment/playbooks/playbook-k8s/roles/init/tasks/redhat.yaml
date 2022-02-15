@@ -1,8 +1,11 @@
-- name: stop firewall
+- name: disable some services
   service:
-    name: firewalld
+    name: "{{ item }}"
     state: stopped
     enabled: False
+  with_items:
+  - firewalld
+  - NetworkManager
 
 - name: disable selinux
   selinux:
@@ -19,18 +22,18 @@
       remote_src: yes
       dest: "/etc/yum_bak"
       force: no
-  
+
   - name: remove old repo
     file:
       path: "/etc/yum.repos.d"
       state: absent
-  
+
   - name: copy repo
     copy:
       src: "repo/{{ansible_distribution | lower}}-{{ansible_distribution_major_version}}/yum.repos.d"
       dest: "/etc/"
       force: yes
-  
+
   - name: flush yum repo
     yum:
       update_cache: yes
