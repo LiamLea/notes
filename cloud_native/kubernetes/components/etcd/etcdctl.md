@@ -5,12 +5,13 @@
 ### 使用
 
 #### 1.前提：指定使用的API version
-有2和3（跟etcdctl版本无关）两个版本，api version设置不对，无法查询到数据
+* 有2和3（跟etcdctl版本无关）两个版本，api version设置不对，无法查询到数据
 ```shell
 export ETCDCTL_API=3
 ```
+* 注意：endpoints有时用127.0.0.1无效，要用具体ip
 
-* v2 api只能操作etcd v2 data
+##### （1）v2 api只能操作etcd v2 data
 [etcdctl v2](https://chromium.googlesource.com/external/github.com/coreos/etcd/+/HEAD/etcdctl/READMEv2.md)
 
 ```shell
@@ -21,7 +22,7 @@ etcdctl --endpoints="https://127.0.0.1:2379"  --ca-file=/etc/kubernetes/pki/etcd
 ls --recursive
 ```
 
-* v3 api只能操作etcd v3 data
+##### （2）v3 api只能操作etcd v3 data
 
 ```shell
 docker run --rm -it \

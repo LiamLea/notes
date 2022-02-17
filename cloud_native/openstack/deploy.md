@@ -310,7 +310,7 @@ openstack router add subnet demo-router demo-subnet
 ```shell
 #在demo-router路由器上创建一个端口，并将该端口加入到外部网络的子网中
 #该端口的地址 就是 该子网中可分配地址的随机一个
-openstack router set --external-gateway public1 demo-router
+openstack router set --enable-snat --external-gateway public1 demo-router
 ```
 
 #### 12.创建没有限制的security group

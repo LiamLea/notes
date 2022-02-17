@@ -9,9 +9,12 @@
 #### 1.enterprise WAN
 
 ##### （1） traditional network
-* MPLS
+* leased line（专线）
   * 是一个物理的**专用网络**
-  * 成本比较高
+  * 成本高
+* MPLS
+  * 利用供应商的MPLS网络，会给数据包打上标签，然后运营商会根据该标签，将数据包发往指定的目的地
+  * 成本较高
 * internet-based VPN
   * 基于internet网络，创建隧道
   * 性能不够好

@@ -176,6 +176,11 @@ kubeadm init phase addon all --config <kubeadm-config>
 #### 3.`kubeadm alpha`
 
 ##### （1）重新生成证书：`kubeadm alpha certs renew`
+* 本质：
+  * 每个服务 重新生成 自己的私钥（可以不需要重新生成）
+  * 每个服务 利用 CA 和 自己的私钥 重新签署证书
+    * 生成证书时指定`CN=<user>`，从而决定了这个证书的权限
+  * 将CA、key、cert配置到每个服务的kubeconfig文件中
 
 * 查看证书的到期时间
 

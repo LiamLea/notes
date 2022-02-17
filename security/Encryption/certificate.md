@@ -76,7 +76,8 @@ openssl x509 -req -in <SERVER.CSR> \      #-req -in 后面跟请求文件
 ```
 #### 3.查看证书内容
 ```shell
-openssl x509 -in xx -text
+openssl x509 -in <cert> -text
+openssl rsa -in <key> -text
 ```
 
 #### 4.创建x509 v3证书（支持多个域名）
