@@ -195,9 +195,10 @@ kubeadm alpha certs check-expiration
   * 这个命令**不会重新生成各种ca相关证书**，所以kubelet不需要重新加载证书，因为kubelet只需要指定ca证书就行
     * 如果需要重新ca证书：`kubeadm init phase certs ...`，这里需要注意：所有节点的ca证书要一致，可以在一台主机上生成，然后拷贝到其他主机上
   * 所有master节点，都需要执行一下这个命令
-  * 建议重启相关容器（etcd、apiserver、scheduler、controller），否则有可能不生效
+  * **重启** 相关容器（etcd、apiserver、scheduler、controller），否则无法生效
 ```shell
 kubeadm alpha certs renew all
+#注意有时候renew all无效，有些需要单独执行更新命令
 ```
 
 ***
