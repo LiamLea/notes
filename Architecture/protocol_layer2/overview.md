@@ -48,3 +48,5 @@
 * 为什么需要IXP
 如果没有IXP，流量就需要通过中介网络才能到达对方，这样效率和性能都比较低，如下所示
 ![](./imgs/overview_02.png)
+
+[查看世界上的所有IXPs](https://www.internetexchangemap.com/)
