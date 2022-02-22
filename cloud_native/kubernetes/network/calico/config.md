@@ -39,11 +39,19 @@ bgp的默认配置查看容器内的：`/etc/calico/confd/config/bird.cfg`文件
 apiVersion: projectcalico.org/v3
 kind: BGPPeer
 metadata:
-  name: node-2-peer
+  name: 4-net-peer
 spec:
   peerIP: 3.1.4.254
   asNumber: 64512
-  node: node-2
+#如果指定node，则这个bgp peer只会应用于某个node
+---
+apiVersion: projectcalico.org/v3
+kind: BGPPeer
+metadata:
+  name: 5-net-peer
+spec:
+  peerIP: 3.1.5.254
+  asNumber: 64512
 ```
 
 * 创建peer
@@ -77,15 +85,14 @@ protocol bgp Mesh_3_1_5_115 from bgp_template {
 
 
 # ------------- Global peers -------------
-# No global peers configured.
 
-
-# ------------- Node-specific peers -------------
-
-
-# For peer /host/node-2/peer_v4/3.1.4.254
 protocol bgp Node_3_1_4_254 from bgp_template {
   neighbor 3.1.4.254 as 64512;
+  source address 3.1.4.114;  # The local address we use for the TCP connection
+}
+
+protocol bgp Node_3_1_4_254 from bgp_template {
+  neighbor 3.1.5.254 as 64512;
   source address 3.1.4.114;  # The local address we use for the TCP connection
 }
 
