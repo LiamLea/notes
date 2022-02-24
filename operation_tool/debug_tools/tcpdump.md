@@ -70,5 +70,6 @@ $ ip link
 
 * 在宿主机上 抓取 容器中指定网卡 的数据包
 ```shell
-tcpdump -i cali5ddcf4a2547 -nn
+tcpdump -l -i cali5ddcf4a2547 -nn
+#-l：Make stdout line buffered，能够立即看到抓到的包
 ```
