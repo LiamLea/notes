@@ -19,12 +19,13 @@
 所有用于**控制设备（即配置控制平面）和监控设备**(比如CLI，snmp等)的功能
 
 ***
+
 ### 基础概念
+
 #### 1.核心功能
 * traffic management
 依赖以sidecar模式部署envoy，所有流量由envoy转发
 无需对服务做任何更改
-<br/>
 * security
 * observability
 
