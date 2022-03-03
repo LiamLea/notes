@@ -96,7 +96,7 @@ ceph config set mon public_network <CIDR>   #声明monitor的网段，当node在
 * 查看所有osd信息
 ```shell
 #osd元信息（包括osd的版本、使用的objectstore等等）
-ceph osd metadata
+ceph osd metadata <osd_id>
 
 #osd状态信息
 ceph osd dump
