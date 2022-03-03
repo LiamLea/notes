@@ -14,6 +14,16 @@
 For HTTP: `proxy_pass http://backend` 或者https
 For TCP: `proxy_pass backend:123`
 
+#### 3.proxy基本过程
+* 根据负载策略，将将流量负载到后端的server
+* 如果负载到某个server，失败（即unsuccessful attempt）
+  * 则继续将请求发送到其他server，如果尝试过所有server，仍然失败，则返回最新的失败的结果
+  * 如果有一个成功，则返回成功的结果
+
+#### 4.unsuccessful attempt（失败的请求）
+* http_500, http_502, http_503, http_504, and http_429
+* http_403 and http_404不认为是失败的请求
+
 ***
 
 ### 配置
@@ -108,7 +118,7 @@ upstream <NAME> {
   #  weight=<NUM>，权重（当为轮询方式时有用）
   #  max_conns=<NUM>，限制后端服务器的并发连接数
   #  max_fails=1 ，在一个探测周期内，如果失败次数达到了，则标记该服务器不可用，并等待下一个周期再检测（如果为0，标记该服务器一直可用）
-  #  fail_timeout=10s，一个探测周期
+  #  fail_timeout=10s，一个探测周期（不是主动的健康检查，而是当有请求来，进行负载时）
   #  resolve，如果server用的是域名，当该域名对应的ip变化时，nginx会自动更新
   #  service=<SRV_NAME>，该选项必须和resolve连用，且server必须用的是域名且不用指定端口，因为该配置会去DNS的SRV记录中找到名为<SRV_NAME>的port
   server <DOMAIN_OR_IP>:<PORT>;

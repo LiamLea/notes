@@ -24,3 +24,6 @@ anti-spoofing（即防止ip或mac欺骗），因为openstack是一个云平台�
 ##### （1）默认security group: default
 流量只能出，不能主动进
 只有在default中的port发来的流量才能主动进
+
+##### （2）如果设置了floating ip
+如果设置了floating ip，则一定要放行外部的流量，否则设置floating ip没有意义

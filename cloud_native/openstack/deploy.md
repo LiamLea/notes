@@ -27,8 +27,12 @@
 * 每个版本之间都有依赖关系，比如特定kolla-ansible版本只能部署特定的openstack版本，特定的openstack版本只能装在特定的操作系统上
 [参考](https://docs.openstack.org/releasenotes/kolla-ansible/)
 
+#### 2.注意
 
-#### 2.准备openstack相关机器
+##### （1）deploy执行是幂等
+即多次执行不会影响现有环境（前提是 所有的配置都是通过kolla-ansible脚本修改的，然后通过kolla-ansible deploy应用的）
+
+#### 3.准备openstack相关机器
 
 ##### （1）建议选择ubuntu系统
 因为选择centos时，容易出现一些包的错误
@@ -59,7 +63,7 @@ reboot
 ##### （2）加载kvm模块
 所有机器上加载kvm_intel（或者kvm_amd）模块
 
-#### 3.准备好ansible部署机
+#### 4.准备好ansible部署机
 
 ##### （1）安装ansible所需依赖
 ```shell
@@ -98,7 +102,7 @@ cd /root/kolla-deployment
 cp /root/kolla-env/share/kolla-ansible/ansible/inventory/* ./
 ```
 
-#### 4.配置清单文件（@ansible）
+#### 5.配置清单文件（@ansible）
 ```shell
 vim multinode
 ```
@@ -129,14 +133,21 @@ localhost       ansible_connection=local become=true
 ansible -i ./multinode all -m ping
 ```
 
-#### 5.生成密码
+#### 6.生成和修改密码
 ```shell
 kolla-genpwd
 
 #会在/etc/kolla/passwords.yml文件中生成密码
 ```
 
-#### 6.配置：`/etc/kolla/globals.yml`
+* 修改admin的登录密码
+```shell
+$ vim /etc/kolla/passwords.yml
+
+keystone_admin_password: cangoal
+```
+
+#### 7.配置：`/etc/kolla/globals.yml`
 
 * 注意：当不同主机的变量不一样时（比如网卡名不一样），需要 **注释** `globals.yaml`中的配置，然后在inventory配置相应的变量
   * 比如：
@@ -187,7 +198,7 @@ nova_compute_virt_type: "kvm"
 #glance配置，enable ceph后默认使用rbd作为后端存储
 ```
 
-#### 7.使用ceph
+#### 8.使用ceph
 
 注意：ceph osd数量**至少是3个**，因为pool的默认副本数为3，如果osd数量小于3，会导致ceph不可用
 如果要修改ceph的配置（比如默认的副本数等），[参考这里](https://docs.openstack.org/kolla-ansible/queens/reference/ceph-guide.html)
@@ -205,17 +216,20 @@ parted <disk> -s -- mklabel gpt mkpart KOLLA_CEPH_OSD_BOOTSTRAP_BS 1 -1
 # roles/ceph/defaults/main.yml
 ```
 
-#### 8.进行部署
-```shell
-kolla-ansible -i ./multinode bootstrap-servers
-kolla-ansible -i ./multinode prechecks
-#可以提前准备镜像：kolla-ansible -i ./multinode pull
-kolla-ansible -i ./multinode deploy
-```
-
 #### 9.修改配置解决相关bug
 
 ##### （1）解决无法从volume-based image创建volume的问题
+* 配置glance-api
+```shell
+$ mkdir /etc/kolla/config/glance
+$ vim /etc/kolla/config/glance/glance-api.conf
+
+[glance_store]
+stores = rbd
+
+```
+
+或者等安装完成后（不推荐，因为重新执行deploy后，会被覆盖）
 * 修改所有controller的`/etc/kolla/glance-api/glance-api.conf`
 ```shell
 #修改下面的两个配置
@@ -227,7 +241,16 @@ stores = rbd
 
 * 重启所有controller的glance-api这个容器
 
-#### 10.使用openstack
+#### 10.进行部署
+```shell
+kolla-ansible -i ./multinode bootstrap-servers
+kolla-ansible -i ./multinode prechecks
+#可以提前准备镜像：kolla-ansible -i ./multinode pull
+kolla-ansible -i ./multinode deploy
+```
+
+#### 11.使用openstack
+
 ```shell
 #安装openstack客户端(注意client版本，可能跟openstack版本不兼容)
 pip install python-openstackclient==5.5.1
@@ -235,7 +258,87 @@ pip install python-openstackclient==5.5.1
 kolla-ansible post-deploy
 ```
 
-#### 11.执行一个demo
+#### 12.部署Loadbalancer
+
+[参考](https://docs.openstack.org/kolla-ansible/train/reference/networking/octavia.html)
+* 制作镜像
+
+```shell
+apt -y install debootstrap qemu-utils kpartx
+
+git clone https://opendev.org/openstack/octavia -b stable/train
+
+python3 -m venv dib-venv
+source dib-venv/bin/activate
+pip install diskimage-builder
+
+cd octavia/diskimage-create
+
+#有必要设置代理，不然总是超时
+#export http_proxy='http://10.10.10.103:1080'
+#export https_proxy='http://10.10.10.103:1080'
+./diskimage-create.sh
+#用完记得关闭代理（即删除这两个环境变量）
+```
+
+* 上传镜像
+```shell
+source /etc/kolla/admin-openrc.sh
+source /root/kolla-env/bin/activate
+openstack image create --progress --container-format bare --disk-format qcow2 --private --tag amphora --file amphora-x64-haproxy.qcow2  amphora-x64-haproxy.qcow2
+```
+
+* 生成证书
+```shell
+(umask 077;openssl genrsa -aes256 -out server_ca.key)
+openssl req -new -x509 -key server_ca.key -out server_ca.crt -days 3650
+
+(umask 077;openssl genrsa -aes256 -out client_ca.key)
+openssl req -new -x509 -key client_ca.key -out client_ca.crt -days 3650
+
+(umask 077;openssl genrsa -aes256 -out client.key)
+openssl req -new -key client.key -out client.csr -subj '/CN=xx'
+openssl x509 -req -in client.csr -CA client_ca.crt -CAkey client_ca.key -CAcreateserial -days 3650 -out client.crt
+
+openssl rsa -in client_ca.key -out client.cert-and-key
+cat client_ca.crt >> client.cert-and-key
+
+#client_ca是用给amphora agent用于签署证书的
+cp client_ca.crt /etc/kolla/config/octavia/client_ca.cert.pem
+#server_ca是用于签署服务端的证书
+cp server_ca.crt /etc/kolla/config/octavia/server_ca.cert.pem
+cp server_ca.key /etc/kolla/config/octavia/server_ca.key.pem
+#amphora agent使用的证书（是用server_ca签署的）
+cp client.cert-and-key /etc/kolla/config/octavia/client.cert-and-key.pem
+
+vim /etc/kolla/passwords.yml
+#octavia_ca_password: xx
+```
+
+* 创建ssh keypair
+```shell
+#创建的是公钥，公钥会被放到amphora的authorized_keys中
+openstack keypair create octavia_ssh_key   --os-username octavia   --os-password "$(cat /etc/kolla/passwords.yml | grep octavia_keystone_password | awk '{ print $2 }')"
+#注意私钥会打印出来，注意保存
+```
+
+* 修改：`/etc/kolla/globals.yaml`
+```shell
+enable_octavia: "yes"
+#网络id（controller必须能达到这个网络，所以用私有网络不行，可以使用public网络或者管理网络）
+octavia_amp_boot_network_list: "07810178-94ec-4fe7-ae9e-c12f4cd41b52"
+#amphora的security group id
+octavia_amp_secgroup_list: "8c2b28eb-2714-40c2-ac94-151238031043,7a9aea64-d67e-4c0d-a3b2-6fa12194866c"
+#amphora使用的flavor id
+octavia_amp_flavor_id: "8b81c090-1129-452c-bd31-5d5a9b3bb116"
+```
+
+* 部署
+```shell
+kolla-ansible -i ./multinode deploy
+```
+
+#### 12.执行一个demo
 ```shell
 source /etc/kolla/admin-openrc.sh
 #会创建example networks、images等待
@@ -283,8 +386,8 @@ openstack network create \
 openstack subnet create \
     --network demo-net \
     --subnet-range 10.0.0.0/24 \    #设置该租户所在网段，该租户创建的虚拟的ip就要从其中分配
-    --gateway 10.0.0.1 \    #指定网关地址，之后配置在虚拟路由器上就行
-    --dns-nameserver 8.8.8.8 \
+    --gateway 10.0.0.254 \    #指定网关地址，之后配置在虚拟路由器上就行
+    --dns-nameserver 114.114.114.114 \
     demo-subnet
 ```
 
@@ -313,12 +416,19 @@ openstack router add subnet demo-router demo-subnet
 openstack router set --enable-snat --external-gateway public1 demo-router
 ```
 
-#### 12.创建没有限制的security group
-instance必须要配置，不配置的话默认禁止所有请求
-![](./imgs/deploy_05.png)
+#### 13.创建security group用于对外（即当使用floating ip时）
+* 可以具体到端口，一般不会具体到ip（因为对外提供服务不会限制某些具体ip）
+
+```shell
+openstack security group create public
+
+#protocol、port等默认为所有
+openstack security group rule create --ingress  --remote-ip 0.0.0.0/0 public
+openstack security group rule create --ingress  --ethertype ipv6 --remote-ip ::/0 public
+```
 
 
-#### 13.从host能够ping instance（默认不可以）
+#### 14.从host能够ping instance（默认不可以）
 
 ##### （1）分配floating ip
 
@@ -350,6 +460,13 @@ kolla-ansible -i ./multinode bootstrap-servers --limit <new_host>
 kolla-ansible -i ./multinode pull --limit <new_host>
 kolla-ansible -i ./multinode deploy --limit <new_host>
 ```
+
+***
+
+### 覆盖配置（除了`global.yaml`）
+
+* 可以覆盖某个具体服务的具体配置
+[参考](https://docs.openstack.org/kayobe/latest/configuration/reference/kolla-ansible.html)
 
 ***
 
