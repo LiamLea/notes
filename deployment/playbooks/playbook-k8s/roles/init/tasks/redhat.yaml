@@ -10,9 +10,9 @@
 - name: disable selinux
   selinux:
     state: disabled
-  notify: reboot
+  notify: reboot host
 
-- name: reboot
+- name: flush handlers
   meta: flush_handlers
 
 - block:

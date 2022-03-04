@@ -1,0 +1,32 @@
+- name: check harbor
+  shell: docker ps -f name=harbor-core | grep harbor
+  register: harbor_installed
+  ignore_errors: True
+
+- block:
+  - name: install docker
+    include_role:
+      name: docker
+
+  - name: install docker-compose on debian
+    include_tasks: debian.yaml
+    when: ansible_distribution_file_variety == "Debian"
+
+  - name: install docker-compose on redhat
+    include_tasks: redhat.yaml
+    when: ansible_distribution_file_variety == "RedHat"
+
+  - name: copy file
+    unarchive:
+      src: harbor-online-installer-v2.3.5.tgz
+      dest: /root/
+
+  - name: copy config file
+    template:
+      src: harbor.yml.j2
+      dest: /root/harbor/harbor.yml
+
+  - name: install harbor
+    shell: "cd /root/harbor;./prepare;docker-compose up -d"
+
+  when: harbor_installed.rc != 0

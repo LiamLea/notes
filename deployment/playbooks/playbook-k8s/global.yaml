@@ -6,6 +6,8 @@ ntp:
   - ntp1.aliyun.com
   - 210.72.145.44
 
+timezone: Asia/Shanghai
+
 dns:
 - 114.114.114.114
 - 8.8.8.8
@@ -15,11 +17,21 @@ hosts:
   hostname:
   - localhost
 
+#if registry is changed,you should pay attention to registry_prefix,docker.insecure-registries
 registry: 3.1.4.126
+registry_prefix: "{{ registry }}/"
+
+docker:
+  version: 20.10.5
+  insecure-registries: ["{{ registry }}"]
 
 kubernetes:
   version: 1.23.1
-  repository: "{{ registry }}/k8s.gcr.io"
+  repository: "{{ registry_prefix }}k8s.gcr.io"
+  apiserver:
+    control_plane:
+      ip: 3.1.4.120
+      port: 16443
 
 calico:
   repository: "{{ registry }}"
@@ -28,42 +40,43 @@ calico:
     cidrs:
     - "3.1.4.0/24"
 
+nginx:
+  image: "{{ registry_prefix }}nginx:latest"
+
 keepalived:
   id: 120
-  vip: 3.1.4.120
-  image: "{{ registry }}/osixia/keepalived:latest"
+  vip: "{{ kubernetes.apiserver.control_plane.ip }}"
+  check_script: check_nginx.sh
+  image: "{{ registry_prefix }}osixia/keepalived:latest"
 
-docker:
-  version: 20.10.5
-  insecure-registries: ["{{ registry }}"]
 
 #nfs config
 nfs:
   server: ""
   path: ""
-  image: "{{ registry }}/nfs-server-alpine:12"
+  image: "{{ registry_prefix }}nfs-server-alpine:12"
 
 
 #basic service
 metrics_server:
-  repository: "{{ registry }}/k8s.gcr.io/metrics-server/metrics-server"
+  repository: "{{ registry_prefix }}k8s.gcr.io/metrics-server/metrics-server"
 
 nginx_ingress:
   controller:
-    repository: "{{ registry }}/k8s.gcr.io/nginx-ingress-controller/controller"
+    repository: "{{ registry_prefix }}k8s.gcr.io/nginx-ingress-controller/controller"
   defaultBackend:
-    repository: "{{ registry }}/k8s.gcr.io/defaultbackend-amd64"
+    repository: "{{ registry_prefix }}k8s.gcr.io/defaultbackend-amd64"
 
 cert_manager:
   cainjector:
-    repository: "{{ registry }}/quay.io/jetstack/cert-manager-cainjector"
+    repository: "{{ registry_prefix }}quay.io/jetstack/cert-manager-cainjector"
   controller:
-    repository: "{{ registry }}/quay.io/jetstack/cert-manager-controller"
+    repository: "{{ registry_prefix }}quay.io/jetstack/cert-manager-controller"
   webhook:
-    repository: "{{ registry }}/quay.io/jetstack/cert-manager-webhook"
+    repository: "{{ registry_prefix }}quay.io/jetstack/cert-manager-webhook"
 
 nfs_provisioner:
-  repository: "{{ registry }}/nfs-client-provisioner"
+  repository: "{{ registry_prefix }}nfs-client-provisioner"
 
 
 #create storageClass
@@ -76,54 +89,54 @@ storage_class:
 
 tidb:
   operator:
-    image: "{{ registry }}/tidb-operator:v1.1.10"
-    scheduler_repository: "{{ registry }}/kube-scheduler"
+    image: "{{ registry_prefix }}tidb-operator:v1.1.10"
+    scheduler_repository: "{{ registry_prefix }}kube-scheduler"
   discovery:
-    image: "{{ registry }}/tidb-operator:v1.1.10"
+    image: "{{ registry_prefix }}tidb-operator:v1.1.10"
   pd:
-    image: "{{ registry }}/pd:v4.0.10"
+    image: "{{ registry_prefix }}pd:v4.0.10"
     storage_class: "{{ storage_class.tidb.pd }}"
   tikv:
-    image: "{{ registry }}/tikv:v4.0.10"
+    image: "{{ registry_prefix }}tikv:v4.0.10"
     storage_class: "{{ storage_class.tidb.tikv }}"
   tidb:
-    image: "{{ registry }}/tidb:v4.0.10"
+    image: "{{ registry_prefix }}tidb:v4.0.10"
   busybox:
-    image: "{{ registry }}/busybox:1.31.1"
+    image: "{{ registry_prefix }}busybox:1.31.1"
   mysql_client:
-    image: "{{ registry }}/mysqlclient:v1.4.6"
+    image: "{{ registry_prefix }}mysqlclient:v1.4.6"
   root_password: cangoal
   node_port: 14000
 
 mysql:
-  repository: "{{ registry }}/mysql"
+  repository: "{{ registry_prefix }}mysql"
   root_password: cangoal
   node_port: 13306
   storage_class: nfs-client
 
 
 kafka:
-  repository: "{{ registry }}/kafka"
+  repository: "{{ registry_prefix }}kafka"
   zookeeper:
-    repository: "{{ registry }}/zookeeper"
+    repository: "{{ registry_prefix }}zookeeper"
   replicas: 1
   ip: "{{ keepalived.vip }}"
   node_port: [19092]
 
 redis:
-  repository: "{{ registry }}/redis"
+  repository: "{{ registry_prefix }}redis"
   password: cangoal
 
 prometheus:
   alertmanager:
-    repository: "{{ registry }}/alertmanager"
+    repository: "{{ registry_prefix }}alertmanager"
   configmapReload:
-    repository: "{{ registry }}/configmap-reload"
+    repository: "{{ registry_prefix }}configmap-reload"
   nodeExporter:
-    repository: "{{ registry }}/node-exporter"
+    repository: "{{ registry_prefix }}node-exporter"
   pushgateway:
-    repository: "{{ registry }}/pushgateway"
-  repository: "{{ registry }}/prometheus"
+    repository: "{{ registry_prefix }}pushgateway"
+  repository: "{{ registry_prefix }}prometheus"
   storage_class: "{{ storage_class.prometheus }}"
 
 aiops:

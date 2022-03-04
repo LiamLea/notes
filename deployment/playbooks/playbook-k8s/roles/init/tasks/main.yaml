@@ -14,6 +14,17 @@
   hostname:
     name: "{{inventory_hostname}}"
 
+- name: check timezone file
+  stat:
+    path: "/usr/share/zoneinfo/{{timezone}}"
+  register: check_tz
+- name: set timezone
+  file:
+    src: "/usr/share/zoneinfo/{{timezone}}"
+    dest: "/etc/localtime"
+    state: link
+  when: check_tz.stat.exists
+
 - name: set hosts
   template:
     src: hosts.j2
