@@ -1,0 +1,10 @@
+- name: check docker-compose
+  shell: docker-compose --version
+  ignore_errors: True
+  register: compose_installed
+- block:
+  - name: install docker-compose
+    yum:
+      name: "docker-compose"
+      state: present
+  when: compose_installed.rc != 0

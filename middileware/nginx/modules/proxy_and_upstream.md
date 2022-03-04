@@ -123,7 +123,7 @@ upstream <NAME> {
   #  service=<SRV_NAME>，该选项必须和resolve连用，且server必须用的是域名且不用指定端口，因为该配置会去DNS的SRV记录中找到名为<SRV_NAME>的port
   server <DOMAIN_OR_IP>:<PORT>;
 
-  #采用ip hash算法（默认是round-robin，轮询）
+  #采用ip hash算法（默认是round-robin，轮询，不需要指定）
   ip_hash;
 
   #利用指定的key进行hash

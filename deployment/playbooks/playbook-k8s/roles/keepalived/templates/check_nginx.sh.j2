@@ -1,0 +1,2 @@
+#!/bin/bash
+if netstat -lt | grep {{ kubernetes.apiserver.control_plane.port }} >/dev/null ;then exit 0 ;else exit 1;fi

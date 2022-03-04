@@ -1,0 +1,25 @@
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+stream {
+  upstream k8s {
+
+    {% for host in groups["master"] -%}
+    server {{ hostvars[host]["ansible_host"]}}:6443;
+    {% endfor -%}
+
+  }
+
+  server {
+    listen 0.0.0.0:{{ kubernetes.apiserver.control_plane.port }};
+    proxy_pass k8s;
+  }
+}

@@ -116,7 +116,9 @@ set_fact:
   ```
 
 ##### （2）触发器：`notify`和`handlers`
-注意：默认所有tasks执行完，才会执行handlers中的任务，可以通过meta立即执行已经触发的handlers中的任务
+* 当状态**changed**，才会发送notify
+* handler必须有**全局唯一**的名字
+* 注意：默认在一个play中，所有tasks执行完，才会执行handlers中的任务，可以通过meta立即执行已经触发的handlers中的任务
 ```yaml
 tasks:
   - name: <NAME>

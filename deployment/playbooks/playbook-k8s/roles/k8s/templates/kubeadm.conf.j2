@@ -33,7 +33,7 @@ etcd:
     dataDir: /var/lib/etcd
 imageRepository: {{ kubernetes.repository }}
 kind: ClusterConfiguration
-controlPlaneEndpoint: "{{ keepalived.vip }}:6443"
+controlPlaneEndpoint: "{{ kubernetes.apiserver.control_plane.ip }}:{{ kubernetes.apiserver.control_plane.port }}"
 kubernetesVersion: {{ kubernetes.version }}
 networking:
   dnsDomain: cluster.local

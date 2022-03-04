@@ -19,11 +19,11 @@
 * linking（链接）
   * 将所有目标代码链接到一个文件中
 
-#### 1.configure
+#### 2.configure
 * 检查 编译 所需的依赖
 * 生成makefile文件
 
-#### 2.makefile
+#### 3.makefile
 * makefile 用于组织代码编译 的文件
 * 不仅仅可用于c语言，还可以用于任何可以用shell命令进行编译的语言
 
@@ -69,3 +69,12 @@ make [options] [targets]
                       #如果需要调用某个target：$(MAKE) <TARGET>
                       #$(MAKE)就是make，就是递归执行make命令
 ```
+
+#### 3.语法
+
+##### （1）转义
+
+|原字符|转义|
+|-|-|
+|`$`|`$$`|
+|`#`|`\#`|

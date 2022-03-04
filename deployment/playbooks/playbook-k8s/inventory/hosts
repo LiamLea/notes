@@ -1,5 +1,5 @@
 [master]
-master-1 ansible_host=3.1.4.121 ansible_user=root ansible_password=cangoal 
+master-1 ansible_host=3.1.4.121 ansible_user=root ansible_password=cangoal
 master-2 ansible_host=3.1.4.122 ansible_user=root ansible_password=cangoal
 master-3 ansible_host=3.1.4.123 ansible_user=root ansible_password=cangoal
 
@@ -14,6 +14,13 @@ node
 
 [work_master]
 master-3
+
+[nginx]
+master-1
+master-2
+
+[keepalived:children]
+nginx
 
 [registry]
 #docker-registry ansible_host=3.1.5.238 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal registry_host=docker.repo.aiops
@@ -30,6 +37,6 @@ master-1
 
 [others]
 harbor ansible_host=3.1.4.126 ansible_user=root ansible_password=cangoal
-ceph-1 ansible_host=3.1.4.128 ansible_user=root ansible_password=cangoal 
+ceph-1 ansible_host=3.1.4.128 ansible_user=root ansible_password=cangoal
 ceph-2 ansible_host=3.1.4.129 ansible_user=root ansible_password=cangoal
 ceph-3 ansible_host=3.1.4.130 ansible_user=root ansible_password=cangoal
