@@ -17,9 +17,15 @@ fi
 # images=$(docker images | grep -vE ^$my_registry | grep -vE $match_pattern | awk 'NR!=1{print $1":"$2}')
 
 ## retag images and then push to my-registry
-for image in ${images}; do 
-  docker image tag ${image} ${my_registry}/${image}
-  docker push ${my_registry}/${image}
+for image in ${images}; do
+  if ! echo ${image} | grep "/"
+    then
+      docker image tag ${image} ${my_registry}/docker.io/${image}
+      docker push ${my_registry}/docker.io/${image}
+    else
+      docker image tag ${image} ${my_registry}/${image}
+      docker push ${my_registry}/${image}
+  fi
 done
 
 if [ -n "$match_pattern" ];then
