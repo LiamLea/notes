@@ -94,7 +94,7 @@ kubectl get xx
     -o wide          #-o指明输出格式，wide输出扩展信息
     -l xx=yy         #过滤含有xx这个标签且标签值为yy的资源
                      #也可以-l xx直接过滤含有xx标签的pods  
-    --filed-selector xx=yy    #过滤xx字段为yy的资源
+    --field-selector xx=yy    #过滤xx字段为yy的资源
                               #字段即kubectl describe xx能够查看到的字段
                               #比如：--filed-selector metadata.namespace=default,statu.phase!=Running
 

@@ -18,7 +18,7 @@ hosts:
   - localhost
 
 #if registry is changed,you should pay attention to registry_prefix,docker.insecure-registries
-registry: 3.1.4.126
+registry: "3.1.4.126"
 registry_prefix: "{{ registry }}/"
 
 docker:
@@ -41,7 +41,7 @@ calico:
     - "3.1.4.0/24"
 
 nginx:
-  image: "{{ registry_prefix }}nginx:latest"
+  image: "{{ registry_prefix }}docker.io/nginx:latest"
 
 keepalived:
   id: 120
