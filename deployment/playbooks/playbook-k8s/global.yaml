@@ -24,6 +24,10 @@ registry_prefix: "{{ registry }}/"
 docker:
   version: 20.10.5
   insecure-registries: ["{{ registry }}"]
+  http_proxy:
+    enabled: True
+    server: http://10.10.10.250:8123
+    no_proxy: ["{{ registry }}", "docker.io", "localhost", "127.0.0.1"]
 
 kubernetes:
   version: 1.23.1
