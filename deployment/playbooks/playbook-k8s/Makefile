@@ -17,11 +17,11 @@ install_docker:
 
 .PHONY := run
 run: docker
-	docker run --network host --name ansible-lil --rm -v ${ansible_dir}:/root/ansible -itd ${ansible_image} /bin/sh -c "cd /root/ansible;ansible-playbook main.yaml -e @global.yaml &> run.log"
+	docker rm ansible-lil;docker run --network host --name ansible-lil -v ${ansible_dir}:/root/ansible -itd ${ansible_image} /bin/sh -c "cd /root/ansible;ansible-playbook main.yaml -e @global.yaml &> run.log"
 
 .PHONY := test
 test: docker
-	docker run --network host --name ansible-lil --rm -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/sh -c "cd /root/ansible;ansible-playbook test.yaml -e @global.yaml"
+	docker rm ansible-lil;docker run --network host --name ansible-lil -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/sh -c "cd /root/ansible;ansible-playbook test.yaml -e @global.yaml"
 
 .PHONY := stop
 stop:

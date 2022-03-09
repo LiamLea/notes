@@ -1,3 +1,12 @@
+- name: set sysctl
+  sysctl:
+    name: "{{ item }}"
+    value: '1'
+  with_items:
+  - "net.ipv4.ip_forward"
+  - "net.bridge.bridge-nf-call-iptables"
+  - "net.bridge.bridge-nf-call-ip6tables"
+
 - name: install docker on debian
   include_tasks: debian.yaml
   when: ansible_distribution_file_variety == "Debian"
@@ -5,6 +14,24 @@
 - name: install docker on redhat
   include_tasks: redhat.yaml
   when: ansible_distribution_file_variety == "RedHat"
+
+- name: create docker.service.d dir
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+
+- name: copy docker daemon proxy
+  template:
+    src: proxy.conf.j2
+    dest: /etc/systemd/system/docker.service.d/proxy.conf
+  notify: restart docker
+
+- name: systemd reload
+  systemd:
+    daemon_reload: True
+
+- name: flush handlers
+  meta: flush_handlers
 
 - name: create docker dir
   file:

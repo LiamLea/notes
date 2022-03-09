@@ -1,0 +1,33 @@
+- name: handler create docker dir
+  file:
+    path: /etc/docker
+    state: directory
+  listen: restart docker
+
+- name: handler set restart_docker
+  set_fact:
+    restart_docker: before
+  listen: restart docker
+
+- name: handler config docker
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+  listen: restart docker
+
+- name: handler reload docker
+  service:
+    name: docker
+    state: reloaded
+  listen: restart docker
+
+- name: handler restart docker
+  service:
+    name: docker
+    state: restarted
+  listen: restart docker
+
+- name: handler set restart_docker
+  set_fact:
+    restart_docker: after
+  listen: restart docker
