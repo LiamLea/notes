@@ -1,0 +1,32 @@
+- hosts: localhost
+  gather_facts: True
+  tasks:
+  - name: install kubeadm
+    apt:
+      name: "kubeadm={{ kubernetes.version }}-00"
+      state: present
+  - name: get k8s images
+    shell: "kubeadm config images list --kubernetes-version={{ kubernetes.version}} --image-repository={{ kubernetes.repository }}"
+    register: result
+
+  - name: include vars
+    include_vars:
+      dir: roles/k8s/defaults
+  - name: select calico version
+    set_fact:
+      result: "{% for c_v in calico_k8s %} {% for k_v in calico_k8s[c_v]['k8s'] %} {% if k_v in kubernetes.version %} {{ c_v }} {% endif %} {% endfor %}{% endfor %}"
+  - name: select calico version
+    set_fact:
+      calico_version: "{{ result | trim }}"
+
+  - name: set images
+    set_fact:
+      my_dict:
+        k8s: "{{ result.stdout.split('\n') }}"
+        others:
+        - "{{ nginx.image }}"
+        - "{{ keepalived.image }}"
+        calico: "{{ calico_k8s[calico_version]['images'] }}"
+  - name: list_images
+    debug:
+      msg: "{{ my_dict }}"

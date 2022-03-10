@@ -5659,7 +5659,7 @@ rules:
     verbs:
       - list
       - watch
-      - create 
+      - create
       - update
   # Needed for operator lock
   - apiGroups:
@@ -5747,7 +5747,11 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: tigera-operator
+          {% if registry == "" -%}
+          image: "quay.io/tigera/operator:v1.23.3"
+          {% else -%}
           image: "{{ registry }}/quay.io/tigera/operator:v1.23.3"
+          {% endif -%}
           imagePullPolicy: IfNotPresent
           command:
             - operator
@@ -5774,4 +5778,3 @@ spec:
         - name: var-lib-calico
           hostPath:
             path: /var/lib/calico
-
