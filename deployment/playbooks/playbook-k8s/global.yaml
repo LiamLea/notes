@@ -18,7 +18,7 @@ hosts:
   - localhost
 
 #if registry is changed,you should pay attention to registry_prefix,docker.insecure-registries
-registry: "3.1.4.126"
+registry: "10.10.10.250"
 registry_prefix: "{{ registry }}/"
 
 docker:
@@ -34,7 +34,7 @@ kubernetes:
   repository: "{{ registry_prefix }}k8s.gcr.io"
   apiserver:
     control_plane:
-      ip: 3.1.4.120
+      ip: 10.172.1.10
       port: 16443
 
 calico:
@@ -42,7 +42,7 @@ calico:
   encapsulation: IPIP
   nodeAddressAutodetectionV4:
     cidrs:
-    - "3.1.4.0/24"
+    - "10.172.1.0/24"
 
 nginx:
   image: "{{ registry_prefix }}docker.io/nginx:latest"

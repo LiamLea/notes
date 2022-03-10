@@ -1,0 +1,16 @@
+- hosts: ansible
+  gather_facts: True
+  become: True
+  become_method: sudo
+  become_flags: "-i"
+  tasks:
+  - name: disable selinux
+    selinux:
+      state: disabled
+    notify: reboot host
+  - name: include docker role
+    include_role:
+      name: docker
+  handlers:
+  - name: reboot host
+    reboot:

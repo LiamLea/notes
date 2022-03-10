@@ -1,0 +1,26 @@
+- name: create calico dir
+  file:
+    path: /etc/kubernetes/calico
+    state: directory
+
+- name: copy calico yaml
+  template:
+    src: "{{ item }}"
+    dest: /etc/kubernetes/calico
+  with_items:
+  - "calico/{{ calico_version }}/tigera-operator.yaml"
+  - "calico/{{ calico_version }}/custom-resources.yaml"
+
+- name: install calico operator
+  shell: kubectl apply -f tigera-operator.yaml
+  args:
+    chdir: /etc/kubernetes/calico
+
+- name: install calico
+  shell: kubectl apply -f custom-resources.yaml
+  args:
+    chdir: /etc/kubernetes/calico
+  register: calico_installed
+  until: calico_installed.rc == 0
+  delay: 10
+  retries: 2
