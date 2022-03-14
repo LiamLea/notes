@@ -8,6 +8,9 @@ node-1 ansible_host=3.1.4.124 ansible_user=root ansible_password=cangoal
 node-2 ansible_host=3.1.4.125 ansible_user=root ansible_password=cangoal
 node-3 ansible_host=3.1.4.127 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
 
+[others]
+harbor ansible_host=3.1.4.126 ansible_user=root ansible_password=cangoal
+
 [ansible]
 master-1
 
@@ -16,7 +19,7 @@ master
 node
 
 [work_master]
-master-3
+master-1
 
 [nginx]
 master-1
@@ -37,9 +40,3 @@ nginx
 
 [ntp_server]
 master-1
-
-[others]
-harbor ansible_host=3.1.4.126 ansible_user=root ansible_password=cangoal
-ceph-1 ansible_host=3.1.4.128 ansible_user=root ansible_password=cangoal
-ceph-2 ansible_host=3.1.4.129 ansible_user=root ansible_password=cangoal
-ceph-3 ansible_host=3.1.4.130 ansible_user=root ansible_password=cangoal

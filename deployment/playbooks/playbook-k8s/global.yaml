@@ -27,7 +27,7 @@ docker:
   http_proxy:
     enabled: True
     server: http://10.10.10.250:8123
-    no_proxy: ["{{ registry }}", "docker.io", "localhost", "127.0.0.1"]
+    no_proxy: ["{{ registry }}", "quay.io", ".docker.com", "docker.io", "localhost", "127.0.0.1"]
 
 kubernetes:
   version: 1.23.1
@@ -36,6 +36,10 @@ kubernetes:
     control_plane:
       ip: 10.172.1.10
       port: 16443
+    network:
+      service_subnet: 10.96.0.0/12
+      pod_subnet: 10.244.0.0/16
+    nodeport_range: 10000-65535
 
 calico:
   repository: "{{ registry }}"

@@ -14,7 +14,8 @@
 
 - name: set variable init_master
   set_fact:
-    init_master: "{%- set myList = [] -%} {%- for i in groups.master -%} {{ myList.append({'name': i, 'priority': hostvars[i]['ansible_host'].split('.')[-1] | int}) }} {%- endfor -%} {{ (myList | sort(attribute='priority') | last)['name'].strip() }}"
+    init_master: "{{ groups['master'][0] }}"
+#    init_master: "{%- set myList = [] -%} {%- for i in groups.master -%} {{ myList.append({'name': i, 'priority': hostvars[i]['ansible_host'].split('.')[-1] | int}) }} {%- endfor -%} {{ (myList | sort(attribute='priority') | last)['name'].strip() }}"
 
 - block:
 
