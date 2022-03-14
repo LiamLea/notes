@@ -1,12 +1,3 @@
-- name: set sysctl
-  sysctl:
-    name: "{{ item }}"
-    value: '1'
-  with_items:
-  - "net.ipv4.ip_forward"
-  - "net.bridge.bridge-nf-call-iptables"
-  - "net.bridge.bridge-nf-call-ip6tables"
-
 - name: install docker on debian
   include_tasks: debian.yaml
   when: ansible_distribution_file_variety == "Debian"
@@ -53,3 +44,12 @@
     name: docker
     state: reloaded
     enabled: True
+    
+- name: set sysctl
+  sysctl:
+    name: "{{ item }}"
+    value: '1'
+  with_items:
+  - "net.ipv4.ip_forward"
+  - "net.bridge.bridge-nf-call-iptables"
+  - "net.bridge.bridge-nf-call-ip6tables"

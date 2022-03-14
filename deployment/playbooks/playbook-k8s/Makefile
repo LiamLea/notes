@@ -11,7 +11,8 @@ docker:
 .PHONY := install_docker
 install_docker:
 	if grep -i "debian"  /etc/os-release &> /dev/null;then apt-get -y install docker-ce=${docker_version};   elif grep -i "redhat" /etc/os-release &>/dev/null;then yum -y install docker-ce-${docker_version};   fi
-	$(MAKE) init_localhost
+	systemctl restart docker
+	systemctl enable docker
 
 .PHONY := init_localhost
 init_localhost: docker
@@ -23,7 +24,7 @@ run: docker
 
 .PHONY := test
 test: docker
-	docker run --rm --network host --name ansible-lil -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook test.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil-test -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook test.yaml -e @global.yaml"
 
 .PHONY := stop
 stop:
@@ -31,4 +32,8 @@ stop:
 
 .PHONY := list_images
 list_images:
-	docker run --rm --network host --name ansible-lil -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook list_images.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil-list -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook list_images.yaml -e @global.yaml"
+
+.PHONY := check
+check:
+	docker run --rm --network host --name ansible-lil-check -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible all -m ping"
