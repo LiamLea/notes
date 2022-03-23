@@ -1,6 +1,6 @@
 vrrp_script health_check {
-    script "/bin/bash /etc/keepalived/{{ keepalived.check_script }}"
-    interval 1
+    script "/bin/bash /etc/keepalived/health_check.sh"
+    interval 5
     timeout 5
     rise 3
     fall 3

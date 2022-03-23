@@ -7,7 +7,7 @@
       state: present
   - name: get k8s images
     shell: "kubeadm config images list --kubernetes-version={{ kubernetes.version}} --image-repository={{ kubernetes.repository }}"
-    register: result
+    register: result1
 
   - name: include vars
     include_vars:
@@ -22,7 +22,7 @@
   - name: set images
     set_fact:
       my_dict:
-        k8s: "{{ result.stdout.split('\n') }}"
+        k8s: "{{ result1.stdout.split('\n') }}"
         others:
         - "{{ nginx.image }}"
         - "{{ keepalived.image }}"

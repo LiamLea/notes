@@ -9,7 +9,7 @@ node-2 ansible_host=3.1.4.125 ansible_user=root ansible_password=cangoal
 node-3 ansible_host=3.1.4.127 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
 
 [others]
-harbor ansible_host=3.1.4.126 ansible_user=root ansible_password=cangoal
+#harbor ansible_host=3.1.4.126 ansible_user=root ansible_password=cangoal
 
 [ansible]
 master-1

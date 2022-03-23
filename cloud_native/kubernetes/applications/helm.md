@@ -97,6 +97,9 @@ helm status xx              #查看已安装的release的信息（包括service�
 helm list                   #列出已安装的release
 helm delete xx --purge
 helm upgrade xx xx1         #xx1为chart名或者本地chart的路径
+
+#获取release的manifests
+helm get manifest <release>
 ```
 ***
 ### helm模板语法

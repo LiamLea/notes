@@ -13,22 +13,22 @@
 #    dest: "{{ workdir }}"
 
 #install metrics-server
-- name: check metrcis-server
-  shell: a=`kubectl get pods -A -l app=metrics-server || echo 1`;if [ -z $a ];then exit 1;fi
-  register: metrics_server_installed
-  ignore_errors: True
-
-- name: install metrics-server
-  community.kubernetes.helm:
-    chart_ref: "{{ workdir }}/basic_charts/metrics-server"
-    release_name: metrics-server
-    release_namespace: kube-system
-    create_namespace: yes
-    atomic: yes
-    release_values:
-      image:
-        repository: "{{ metrics_server.repository }}"
-  when: metrics_server_installed.rc != 0 
+# - name: check metrcis-server
+#   shell: a=`kubectl get pods -A -l app=metrics-server || echo 1`;if [ -z $a ];then exit 1;fi
+#   register: metrics_server_installed
+#   ignore_errors: True
+#
+# - name: install metrics-server
+#   community.kubernetes.helm:
+#     chart_ref: "{{ workdir }}/basic_charts/metrics-server"
+#     release_name: metrics-server
+#     release_namespace: kube-system
+#     create_namespace: yes
+#     atomic: yes
+#     release_values:
+#       image:
+#         repository: "{{ metrics_server.repository }}"
+#   when: metrics_server_installed.rc != 0
 
 
 #install cert-manager
@@ -56,7 +56,7 @@
             repository: "{{ cert_manager.webhook.repository }}"
 
   - name: copy pki
-    copy: 
+    copy:
       src: pki
       dest: "{{ workdir }}"
   - name: create tls secret

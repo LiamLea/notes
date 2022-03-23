@@ -57,7 +57,7 @@
     copy:
       src: id_rsa.pub
       dest: "~/.ssh"
-  when: inventory_hostname in groups["master"]
+  when: groups["master"] is defined and inventory_hostname in groups["master"]
 
 - name: create directory ssh
   file:
@@ -68,3 +68,4 @@
   copy:
     src: authorized_keys
     dest: "/root/.ssh"
+  ignore_erros: True

@@ -1,0 +1,2 @@
+#/bin/bash
+if [ `curl  --insecure -s --write-out  '%{http_code}' --output /dev/null -m 5 {{ keepalived.health_check.url }}` == 200 ];then exit 0 ;else exit 1;fi

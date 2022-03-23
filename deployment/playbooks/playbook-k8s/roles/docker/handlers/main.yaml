@@ -37,3 +37,4 @@
   service:
     name: docker
     state: restarted
+    enabled: True
