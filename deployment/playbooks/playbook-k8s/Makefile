@@ -20,6 +20,7 @@ init_localhost: docker
 
 .PHONY := run
 run: docker
+	$(MAKE) init_localhost
 	docker run --rm --network host --name ansible-lil -v ${ansible_dir}:/root/ansible -itd ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook main.yaml -e @global.yaml &> run.log"
 
 .PHONY := test
@@ -37,3 +38,7 @@ list_images:
 .PHONY := check
 check:
 	docker run --rm --network host --name ansible-lil-check -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible all -m ping"
+
+.PHONY := install_harbor
+install_harbor:
+	docker run --rm --network host --name ansible-lil-harbor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook -i inventory/harbor_hosts install_harbor.yaml -e @global.yaml"

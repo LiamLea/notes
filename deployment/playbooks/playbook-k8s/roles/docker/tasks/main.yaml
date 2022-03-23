@@ -21,9 +21,6 @@
   systemd:
     daemon_reload: True
 
-- name: flush handlers
-  meta: flush_handlers
-
 - name: create docker dir
   file:
     path: /etc/docker
@@ -33,18 +30,22 @@
   template:
     src: daemon.json.j2
     dest: /etc/docker/daemon.json
+  notify: restart docker
 
-- name: start docker
-  service:
-    name: docker
-    state: started
+- name: flush handlers
+  meta: flush_handlers
 
-- name: reload docker
-  service:
-    name: docker
-    state: reloaded
-    enabled: True
-    
+# - name: start docker
+#   service:
+#     name: docker
+#     state: started
+#
+# - name: reload docker
+#   service:
+#     name: docker
+#     state: reloaded
+#     enabled: True
+
 - name: set sysctl
   sysctl:
     name: "{{ item }}"

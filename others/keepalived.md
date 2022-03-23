@@ -34,7 +34,7 @@ global_defs {
 vrrp_script <CUSTOME_NAME> {
   script "<COMMAND>"               #执行脚本时必须：/bin/bash <script_path>
   interval <INTEGER:1>          #调用脚本的频率，单位秒
-  timeout <INTEGER>             #脚本超时时间，超时则认为执行失败
+  timeout <INTEGER>             #脚本超时时间，超时则认为执行失败（必须<=interval）
   weight <INTEGER:0>          #默认为0，表示脚本检测失败，则认为该vrrp实例状态是fail的
                               #当weight值 < 0时：
                               #   如果脚本检测成功，则节点优先级不变
@@ -106,7 +106,7 @@ if [ `curl  --insecure -s --write-out  '%{http_code}' --output /dev/null -m 5 ht
 ```shell
 vrrp_script health_check {
     script "/bin/bash /etc/keepalived/check.sh"
-    interval 1
+    interval 5
     timeout 5
     rise 3
     fall 3

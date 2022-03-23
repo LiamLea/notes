@@ -74,12 +74,13 @@ openstack server create /
   --image <image> /
   --flavor <flavor> /
   --nic net-id=<network>,v4-fixed-ip=<ip> / #重复使用可以添加多个port（可以代替的选项：--network <network> 或者 --port <port>）
-  --block-device source_type=blank,destination_type=volume,delete_on_termination=true,volume_size=<size> /#创建新的volume（删除instance时，删除该volume）
+  --boot-from-volume <volume_size> /
   --security-group <security-group | default=default> /  #重复使用可以添加多个securiy group（取并集）
   --availability-zone <zone-name | default=nova> /
   <instance_name>
 
-#--boot-from-volume <volume_size> 当需要持久化时（<volume_size必须 >= 启动image的size）
+# 添加新的磁盘
+# --block-device source_type=blank,destination_type=volume,delete_on_termination=true,volume_size=<size>
 ```
 
 #### 7.虚拟机的调度：zone和aggregate

@@ -10,18 +10,18 @@
 
 - name: copy check.sh
   template:
-    src: "{{ keepalived.check_script }}.j2"
-    dest: "/etc/keepalived/{{ keepalived.check_script }}"
+    src: "health_check.sh.j2"
+    dest: "/etc/keepalived/health_check.sh"
     mode: 755
   notify:
-    - restart keepalived
-    
+  - restart keepalived
+
 - name: config keepalived
   template:
     src: keepalived.conf.j2
     dest: /etc/keepalived/keepalived.conf
   notify:
-    - restart keepalived
+  - restart keepalived
 
 - name: flush handlers
   meta: flush_handlers

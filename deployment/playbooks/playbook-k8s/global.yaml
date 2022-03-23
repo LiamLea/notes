@@ -24,13 +24,14 @@ registry_prefix: "{{ registry }}/"
 docker:
   version: 20.10.5
   insecure-registries: ["{{ registry }}"]
+  registry-mirrors: []
   http_proxy:
     enabled: True
     server: http://10.10.10.250:8123
-    no_proxy: ["{{ registry }}", "quay.io", ".docker.com", "docker.io", "localhost", "127.0.0.1"]
+    no_proxy: ["{{ registry }}", "quay.io", "docker.com", "docker.io", "localhost", "127.0.0.1", "aliyuncs.com", "myhuaweicloud.com"]
 
 kubernetes:
-  version: 1.23.1
+  version: 1.22.10
   repository: "{{ registry_prefix }}k8s.gcr.io"
   apiserver:
     control_plane:
@@ -50,11 +51,14 @@ calico:
 
 nginx:
   image: "{{ registry_prefix }}docker.io/nginx:latest"
+  health_check:
+    port: 16442
 
 keepalived:
   id: 120
   vip: "{{ kubernetes.apiserver.control_plane.ip }}"
-  check_script: check_nginx.sh
+  health_check:
+    url: "http://127.0.0.1:{{ nginx.health_check.port }}/"
   image: "{{ registry_prefix }}osixia/keepalived:latest"
 
 
@@ -71,7 +75,7 @@ metrics_server:
 
 nginx_ingress:
   controller:
-    repository: "{{ registry_prefix }}k8s.gcr.io/nginx-ingress-controller/controller"
+    repository: "{{ registry_prefix }}quay.io/kubernetes-ingress-controller/nginx-ingress-controller"
   defaultBackend:
     repository: "{{ registry_prefix }}k8s.gcr.io/defaultbackend-amd64"
 

@@ -63,6 +63,8 @@ reboot
 ##### （2）加载kvm模块
 所有机器上加载kvm_intel（或者kvm_amd）模块
 
+##### （3）高可用：奇数台controller
+
 #### 4.准备好ansible部署机
 
 ##### （1）安装ansible所需依赖
@@ -170,7 +172,7 @@ kolla_install_type: "source"
 #  配置加速镜像源，安装docker时进行配置（下面这个地址比较慢，不用添加）
 # docker_custom_config:
 #  registry-mirrors:
-#  - http://registry.docker-cn.com
+#  - https://05916ee38400267c0f42c0097caab960.mirror.swr.myhuaweicloud.com
 
 #  指定私有仓库
 docker_registry: xx
@@ -443,14 +445,17 @@ ip route add 10.172.0.0/16 via 10.10.10.68
 
 ***
 
-### 添加节点
+### 添加或删除节点
+
+[参考](https://docs.openstack.org/kolla-ansible/xena/user/adding-and-removing-hosts.html)
 
 #### 1.添加controller
 
 ```shell
-kolla-ansible -i ./multinode bootstrap-servers --limit control
+#使用--limit可以节省时间，因为不需要部署其他机器了
+kolla-ansible -i ./multinode bootstrap-servers --limit <new_host>
 kolla-ansible -i ./multinode pull --limit <new_host>
-kolla-ansible -i ./multinode deploy --limit control
+kolla-ansible -i ./multinode deploy
 ```
 
 #### 2.添加compute
@@ -458,7 +463,18 @@ kolla-ansible -i ./multinode deploy --limit control
 ```shell
 kolla-ansible -i ./multinode bootstrap-servers --limit <new_host>
 kolla-ansible -i ./multinode pull --limit <new_host>
-kolla-ansible -i ./multinode deploy --limit <new_host>
+kolla-ansible -i ./multinode deploy
+```
+
+#### 3.删除controller
+需要注意的是，不仅仅要做参考文档中的某些步骤，可能还需要其他步骤，因为有些组件的集群需要手动调整，比如：
+* ceph需要用客户端命令删除相应的mon
+
+#### 4.可能遇到的问题及恢复办法
+
+##### （1）mariadb无法启动
+```shell
+kolla-ansible -i ./multinode mariadb_recovery
 ```
 
 ***

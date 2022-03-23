@@ -23,3 +23,12 @@ stream {
     proxy_pass k8s;
   }
 }
+
+http {
+  server {
+    listen 127.0.0.1:{{ nginx.health_check.port }};
+    location / {
+      return 200;
+    }
+  }
+}

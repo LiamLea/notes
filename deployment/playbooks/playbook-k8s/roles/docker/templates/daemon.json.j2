@@ -8,5 +8,6 @@
     "max-size": "10m",
     "max-file": "5"
   },
-  "insecure-registries": {{ docker["insecure-registries"] | select() | list | to_json }}
+  "insecure-registries": {{ docker["insecure-registries"] | select() | list | to_json }},
+  "registry-mirrors": {{ docker["registry-mirrors"] | to_json }}
 }
