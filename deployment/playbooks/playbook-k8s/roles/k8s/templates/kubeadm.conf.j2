@@ -12,7 +12,6 @@ localAPIEndpoint:
   advertiseAddress: {{ ansible_host }}
   bindPort: 6443
 nodeRegistration:
-  criSocket: /var/run/dockershim.sock
   name: {{ inventory_hostname }}
   taints:
   - effect: NoSchedule
@@ -53,3 +52,4 @@ systemReserved:
   cpu: 1000m
   memory: 1Gi
   pid: "100"
+cgroupDriver: systemd

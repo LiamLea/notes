@@ -32,13 +32,17 @@ stop:
 	docker stop ansible-lil
 
 .PHONY := list_images
-list_images:
+list_images: docker
 	docker run --rm --network host --name ansible-lil-list -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook list_images.yaml -e @global.yaml"
 
 .PHONY := check
-check:
+check: docker
 	docker run --rm --network host --name ansible-lil-check -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible all -m ping"
 
 .PHONY := install_harbor
-install_harbor:
+install_harbor: docker
 	docker run --rm --network host --name ansible-lil-harbor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook -i inventory/harbor_hosts install_harbor.yaml -e @global.yaml"
+
+.PHONY := push_images
+push_images: docker
+	docker run --rm --network host --name ansible-lil-push -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook push_images.yaml"

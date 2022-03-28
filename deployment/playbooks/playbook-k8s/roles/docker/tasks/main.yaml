@@ -6,10 +6,19 @@
   include_tasks: redhat.yaml
   when: ansible_distribution_file_variety == "RedHat"
 
-- name: create docker.service.d dir
+- name: create dir
   file:
-    path: /etc/systemd/system/docker.service.d
+    path: "/etc/systemd/system/{{ item }}"
     state: directory
+  with_items:
+  - containerd.service.d
+  - docker.service.d
+
+- name: copy containerd daemon proxy
+  template:
+    src: proxy.conf.j2
+    dest: /etc/systemd/system/containerd.service.d/proxy.conf
+  notify: restart containerd
 
 - name: copy docker daemon proxy
   template:
@@ -21,10 +30,19 @@
   systemd:
     daemon_reload: True
 
-- name: create docker dir
+- name: create dir
   file:
-    path: /etc/docker
+    path: "/etc/{{ item }}"
     state: directory
+  with_items:
+  - containerd
+  - docker
+
+- name: config containerd
+  template:
+    src: config.toml.j2
+    dest: /etc/containerd/config.toml
+  notify: restart containerd
 
 - name: config docker
   template:
