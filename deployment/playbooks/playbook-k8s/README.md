@@ -31,11 +31,14 @@ vim global.yaml
 ```
 
 ```yaml
-#if registry is changed,you should pay attention to registry_prefix,docker.insecure-registries
+#if registry is changed,you should pay attention to registry_prefix
 registry: "10.10.10.250"
-registry_prefix: "{{ registry }}/"
+#when registry is empty, this should be empty too
+registry_prefix: "{{ registry }}/library/"
 
 docker:
+  #add your insecure registries and must set no proxy
+  insecure-registries: ["{{ registry }}"]   
   http_proxy:
     enabled: False
     server: http://10.10.10.250:8123
@@ -135,7 +138,24 @@ run after [step 3](#3init-localhost)
 make install_harbor
 ```
 
-* 创建以下共有仓库
-  * docker.io
-  * k8s.gcr.io
-  * quay.io
+* 创建以下公有仓库
+  * library
+
+#### 8.push images to private registry
+
+* set variables
+```shell
+vim push_images.yaml
+```
+```yaml
+vars:
+  target_registry: "10.10.10.250"
+  username: "admin"
+  password: "Harbor12345"
+  exception_pattern: ""
+```
+
+* run the task
+```shell
+make push_images
+```

@@ -26,7 +26,7 @@
 
   - name: init first master
     shell: |
-      kubeadm init --config /etc/kubernetes/kubeadm.conf
+      kubeadm init --config /etc/kubernetes/kubeadm.conf --cri-socket unix:///run/containerd/containerd.sock
       mkdir ~/.kube || echo ""
       cp -f /etc/kubernetes/admin.conf ~/.kube/config
 
@@ -59,12 +59,12 @@
 
 - name: init other master
   shell: |
-    {{ hostvars[init_master]['join_command'].stdout }} --certificate-key {{ hostvars[init_master]['cert_key'].stdout }} --control-plane --apiserver-advertise-address={{ ansible_host }} --apiserver-bind-port=6443 || exit 1
+    {{ hostvars[init_master]['join_command'].stdout }} --certificate-key {{ hostvars[init_master]['cert_key'].stdout }} --control-plane --apiserver-advertise-address={{ ansible_host }} --apiserver-bind-port=6443 --cri-socket unix:///run/containerd/containerd.sock  || exit 1
     mkdir ~/.kube || echo ""
     cp -f /etc/kubernetes/admin.conf ~/.kube/config || echo ""
   throttle: 1
   when: k8s_setup.rc != 0 and inventory_hostname in groups["master"] and inventory_hostname != init_master
 
 - name: init node
-  shell: "{{ hostvars[init_master]['join_command'].stdout }}"
+  shell: "{{ hostvars[init_master]['join_command'].stdout }} --cri-socket unix:///run/containerd/containerd.sock"
   when: k8s_setup.rc != 0 and inventory_hostname in groups["node"]

@@ -1,11 +1,10 @@
-```shell
 #!/bin/bash
 
 #please set variables depending on your environment
 #local registry address
-my_registry=harbor.test.com
+my_registry="{{ target_registry }}"
 #other registry,use | to match multiple registries
-match_pattern="t1.harbor.com|t2.harbor.com"
+match_pattern="{{ exception_pattern }}"
 registry_prefix="${my_registry}/library"
 
 
@@ -41,4 +40,3 @@ if [ -n "$match_pattern" ];then
     docker push ${registry_prefix}${localImage}
   done
 fi
-```

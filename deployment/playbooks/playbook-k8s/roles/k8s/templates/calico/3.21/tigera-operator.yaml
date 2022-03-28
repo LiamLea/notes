@@ -5750,7 +5750,7 @@ spec:
           {% if registry == "" -%}
           image: "quay.io/tigera/operator:v1.23.3"
           {% else -%}
-          image: "{{ registry }}/quay.io/tigera/operator:v1.23.3"
+          image: "{{ registry_prefix }}quay.io/tigera/operator:v1.23.3"
           {% endif -%}
           imagePullPolicy: IfNotPresent
           command:

@@ -17,9 +17,10 @@ hosts:
   hostname:
   - localhost
 
-#if registry is changed,you should pay attention to registry_prefix,docker.insecure-registries
+#if registry is changed,you should pay attention to registry_prefix
 registry: "10.10.10.250"
-registry_prefix: "{{ registry }}/"
+#when registry is empty, this should be empty too
+registry_prefix: "{{ registry }}/library/"
 
 docker:
   version: 20.10.5
@@ -43,14 +44,14 @@ kubernetes:
     nodeport_range: 10000-65535
 
 calico:
-  repository: "{{ registry }}"
+  repository: "{{ registry_prefix }}"
   encapsulation: IPIP
   nodeAddressAutodetectionV4:
     cidrs:
     - "10.172.1.0/24"
 
 nginx:
-  image: "{{ registry_prefix }}docker.io/nginx:latest"
+  image: "{{ registry_prefix }}nginx:latest"
   health_check:
     port: 16442
 

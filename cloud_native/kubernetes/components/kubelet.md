@@ -115,25 +115,3 @@ systemReserved:
   ephemeral: xx
   pid: "100"
 ```
-
-#### 4.设置container runtime
-```shell
---container-runtime=remote --container-runtime-endpoint=/var/run/containerd/containerd.sock
-#注意：containerd服务也需要做相应配置
-```
-[参考,将网址复制出去访问](https://mp.weixin.qq.com/s?__biz=MzI5ODk5ODI4Nw==&mid=2247495372&idx=1&sn=6d81a55241fbc8491a22478d88f38f3d&chksm=ec9fe1acdbe868ba2f9247523d8551c5eda6b1180112c4badd14bdc588738afb67fb9e67f1f4&scene=21#wechat_redirect)
-
-* 为什么要更换
-因为kubelet需要 实现了cri（container runtime interface）接口的 容器运行时，
-然而docker没有实现，所以需要dockershim来转换一下，
-后续就会启用dockershim，因为越来越臃肿，所以运行时就不能使用docker
-</br<
-* 影响
-相关配置就不需要了比如`--cni`，
-不能用docker命令来管理kubelet创建的容器了，需要使用crictl命令
-其他基本上没有影响
-</br>
-* 客户端命令
-```shell
-crictl ...
-```

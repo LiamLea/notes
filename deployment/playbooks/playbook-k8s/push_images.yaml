@@ -1,0 +1,24 @@
+- hosts: all
+  gather_facts: True
+  become: True
+  become_method: sudo
+  become_flags: "-i"
+  vars:
+    target_registry: "10.10.10.250"
+    username: "admin"
+    password: "Harbor12345"
+    exception_pattern: ""
+  tasks:
+  - name: login registry
+    shell: docker login {{ target_registry }} -u {{ username }} -p {{ password }}
+  - name: copy scripts
+    template:
+      src: scripts/tag_push_images.sh.j2
+      dest: /tmp/tag_push_images.sh
+      mode: 0755
+  - name: exec scripts
+    shell: /tmp/tag_push_images.sh
+    register: result
+  - name: output errors
+    debug:
+      msg: "{{ result.stderr_lines }}"
