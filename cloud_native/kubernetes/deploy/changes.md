@@ -103,6 +103,8 @@ kubectl get nodes -o wide
 crictl ps
 ```
 
+***
+
 ### containerd runtime
 
 ![](./imgs/containerd_01.png)

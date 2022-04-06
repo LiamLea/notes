@@ -78,7 +78,8 @@
 * 修改api server的配置
 ```shell
 #将相关的API关闭（就相当于移除）
---runtime-config=admissionregistration.k8s.io/v1beta1=false,apiextensions.k8s.io/v1beta1=false
+#比如升级到1.22之间测试以下，因为1.22将移除下列api
+--runtime-config=admissionregistration.k8s.io/v1beta1=false,apiextensions.k8s.io/v1beta1=false,apiregistration.k8s.io/v1beta1=false,authentication.k8s.io/v1beta1=false,authorization.k8s.io/v1beta1=false,certificates.k8s.io/v1beta1=false,coordination.k8s.io/v1beta1=false,extensions/v1beta1=false,networking.k8s.io/v1beta1=false
 ```
 
 #### 3.升级其中一个master
@@ -86,6 +87,8 @@
 ##### （1）升级该master
 
 * 安装指定版本的kubeadm
+  * 建议同时安装kubelet和kubectl（否则可能会自动升级kubelet和kubectl到最新版）
+
 * 查看升级信息（**很重要**）：
   * 可升级的k8s版本
   * 哪些组件需要手动升级（比如：kubelet、kubectl）
@@ -106,7 +109,8 @@ kubeadm upgrade apply <version>
 
 ##### （1）升级该master
 * 安装指定版本的kubeadm
-  * 注意升级kubeadm时，可能会自动升级kubelet和kubectl到最新版
+  * 建议同时安装kubelet和kubectl（否则可能会自动升级kubelet和kubectl到最新版）
+
 * 进行升级
 ```shell
 kubeadm upgrade node
@@ -136,6 +140,8 @@ kubectl uncordon <cp-node-name>
 
 ##### （1）升级该node
 * 安装指定版本的kubeadm
+  * 建议同时安装kubelet和kubectl（否则可能会自动升级kubelet和kubectl到最新版）
+
 * 进行升级
 ```shell
 kubeadm upgrade node
