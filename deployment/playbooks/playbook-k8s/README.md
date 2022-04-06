@@ -39,10 +39,12 @@ registry_prefix: "{{ registry }}/library/"
 docker:
   #add your insecure registries and must set no proxy
   insecure-registries: ["{{ registry }}"]   
+  #Note: this isn't only image proxy and you must handle network which containerd will connect to
   http_proxy:
     enabled: False
     server: http://10.10.10.250:8123
-    no_proxy: ["{{ registry }}", "quay.io", ".docker.com", "docker.io", "localhost", "127.0.0.1", ".aliyuncs.com"]
+    #must include service and pod network: 10.0.0.0/8
+    no_proxy: ["{{ registry }}", "10.0.0.0/8", "quay.io", ".docker.com", "docker.io", "localhost", "127.0.0.1", ".aliyuncs.com"]
 
 kubernetes:
   apiserver:

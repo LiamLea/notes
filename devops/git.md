@@ -178,13 +178,35 @@ git stash drop 标号
 * 合并是将**创建分支后**变化的部分合并过来，而不是将整个分支合并过来
 
 ![](./imgs/git_02.png)
+
+* 分支基本操作：查看、添加、删除
 ```shell
 git branch -a           #查看所有分支（包括本地分支和远程分支）
 git branch xx           #创建xx分支，拥有和 当前分支 一样的内容
 git branch -d xx        #删除xx分支
+```
 
+* clone其他分支到本地
+```shell
+git checkout -b <branch_name> origin/<branch_name>
+```
+
+* 拉取分支
+```shell
+git pull <REMOTE_REPO_NAME> <LOCAL_BRANCH>:<REMOTE_BRANCH>
+```
+
+* 切换分支
+```shell
+#-b 表示不存在该分支，会自动创建
 git checkout xx         #切换到xx分支
+```
+
+* 合并分支
+```shell
 git merge xx            #当xx分支合并到 当前分支
+#合并后，不需要add，直接push就行
+git push <REMOTE_REPO_NAME> <LOCAL_BRANCH>:<REMOTE_BRANCH>
 ```
 
 #### 5.版本控制（打标签操作）

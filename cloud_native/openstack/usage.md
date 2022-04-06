@@ -6,7 +6,79 @@
 
 #### 1.镜像相关
 
-* 创建镜像
+最好使用官方制作好的cloud镜像，在此基础上改：[下载](https://docs.openstack.org/image-guide/obtain-images.html)
+
+注意：
+* cloud-init很多配置是创建镜像时生效，不是每次重启都生效，比如配置ssh
+* 不仅要修改cloud.cfg而且要本身的配置也修改过来（比如：sshd的配置），因为cloud-init其实实现的不够完美，有时候不生效
+
+##### （1）在cloud镜像基础上制作镜像
+* 启动一个实例
+```yaml
+#cloud-config
+
+ssh_pwauth: true
+
+users:
+ - name: root
+   lock_passwd: false
+   plain_text_passwd: cangoal
+```
+
+* 修改cloud-init配置
+```shell
+$ vim /etc/cloud/cloud.cfg
+
+disable_root: false
+ssh_pwauth: true
+```
+
+* 其他一些初始化
+  * 比如：配置ssh、安装常用软件等
+
+* 清除cloud-init记录
+```shell
+cloud-init clean
+```
+
+* 上传volume作为镜像（qcow2）
+  * 修改镜像的metadata，删除signature_verified、owner_specified.openstack.sha256和owner_specified.openstack.md5
+
+##### （2）制作镜像
+
+* 只有有一个分区且不能是LVM
+  * 这样才能自动扩容根文件系统
+
+* 需要安装好cloud-init相关组件，这样才能启动时调整磁盘、修改密码登
+```shell
+yum -y install cloud-init cloud-utils-growpart gdisk
+#apt-get -y install cloud-init cloud-guest-utils gdisk
+```
+
+* 允许密码登录
+```shell
+$ vim /etc/cloud/cloud.cfg
+
+ssh_pwauth: 1
+```
+
+* 能够看到console log
+```shell
+$ vim /etc/default/grub
+
+#增加console=tty0 console=ttyS0,115200n8
+GRUB_CMDLINE_LINUX="... console=tty0 console=ttyS0,115200n8"
+
+$ grub2-mkconfig -o /etc/grub2.cfg
+```
+
+* 安装基础组件
+```shell
+yum -y install vim lrzsz unzip zip
+```
+
+##### （2）创建镜像
+
 ```shell
 openstack image create --progress --disk-format <image_format> --public --file <path>  <image_name>
 ```
@@ -41,6 +113,8 @@ openstack port set --allowed-address ip-address=10.172.1.13 <port_id>
 ```
 
 #### 4.volume（磁盘）相关
+
+##### （1）基本使用
 volume就是块设备
 * voluem source：
   * 默认source是blank，就是空的
@@ -51,6 +125,11 @@ volume就是块设备
 #size单位默认为GB
 openstack volume create --size <size> <volume_name>
 ```
+
+##### （2）扩容
+必须先detach该volume
+然后扩容
+如果是系统盘，然后再利用扩容后的volume创建instance
 
 #### 5.创建虚拟机模板（即image）
 
@@ -79,8 +158,51 @@ openstack server create /
   --availability-zone <zone-name | default=nova> /
   <instance_name>
 
-# 添加新的磁盘
+#注意：
+# --boot-from-volume 只能指定磁盘的大小，文件的大小不能自动扩容，需要手动扩容
+#添加磁盘：
 # --block-device source_type=blank,destination_type=volume,delete_on_termination=true,volume_size=<size>
+#执行脚本：
+# --user-data <script_file_path>
+```
+
+##### （1）依赖cloud-init的功能
+
+* user-data进行初始化，格式如下：
+
+```shell
+#!/bin/bash
+
+echo xx | passwd --stdin root
+#ubuntu: echo -e "cangoal\ncangoal" | passwd  root
+```
+
+或者
+
+```yaml
+#cloud-config
+
+ssh_pwauth: true
+
+users:
+ - name: root
+   lock_passwd: false
+   plain_text_passwd: cangoal
+```
+
+* 自动扩容根分区
+
+##### （2）手动进行扩容（如果不支持自动扩容）
+```shell
+fdisk /dev/vda
+
+#删除某一个分区，然后创建该分区
+
+partprobe
+
+pvresize /dev/vda2
+lvextend -l 100%VG /dev/mapp/centos-root
+xfs_growfs /dev/mapp/centos-root
 ```
 
 #### 7.虚拟机的调度：zone和aggregate
