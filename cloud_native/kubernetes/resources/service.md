@@ -48,18 +48,9 @@
 * 将serivce与指定pod绑定
 * 将node上指定端口映射到该service上的指定端口
 
-##### （3）LoadBalancer
-前提：需要在云提供商或者支持external load balancers的环境中
-目前：就是能够通过public ip直接访问service，否则只能通过node ip访问service
-```shell
-$ kubectl get svc
-
-NAME         TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE
-nginx-1      LoadBalancer   10.104.90.5   <pending>     80:32037/TCP   2m10s
-
-#当分配一个ip给该service时，EXTERNAL-IP字段就为分配的public ip
-nginx-1      LoadBalancer   10.104.90.5   206.189.117.254   80:32037/TCP   2m36s
-```
+##### （3）LoadBalancer（需要插件支持）
+前提：需要安装相应的云厂商插件，然后配置正确
+使用：创建service后，会自动创建LoadBalancer
 
 ##### （4）ExternalName
 * 能够使得集群内的pod能够与外界联系，这种类型的service就充当这个外出的桥梁
@@ -112,6 +103,30 @@ _<PORT_NAME>._<PORTP_ROTOCOL>.<SERVICENAME>.<NAMESPACE>.svc.<CLUSTERNAME>
 （不需要通过externalName且必须填域名，这里可以利用ip）
 * 首先创建无selector的service，并指明service上的端口号和后端的端口号
 * 然后创建Endpoints，指向后端服务的ip和端口号
+
+#### 8.service暴露的两种方式：nodeport 和 external ip
+
+* 通过nodeport暴露
+相当于在所有节点上监听：`*:8081`
+```yaml
+ports:
+- nodePort: 8081
+  port: 80
+  protocol: TCP
+  targetPort: 80
+type: NodePort
+```
+
+* 通过external ip暴露
+```yaml
+ports:
+- port: 80
+  protocol: TCP
+  targetPort: 80
+externalIPs:
+- 1.1.1.1
+```
+相当于在所有节点上监听：`1.1.1.1:80`（如果节点上没有这个地址，则无效），外部只能通过1.1.1.1这个地址访问
 
 ***
 

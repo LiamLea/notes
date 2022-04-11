@@ -139,7 +139,7 @@ spec:
 ##### （1）基本配置
 
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: xx
@@ -148,10 +148,6 @@ metadata:
   namespace: xx
 
   annotations:
-    #不能省略，指明使用哪个nginx
-    #启动nginx时，可以设置ingress class：--ingress-class
-    kubernetes.io/ingress.class: "nginx"
-
     #使用clusterissuer
     cert-manager.io/cluster-issuer: xx
 
@@ -180,6 +176,10 @@ metadata:
       add_header name aa;
 
 spec:
+
+  #指明使用哪个ingress controller
+  ingressClassName: "nginx"
+
   rules:
 
   #匹配 HTTP请求头中 的 Host字段的域名部分 是否 匹配下面设置的域名
@@ -189,12 +189,18 @@ spec:
       paths:
 
       #根据url，转发请求
-      # path默认是 前缀匹配，如果要用 正则匹配 需要在annotations中设置（要么都是正则匹配，要么都是前缀匹配）
+      # pathType指定了匹配的策略：
+      #   Exact  为精确匹配
+      #   Prefix  为前缀匹配(e.g. /foo/bar matches /foo/bar/baz, but does not match /foo/barbaz)
+      #   ImplementationSpecific  由ingress class自己决定（nginx是前缀匹配）
       # path注入到nginx配置文件中的顺序，按照path的长度，从上到下注入到nginx配置文件中的（而不是按照写在这里的顺序）
-      - path: /		
+      - path: /
+        pathType: Prefix
         backend:
-          serviceName: xx   #后端的pod是由该service代理的pod
-          servicePort: xx   #指定service端口，其实就是确定后端的pod端口（实际不从service走，只是用于映射）
+          service:
+            name: <service_name> #后端的pod是由该service代理的pod
+            port:
+              number: <port>    #指定service端口，其实就是确定后端的pod端口（实际不从service走，只是用于映射）
 
   tls:
   - hosts:
@@ -215,25 +221,33 @@ nginx.ingress.kubernetes.io/rewrite-target: <replcement>  #可以使用正则的
 
 * demo
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     ...
 spec:
+  ingressClassName: "nginx"
   rules:
   - host: aiops.dev.nari
     http:
       paths:
       - path: /(.*)
+        pathType: Prefix
         backend:
-          serviceName: kangpaas-front
-          servicePort: 80
+          service:
+            name: kangpaas-front
+            port:
+              number: 80
+
      - path: /gate/(.*)
+       pathType: Prefix
        backend:
-         serviceName: kangpaas-gate
-         servicePort: 8093
+         service:
+           name: kangpaas-gate
+           port:
+             number: 8093
   ...
 ```
 
@@ -255,12 +269,33 @@ nginx.ingress.kubernetes.io/ssl-passthrough: "true"
 ```
 
 ##### （4）存在解码问题的解决方案
-明确指定url进行替换，比如：
+
 ```yaml
 ...
-  nginx.ingress.kubernetes.io/rewrite-target: /argocd/api/v1/repositories/git%40$1%3A$2%2F$3
+metadata:
+  annotations:
+    #upstream_balancer是默认名称，后端的service是通过lua动态产生的
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($request_uri ~ "^/argocd.*") {
+        rewrite ^ $request_uri;
+        rewrite "(?i)/(argocd.*)" /$1 break;
+        proxy_pass http://upstream_balancer$uri;
+        break;
+      }
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: k8s.my.local
+      http:
+        paths:
+          - backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 80
+            path: /argocd
+            pathType: Prefix
 ...
-- path: /argocd/api/v1/repositories/git@(.*?):(.*?)/(.*)
 ```
 
 #### 2.查看是否注入

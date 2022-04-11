@@ -165,9 +165,27 @@ proxy_pass http://backend;
 rewrite ^ $request_uri;
 
 #进行自己想要的转换
+#(?i) starts case-insensitive mode
 #比如：rewrite "(?i)/(argocd.*)" /$1 break;
 
 proxy_pass http://backend$uri;
+```
+
+
+```shell
+if ($request_uri ~ "^/argocd.*") {
+  rewrite ^ $request_uri;
+  rewrite "(?i)/(argocd.*)" /$1 break;
+  proxy_pass http://backend$uri;
+  break;
+}
+
+#或者在if的时候直接匹配（这两种方法本质是一样的）
+
+if ($request_uri ~ "^(/argocd.*)") {
+  proxy_pass http://backend$1;
+  break;
+}
 ```
 
 

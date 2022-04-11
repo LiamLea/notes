@@ -128,18 +128,20 @@ git revert <id>
 git push
 ```
 
-##### （2）回滚到指定commit
+##### （2）修改本地的commit
+
+* 用于代码在code review阶段被打回时进行的操作
+
 ```shell
 git reset --soft xx       #回滚到指定版本，但是当前的工作空间的内容不变
-                          #用于代码在code review阶段被打回时进行的操作
-git reset --hard xx       #回滚到指定版本，当前的工作空间的内容也会回滚
-
-#回滚本地仓库后，如果需要回滚远程仓库：
-#注意：master分支必须解除保护，不然无法push
-git push -f origin master
 ```
 
-##### （3）利用revertc回滚（建议）
+* 本地完全回滚到指定commit
+```shell
+git reset --hard xx       #回滚到指定版本，当前的工作空间的内容也会回滚
+```
+
+##### （3）利用revert回滚（建议）
 这种方式相当于会多一个commit记录
 
 * 撤销单个commit
