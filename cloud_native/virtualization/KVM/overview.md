@@ -21,6 +21,11 @@
 * libvirt-daemon-driver-qemu	:libvirtd 连接 qemu 的驱动
 * virt-manager	:图形管理工具
 
+```shell
+yum -y install qemu-kvm libvirt-daemon libvirt-daemon-driver-qemu libvirt-client virt-manager
+#apt-get -y install qemu-kvm libvirt-daemon bridge-utils libvirt-clients virt-manager
+```
+
 ##### （2）虚拟化服务：libvirtd
 ##### （3）图形管理虚拟化工具:virt-manager
 ##### （4）虚拟机的磁盘镜像文件格式:qcow2

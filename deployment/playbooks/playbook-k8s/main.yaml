@@ -9,7 +9,7 @@
 #  - { role: docker-registry, when: "inventory_hostname in groups['registry']" }
 #  - { role: nfs-server, when: "inventory_hostname in groups['nfs']"}
   - { role: k8s, when: "inventory_hostname in groups['k8s']" }
-  - { role: k8s_basic, when: "inventory_hostname in groups['work_master']" }
+#  - { role: k8s_basic, when: "inventory_hostname in groups['work_master']" }
 #  - { role: storage_class }
 #  - { role: tidb, when: "inventory_hostname in groups['work_master']" }
 #  - { role: mysql, when: "inventory_hostname in groups['work_master']" }

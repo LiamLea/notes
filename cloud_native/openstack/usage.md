@@ -8,6 +8,8 @@
 
 最好使用官方制作好的cloud镜像，在此基础上改：[下载](https://docs.openstack.org/image-guide/obtain-images.html)
 
+windows镜像参考：[virtio-win](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.215-2/),[参考1](https://techglimpse.com/create-windows-10-qcow2-image-openstack/),[参考2](https://linuxhint.com/install_virtio_drivers_kvm_qemu_windows_vm/)
+
 注意：
 * cloud-init很多配置是创建镜像时生效，不是每次重启都生效，比如配置ssh
 * 不仅要修改cloud.cfg而且要本身的配置也修改过来（比如：sshd的配置），因为cloud-init其实实现的不够完美，有时候不生效
@@ -77,7 +79,7 @@ $ grub2-mkconfig -o /etc/grub2.cfg
 yum -y install vim lrzsz unzip zip
 ```
 
-##### （2）创建镜像
+##### （3）上传镜像
 
 ```shell
 openstack image create --progress --disk-format <image_format> --public --file <path>  <image_name>
