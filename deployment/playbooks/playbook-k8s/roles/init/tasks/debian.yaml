@@ -15,6 +15,7 @@
   - apt-daily.service
   - apt-daily-upgrade.service
   - unattended-upgrades.service
+  ignore_errors: True
 
 - name: config apt repo
   shell: |

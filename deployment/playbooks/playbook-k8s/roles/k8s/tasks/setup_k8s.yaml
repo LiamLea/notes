@@ -26,7 +26,7 @@
 
   - name: init first master
     shell: |
-      kubeadm init --config /etc/kubernetes/kubeadm.conf --cri-socket unix:///run/containerd/containerd.sock
+      kubeadm init --config /etc/kubernetes/kubeadm.conf
       mkdir ~/.kube || echo ""
       cp -f /etc/kubernetes/admin.conf ~/.kube/config
 

@@ -26,6 +26,7 @@
         others:
         - "{{ nginx.image }}"
         - "{{ keepalived.image }}"
+        - "{{ docker.containerd.sandbox_image }}"
         calico: "{{ calico_k8s[calico_version]['images'] }}"
   - name: list_images
     debug:

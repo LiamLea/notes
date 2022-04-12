@@ -24,6 +24,8 @@ registry_prefix: "{{ registry }}/library/"
 
 docker:
   version: 20.10.5
+  containerd:
+    sandbox_image: "{{ registry_prefix }}k8s.gcr.io/pause:3.6"
   insecure-registries: ["{{ registry }}"]
   registry-mirrors: []
   http_proxy:
