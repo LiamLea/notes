@@ -136,11 +136,12 @@ vim /etc/containerd/config.toml
 [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."10.10.10.250"]
     endpoint = ["http://10.10.10.250"]
-[plugins."io.containerd.grpc.v1.cri".registry.configs]
-  [plugins."io.containerd.grpc.v1.cri".registry.configs."10.10.10.250".tls]
-    #配置该仓库为insecure
-    insecure_skip_verify = true
 
+#当上面是https时，如果需要使用http，下面才需要这样设置，否则重复设置，会报错
+# [plugins."io.containerd.grpc.v1.cri".registry.configs]
+#   [plugins."io.containerd.grpc.v1.cri".registry.configs."10.10.10.250".tls]
+#     #配置该仓库为insecure
+#     insecure_skip_verify = true
 ...
 
 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]

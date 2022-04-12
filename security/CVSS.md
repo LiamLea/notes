@@ -4,9 +4,10 @@
 
 ### 概述
 
+[参考](https://www.first.org/cvss/specification-document)
+
 #### 1.CVSS（common vulnerability scoring system）
 安全评价的一种标准，有三个版本（v1，v2，v3）
-[参考](https://www.first.org/cvss/specification-document)
 
 #### 2.安全评价三个group
 

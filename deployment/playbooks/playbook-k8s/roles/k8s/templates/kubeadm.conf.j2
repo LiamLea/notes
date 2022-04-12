@@ -13,6 +13,7 @@ localAPIEndpoint:
   bindPort: 6443
 nodeRegistration:
   name: {{ inventory_hostname }}
+  criSocket: unix:///run/containerd/containerd.sock
   taints:
   - effect: NoSchedule
     key: node-role.kubernetes.io/master

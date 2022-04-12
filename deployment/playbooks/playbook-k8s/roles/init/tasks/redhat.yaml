@@ -6,6 +6,7 @@
   with_items:
   - firewalld
   - NetworkManager
+  ignore_errors: True
 
 - name: disable selinux
   selinux:

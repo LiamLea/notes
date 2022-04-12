@@ -29,18 +29,22 @@ vim /tmp/kubeadm.conf
 ```
 
 ```yaml
-...
+
 kind: InitConfiguration
 
 #相当于--apiserver-advertise-address=<IP> --apiserver-bind-port=<PORT>
 localAPIEndpoint:
   advertiseAddress: 3.1.5.241
   bindPort: 6443
-...
+
+nodeRegistration:
+  name: master-1
+  criSocket: unix:///run/containerd/containerd.sock
+  kubeletExtraArgs:
+    cgroup-driver: systemd
 
 ---
 
-...
 kind: ClusterConfiguration
 imageRepository: k8s.gcr.io
 
@@ -59,6 +63,7 @@ networking:
 apiServer:
   extraArgs:
     service-node-port-range: 1-65535
+
 ...
 ```
 
