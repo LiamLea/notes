@@ -14,3 +14,4 @@ calico_k8s:
    - "{{ registry_prefix }}calico/pod2daemon-flexvol:v3.21.2"
    - "{{ registry_prefix }}calico/cni:v3.21.2"
    - "{{ registry_prefix }}calico/typha:v3.21.2"
+   - "{{ registry_prefix }}calico/kube-controllers:v3.21.2"
