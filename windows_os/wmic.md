@@ -46,7 +46,7 @@ cd /tmp
 mkdir wmic
 cd wmic
 
-apt install autoconf gcc libdatetime-perl make build-essential g++ python-dev
+apt install autoconf gcc libdatetime-perl make build-essential g++ python-dev libffi-dev
 wget http://www.opsview.com/sites/default/files/wmi-1.3.16.tar_.bz2
 bunzip2 wmi-1.3.16.tar_.bz2
 tar -xvf wmi-1.3.16.tar_
