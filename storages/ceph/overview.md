@@ -150,19 +150,59 @@ ceph osd pool application enable {pool-name} {application-name}
 ##### （4）基础概念
 * pgid：`<pool_id>.<hex>`
   * 比如：`1.1f`
-* acting set 和 up set：`<osd_list>p<pool_id>`
-  * 比如：`[0,1,2]p1`表示该pg，与osd.0、osd.1和osd.2关联，与pool 1关联
-  * acting set 表示当前pg的状态
-  * up set表示变化后的pg的状态
-    * 比如pg关联的osd变化了，此时读写使用的还是acting set，当up set中的osd将acting set中osd的状态都迁移了，此时acting set才会变得跟up set一样
+
+##### （5）acting set 和 up set：
+|osd集（即该pg关联了哪些osd）|说明|
+|-|-|
+|acting set|pg当前关联的osd|
+|up set|pg新关联的osd（需要将acting set关联的osd数据迁移过来），迁移完成后，acting set就会变为跟up set一样|
+
+* osd集 命名：`<osd_list>p<pool_id>`
+  * `[0,1,2]p1`表示该pg，与osd.0、osd.1和osd.2关联，与pool 1关联
+
+* 当某个pg的 acting set 和 up set 不一样时，证明有数据正在进行迁移
+  * 比如pg关联的osd变化了，此时读写使用的还是acting set，当up set中的osd将acting set中osd的状态都迁移了，此时acting set才会变得跟up set一样
 
 ##### （5）pg的状态
-[参考文档](https://docs.ceph.com/en/latest/rados/operations/pg-states/)
+[状态参考](https://docs.ceph.com/en/latest/rados/operations/pg-states/)
+[状态debug](https://docs.ceph.com/en/pacific/rados/operations/monitoring-osd-pg/)
 
-* 常用的pg状态
+* 正常的pg状态
 
 |状态|说明|
 |-|-|
 |active|可以处理对pg的请求|
 |clean|所有对象的副本数正常|
-|stale|pg的状态没有更新，处于一种未知状态|
+|remapped|active set和active set不一致时（正在进行数据迁移）|
+
+* 非正常状态
+
+|状态|说明|可能问题|
+|-|-|-|
+|degraded|数据存在，副本数不够</br>或者某一个或更多object找不到|可能某个osd挂掉（正好其中一个副本在上面）|
+|peering|该pg中的osd正在尝试通信，达成共识|osd之间无法通信，可能某个osd挂掉了|
+|recovering|osd正在恢复数据|osd因为宕机，导致数据滞后，重新启动后，需要更新数据|
+|backfill（需要进行backfill）|是一种特殊的recovering，同步该pg的全部内容|当有新的osd加入时|
+|backfilling（正在进行backfill）|是一种特殊的recovering，同步该pg的全部内容|当有新的osd加入时|
+|stale|pg的状态没有更新，处于一种未知状态|osd集中的primary osd没有向mon汇报pg的状态</br>或者其他osd向mon汇报primary osd宕机了|
+
+#### 4.OSD（提供存储服务）
+
+每一个磁盘启动一个OSD服务，就可以提供存储服务了
+pg与OSD关联，从而进行数据的分发
+
+##### （1）OSD状态
+
+* 运行状态
+
+|运行状态|说明|
+|-|-|
+|up|该OSD服务正在运行|
+|down|该OSD服务停止运行|
+
+* 使用状态
+
+|使用状态|说明|
+|-|-|
+|in|该OSD正在集群中（即正在使用中）|
+|out|该OSD不在集中中（即OSD没有在使用）|
