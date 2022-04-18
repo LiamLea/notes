@@ -2,11 +2,16 @@
 
 [toc]
 
+[不同版本的文档，需要去github上查看](https://github.com/ceph/ceph/tree/hammer/doc)
+
 ### orchestrator module：`ceph orch`
 
 #### 1.获取整个集群状态
 ```shell
 ceph status
+
+#参考（https://docs.ceph.com/en/pacific/rados/operations/health-checks/）
+ceph health detail
 ```
 
 #### 2.管理host：`ceph orch host`
@@ -102,16 +107,15 @@ ceph osd metadata <osd_id>
 ceph osd dump
 ```
 
+* 查看osd和host的关系
+```shell
+ceph osd tree
+```
+
 * 查看osd和device的关系
 ```shell
 ceph device ls
-```
-
-* 查看device和host的关系
-```shell
-ceph device ls
-
-#如果上面这个命令，无法查询不到，使用下面的命令：
+#如果上面这个命令，无法查询不到，尝试下面的命令：
 ceph osd find <osd_id>  #<osd_id>就是数字
 ```
 
@@ -145,10 +149,19 @@ ceph config set mon mon_allow_pool_delete false
 ```
 
 #### 3.pg相关
+* 查看所有pg的状态统计
+```shell
+ceph pg stat
+```
 
-* 查看所有pg信息
+* 查看所有pg信息（包括状态等）
 ```shell
 ceph pg ls
+```
+
+* 查看pg的active set和up set
+```shell
+ceph pg map <pg_id>
 ```
 
 * 查看pg在osd上的分布情况
@@ -193,3 +206,31 @@ data:
   usage:   27 GiB used, 69 GiB / 96 GiB avail   #一共 96G，还剩 69G
   pgs:     225 active+clean
 ```
+
+* 查看更详细的状态
+```shell
+ceph health detail
+```
+
+#### 2.查看osd的状态
+```shell
+#osd统计信息
+ceph osd stat
+
+#osd详细信息  
+ceph osd dump
+```
+
+* 运行状态
+
+|运行状态|说明|
+|-|-|
+|up|该OSD服务正在运行|
+|down|该OSD服务停止运行|
+
+* 使用状态
+
+|使用状态|说明|
+|-|-|
+|in|该OSD正在集群中（即正在使用中）|
+|out|该OSD不在集中中（即OSD没有在使用）|

@@ -40,7 +40,7 @@
 |stages|一个stage是一个任务子集（即包含多个steps）|
 |steps|执行的最小单元|
 |options|设置一些基础配置（比如超时时间等）|
-|environment|设置变量，作用于全局或者某个stage|
+|environment|设置环境变量，作用于全局或者某个stage（不仅能在pipeline中引用，还能在系统中引用该变量）|
 |parameters|设置参数，用户执行pipeline时需要输入参数（如果不输入，则用默认的）|
 |when|设置执行的条件|
 |parallel|设置并行执行|
@@ -185,6 +185,41 @@ pipeline {
 }
 ```
 
+* 设置动态环境变量
+```groovy
+pipeline {
+    agent any
+    environment {
+        // Using returnStdout
+        CC = """${sh(
+                returnStdout: true,
+                script: 'echo "clang"'
+            )}"""
+        // Using returnStatus
+        EXIT_STATUS = """${sh(
+                returnStatus: true,
+                script: 'exit 1'
+            )}"""
+    }
+    stages {
+        stage('Example') {
+            environment {
+                DEBUG_FLAGS = '-g'
+            }
+            steps {
+                sh 'printenv'
+            }
+        }
+    }
+}
+
+//输出结果：
+//  ...
+//  CC=clang
+//  EXIT_STATUS=1
+//  DEBUG_FLAGS=-g
+```
+
 #### 2.steps常用语句
 
 [全部语法](https://www.jenkins.io/doc/pipeline/steps/)
@@ -199,7 +234,7 @@ steps {
 
   sleep(time: 1, unit: 'SECONDS')
 
-  //切换目录执行部分steps
+  //切换目录执行部分steps（如果没有该目录会自动创建）
   dir('<path>') {
     echo("hello work")
   }
@@ -323,5 +358,14 @@ stages {
             ''')
         }
     }
+}
+```
+
+##### （6）git
+
+```groovy
+steps {
+  //拉取代码到当前目录（即.git在当前目录）
+  git(url:'<url>', branch:'<branch>')
 }
 ```

@@ -1,6 +1,9 @@
 # maven
+
 [toc]
+
 ### 基本概念
+
 #### 1.maven
 * maven是一款服务于Java平台的自动化构建工具
 * 构建是 以"java源文件","框架配置文件","jsp","html","图片"等资源为原材料，生成一个可以运行的项目的过程
@@ -156,6 +159,19 @@ mvn -f pom.xml clean deploy -D maven.test.skip=true
   <username>nexus账号</username>
   <password>nexus</password>
 </server>
+```
+
+#### 3.允许用http连接nexus仓库
+* 需要将下面的内容注释掉
+```xml
+<!--将下面的内容注释掉-->
+<mirror>
+  <id>maven-default-http-blocker</id>
+  <mirrorOf>external:http:*</mirrorOf>
+  <name>Pseudo repository to mirror external repositories initially using HTTP.</name>
+  <url>http://0.0.0.0/</url>
+  <blocked>true</blocked>
+</mirror
 ```
 
 ***
