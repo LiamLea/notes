@@ -109,7 +109,9 @@ ceph osd dump
 
 * 查看osd和host的关系
 ```shell
-ceph osd tree
+ceph osd tree   #当reweight=0时，表示该osd处于out状态（数据有没有完全迁出，需要查看pg状态）
+#WEIGHT 表示该osd在pg中最初的权重
+#REWEIGHT 表示重新设置osd的权重
 ```
 
 * 查看osd和device的关系
@@ -123,6 +125,24 @@ ceph osd find <osd_id>  #<osd_id>就是数字
 ```shell
 ceph osd df
 ```
+
+* 调整OSD的权重
+  * 手动调整
+  ```shell
+  ceph osd reweight <osd_id> <weight>
+  ```
+
+  * 自动调整
+  ```shell
+  #执行这个命令之前，先dry run一下：
+  # ceph osd test-reweight-by-utilization
+  ceph osd reweight-by-utilization <threshold|default=120> [<max_change|default=0.05> <max_osds|default=4>] [--no-increasing]
+
+  #<threshold>，是一个百分数，范围：100-120: 选出需要重新设置权限的osd：osd的使用率 > 平均使用率（所有osd） * <threshold>
+  #<max_change>: 权重的变化
+  #<max_osds>: 对多少个osd重新设置权重
+  #--no-increasing: 不提升权重，只降低权重
+  ```
 
 #### 2.pool相关
 
@@ -169,6 +189,11 @@ ceph pg map <pg_id>
 ceph osd utilization
 ```
 
+* 查看某个pg的具体情况（能够看出失败的原因等）
+```shell
+ceph pg <pd_id> query
+```
+
 ***
 
 ### 权限相关
@@ -211,26 +236,3 @@ data:
 ```shell
 ceph health detail
 ```
-
-#### 2.查看osd的状态
-```shell
-#osd统计信息
-ceph osd stat
-
-#osd详细信息  
-ceph osd dump
-```
-
-* 运行状态
-
-|运行状态|说明|
-|-|-|
-|up|该OSD服务正在运行|
-|down|该OSD服务停止运行|
-
-* 使用状态
-
-|使用状态|说明|
-|-|-|
-|in|该OSD正在集群中（即正在使用中）|
-|out|该OSD不在集中中（即OSD没有在使用）|

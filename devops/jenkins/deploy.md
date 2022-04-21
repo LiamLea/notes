@@ -35,9 +35,59 @@ agent需要一直运行着，并与controller保持连接，通过ssh或者其�
 
 |agent image|description|extra args|env|
 |-|-|-|-|
-|`maven:3.8.5-openjdk-8`|提供maven|||
+|`maven:3.8.5-openjdk-8`|提供maven|`-v /root/agents/maven/cache:/root/.m2 -v /root/agents/maven/settings.xml:/usr/share/maven/conf/settings.xml`||
 
-#### 4.demo: 配置docker agent
+#### 4.demo: 基于docker配置maven agent
+注意-v源目录是docker所在机器得目录，所以即使jenkins是运行在容器内，-v源目录也是宿主机的目录
+
+* 在docker所在机器上创建相关目录和文件
+```shell
+mkdir -p /root/agents/maven/cache
+```
+* 准备好配置文件：`/root/agents/maven/settings.xml`
+```xml
+<!-- 添加下面的配置 -->
+
+<!-- 设置私库的账号密码 -->
+<servers>
+  <server>
+    <id>maven-public</id>
+    <username>admin</username>
+    <password>cangoal</password>
+  </server>
+  <server>
+    <id>kangpaas-release</id>
+    <username>admin</username>
+    <password>cangoal</password>
+  </server>
+  <server>
+    <id>kangpaas-snapshot</id>
+    <username>admin</username>
+    <password>cangoal</password>
+  </server>
+</servers>
+
+<!-- 设置中央仓库的地址 -->
+<mirrors>
+  <mirror>
+     <id>central</id>
+     <mirrorOf>central</mirrorOf>
+     <name>central</name>
+     <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+  </mirror>
+</mirrors>
+
+<!-- 注释下面内容，否则不能使用http协议连接私库 -->
+<!--<mirror>
+  <id>maven-default-http-blocker</id>
+  <mirrorOf>external:http:*</mirrorOf>
+  <name>Pseudo repository to mirror external repositories initially using HTTP.</name>
+  <url>http://0.0.0.0/</url>
+  <blocked>true</blocked>
+</mirror>-->
+```
+
+* 配置maven agent
 ```shell
 #docker host uri:
 unix:///var/run/docker.sock
@@ -48,6 +98,8 @@ unix:///var/run/docker.sock
 #voluems:
 type=bind,src=/bin/docker,dst=/bin/docker
 type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock
+type=bind,src=/root/agents/maven/cache,dst=/root/.m2
+type=bind,src=/root/agents/maven/settings.xml,dst=/usr/share/maven/conf/settings.xml
 
 #env:
 GIT_SSL_NO_VERIFY=1

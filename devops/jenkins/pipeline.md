@@ -15,6 +15,10 @@
 #### 2.常用的CD场景
 ![](./imgs/pipeline_01.png)
 
+#### 3.使用建议
+* Think of Pipeline as a tool to accomplish a build rather than the core of a build
+pipeline中的基础语句主要作用是连接各个actions，不要过度使用，尽量使用一个sh完成多步操作
+
 ***
 
 ### 语法
@@ -41,7 +45,7 @@
 |steps|执行的最小单元|
 |options|设置一些基础配置（比如超时时间等）|
 |environment|设置环境变量，作用于全局或者某个stage（不仅能在pipeline中引用，还能在系统中引用该变量）|
-|parameters|设置参数，用户执行pipeline时需要输入参数（如果不输入，则用默认的）|
+|parameters|设置参数，用户执行pipeline时需要设置参数值（如果不设置，则用默认的）|
 |when|设置执行的条件|
 |parallel|设置并行执行|
 |matrix|也可以并行（较复杂，通过设置参数，参数的组合决定了并行数，所以每个并行，参数值也不相同）|
@@ -136,7 +140,7 @@ agent {
 }
 ```
 
-##### （2）执行额外任务：post
+##### （2）根据执行结果执行相应任务：post
 根据post所在的位置，决定当整个pipeline 或 某个stage 执行完，执行一些额外的任务
 * 可以根据执行的结果（`<condition>`），决定是否执行，常用condition:
   * always  总是执行
@@ -159,7 +163,7 @@ pipeline {
 * 全局的options
 * stage中的options
 
-##### （4）设置变量
+##### （4）设置环境变量
 
 * 设置环境变量（全局或stage）
 ```groovy
@@ -220,6 +224,27 @@ pipeline {
 //  DEBUG_FLAGS=-g
 ```
 
+##### （5）设置参数
+```groovy
+pipeline {
+    agent any
+    parameters {
+
+        //定义参数Greeing，默认值为：'Hello'
+        string(name: 'Greeting', defaultValue: 'Hello', description: 'How should I greet the world?')
+    }
+    stages {
+        stage('Example') {
+            steps {
+
+                //使用参数
+                echo "${params.Greeting} World!"
+            }
+        }
+    }
+}
+```
+
 #### 2.steps常用语句
 
 [全部语法](https://www.jenkins.io/doc/pipeline/steps/)
@@ -248,10 +273,12 @@ steps {
 }
 ```
 
-##### （2）执行shell命令
+##### （2）执行shell命令: `sh`
+通过`set -e`：只要某个命令执行失败，脚本就会以失败退出（不加这个的话，即使命令失败，脚本还是往下执行，jenkins上显示也是执行成功）
 ```groovy
 steps {
     sh('''#!/bin/bash
+        set -e  
         echo 'Hello world!'
         ls /tmp/
     ''')
@@ -367,5 +394,6 @@ stages {
 steps {
   //拉取代码到当前目录（即.git在当前目录）
   git(url:'<url>', branch:'<branch>')
+  //或：checkout($class: 'GitSCM', url:'<url>', branch:'<branch>')
 }
 ```
