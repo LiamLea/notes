@@ -69,7 +69,7 @@ for ns in namespaces:
                         instances.remove(service)
 
             for instance in instances:
-                run_shell("kubectl get %s %s -n %s -o yaml > %s" %(resource, instance, ns, os.path.join(instances_dir, instance)))
+                run_shell("kubectl get %s %s -n %s -o yaml > %s.yaml" %(resource, instance, ns, os.path.join(instances_dir, instance)))
 
 
 try:
@@ -87,4 +87,4 @@ for resource in global_resources:
             pass
 
         for instance in instances:
-            run_shell("kubectl get %s %s -o yaml > %s" %(resource, instance, os.path.join(instances_dir, instance)))
+            run_shell("kubectl get %s %s -o yaml > %s.yaml" %(resource, instance, os.path.join(instances_dir, instance)))

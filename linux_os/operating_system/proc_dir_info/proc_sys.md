@@ -105,7 +105,7 @@ dmesg -c        #可以查看到读写的日志
 #### 1.`/proc/sys/kernel/pid_max`
   整个系统，最多能同时打开的进程数
 
-#### 2.`/proc/sys/kernel/threads_max`
+#### 2.`/proc/sys/kernel/threads-max`
   一个进程最多能够使用的线程数
 
 #### 3.`ulimit -u`

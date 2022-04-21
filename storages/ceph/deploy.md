@@ -195,12 +195,24 @@ ceph orch daemon add osd <HOST>:<DEVICE_PATH>
 ```
 
 #### 6.删除某个osd
-```shell
 
+* 将osd踢出集群
+```shell
+ceph osd out <osd_id>
+```
+
+* 等所有pg都处于`active+clean`状态（ceph status查看），再进行下面得步骤
+
+* 删除配置文件中关于该osd的配置：`ceph.conf`
+
+* 删除osd
+```shell
+ceph osd crush remove  <osd_id>
+ceph auth del <osd_id>
 ceph osd rm <osd_id>
+
 #查看删除状态（直到PG数量降为0才算真正的删除）
 ceph orch osd rm status
-
 #等osd删除之后，执行这个命令清理磁盘，保证磁盘还可以再次使用
 ceph orch device zap <hostname> <device_path> --force
 ```

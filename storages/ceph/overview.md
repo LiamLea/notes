@@ -152,7 +152,7 @@ ceph osd pool application enable {pool-name} {application-name}
   * 比如：`1.1f`
 
 ##### （5）acting set 和 up set：
-|osd集（即该pg关联了哪些osd）|说明|
+|osd集（即该pg关联了哪些osd）</br>对于replicated pool，一个pg中osd的数量=副本数|说明|
 |-|-|
 |acting set|pg当前关联的osd|
 |up set|pg新关联的osd（需要将acting set关联的osd数据迁移过来），迁移完成后，acting set就会变为跟up set一样|
@@ -173,18 +173,28 @@ ceph osd pool application enable {pool-name} {application-name}
 |-|-|
 |active|可以处理对pg的请求|
 |clean|所有对象的副本数正常|
-|remapped|active set和active set不一致时（正在进行数据迁移）|
+|remapped|active set变化了（可能某个osd out了）|
 
 * 非正常状态
 
 |状态|说明|可能问题|
 |-|-|-|
 |degraded|数据存在，副本数不够</br>或者某一个或更多object找不到|可能某个osd挂掉（正好其中一个副本在上面）|
+|down|某个副本down了||
 |peering|该pg中的osd正在尝试通信，达成共识|osd之间无法通信，可能某个osd挂掉了|
-|recovering|osd正在恢复数据|osd因为宕机，导致数据滞后，重新启动后，需要更新数据|
-|backfill（需要进行backfill）|是一种特殊的recovering，同步该pg的全部内容|当有新的osd加入时|
-|backfilling（正在进行backfill）|是一种特殊的recovering，同步该pg的全部内容|当有新的osd加入时|
+|recovering|osd同步 对象和它的副本 的数据|osd因为宕机，导致某个副本或对象数据滞后，重新启动后，需要同步数据|
+|backfill（需要进行backfill）|是一种特殊的recovering，同步该pg的全部内容|当有新的osd加入（或者剔除某一个osd）时，该osd所在pg的都会进行backfill|
+|backfilling（正在进行backfill）|||
+|backfill_toofull|磁盘容量快满了，导致没法backfill（可以调整osd的权重平衡所有osd的存储或者backfill_ratio提高阈值|
 |stale|pg的状态没有更新，处于一种未知状态|osd集中的primary osd没有向mon汇报pg的状态</br>或者其他osd向mon汇报primary osd宕机了|
+|inconsistent|对象和副本之间的数据不一致||
+|incomplete（严重）|pg检测到数据不完整（即数据丢失），需要启动相应的osd来恢复数据|某几个osd宕机，导致对象和它的副本都无法获取，即数据丢失|
+
+##### （6）需要关注长时间处于down的pg
+因为pg处于down的状态，因为副本down了（即osd down了），当osd down超过一定的时间，osd会变为out，该pg会重新remapped，即不再是down的状态了
+如果一直处于down的状态，可能是所有的副本都down了，即数据丢失了
+
+##### （6）需要保证pg都处于up的状态，才能看出数据的真实状态（否则数据丢失，可能看不出来）
 
 #### 4.OSD（提供存储服务）
 
@@ -201,8 +211,23 @@ pg与OSD关联，从而进行数据的分发
 |down|该OSD服务停止运行|
 
 * 使用状态
+  * 当osd宕机一段时间（10min），该osd状态会变成out，
+  * 当out的osd再次启动，状态就会变成in
 
 |使用状态|说明|
 |-|-|
 |in|该OSD正在集群中（即正在使用中）|
 |out|该OSD不在集中中（即OSD没有在使用）|
+
+##### （2）OSD weight（决定了数据的分布）
+* 范围：0 - 1
+* 作用：
+  * 在一个pg内，OSD的权重的比例，决定了数据的分布
+  * 当数据分布不均衡时（即有些磁盘快满了，有些确还有很多空间），需要调整OSD的权重值
+
+* 有两种调整权重的方式：
+  * 手动调整某个OSD的权重
+  * 自动调整
+
+##### （3）OSD宕机
+当OSD宕机，不会立即发生数据迁移，会等10min，然后会将该OSD提出集群（即out状态），pg就会进行remapped和recovering
