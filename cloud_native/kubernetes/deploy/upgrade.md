@@ -36,14 +36,22 @@
 * 目的：能够实现k8s的**滚动升级**
   * 所以，升级时，不能跨越多个minor version
 
-#### 3.升级最需要考虑的问题：API的升级
+#### 3.升级需要考虑的方面
+
+##### （1）API的改变（需要特别关注）
+
 升级到某一个k8s版本后，API也会升级，会出现新的API代替旧的API：
   * 稳定（GA，general availability）的API（即版本不是alpha或者beta的API），是最终版本的API，通常不会被替换（除非有更新的稳定版）
   * 旧的API（比如一些alpha和beta版本的API），会被 **deprecated（弃用）**，最终在某一个版本被 **removed（移除）**，在被移除之前，这些API还能够被使用
     * [弃用api查询](https://kubernetes.io/docs/reference/using-api/deprecation-guide/)
 * API升级，意味着这个资源的有些字段可能不一样了（即旧的yaml文件可能用不了），需要阅读changelogs
 
-#### 4.升级前先预演：API被移除
+##### （2）相关功能的改变
+* 比如1.20不支持传递selflink，如果有些应用依赖selfLink才能工作，就会有问题
+
+#### 4.升级前先预演
+
+##### （1）移除升级后不存在的API
 通过修改api server的配置，将升级后会被移除的API，先关闭掉，就能看出升级后的效果
 
 #### 5.升级后的影响

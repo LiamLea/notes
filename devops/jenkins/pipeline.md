@@ -135,7 +135,7 @@ agent(<value>)
 agent {
     node {
         label('<label>')   //用于匹配agent
-        customWorkspace('<path>')  //指定工作目录（绝对或相对路径），不指定使用默认的
+        //customWorkspace('<path>')  //指定工作目录（绝对或相对路径），不指定使用默认的
     }
 }
 ```
@@ -395,5 +395,23 @@ steps {
   //拉取代码到当前目录（即.git在当前目录）
   git(url:'<url>', branch:'<branch>')
   //或：checkout($class: 'GitSCM', url:'<url>', branch:'<branch>')
+}
+```
+
+##### （7）在指定container中执行任务（当使用k8s agent时）
+* 如果不指定容器，默认使用jnlp这个容器执行任务
+```groovy
+steps {
+  //如果不指定容器，默认使用jnlp这个容器执行任务
+  sh('''#!/bin/bash
+    echo "aaaa"
+  ''')
+
+  //指定在nodejs这个容器中运行下面的任务
+  container('nodejs') {
+    sh('''#!/bin/bash
+      echo "bbbb"
+    ''')
+  }
 }
 ```
