@@ -19,25 +19,41 @@ docker run --restart always -p 8080:8080 -itd -v /root/jenkins-data:/var/jenkins
 
 agent用于执行controller下发的任务，安装好jenkins后，默认有一个build-in agent（即本地的agent）
 
-#### 1.传统的静态agent（不建议）
-agent需要一直运行着，并与controller保持连接，通过ssh或者其他相关协议
+#### 1.controller 与 agent的三种连接方式
 
-#### 2.基于云（docker或者k8s）的动态agent
-* 需要安装：docker和kuberntes插件
+|连接方式|对环境的要求|
+|-|-|
+|ssh|安装了sshd和java|
+|JNLP（java network launch protocol）|安装了java、启动了agent.jar|
+|attach（只是用docker）|安装了java|
 
-需要创建agent模板，当指定用该agent执行任务时，会自动创建agent（即容器或者pod）去执行任务，当任务执行完成会自动删除该agent
+#### 2.常用镜像
 
-#### 3.常用agent镜像（必须安装好了java）
+##### （1）通用配置（即每个镜像都需要配置）
 
-* 能够方面使用，需要添加以下参数：
-  * 能够使用docker: `-v /bin/docker:/bin/docker -v /var/run/docker.sock:/var/run/docker.sock -u root`
-  * git支持unauthorized ca: `-e GIT_SSL_NO_VERIFY=1`
+* 能够使用docker:
+  * `-v /bin/docker:/bin/docker`
+  * `-v /var/run/docker.sock:/var/run/docker.sock`
+  * `-u root`
+* git支持unauthorized ca:
+  * `-e GIT_SSL_NO_VERIFY=1`
 
+##### （2）镜像列表
 |agent image|description|extra args|env|
 |-|-|-|-|
+|`jenkins/inbound-agent:4.11-1-jdk11`|jenkins agent基础镜像（包含java、git环境）|||
 |`maven:3.8.5-openjdk-8`|提供maven|`-v /root/agents/maven/cache:/root/.m2 -v /root/agents/maven/settings.xml:/usr/share/maven/conf/settings.xml`||
+|`node:8.17.0-stretch-slim`|提供nodejs和npm|`-v /root/.npm:/root/.npm`|
 
-#### 4.demo: 基于docker配置maven agent
+
+#### 3.传统的静态agent
+agent需要一直运行着，并与controller建立连接
+
+#### 4.基于docker的动态agent
+
+需要创建agent（即container）模板，当指定用该agent执行任务时，会自动创建agent（即container），并与controller建立连接，当任务执行完成会自动删除该agent
+
+##### （1）demo: 基于docker配置maven agent
 注意-v源目录是docker所在机器得目录，所以即使jenkins是运行在容器内，-v源目录也是宿主机的目录
 
 * 在docker所在机器上创建相关目录和文件
@@ -45,6 +61,88 @@ agent需要一直运行着，并与controller保持连接，通过ssh或者其�
 mkdir -p /root/agents/maven/cache
 ```
 * 准备好配置文件：`/root/agents/maven/settings.xml`
+
+* 配置maven agent
+```shell
+#docker host uri:
+unix:///var/run/docker.sock
+
+#image:
+10.10.10.250/library/maven:3.8.5-openjdk-8
+
+#voluems:
+type=bind,src=/bin/docker,dst=/bin/docker
+type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock
+type=bind,src=/root/agents/maven/cache,dst=/root/.m2
+type=bind,src=/root/agents/maven/settings.xml,dst=/usr/share/maven/conf/settings.xml
+
+#env:
+GIT_SSL_NO_VERIFY=1
+```
+![](./imgs/deploy_01.png)
+![](./imgs/deploy_02.png)
+
+#### 5.基于k8s的动态agent（建议）
+
+需要创建agent（即pod）模板，当指定用该agent执行任务时，会自动创建agent（即pod），并与controller建立连接，当任务执行完成会自动删除该agent
+* pod中可以创建多个container
+  * 默认会有一个jnlp的container，即不需要在模板中添加
+    * 如果需要覆盖相关配置，需要明确在模板中添加，覆盖相关配置（不需要覆盖的地方填空就行了）
+    * 一般只需要覆盖镜像地址，所以只需要填写container的name和image这两个选项，其他都不填（注意其他最好置空，不然容易出现问题）
+* pod通过创建empry volume，所有container都将该volume挂载到自己的workdir下，实现了数据共享
+* 使用注意：
+  * 不要设置customWorkspace，或者用相对路径，因为pod间的目录共享一个指定目录，如果在这里指定了其他目录，数据就不能共享
+  * 所用容器使用相同的usr id，不然容易出问题，所以都设置成root用户
+
+##### （1）基于k8s配置agent（即pod模板）
+
+* 创建ns
+```shell
+kubectl create ns workflow
+```
+
+* 配置jenkins 连接k8s
+![](./imgs/deploy_03.png)
+
+* 配置pod template（即一些通用配置）
+```shell
+#env:
+GIT_SSL_NO_VERIFY=1
+#volume（hostPath）:
+/bin/docker:/bin/docker
+/var/run/docker.sock:/var/run/docker.sock
+```
+
+![](./imgs/deploy_04.png)
+
+* 配置默认容器（jnlp）
+![](./imgs/deploy_05.png)
+
+
+##### （2）添加maven容器
+
+* 创建maven用于缓存的pvc
+```shell
+vim maven-pvc.yaml
+```
+```yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: maven-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+```
+```shell
+kubectl apply -f maven-pvc.yaml -n workflow
+```
+
+* 创建maven的配置文件configmap
+  * 准备好settings.xml文件
 ```xml
 <!-- 添加下面的配置 -->
 
@@ -87,22 +185,69 @@ mkdir -p /root/agents/maven/cache
 </mirror>-->
 ```
 
-* 配置maven agent
 ```shell
-#docker host uri:
-unix:///var/run/docker.sock
-
-#image:
-10.10.10.250/library/maven:3.8.5-openjdk-8
-
-#voluems:
-type=bind,src=/bin/docker,dst=/bin/docker
-type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock
-type=bind,src=/root/agents/maven/cache,dst=/root/.m2
-type=bind,src=/root/agents/maven/settings.xml,dst=/usr/share/maven/conf/settings.xml
-
-#env:
-GIT_SSL_NO_VERIFY=1
+kubectl create configmap maven-config --from-file=settings.xml=<path> -n workflow
 ```
-![](./imgs/deploy_01.png)
-![](./imgs/deploy_02.png)
+
+* 配置jenkins pod template添加maven容器
+```shell
+#volume（configmap）：
+name: maven-config
+subPath: settings.xml
+mountPath: /usr/share/maven/conf/settings.xml
+
+#volume（pvc）:
+name: maven-pvc
+mountPath: /root/.m2
+```
+![](./imgs/deploy_06.png)
+![](./imgs/deploy_07.png)
+
+##### （3）添加nodejs容器
+* 创建npm用于缓存的pvc
+```shell
+vim npm-pvc.yaml
+```
+```yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: npm-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+```
+```shell
+kubectl apply -f npm-pvc.yaml -n workflow
+```
+
+* 配置jenkins pod template添加nodejs容器
+```shell
+#volume（pvc）:
+name: npm-pvc
+mountPath: /root/.npm
+```
+![](./imgs/deploy_08.png)
+![](./imgs/deploy_09.png)
+
+##### （4）在pipeline中使用k8s agent
+
+* 如果不指定容器，默认使用jnlp这个容器执行任务
+```groovy
+steps {
+  //如果不指定容器，默认使用jnlp这个容器执行任务
+  sh('''#!/bin/bash
+    echo "aaaa"
+  ''')
+
+  //指定在nodejs这个容器中运行下面的任务
+  container('nodejs') {
+    sh('''#!/bin/bash
+      echo "bbbb"
+    ''')
+  }
+}
+```
