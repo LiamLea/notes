@@ -191,6 +191,7 @@ network_interface: "eth0"
 neutron_external_interface: "eth1"
 
 enable_ceph: "yes"
+enable_ceph_mds: "yes"
 enable_cinder: "yes"
 
 #  设置hypervisor类型（默认为：kvm）

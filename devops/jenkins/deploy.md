@@ -2,16 +2,24 @@
 
 [toc]
 
-### 安装jenkins（docker)
+### 安装jenkins
 
+#### 1.docker方式安装
 ```shell
 mkdir /root/jenkins-data
 mkdir /root/jenkins-docker-certs
 chown -R 1000 /root/jenkins-data
 chown -R 1000 /root/jenkins-docker-certs
 
-docker run --restart always -p 8080:8080 -itd -v /root/jenkins-data:/var/jenkins_home -v /root/jenkins-docker-certs:/certs/client:ro -v /bin/docker:/bin/docker -v /var/run/docker.sock:/var/run/docker.sock --group-add <docker_group_id> 10.10.10.250/library/jenkins/jenkins:2.332.2-jdk11
+docker run --name jenkins --restart always -p 8080:8080 -p 50000:50000 -itd -v /root/jenkins-data:/var/jenkins_home -v /root/jenkins-docker-certs:/certs/client:ro -v /bin/docker:/bin/docker -v /var/run/docker.sock:/var/run/docker.sock --group-add <docker_group_id> 10.10.10.250/library/jenkins/jenkins:2.332.2-jdk11
 ```
+
+#### 2.端口说明
+
+|port|description|
+|-|-|
+|8080|web ui|
+|50000|用于agent连接该controller（可以在Configure Global Security中修改|
 
 ***
 
@@ -93,6 +101,7 @@ GIT_SSL_NO_VERIFY=1
 * 使用注意：
   * 不要设置customWorkspace，或者用相对路径，因为pod间的目录共享一个指定目录，如果在这里指定了其他目录，数据就不能共享
   * 所用容器使用相同的usr id，不然容易出问题，所以都设置成root用户
+  * pvc最好使用RWX模式（有些sc不支持，比如：ceph rbd），否则不能启动多个任务
 
 ##### （1）基于k8s配置agent（即pod模板）
 
@@ -132,13 +141,14 @@ metadata:
   name: maven-pvc
 spec:
   accessModes:
-  - ReadWriteOnce
+  - ReadWriteMany
   resources:
     requests:
       storage: 10Gi
 ```
 ```shell
 kubectl apply -f maven-pvc.yaml -n workflow
+#查看pvc状态：kubectl get pvc -n workflow
 ```
 
 * 创建maven的配置文件configmap
@@ -215,13 +225,14 @@ metadata:
   name: npm-pvc
 spec:
   accessModes:
-  - ReadWriteOnce
+  - ReadWriteMany
   resources:
     requests:
       storage: 10Gi
 ```
 ```shell
 kubectl apply -f npm-pvc.yaml -n workflow
+#查看pvc状态：kubectl get pvc -n workflow
 ```
 
 * 配置jenkins pod template添加nodejs容器
@@ -251,3 +262,6 @@ steps {
   }
 }
 ```
+
+#### 6.debug动态agent
+可以将动态agent设置为不删除，这样就可以查看日志，从而定位问题
