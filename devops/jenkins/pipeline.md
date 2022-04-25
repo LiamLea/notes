@@ -25,7 +25,28 @@ pipeline中的基础语句主要作用是连接各个actions，不要过度使�
 
 [参考](https://www.jenkins.io/doc/book/pipeline/syntax/)
 
-#### 1.基本格式
+#### 1.单引号和双引号：
+* 当需要传递`${...}`时，使用单引号，否则使用双引号
+  * 比如：`sh("echo ${params.v1}")`，如果不使用双引号，`${params.v1}`会被传递给shell，但是这个明明是pipeline中设置的参数
+  * 当使用双引号时，想把`${...}`传递给shell时，`\${...}`
+
+  ```groovy
+  //$v1会传递给shell
+  //$v2不会传递给shell
+  sh("""
+    set -ex
+    echo \$v1   
+    echo $v2
+  """)
+  ```
+
+##### （1）需要转义的符合（当使用双引号时）
+
+|symbol|escape|
+|-|-|
+|`$`|`\$`|
+
+#### 2.基本格式
 
 * 基础语法
 
@@ -179,10 +200,12 @@ pipeline {
 
         steps {
 
-            //使用变量的三种方式
+            //使用变量（注意单引号和双引号的区别）
             echo("$v2")
-            echo(v2)
-            echo(env.v2)
+            echo('$v2')
+
+            //注意使用的是双引号
+            echo("${env.v2}")
         }
     }
   }
@@ -224,7 +247,10 @@ pipeline {
 //  DEBUG_FLAGS=-g
 ```
 
-##### （5）设置参数
+##### （5）常用内置变量
+[参考](https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#using-environment-variables)
+
+##### （6）设置参数
 ```groovy
 pipeline {
     agent any
@@ -237,7 +263,7 @@ pipeline {
         stage('Example') {
             steps {
 
-                //使用参数
+                //使用参数（注意双引号）
                 echo "${params.Greeting} World!"
             }
         }
@@ -245,7 +271,7 @@ pipeline {
 }
 ```
 
-#### 2.steps常用语句
+#### 3.steps常用语句
 
 [全部语法](https://www.jenkins.io/doc/pipeline/steps/)
 
@@ -277,11 +303,12 @@ steps {
 通过`set -e`：只要某个命令执行失败，脚本就会以失败退出（不加这个的话，即使命令失败，脚本还是往下执行，jenkins上显示也是执行成功）
 ```groovy
 steps {
-    sh('''#!/bin/bash
-        set -e  
+    //注意使用的双引号
+    sh("""#!/bin/bash
+        set -ex  
         echo 'Hello world!'
         ls /tmp/
-    ''')
+    """)
 }
 ```
 
@@ -318,6 +345,7 @@ stages {
         steps {
             dir(path: 'new') {
                 sh('''#!/bin/bash
+                    set -ex
                     echo 'hello world' > a.txt
                 ''')
             }
@@ -342,9 +370,10 @@ stages {
             //恢复data中的文件到当前工作目录
             unstash(name: 'data')
 
-            sh('''#!/bin/bash
+            sh("""#!/bin/bash
+                set -ex
                 cat new/a.txt
-            ''')
+            """)
         }
     }
 }
@@ -361,9 +390,10 @@ stages {
 
         steps {
             dir(path: 'new') {
-                sh('''#!/bin/bash
+                sh("""#!/bin/bash
+                    set -ex
                     echo 'hello world' > a.txt
-                ''')
+                """)
             }
 
             archiveArtifacts(artifacts: '**')
@@ -379,10 +409,11 @@ stages {
     stage('Stage 1') {
         steps {
             copyArtifacts(projectName: 'test-3', filter: '**', target: 'new-1')
-            sh('''#!/bin/bash
+            sh("""#!/bin/bash
+                set -ex
                 ls
                 cat new-1/new/a.txt
-            ''')
+            """)
         }
     }
 }
@@ -403,15 +434,17 @@ steps {
 ```groovy
 steps {
   //如果不指定容器，默认使用jnlp这个容器执行任务
-  sh('''#!/bin/bash
+  sh("""#!/bin/bash
+    set -ex
     echo "aaaa"
-  ''')
+  """)
 
   //指定在nodejs这个容器中运行下面的任务
   container('nodejs') {
-    sh('''#!/bin/bash
+    sh("""#!/bin/bash
+      set -ex
       echo "bbbb"
-    ''')
+    """)
   }
 }
 ```

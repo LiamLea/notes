@@ -4,7 +4,7 @@
 
 ### 概述
 
-#### 1.cephfs
+#### 1.cephfs（需要MDS服务）
 基于RADOS对外提供文件系统
 需要至少两个pool：一个pool用于存储data（可以有多个data pool），另一个pool用于存储metadata
 数据的存取会被分成同等大小的chunk，每个chunk是一个object，存储在RADOS中，元数据存在另一个pool（通过MDS服务提供）
@@ -96,7 +96,7 @@ ceph fs set <fd_name> <key> <value>
 
 * 删除文件系统
 ```shell
-ceph fs rm <fs_name> --yes-i-readlly-mean-it
+ceph fs rm <fs_name> --yes-i-really-mean-it
 ```
 
 * 管理subvolume
@@ -183,7 +183,7 @@ storageClass:
   clusterID: 20870fc4-c996-11eb-8c25-005056b80961 #刚刚在集群信息中设置的id
   fsName: ceph-fs     #需要已经存在的volume
   volumeNamePrefix: "dev-csi-vol-"    #设置创建的subvolume的前缀（最好设置，当有多个环境时，能够区分）
-                                      #csi-dev-vol-大概意思：这是dev环境中，通过csi创建的subvolume
+                                      #dev-csi-vol-大概意思：这是dev环境中，通过csi创建的subvolume
 ```
 
 ##### （4）创建volume
