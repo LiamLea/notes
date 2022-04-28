@@ -1,3 +1,5 @@
+[toc]
+
 ### 常用dashboard
 
 #### 1.监控Linux：8919
