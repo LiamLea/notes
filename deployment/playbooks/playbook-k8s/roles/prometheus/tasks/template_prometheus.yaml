@@ -1,12 +1,8 @@
-- name: install prometheus
-  kubernetes.core.helm:
+- name: template prometheus
+  kubernetes.core.helm_template:
     chart_ref: "{{ chart.path }}{{ monitor.prometheus.chart.path }}"
     chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
     chart_version: "{{ monitor.prometheus.chart.version }}"
-    release_name: "{{ monitor.prometheus.name }}"
-    release_namespace: "{{ monitor.namespace }}"
-    create_namespace: yes
-    atomic: yes
     release_values:
       alertmanager:
         image:
@@ -36,72 +32,33 @@
       kube-state-metrics:
         image:
           repository: "{{ monitor.repository }}k8s.gcr.io/kube-state-metrics/kube-state-metrics"
+  register: prometheus_template_result
 
-- name: install blackbox-exporter
-  kubernetes.core.helm:
+- name: template blackbox
+  kubernetes.core.helm_template:
     chart_ref: "{{ chart.path }}{{ monitor.prometheus.blackbox.chart.path }}"
     chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
     chart_version: "{{ monitor.prometheus.blackbox.chart.version }}"
-    release_name: "{{ monitor.prometheus.blackbox.name }}"
-    release_namespace: "{{ monitor.namespace }}"
-    create_namespace: yes
-    atomic: yes
     release_values:
       image:
         repository: "{{ monitor.repository }}prom/blackbox-exporter"
+  register: blackbox_template_result
 
-- name: install prometheus-adapter
-  kubernetes.core.helm:
+- name: template prometheus-adapter
+  kubernetes.core.helm_template:
     chart_ref: "{{ chart.path }}{{ monitor.prometheus.adapter.chart.path }}"
     chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
     chart_version: "{{ monitor.prometheus.adapter.chart.version }}"
-    release_name: "{{ monitor.prometheus.adapter.name }}"
-    release_namespace: "{{ monitor.namespace }}"
-    create_namespace: yes
-    atomic: yes
     release_values:
       image:
         repository: "{{ monitor.repository }}k8s.gcr.io/prometheus-adapter/prometheus-adapter"
-      prometheus:
-        url: http://prometheus-server
-        port: 80
-      rules:
-        resource:
-          cpu:
-            containerQuery: sum(rate(container_cpu_usage_seconds_total{<<.LabelMatchers>>, container!=""}[3m])) by (<<.GroupBy>>)
-            nodeQuery: sum(rate(container_cpu_usage_seconds_total{<<.LabelMatchers>>, id='/'}[3m])) by (<<.GroupBy>>)
-            resources:
-              overrides:
-                kubernetes_io_hostname:
-                  resource: node
-                namespace:
-                  resource: namespace
-                pod:
-                  resource: pod
-            containerLabel: container
-          memory:
-            containerQuery: sum(container_memory_working_set_bytes{<<.LabelMatchers>>, container!=""}) by (<<.GroupBy>>)
-            nodeQuery: sum(container_memory_working_set_bytes{<<.LabelMatchers>>,id='/'}) by (<<.GroupBy>>)
-            resources:
-              overrides:
-                kubernetes_io_hostname:
-                  resource: node
-                namespace:
-                  resource: namespace
-                pod:
-                  resource: pod
-            containerLabel: container
-          window: 3m
+  register: adapter_template_result
 
 - name: install grafana
-  kubernetes.core.helm:
+  kubernetes.core.helm_template:
     chart_ref: "{{ chart.path }}{{ monitor.prometheus.grafana.chart.path }}"
     chart_repo_url: "{{ chart.repo['grafana'] }}"
     chart_version: "{{ monitor.prometheus.grafana.chart.version }}"
-    release_name: "{{ monitor.prometheus.grafana.name }}"
-    release_namespace: "{{ monitor.namespace }}"
-    create_namespace: yes
-    atomic: yes
     release_values:
       image:
         repository: "{{ monitor.repository }}grafana/grafana"
@@ -115,8 +72,12 @@
       initChownData:
         image:
           repository: "{{ monitor.repository }}busybox"
-      grafana.ini:
-        server:
-          root_url: "%(protocol)s://%(domain)s/grafana"
-          serve_from_sub_path: true
-      adminPassword: admin
+  register: grafana_template_result
+
+- name: set facts
+  set_fact:
+    prometheus_template_stdout: "{{ prometheus_template_result.stdout_lines + blackbox_template_result.stdout_lines + adapter_template_result.stdout_lines + grafana_template_result.stdout_lines }}"
+
+- name: get images
+  set_fact:
+    prometheus_images: "{{ prometheus_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"

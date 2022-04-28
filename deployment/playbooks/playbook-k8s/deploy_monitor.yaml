@@ -1,0 +1,5 @@
+- hosts: all
+  gather_facts: True
+  become: True
+  roles:
+  - { role: prometheus, when: "inventory_hostname in groups['work_master']" }

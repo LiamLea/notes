@@ -1,13 +1,2 @@
 task_id: 2
 workdir: "~/ansible_{{task_id}}"
-prometheus:
-  alertmanager:
-    repository: docker.repo.local:5000/alertmanager
-  configmapReload:
-    repository: docker.repo.local:5000/configmap-reload
-  nodeExporter:
-    repository: docker.repo.local:5000/node-exporter
-  pushgateway:
-    repository: docker.repo.local:5000/pushgateway
-  repository: docker.repo.local:5000/prometheus
-  storage_class: prometheus

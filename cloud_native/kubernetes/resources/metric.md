@@ -186,7 +186,7 @@ metricsQuery: "sum(rate(<<.Series>>{<<.LabelMatchers>>}[2m])) by (<<.GroupBy>>)"
 ##### （1）`values.yaml`
 ```yaml
 
-#配置prometheus地址
+#配置prometheus地址（一定要配置）
 prometheus:
   url: http://prometheus-server.monitor
   port: 80

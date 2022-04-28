@@ -27,13 +27,17 @@ run: docker
 test: docker
 	docker run --rm --network host --name ansible-lil-test -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook test.yaml -e @global.yaml"
 
+.PHONY := monitor
+monitor: docker
+	docker run --rm --network host --name ansible-lil-monitor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook deploy_monitor.yaml -e @global.yaml"
+
 .PHONY := stop
 stop:
 	docker stop ansible-lil
 
 .PHONY := list_images
 list_images: docker
-	docker run --rm --network host --name ansible-lil-list -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook list_images.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil-list -v ${ansible_dir}/roles/k8s/files/helm:/bin/helm -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "chmod +x /bin/helm;cd /root/ansible;ansible-playbook list_images.yaml -e @global.yaml"
 
 .PHONY := check
 check: docker

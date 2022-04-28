@@ -20,6 +20,7 @@ hosts:
 #if registry is changed,you should pay attention to registry_prefix
 registry: "10.10.10.250"
 #when registry is empty, this should be empty too
+#must end with / or be empty
 registry_prefix: "{{ registry }}/library/"
 
 docker:
@@ -71,6 +72,42 @@ nfs:
   server: ""
   path: ""
   image: "{{ registry_prefix }}nfs-server-alpine:12"
+
+chart:
+  repo:
+    prometheus-community: https://prometheus-community.github.io/helm-charts
+    grafana: https://grafana.github.io/helm-charts
+  #if the charts are local, set the absoulte path here(e.g. /home/lil/prometheus)
+  #then chart url and chart version won't work
+  #must end with /
+  path: ""
+
+monitor:
+  namespace: monitor
+  repository: "{{ registry_prefix }}"
+  #use default sc when set null
+  storage_class: null
+  prometheus:
+    name: prometheus
+    chart:
+      #the path is relative path
+      path: "prometheus"
+      version: "15.8.5"
+    blackbox:
+      name: "blackbox-exporter"
+      chart:
+        path: "prometheus-blackbox-exporter"
+        version: "5.7.0"
+    adapter:
+      name: "prometheus-adapter"
+      chart:
+        path: "prometheus-adapter"
+        version: "3.2.2"
+    grafana:
+      name: "grafana"
+      chart:
+        path: "grafana"
+        version: "6.28.0"
 
 
 #basic service

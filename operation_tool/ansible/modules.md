@@ -275,12 +275,16 @@ blockinfile:
 ***
 
 ### kubernetes相关模块
-需要安装community.kubernetes collection
+
+debug方式：通过ansible -vvv获取执行的helm命令，然后去目标机上执行，能够看出报错，
+如果不这样，直接看ansible的报错，看不出原因
 
 #### 1.helm
 ```yaml
-community.kubernetes.helm:
-  chart_ref: <path_or_url>
+kubernetes.core.helm:
+  chart_ref: <path> #会先在本地寻找，然后会在url中寻找
+  chart_repo_url: <url>
+  chart_version: <version>
   release_name: <name>
   release_namespace: <namespace>
   create_namespace: yes #默认为no
