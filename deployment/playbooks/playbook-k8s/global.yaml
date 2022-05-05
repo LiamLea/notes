@@ -108,6 +108,16 @@ monitor:
       chart:
         path: "grafana"
         version: "6.28.0"
+      dashboards:
+        default:
+          node-exporter:
+            gnetId: 8919
+            revision: 24
+            datasource: Prometheus
+          blackbox-exporter:
+            gnetId: 7587
+            revision: 3
+            datasource: Prometheus
 
 
 #basic service
