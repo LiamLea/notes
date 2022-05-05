@@ -5,6 +5,18 @@
 
 #### 1.安装设置数据源
 
+```yaml
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-server
+      access: proxy
+      isDefault: true
+```
+
 #### 2.安装时导入dashboard
 
 * 有四种导入方式
