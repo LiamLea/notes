@@ -45,7 +45,7 @@ check: docker
 
 .PHONY := install_harbor
 install_harbor: docker
-	docker run --rm --network host --name ansible-lil-harbor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook -i inventory/harbor_hosts install_harbor.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil-harbor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook install_harbor.yaml -e @global.yaml"
 
 .PHONY := push_images
 push_images: docker

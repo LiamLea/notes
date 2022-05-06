@@ -1,9 +1,1 @@
-- name: taints tidb nodes
-  shell: "kubectl taint --overwrite nodes {{ item }} node-role=tidb:NoExecute"
-  with_items: "{{ groups['tidb'] }}"
-  when: groups["tidb"] is defined
-
-- name: taints prometheus nodes
-  shell: "kubectl taint --overwrite nodes {{ item }} node-role=prometheus:NoExecute"
-  with_items: "{{ groups['prometheus'] }}"
-  when: groups["prometheus"] is defined
+#e.g. taint some nodes

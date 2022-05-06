@@ -165,7 +165,7 @@ selinux:
   state: disabled
 ```
 
-##### 5.sysctl
+#### 5.sysctl
 ```yaml
 sysctl:
   name: <KEY>

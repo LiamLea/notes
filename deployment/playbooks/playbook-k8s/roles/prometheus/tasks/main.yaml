@@ -1,4 +1,24 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- block:
+  - name: copy charts
+    copy:
+      src: "{{ chart.local_dir.rstrip('/') }}/"
+      dest: "/tmp/"
+      force: true
+  - name: set fact
+    set_fact:
+      __path: "/tmp/"
+  when: chart.local_dir.strip() != ""
+
+- name: set fact
+  set_fact:
+    __node_exporter: "{{ __node_exporter | default([]) + [hostvars[item]['ansible_host'] + ':' + (monitor['node_exporter']['port']|string)] + monitor.prometheus.config.node_exporter }}"
+  when: item not in groups['monitor_exceptions']
+  with_items: "{{ groups['all'] }}"
+
 - name: setup prometheus
   include_tasks: setup_prometheus.yaml
   when: inventory_hostname in groups["work_master"]
-

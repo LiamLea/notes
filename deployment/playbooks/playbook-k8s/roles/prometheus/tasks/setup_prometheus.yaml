@@ -1,6 +1,6 @@
 - name: install prometheus
   kubernetes.core.helm:
-    chart_ref: "{{ chart.path }}{{ monitor.prometheus.chart.path }}"
+    chart_ref: "{{ __path }}{{ monitor.prometheus.chart.path }}"
     chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
     chart_version: "{{ monitor.prometheus.chart.version }}"
     release_name: "{{ monitor.prometheus.name }}"
@@ -296,7 +296,7 @@
             params:
               module: [http_2xx]
             static_configs:
-              - targets: []
+              - targets: "{{ monitor.prometheus.config.http_probe }}"
             relabel_configs:
               - source_labels: [__address__]
                 target_label: __param_target
@@ -310,7 +310,7 @@
             params:
               module: [icmp]
             static_configs:
-              - targets: []
+              - targets: "{{ monitor.prometheus.config.icmp_probe }}"
             relabel_configs:
               - source_labels: [__address__]
                 target_label: __param_target
@@ -324,7 +324,7 @@
             params:
               module: [tcp_connect]
             static_configs:
-              - targets: []
+              - targets: "{{ monitor.prometheus.config.tcp_probe }}"
             relabel_configs:
               - source_labels: [__address__]
                 target_label: __param_target
@@ -335,11 +335,11 @@
 
           - job_name: node-exporter
             static_configs:
-              - targets: []
+              - targets: "{{ __node_exporter }}"
 
 - name: install blackbox-exporter
   kubernetes.core.helm:
-    chart_ref: "{{ chart.path }}{{ monitor.prometheus.blackbox.chart.path }}"
+    chart_ref: "{{ __path }}{{ monitor.prometheus.blackbox.chart.path }}"
     chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
     chart_version: "{{ monitor.prometheus.blackbox.chart.version }}"
     release_name: "{{ monitor.prometheus.blackbox.name }}"
@@ -355,7 +355,7 @@
 
 - name: install prometheus-adapter
   kubernetes.core.helm:
-    chart_ref: "{{ chart.path }}{{ monitor.prometheus.adapter.chart.path }}"
+    chart_ref: "{{ __path }}{{ monitor.prometheus.adapter.chart.path }}"
     chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
     chart_version: "{{ monitor.prometheus.adapter.chart.version }}"
     release_name: "{{ monitor.prometheus.adapter.name }}"
@@ -368,6 +368,7 @@
       prometheus:
         url: http://prometheus-server
         port: 80
+        path: /prometheus
       rules:
         resource:
           cpu:
@@ -398,7 +399,7 @@
 
 - name: install grafana
   kubernetes.core.helm:
-    chart_ref: "{{ chart.path }}{{ monitor.prometheus.grafana.chart.path }}"
+    chart_ref: "{{ __path }}{{ monitor.prometheus.grafana.chart.path }}"
     chart_repo_url: "{{ chart.repo['grafana'] }}"
     chart_version: "{{ monitor.prometheus.grafana.chart.version }}"
     release_name: "{{ monitor.prometheus.grafana.name }}"

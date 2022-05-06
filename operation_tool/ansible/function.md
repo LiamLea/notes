@@ -27,3 +27,18 @@
 set_fact:
   list_new: "{{ list1 + list2 }}"
 ```
+
+##### 3.创建列表
+* 方式一：
+```jinja2
+{# (monitor['node_exporter']['port']|string))  使用变量，并且将这个变量转换成字符串#}
+{{ groups['all'] | map('extract', hostvars, ['ansible_host']) | map('regex_replace', '^(.*)$','\\1:' + (monitor['node_exporter']['port']|string)) | list }}
+```
+
+* 方式二（利用with_items）：
+```yaml
+- name: set fact
+  set_fact:
+    dst: "{{ dst | default([]) + [hostvars[item]['ansible_host'] + ':' + (monitor['node_exporter']['port']|string)]}}"
+  with_items: "{{ groups['all'] }}"
+```

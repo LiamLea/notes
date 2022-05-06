@@ -9,7 +9,14 @@ node-2 ansible_host=3.1.4.125 ansible_user=root ansible_password=cangoal
 node-3 ansible_host=3.1.4.127 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
 
 [others]
-#harbor ansible_host=3.1.4.126 ansible_user=root ansible_password=cangoal
+#test-1 ansible_host=3.1.4.126 ansible_user=root ansible_password=cangoal
+
+[harbor]
+#harbor ansible_host=3.1.4.250 ansible_user=root ansible_password=cangoal
+
+[monitor]
+
+[monitor_exception]
 
 [ansible]
 master-1
@@ -28,15 +35,15 @@ master-2
 [keepalived:children]
 nginx
 
-[registry]
-#docker-registry ansible_host=3.1.5.238 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal registry_host=docker.repo.aiops
-
-[nfs]
-#docker-registry nfs_path=/mnt/nfs-k8s
-
-[tidb]
-
-[prometheus]
-
 [ntp_server]
 master-1
+
+[cluster:children]
+k8s
+nginx
+ntp_server
+others
+
+[monitor_exceptions:children]
+k8s
+monitor_exception

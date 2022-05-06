@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: cluster
   gather_facts: True
   become: True
   become_method: sudo
@@ -6,15 +6,4 @@
   roles:
   - init
   - docker
-#  - { role: docker-registry, when: "inventory_hostname in groups['registry']" }
-#  - { role: nfs-server, when: "inventory_hostname in groups['nfs']"}
   - { role: k8s, when: "inventory_hostname in groups['k8s']" }
-#  - { role: k8s_basic, when: "inventory_hostname in groups['work_master']" }
-#  - { role: storage_class }
-#  - { role: tidb, when: "inventory_hostname in groups['work_master']" }
-#  - { role: mysql, when: "inventory_hostname in groups['work_master']" }
-#  - { role: kafka, when: "inventory_hostname in groups['work_master']" }
-#  - { role: redis, when: "inventory_hostname in groups['work_master']" }
-#  - { role: prometheus, when: "inventory_hostname in groups['work_master']" }
-#  - { role: grafana, when: "inventory_hostname in groups['work_master']" }
-#  - { role: aiops, when: "inventory_hostname in groups['work_master']" }

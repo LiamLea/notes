@@ -1,0 +1,8 @@
+- name: check node-exporter
+  shell: "ss -tulnp src :{{ monitor.node_exporter.port }} | grep {{ monitor.node_exporter.port }}"
+  ignore_errors: True
+  register: node_exporter_setup
+
+- name: install node-exporter
+  include_tasks: install.yaml
+  when: node_exporter_setup.rc != 0
