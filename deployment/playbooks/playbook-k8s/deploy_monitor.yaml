@@ -3,3 +3,9 @@
   become: True
   roles:
   - { role: prometheus, when: "inventory_hostname in groups['work_master']" }
+
+- hosts: all:!monitor_exceptions
+  gather_facts: True
+  become: True
+  roles:
+  - node-exporter
