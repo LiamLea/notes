@@ -1,6 +1,15 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- name: set fact
+  set_fact:
+    __path: "{{ chart.local_dir.rstrip('/') }}/"
+  when: chart.local_dir.strip() != ""
+
 - name: template prometheus
   kubernetes.core.helm_template:
-    chart_ref: "{{ chart.path }}{{ monitor.prometheus.chart.path }}"
+    chart_ref: "{{ __path }}{{ monitor.prometheus.chart.path }}"
     chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
     chart_version: "{{ monitor.prometheus.chart.version }}"
     release_values:
@@ -36,7 +45,7 @@
 
 - name: template blackbox
   kubernetes.core.helm_template:
-    chart_ref: "{{ chart.path }}{{ monitor.prometheus.blackbox.chart.path }}"
+    chart_ref: "{{ __path }}{{ monitor.prometheus.blackbox.chart.path }}"
     chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
     chart_version: "{{ monitor.prometheus.blackbox.chart.version }}"
     release_values:
@@ -46,7 +55,7 @@
 
 - name: template prometheus-adapter
   kubernetes.core.helm_template:
-    chart_ref: "{{ chart.path }}{{ monitor.prometheus.adapter.chart.path }}"
+    chart_ref: "{{ __path }}{{ monitor.prometheus.adapter.chart.path }}"
     chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
     chart_version: "{{ monitor.prometheus.adapter.chart.version }}"
     release_values:
@@ -56,7 +65,7 @@
 
 - name: install grafana
   kubernetes.core.helm_template:
-    chart_ref: "{{ chart.path }}{{ monitor.prometheus.grafana.chart.path }}"
+    chart_ref: "{{ __path }}{{ monitor.prometheus.grafana.chart.path }}"
     chart_repo_url: "{{ chart.repo['grafana'] }}"
     chart_version: "{{ monitor.prometheus.grafana.chart.version }}"
     release_values:

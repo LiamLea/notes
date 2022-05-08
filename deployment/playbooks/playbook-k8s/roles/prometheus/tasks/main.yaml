@@ -13,6 +13,9 @@
       __path: "/tmp/"
   when: chart.local_dir.strip() != ""
 
+- name: set __node_exporter
+  set_fact:
+    __node_exporter: []
 - name: set fact
   set_fact:
     __node_exporter: "{{ __node_exporter | default([]) + [hostvars[item]['ansible_host'] + ':' + (monitor['node_exporter']['port']|string)] + monitor.prometheus.config.node_exporter }}"
