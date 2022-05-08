@@ -5,6 +5,7 @@
     apt:
       name: "kubeadm={{ kubernetes.version }}-00"
       state: present
+      update_cache: yes
   - name: get k8s images
     shell: "kubeadm config images list --kubernetes-version={{ kubernetes.version}} --image-repository={{ kubernetes.repository }}"
     register: result1

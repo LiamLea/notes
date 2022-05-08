@@ -158,6 +158,8 @@ scrape_configs:
 
 #### 1.告警规则的设置
 
+[更多告警规则参考](https://awesome-prometheus-alerts.grep.to/rules.html#prometheus-self-monitoring)
+
 * service
 
 |service|说明|

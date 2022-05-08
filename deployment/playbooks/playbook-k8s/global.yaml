@@ -87,11 +87,16 @@ monitor:
       path: "prometheus"
       version: "15.8.5"
     config:
+      #this url will send with alerting msg which user can click to access prometheus to get alerting details
+      external_url: "https://k8s.my.local:30443/prometheus"
+      webhook_configs:
+      - send_resolved: true
+        url: ""
+      scrape_interval: "1m"
       icmp_probe: []
       tcp_probe: []
       http_probe: []
       node_exporter: []
-
     blackbox:
       name: "blackbox-exporter"
       chart:

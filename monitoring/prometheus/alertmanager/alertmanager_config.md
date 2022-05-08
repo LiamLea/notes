@@ -163,3 +163,102 @@ inhibit_rules:
   equal:
   - <labelname>
 ```
+
+***
+
+### 与第三方应用结合
+
+#### 1.发送告警到钉钉
+
+[参考](https://github.com/timonwong/prometheus-webhook-dingtalk)
+
+##### （1）创建配置文件
+```shell
+vim /etc/dingtalk/config.yaml
+```
+
+```yaml
+targets:
+  webhook1:
+    url: https://oapi.dingtalk.com/robot/send?access_token=09935dc01b6beccc3e485abcf7c8f4a74114630fd38a8db126efb612a46c3633
+    # secret for signature
+    secret: SEC2f054a2c5f2cda5801a3d25ead7c1b741b03f6638bf4a7980c6e05aa8746c13a
+```
+
+##### （2）启动
+```shell
+docker run --rm -itd -v /etc/dingtalk/config.yaml:/etc/dingtalk/config.yaml -p 8060:8060 timonwong/prometheus-webhook-dingtalk:master --config.file=/etc/dingtalk/config.yaml
+```
+
+##### （3）获取webhook的地址
+查看启动日志，webhook在日志中：
+urls=http://localhost:8060/dingtalk/webhook1/send
+
+##### （4）测试
+```shell
+curl -H "Content-Type: application/json" -d '{"test": "alertmanager"}' http://10.10.10.191:8060/dingtalk/webhook1/send
+```
+
+##### 在k8s上部署
+```yaml
+apiVersion: v1
+data:
+  config.yaml: |
+    targets:
+      webhook1:
+        url: https://oapi.dingtalk.com/robot/send?access_token=09935dc01b6beccc3e485abcf7c8f4a74114630fd38a8db126efb612a46c3633
+        secret: SEC2f054a2c5f2cda5801a3d25ead7c1b741b03f6638bf4a7980c6e05aa8746c13a
+kind: ConfigMap
+metadata:
+  name: alertmanager-webhook-dingtalk
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager-webhook-dingtalk
+spec:
+  selector:
+    matchLabels:
+      app: alertmanager-webhook-dingtalk
+  template:
+    metadata:
+      labels:
+        app: alertmanager-webhook-dingtalk
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: alertmanager-webhook-dingtalk
+      containers:
+        - name: alertmanager-webhook-dingtalk
+          image: timonwong/prometheus-webhook-dingtalk:master
+          args:
+            - --web.listen-address=:8060
+            - --config.file=/config/config.yaml
+          volumeMounts:
+            - name: config
+              mountPath: /config
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+          ports:
+            - name: http
+              containerPort: 8060
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager-webhook-dingtalk
+spec:
+  selector:
+    app: alertmanager-webhook-dingtalk
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+```

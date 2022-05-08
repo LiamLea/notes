@@ -37,6 +37,10 @@ set_fact:
 
 * 方式二（利用with_items）：
 ```yaml
+#最好先设置一下为空，不然如果{{ groups['all'] }}为空的话，dst就会是未定义
+- name: set fact
+  set_fact:
+    dst: []
 - name: set fact
   set_fact:
     dst: "{{ dst | default([]) + [hostvars[item]['ansible_host'] + ':' + (monitor['node_exporter']['port']|string)]}}"
