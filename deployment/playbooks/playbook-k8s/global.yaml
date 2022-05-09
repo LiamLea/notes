@@ -70,6 +70,7 @@ chart:
   repo:
     prometheus-community: https://prometheus-community.github.io/helm-charts
     grafana: https://grafana.github.io/helm-charts
+    elastic: https://helm.elastic.co
 
   #if the charts are local, set local directory
   #or will use the remote repo
@@ -88,10 +89,11 @@ monitor:
       version: "15.8.5"
     config:
       #this url will send with alerting msg which user can click to access prometheus to get alerting details
-      external_url: "https://k8s.my.local:30443/prometheus"
-      webhook_configs:
-      - send_resolved: true
-        url: ""
+      #  e.g. https://k8s.my.local:30443/prometheus
+      #set /prometheus if you don't know the exact external_url or you can't access prometheus
+      external_url: "/prometheus"
+      # e.g. {send_resolved: true, url: "<url|no empty>"}
+      webhook_configs: []
       scrape_interval: "1m"
       icmp_probe: []
       tcp_probe: []
@@ -122,8 +124,48 @@ monitor:
             gnetId: 7587
             revision: 3
             datasource: Prometheus
+          #you may need to add a variable represents datasource or this dashboard would go wrong
+          k8s:
+            gnetId: 15520
+            revision: 1
+            datasource: Prometheus
   node_exporter:
     version: 1.0.1
     local_dir: "/root/ansible/files/node_exporter"
     install_path: /usr/local/bin/
     port: 9100
+
+log:
+  namespace: log
+  repository: "{{ registry_prefix }}"
+  #use default sc when set null
+  storage_class: null
+  elastic:
+    version: "7.17.3"
+    elasticsearch:
+      name: elasticsearch
+      chart:
+        #the path is relative path
+        path: "elasticsearch"
+      resources:
+        requests:
+          cpu: "8000m"
+          memory: "16Gi"
+        limits:
+          cpu: "8000m"
+          memory: "16Gi"
+        storage: 30Gi
+        #jvm heap best practice（half of the total memory and less than 30G）
+        esJavaOpts: "-Xmx8g -Xms8g"
+    kibana:
+      name: kibana
+      chart:
+        path: "kibana"
+    logstash:
+      name: logstash
+      chart:
+        path: "logstash"
+    filebeat:
+      name: filebeat
+      chart:
+        path: "filebeat"

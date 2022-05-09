@@ -1,0 +1,48 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- name: set fact
+  set_fact:
+    __path: "{{ chart.local_dir.rstrip('/') }}/"
+  when: chart.local_dir.strip() != ""
+
+- name: template elasticsearch
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ log.elastic.elasticsearch.chart.path }}"
+    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_version: "{{ log.elastic.version }}"
+    release_values:
+      image: "{{ log.repository }}docker.elastic.co/elasticsearch/elasticsearch"
+      resources:
+        requests: "{{ log.elastic.elasticsearch.resources.requests }}"
+        limits: "{{ log.elastic.elasticsearch.resources.limits }}"
+      volumeClaimTemplate:
+        resources:
+          requests:
+            storage: "{{ log.elastic.elasticsearch.resources.storage }}"
+      esJavaOpts: "{{ log.elastic.elasticsearch.resources.esJavaOpts }}"
+  register: es_template_result
+
+- name: template kibana
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ log.elastic.kibana.chart.path }}"
+    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_version: "{{ log.elastic.version }}"
+    release_values:
+      image: "{{ log.repository }}docker.elastic.co/kibana/kibana"
+      healthCheckPath: "/kibana/app/kibana"
+      kibanaConfig:
+        kibana.yml: |
+          server:
+            basePath: /kibana
+            rewriteBasePath: true
+  register: kibana_template_result
+
+- name: set facts
+  set_fact:
+    elastic_template_stdout: "{{ es_template_result.stdout_lines + kibana_template_result.stdout_lines }}"
+
+- name: get images
+  set_fact:
+    elastic_images: "{{ elastic_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"

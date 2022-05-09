@@ -11,6 +11,7 @@
 |`replace('<src_string>', '<dst_string>')`|进行字符串替换|
 |`trim('<string>')`|两端去除<string>内容|
 |使用python字符串函数：`{{ <var>.<func> }}`|参考下面的例子|
+|`unique`|去重|
 
 ```jinja2
 {{ result.stdout_lines | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}

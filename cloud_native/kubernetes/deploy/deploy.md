@@ -212,6 +212,9 @@ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 #### 10.删除节点
 （1））还原节点（需要到该节点上执行，执行kubeadm init或join等后想要还原）
 ```shell
+#master先驱逐该节点
+kubectl drain node-3 --ignore-daemonsets --delete-emptydir-data
+
 kubeadm reset
 
 #该节点要清理干净的话：

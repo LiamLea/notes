@@ -23,6 +23,9 @@
   - name: include template prometheus
     include_tasks: roles/prometheus/tasks/template_prometheus.yaml
 
+  - name: include template elastic
+    include_tasks: roles/elastic/tasks/template_elastic.yaml
+
   - name: set images
     set_fact:
       my_dict:
@@ -32,7 +35,9 @@
         - "{{ keepalived.image }}"
         - "{{ docker.containerd.sandbox_image }}"
         calico: "{{ calico_k8s[calico_version]['images'] }}"
-        prometheus: "{{ prometheus_images }}"
+        prometheus: "{{ prometheus_images | union }}"
+        elastic: "{{ elastic_images | union }}"
+
   - name: list_images
     debug:
       msg: "{{ my_dict }}"

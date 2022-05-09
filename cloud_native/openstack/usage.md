@@ -199,11 +199,12 @@ users:
 fdisk /dev/vda
 
 #删除某一个分区，然后创建该分区
+#Do you want to remove the signature? [Y]es/[N]o: n
 
 partprobe
 
 pvresize /dev/vda2
-lvextend -l 100%VG /dev/mapp/centos-root
+lvextend -l 100%VG /dev/mapper/centos-root
 xfs_growfs /dev/mapp/centos-root
 ```
 

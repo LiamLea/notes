@@ -1,0 +1,37 @@
+- name: install elasticsearch
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ log.elastic.elasticsearch.chart.path }}"
+    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_version: "{{ log.elastic.version }}"
+    release_name: "{{ log.elastic.elasticsearch.name }}"
+    release_namespace: "{{ log.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image: "{{ log.repository }}docker.elastic.co/elasticsearch/elasticsearch"
+      resources:
+        requests: "{{ log.elastic.elasticsearch.resources.requests }}"
+        limits: "{{ log.elastic.elasticsearch.resources.limits }}"
+      volumeClaimTemplate:
+        resources:
+          requests:
+            storage: "{{ log.elastic.elasticsearch.resources.storage }}"
+      esJavaOpts: "{{ log.elastic.elasticsearch.resources.esJavaOpts }}"
+
+- name: install kibana
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ log.elastic.kibana.chart.path }}"
+    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_version: "{{ log.elastic.version }}"
+    release_name: "{{ log.elastic.kibana.name }}"
+    release_namespace: "{{ log.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image: "{{ log.repository }}docker.elastic.co/kibana/kibana"
+      healthCheckPath: "/kibana/app/kibana"
+      kibanaConfig:
+        kibana.yml: |
+          server:
+            basePath: /kibana
+            rewriteBasePath: true
