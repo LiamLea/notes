@@ -26,3 +26,11 @@
 #### 2.监控prometheus：3681
 
 ![](./imgs/dashboard_prometheus_01.png)
+
+#### 3.监控blackbox: 7587
+![](./imgs/dashboard_blackbox.png)
+
+#### 4.监控k8s：15520
+
+![](./imgs/dashboard_prometheus_01.png)
+![](./imgs/dashboard_prometheus_02.png)
