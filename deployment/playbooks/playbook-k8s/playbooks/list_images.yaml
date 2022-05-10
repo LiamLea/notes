@@ -26,6 +26,9 @@
   - name: include template elastic
     include_tasks: ../roles/elastic/tasks/template_elastic.yaml
 
+  - name: include template kafka
+    include_tasks: ../roles/kafka/tasks/template_kafka.yaml
+
   - name: set images
     set_fact:
       my_dict:
@@ -35,8 +38,9 @@
         - "{{ keepalived.image }}"
         - "{{ docker.containerd.sandbox_image }}"
         calico: "{{ calico_k8s[calico_version]['images'] }}"
-        prometheus: "{{ prometheus_images | union }}"
-        elastic: "{{ elastic_images | union }}"
+        prometheus: "{{ prometheus_images | unique }}"
+        elastic: "{{ elastic_images | unique }}"
+        kafka: "{{ kafka_images | unique }}"
 
   - name: list_images
     debug:

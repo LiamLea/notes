@@ -1,0 +1,41 @@
+- name: set fact
+  set_fact:
+    __path: ""
+    __domain: "{{ ansible_host }}"
+
+- name: set fact
+  set_fact:
+    __path: "{{ chart.local_dir.rstrip('/') }}/"
+  when: chart.local_dir.strip() != ""
+
+- name: set domain fact
+  set_fact:
+    __domain: "{{ log.kafka.domain }}"
+  when: log.kafka.domain.strip() != ""
+
+- name: template kafka
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ log.kafka.chart.path }}"
+    chart_repo_url: "{{ chart.repo['bitnami'] }}"
+    chart_version: "{{ log.kafka.chart.version }}"
+    release_values:
+      zookeeper:
+        image:
+          registry: "{{ log.repository.strip('/') }}"
+      image:
+        registry: "{{ log.repository.strip('/') }}"
+      replicaCount: "{{ log.kafka.replicas }}"
+      externalAccess:
+        service:
+          type: NodePort
+          domain: "{{ __domain }}"
+          nodePort: "{{ log.kafka.node_ports }}"
+  register: kafka_template_result
+
+- name: set facts
+  set_fact:
+    kafka_template_stdout: "{{ kafka_template_result.stdout_lines }}"
+
+- name: get images
+  set_fact:
+    kafka_images: "{{ kafka_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"

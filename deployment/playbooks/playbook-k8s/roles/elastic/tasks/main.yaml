@@ -1,6 +1,7 @@
 - name: set fact
   set_fact:
     __path: ""
+    __kafka: "{{ log.kafka.bootstrap_servers }}"
 
 - block:
   - name: copy charts
@@ -13,6 +14,14 @@
       __path: "/tmp/"
   when: chart.local_dir.strip() != ""
 
+- block:
+  - name: set kafka fact
+    set_fact:
+      __kafka: ["{{ log.kafka.name }}.{{ log.kafka.namespace}}:9092"]
+  - name: include kafka role
+    include_role:
+      name: kafka
+  when: log.kafka.enabled
+
 - name: setup elastic
   include_tasks: setup_elastic.yaml
-  when: inventory_hostname in groups["work_master"]

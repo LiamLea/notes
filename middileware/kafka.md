@@ -1,4 +1,4 @@
-x`xx# kafka
+# kafka
 
 [toc]
 
@@ -165,7 +165,7 @@ externalAccess:
   service:
     type: NodePort
     domain: 3.1.5.249
-    nodePort: [19092,19093,19094]
+    nodePorts: [19092,19093,19094]
 ```
 
 #### 2.安全配置
