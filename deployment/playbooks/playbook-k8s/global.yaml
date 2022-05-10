@@ -130,7 +130,7 @@ monitor:
             revision: 1
             datasource: Prometheus
   node_exporter:
-    version: 1.0.1
+    version: 1.3.0
     local_dir: "/root/ansible/files/node_exporter"
     install_path: /usr/local/bin/
     port: 9100

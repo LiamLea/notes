@@ -16,24 +16,24 @@ install_docker:
 
 .PHONY := init_localhost
 init_localhost: docker
-	docker run --rm --network host --name ansible-lil -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook init_localhost.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/init_localhost.yaml -e @global.yaml"
 
 .PHONY := run
 run: docker
 	$(MAKE) init_localhost
-	docker run --rm --network host --name ansible-lil -v ${ansible_dir}:/root/ansible -itd ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook main.yaml -e @global.yaml &> run.log"
+	docker run --rm --network host --name ansible-lil -v ${ansible_dir}:/root/ansible -itd ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/main.yaml -e @global.yaml &> run.log"
 
 .PHONY := test
 test: docker
-	docker run --rm --network host --name ansible-lil-test -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook test.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil-test -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/test.yaml -e @global.yaml"
 
 .PHONY := monitor
 monitor: docker
-	docker run --rm --network host --name ansible-lil-monitor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook deploy_monitor.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil-monitor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_monitor.yaml -e @global.yaml"
 
 .PHONY := log
 log: docker
-	docker run --rm --network host --name ansible-lil-log -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook deploy_log.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil-log -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_log.yaml -e @global.yaml"
 
 .PHONY := stop
 stop:
@@ -41,7 +41,7 @@ stop:
 
 .PHONY := list_images
 list_images: docker
-	docker run --rm --network host --name ansible-lil-list -v ${ansible_dir}/roles/k8s/files/helm:/bin/helm -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "chmod +x /bin/helm;cd /root/ansible;ansible-playbook list_images.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil-list -v ${ansible_dir}/roles/k8s/files/helm:/bin/helm -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "chmod +x /bin/helm;cd /root/ansible;ansible-playbook playbooks/list_images.yaml -e @global.yaml"
 
 .PHONY := check
 check: docker
@@ -49,8 +49,8 @@ check: docker
 
 .PHONY := install_harbor
 install_harbor: docker
-	docker run --rm --network host --name ansible-lil-harbor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook install_harbor.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil-harbor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/install_harbor.yaml -e @global.yaml"
 
 .PHONY := push_images
 push_images: docker
-	docker run --rm --network host --name ansible-lil-push -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook push_images.yaml"
+	docker run --rm --network host --name ansible-lil-push -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/push_images.yaml"
