@@ -12,7 +12,7 @@
 
   - name: include vars
     include_vars:
-      dir: roles/k8s/defaults
+      dir: ../roles/k8s/defaults
   - name: select calico version
     set_fact:
       result: "{% for c_v in calico_k8s %} {% for k_v in calico_k8s[c_v]['k8s'] %} {% if k_v in kubernetes.version %} {{ c_v }} {% endif %} {% endfor %}{% endfor %}"
@@ -21,10 +21,10 @@
       calico_version: "{{ result | trim }}"
 
   - name: include template prometheus
-    include_tasks: roles/prometheus/tasks/template_prometheus.yaml
+    include_tasks: ../roles/prometheus/tasks/template_prometheus.yaml
 
   - name: include template elastic
-    include_tasks: roles/elastic/tasks/template_elastic.yaml
+    include_tasks: ../roles/elastic/tasks/template_elastic.yaml
 
   - name: set images
     set_fact:

@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: cluster
   gather_facts: True
   become: True
   become_method: sudo
@@ -13,7 +13,7 @@
     shell: docker login {{ target_registry }} -u {{ username }} -p {{ password }}
   - name: copy scripts
     template:
-      src: scripts/tag_push_images.sh.j2
+      src: ../scripts/tag_push_images.sh.j2
       dest: /tmp/tag_push_images.sh
       mode: 0755
   - name: exec scripts
