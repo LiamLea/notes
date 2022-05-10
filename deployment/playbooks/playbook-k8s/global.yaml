@@ -71,6 +71,7 @@ chart:
     prometheus-community: https://prometheus-community.github.io/helm-charts
     grafana: https://grafana.github.io/helm-charts
     elastic: https://helm.elastic.co
+    bitnami: https://charts.bitnami.com/bitnami
 
   #if the charts are local, set local directory
   #or will use the remote repo
@@ -140,6 +141,21 @@ log:
   repository: "{{ registry_prefix }}"
   #use default sc when set null
   storage_class: null
+  kafka:
+    #if false, must set bootstrap_servers to use the existing kafka
+    enabled: true
+    bootstrap_servers: []
+    #install new kafka
+    name: kafka
+    namespace: middleware-public
+    chart:
+      path: "kafka"
+      version: "16.2.10"
+    replicas: 3
+    node_ports: [19092, 19093, 19094]
+    #if empty work_master ip will be used
+    domain: ""
+
   elastic:
     version: "7.17.3"
     elasticsearch:
@@ -165,6 +181,18 @@ log:
       name: logstash
       chart:
         path: "logstash"
+      replicas: "3"
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "1536Mi"
+        limits:
+          cpu: "1000m"
+          memory: "1536Mi"
+        logstashJavaOpts: "-Xmx1g -Xms1g"
+      config:
+        batch_size: 1000
+        group_id: logstash_log_k8s
     filebeat:
       name: filebeat
       chart:

@@ -35,3 +35,128 @@
           server:
             basePath: /kibana
             rewriteBasePath: true
+
+- name: install logstash
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ log.elastic.logstash.chart.path }}"
+    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_version: "{{ log.elastic.version }}"
+    release_name: "{{ log.elastic.logstash.name }}"
+    release_namespace: "{{ log.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image: "{{ log.repository }}docker.elastic.co/logstash/logstash"
+      replicas: "{{ log.elastic.logstash.replicas }}"
+      resources:
+        requests: "{{ log.elastic.logstash.resources.requests }}"
+        limits: "{{ log.elastic.logstash.resources.limits }}"
+      logstashJavaOpts: "{{ log.elastic.logstash.resources.logstashJavaOpts }}"
+      logstashConfig:
+        logstash.yml: |
+          http.host: 0.0.0.0
+          pipeline.batch.size: {{ log.elastic.logstash.config.batch_size }}
+      logstashPipeline:
+        logstash.conf: |
+          input {
+            kafka {
+              bootstrap_servers => "{{ __kafka | join(',') }}"
+              topics => ["all-logs_topic"]
+              auto_offset_reset => "latest"
+              group_id => "{{ log.elastic.logstash.config.group_id }}"
+              codec => json
+            }
+          }
+
+          filter {
+
+            mutate{
+              add_field => {
+                "origin_message" => "%{message}"
+              }
+            }
+
+            #进行grok清洗（匹配即停止）
+            grok{
+              match => {
+                "message" => [
+                  "%{IP:[request][remote_addr]}.*?\[%{HTTPDATE:logtime}\]\s+\"%{WORD:[request][request_method]}\s+%{URIPATH:[request][request_path]}(?:\?*(?<[request][params]>\S+))?\s+HTTP/%{NUMBER:[request][http_version]}\"\s+%{INT:[request][status]}\s+%{NOTSPACE:[request][bytes_sent]}(?:\s+\"(?<[request][http_referer]>.*?)\")?(?:\s+\"(?<[request][user_agent]>.*?)\")?(?:\s*%{NUMBER:[request][request_time]})?",
+                  "\[%{TIMESTAMP_ISO8601:logtime}\].*?\[(?<trace_id>.*?)\].*?\[%{LOGLEVEL:level}\s*\].*?\[(?<module>\S+)\]\s*--\s*(?<message>.*)",
+                  "%{DATESTAMP:logtime}\s+\[%{LOGLEVEL:level}\]\s%{POSINT:pid}#%{NUMBER:tid}:\s(?<message>.*)",
+                  "%{TIMESTAMP_ISO8601:logtime}\s+\[(?<module>\S+)\]\s+%{LOGLEVEL:level}\s+(?<message>.*)"
+                ]
+              }
+              overwrite => ["message"]
+            }
+
+            #根据解析出来的字段添加log_type
+            if [request] {
+              mutate {
+                  add_field => {
+                   "[labels][log_type]" => "access"
+                  }
+                 convert => {
+                  "[request][status]" => "integer"
+                  "[request][bytes_sent]" => "integer"
+                  "[request][request_time]" => "float"
+                 }
+              }
+            } else if [logtime] {
+              mutate {
+                add_field => {
+                 "[labels][log_type]" => "app"
+                }
+              }
+            } else {
+              mutate {
+                add_field => {
+                 "[labels][log_type]" => "raw"
+                }
+              }
+            }
+
+            #设置level
+            if ! [level] {
+              mutate {
+                 add_field => {
+                  "level" => "INFO"
+                 }
+              }
+              grok {
+                match => {
+                  "message" => "\b%{LOGLEVEL:level}\b"
+                }
+                overwrite => ["level"]
+              }
+              mutate {
+                uppercase => [ "level" ]
+              }
+            }
+
+            #清洗时间（如果清洗失败，使用默认时间）
+            date {
+               match => ["logtime", "dd/MMM/yyyy:HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss,SSS"]
+               target => "@timestamp"
+               timezone => "%{[labels][timezone]}"
+            }
+
+            #统一清洗
+            prune {
+              whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$"]
+              add_field => {
+                "[labels][app_id]" => "%{[labels][app_name]}-%{[labels][app_env]}-%{[labels][addition]}-%{[labels][log_type]}_log-%{+YYYY.MM.dd}"
+              }
+              remove_field => [ "[labels][timezone]" ]
+            }
+          }
+
+          output {
+            #stdout用于测试
+            #stdout {}
+
+            elasticsearch {
+              hosts => "elasticsearch-master:9200"
+              index => "%{[labels][app_id]}"
+              timeout => 240    #240 sec, when es performance is poor
+            }
+          }

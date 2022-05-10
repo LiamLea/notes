@@ -1,0 +1,22 @@
+- name: install kafka
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ log.kafka.chart.path }}"
+    chart_repo_url: "{{ chart.repo['bitnami'] }}"
+    chart_version: "{{ log.kafka.chart.version }}"
+    release_name: "{{ log.kafka.name }}"
+    release_namespace: "{{ log.kafka.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      zookeeper:
+        image:
+          registry: "{{ log.repository.strip('/') }}"
+      image:
+        registry: "{{ log.repository.strip('/') }}"
+      replicaCount: "{{ log.kafka.replicas }}"
+      externalAccess:
+        enabled: true
+        service:
+          type: NodePort
+          domain: "{{ __domain }}"
+          nodePort: "{{ log.kafka.node_ports }}"

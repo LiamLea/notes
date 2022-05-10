@@ -1,9 +1,0 @@
-task_id: 2
-workdir: "~/ansible_{{task_id}}"
-kafka:
-  repository: docker.repo.local:5000/kafka
-  zookeeper:
-    repository: docker.repo.local:5000/zookeeper
-  replicas: 3
-  ip: kafka.aiops.local
-  node_port: [19092, 19093, 19094]

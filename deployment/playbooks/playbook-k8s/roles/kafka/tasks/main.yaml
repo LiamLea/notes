@@ -1,35 +1,23 @@
-#- name: create kafka namespace
-#  shell: kubectl create ns kafka
-#  ignore_errors: True
+- name: set fact
+  set_fact:
+    __path: ""
+    __domain: "{{ ansible_host }}"
 
-- name: create workdir
-  file:
-   path: "{{ workdir }}"
-   state: directory
+- block:
+  - name: copy charts
+    copy:
+      src: "{{ chart.local_dir.rstrip('/') }}/"
+      dest: "/tmp/"
+      force: true
+  - name: set fact
+    set_fact:
+      __path: "/tmp/"
+  when: chart.local_dir.strip() != ""
 
-- name: copy kafka charts
-  copy:
-    src: kafka
-    dest: "{{ workdir }}"
-    force: no
+- name: set domain fact
+  set_fact:
+    __domain: "{{ log.kafka.domain }}"
+  when: log.kafka.domain.strip() != ""
 
-- name: install kafka
-  community.kubernetes.helm:
-    chart_ref: "{{ workdir }}/kafka"
-    release_name: kafka
-    release_namespace: kafka
-    create_namespace: yes
-    atomic: yes
-    release_values:
-      zookeeper:
-        image:
-          registry: "{{ kafka.zookeeper.repository.rsplit('/', 1)[0] }}"
-          repository: "{{ kafka.zookeeper.repository.rsplit('/', 1)[-1] }}"
-      image:
-        registry: "{{ kafka.repository.rsplit('/', 1)[0] }}"
-        repository: "{{ kafka.repository.rsplit('/', 1)[-1] }}"
-      replicaCount: "{{ kafka.replicas }}"
-      externalAccess:
-        service:
-          domain: "{{ kafka.ip }}"
-          nodePort: "{{ kafka.node_port }}"
+- name: setup kafka
+  include_tasks: setup_kafka.yaml
