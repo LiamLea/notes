@@ -1,0 +1,21 @@
+__config_alertmanager:
+  receivers:
+  - name: default-receiver
+    webhook_configs: "{{ monitor.prometheus.config.webhook_configs }}"
+
+  route:
+    receiver: default-receiver
+    group_by: ['severity']
+    group_interval: 10s
+    repeat_interval: 1h
+
+  inhibit_rules:
+  - target_match_re:
+      severity: "(warning|info)"
+    source_match_re:
+      severity: "critical"
+    equal:
+    - alertname
+    - instance
+    - type    #this will be add in the future
+    - ifName  #this switch interface(also be added in the future)

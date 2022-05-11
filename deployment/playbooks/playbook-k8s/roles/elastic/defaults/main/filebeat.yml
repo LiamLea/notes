@@ -1,0 +1,59 @@
+__config_filebeat: |
+  #通过emptyDir将需要采集的日志挂载出来，然后在宿主机就能通过指定路径读取改日志
+  filebeat.autodiscover:
+    providers:
+
+    - type: kubernetes
+      templates:
+
+        #收集k8s中所有容器的日志（需要排除上面特殊处理的日志）
+        - condition:
+            and:
+            - not:
+                regexp:
+                  kubernetes.pod.name: "filebeat|logstash"
+            - not:
+                regexp:
+                  kubernetes.pod.name: "iot-.*-backend"
+          config:
+          - type: container
+            paths:
+            - "/var/log/containers/*${data.kubernetes.container.id}.log"
+
+  #给容器日志添加相应标签
+  processors:
+  - add_labels:
+      labels:
+        app_env: test
+  - add_labels:
+      labels:
+        timezone: UTC
+      when:
+        not:
+          has_fields: ['labels.timezone']
+  - add_labels:
+      labels:
+        source: container
+      when:
+        not:
+          has_fields: ['labels.source']
+
+  - copy_fields:
+      fields:
+      - from: kubernetes.container.name
+        to: labels.app_name
+      - from: kubernetes.namespace
+        to: labels.addition
+      - from: kubernetes.pod.name
+        to: labels.host
+      fail_on_error: false
+      ignore_missing: true
+      when:
+        has_fields: ['kubernetes']
+
+  #输出到kafka
+  output.kafka:
+    hosts: {{ __kafka }}
+    topic: 'all-logs_topic'
+    partition.round_robin:
+      reachable_only: true    #当有partition不可达，数据会发送到可到达的partition

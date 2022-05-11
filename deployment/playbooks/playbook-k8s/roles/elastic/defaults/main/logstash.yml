@@ -1,0 +1,3 @@
+__config_logstash: |
+  http.host: 0.0.0.0
+  pipeline.batch.size: {{ log.elastic.logstash.config.batch_size }}

@@ -31,10 +31,7 @@
       image: "{{ log.repository }}docker.elastic.co/kibana/kibana"
       healthCheckPath: "/kibana/app/kibana"
       kibanaConfig:
-        kibana.yml: |
-          server:
-            basePath: /kibana
-            rewriteBasePath: true
+        kibana.yml: "{{ __config_kibana }}"
 
 - name: install logstash
   kubernetes.core.helm:
@@ -53,113 +50,9 @@
         limits: "{{ log.elastic.logstash.resources.limits }}"
       logstashJavaOpts: "{{ log.elastic.logstash.resources.logstashJavaOpts }}"
       logstashConfig:
-        logstash.yml: |
-          http.host: 0.0.0.0
-          pipeline.batch.size: {{ log.elastic.logstash.config.batch_size }}
+        logstash.yml: "{{ __config_logstash }}"
       logstashPipeline:
-        logstash.conf: |
-          input {
-            kafka {
-              bootstrap_servers => "{{ __kafka | join(',') }}"
-              topics => ["all-logs_topic"]
-              auto_offset_reset => "latest"
-              group_id => "{{ log.elastic.logstash.config.group_id }}"
-              codec => json
-            }
-          }
-
-          filter {
-
-            mutate{
-              add_field => {
-                "origin_message" => "%{message}"
-              }
-            }
-
-            #进行grok清洗（匹配即停止）
-            grok{
-              match => {
-                "message" => [
-                  "%{IP:[request][remote_addr]}.*?\[%{HTTPDATE:logtime}\]\s+\"%{WORD:[request][request_method]}\s+%{URIPATH:[request][request_path]}(?:\?*(?<[request][params]>\S+))?\s+HTTP/%{NUMBER:[request][http_version]}\"\s+%{INT:[request][status]}\s+%{NOTSPACE:[request][bytes_sent]}(?:\s+\"(?<[request][http_referer]>.*?)\")?(?:\s+\"(?<[request][user_agent]>.*?)\")?(?:\s*%{NUMBER:[request][request_time]})?",
-                  "\[%{TIMESTAMP_ISO8601:logtime}\].*?\[(?<trace_id>.*?)\].*?\[%{LOGLEVEL:level}\s*\].*?\[(?<module>\S+)\]\s*--\s*(?<message>.*)",
-                  "%{DATESTAMP:logtime}\s+\[%{LOGLEVEL:level}\]\s%{POSINT:pid}#%{NUMBER:tid}:\s(?<message>.*)",
-                  "%{TIMESTAMP_ISO8601:logtime}\s+\[(?<module>\S+)\]\s+%{LOGLEVEL:level}\s+(?<message>.*)"
-                ]
-              }
-              overwrite => ["message"]
-            }
-
-            #根据解析出来的字段添加log_type
-            if [request] {
-              mutate {
-                  add_field => {
-                   "[labels][log_type]" => "access"
-                  }
-                 convert => {
-                  "[request][status]" => "integer"
-                  "[request][bytes_sent]" => "integer"
-                  "[request][request_time]" => "float"
-                 }
-              }
-            } else if [logtime] {
-              mutate {
-                add_field => {
-                 "[labels][log_type]" => "app"
-                }
-              }
-            } else {
-              mutate {
-                add_field => {
-                 "[labels][log_type]" => "raw"
-                }
-              }
-            }
-
-            #设置level
-            if ! [level] {
-              mutate {
-                 add_field => {
-                  "level" => "INFO"
-                 }
-              }
-              grok {
-                match => {
-                  "message" => "\b%{LOGLEVEL:level}\b"
-                }
-                overwrite => ["level"]
-              }
-              mutate {
-                uppercase => [ "level" ]
-              }
-            }
-
-            #清洗时间（如果清洗失败，使用默认时间）
-            date {
-               match => ["logtime", "dd/MMM/yyyy:HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss,SSS"]
-               target => "@timestamp"
-               timezone => "%{[labels][timezone]}"
-            }
-
-            #统一清洗
-            prune {
-              whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$"]
-              add_field => {
-                "[labels][app_id]" => "%{[labels][app_name]}-%{[labels][app_env]}-%{[labels][addition]}-%{[labels][log_type]}_log-%{+YYYY.MM.dd}"
-              }
-              remove_field => [ "[labels][timezone]" ]
-            }
-          }
-
-          output {
-            #stdout用于测试
-            #stdout {}
-
-            elasticsearch {
-              hosts => "elasticsearch-master:9200"
-              index => "%{[labels][app_id]}"
-              timeout => 240    #240 sec, when es performance is poor
-            }
-          }
+        logstash.conf: "{{ __config_logstash_conf }}"
 
 - name: install filebeat
   kubernetes.core.helm:
@@ -174,62 +67,4 @@
       image: "{{ log.repository }}docker.elastic.co/beats/filebeat"
       daemonset:
         filebeatConfig:
-          filebeat.yml: |
-            #通过emptyDir将需要采集的日志挂载出来，然后在宿主机就能通过指定路径读取改日志
-            filebeat.autodiscover:
-              providers:
-
-              - type: kubernetes
-                templates:
-
-                  #收集k8s中所有容器的日志（需要排除上面特殊处理的日志）
-                  - condition:
-                      and:
-                      - not:
-                          regexp:
-                            kubernetes.pod.name: "filebeat|logstash"
-                      - not:
-                          regexp:
-                            kubernetes.pod.name: "iot-.*-backend"
-                    config:
-                    - type: container
-                      paths:
-                      - "/var/log/containers/*${data.kubernetes.container.id}.log"
-
-            #给容器日志添加相应标签
-            processors:
-            - add_labels:
-                labels:
-                  app_env: test
-            - add_labels:
-                labels:
-                  timezone: UTC
-                when:
-                  not:
-                    has_fields: ['labels.timezone']
-            - add_labels:
-                labels:
-                  source: container
-                when:
-                  not:
-                    has_fields: ['labels.source']
-
-            - copy_fields:
-                fields:
-                - from: kubernetes.container.name
-                  to: labels.app_name
-                - from: kubernetes.namespace
-                  to: labels.addition
-                - from: kubernetes.pod.name
-                  to: labels.host
-                fail_on_error: false
-                ignore_missing: true
-                when:
-                  has_fields: ['kubernetes']
-
-            #输出到kafka
-            output.kafka:
-              hosts: {{ __kafka }}
-              topic: 'all-logs_topic'
-              partition.round_robin:
-                reachable_only: true    #当有partition不可达，数据会发送到可到达的partition
+          filebeat.yml: "{{ __config_filebeat }}"
