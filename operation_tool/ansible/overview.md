@@ -20,7 +20,7 @@
   * explicit 则表示默认不收集，要显式收集，必须使用 gather_facts: Ture
 * Ansible 支持两种 facts 缓存：redis 和 jsonfile
 
-#### 3.变量
+#### 3.变量（变量名不要使用：`-`符合）
 
 #### （1）变量来源
 * 外部变量
@@ -70,6 +70,8 @@
   * playbook文件的工作目录（比如：当import_playbook时，被import的playbook所在的目录也会被搜索）
 
 #### （3）变量的优先级
+
+[参考](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#understanding-variable-precedence)
 ```shell
 -e > playbook里定义的 > host > child group > parent group > all group
 -e > role的vars目录下定义的变量 > playbook里等定义的 > role的default目录下定义的变量
