@@ -379,15 +379,31 @@ output {
 
 ***
 
-### 性能优化
+### 系统要求和性能优化
 
-目标：消费的速度必须大于采集的速度，否则日志的内容就会滞后
+性能优化目标：消费的速度必须大于采集的速度，否则日志的内容就会滞后
 
-#### 1.采集优化
+#### 1.系统要求
+[参考](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration-memory.html)
+
+* 关闭swap
+* 调整文件句柄数限制（nofile）到 65535
+* 调整进程数限制（noproc） > 4096
+  * 默认系统会根据 内核数*4 来设置
+* 虚拟内存
+```shell
+sysctl -w vm.max_map_count=262144
+```
+* tcp重试数
+```shell
+sysctl -w net.ipv4.tcp_retries2=5
+```
+
+#### 2.采集优化
 kafka划分多个分区，filebeat将日志采集通过roundrobin的方式放入各个分区
 一个分区利用一个logstash去采集
 
-#### 2.es优化
+#### 3.es优化
 
 ##### （1）jvm heap优化
 设为内存的一半（最高不超过30G左右）
@@ -401,7 +417,7 @@ kafka划分多个分区，filebeat将日志采集通过roundrobin的方式放入
 一个worker每次处理的event数量（默认为125），当日志量大，这个数值是远远不够的
 可以设为1000或者更高（需要结合内存进行考虑）
 
-#### 3.配置示例
+#### 4.配置示例
 
 * es
 分配了8c/16G

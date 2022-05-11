@@ -39,9 +39,32 @@
             rewriteBasePath: true
   register: kibana_template_result
 
+- name: template logstash
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ log.elastic.logstash.chart.path }}"
+    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_version: "{{ log.elastic.version }}"
+    release_values:
+      image: "{{ log.repository }}docker.elastic.co/logstash/logstash"
+      replicas: "{{ log.elastic.logstash.replicas }}"
+      resources:
+        requests: "{{ log.elastic.logstash.resources.requests }}"
+        limits: "{{ log.elastic.logstash.resources.limits }}"
+      logstashJavaOpts: "{{ log.elastic.logstash.resources.logstashJavaOpts }}"
+  register: logstash_template_result
+
+- name: template filebeat
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ log.elastic.filebeat.chart.path }}"
+    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_version: "{{ log.elastic.version }}"
+    release_values:
+      image: "{{ log.repository }}docker.elastic.co/beats/filebeat"
+  register: filebeat_template_result
+
 - name: set facts
   set_fact:
-    elastic_template_stdout: "{{ es_template_result.stdout_lines + kibana_template_result.stdout_lines }}"
+    elastic_template_stdout: "{{ es_template_result.stdout_lines + kibana_template_result.stdout_lines + logstash_template_result.stdout_lines + filebeat_template_result.stdout_lines }}"
 
 - name: get images
   set_fact:

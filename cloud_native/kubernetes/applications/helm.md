@@ -101,7 +101,21 @@ helm upgrade xx xx1         #xx1为chart名或者本地chart的路径
 #获取release的manifests
 helm get manifest <release>
 ```
+
+#### 6.查看历史release
+```shell
+#查看revision
+helm history <releae_name>
+
+#查看values文件
+helm get values <releae_name> --revision <revision>
+
+#查看全部文件
+helm get all <releae_name> --revision <revision>
+```
+
 ***
+
 ### helm模板语法
 
 #### 1.基本语法
