@@ -6,6 +6,31 @@
   include_tasks: "redhat.yaml"
   when: ansible_distribution_file_variety == "RedHat"
 
+- name: Add or modify nofile soft limit for all
+  community.general.pam_limits:
+    domain: 'root'
+    limit_type: soft
+    limit_item: nofile
+    value: 65535
+- name: Add or modify nofile soft limit for all
+  community.general.pam_limits:
+    domain: 'root'
+    limit_type: hard
+    limit_item: nofile
+    value: 65535
+- name: Add or modify nofile soft limit for all
+  community.general.pam_limits:
+    domain: '*'
+    limit_type: soft
+    limit_item: nofile
+    value: 65535
+- name: Add or modify nofile soft limit for all
+  community.general.pam_limits:
+    domain: '*'
+    limit_type: hard
+    limit_item: nofile
+    value: 65535
+
 - name: time sync
   include_role:
     name: ntp
