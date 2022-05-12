@@ -1,0 +1,30 @@
+- name: install ingress-nginx
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ basic.ingress_nginx.chart.path }}"
+    chart_repo_url: "{{ chart.repo['ingress-nginx'] }}"
+    chart_version: "{{ basic.ingress_nginx.chart.version }}"
+    release_name: "{{ basic.ingress_nginx.name }}"
+    release_namespace: "{{ basic.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      controller:
+        image:
+          registry: "{{ basic.repository }}k8s.gcr.io"
+          digest: ""
+        admissionWebhooks:
+          patch:
+            image:
+              registry: "{{ basic.repository }}k8s.gcr.io"
+              digest: ""
+        service:
+          type: NodePort
+          nodePorts:
+            http: "{{ basic.ingress_nginx.config.http_port }}"
+            https: "{{ basic.ingress_nginx.config.https_port }}"
+        metrics:
+          enabled: true
+      defaultBackend:
+        enabled: true
+        image:
+          registry: "{{ basic.repository }}k8s.gcr.io"

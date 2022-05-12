@@ -20,6 +20,12 @@
     set_fact:
       calico_version: "{{ result | trim }}"
 
+  - name: include template certmanager
+    include_tasks: ../roles/cert-manager/tasks/template.yaml
+
+  - name: include template ingress nginx
+    include_tasks: ../roles/ingress-nginx/tasks/template.yaml
+
   - name: include template prometheus
     include_tasks: ../roles/prometheus/tasks/template_prometheus.yaml
 
@@ -38,6 +44,8 @@
         - "{{ keepalived.image }}"
         - "{{ docker.containerd.sandbox_image }}"
         calico: "{{ calico_k8s[calico_version]['images'] }}"
+        certmanager: "{{ certmanager_images | unique }}"
+        ingress_nginx: "{{ ingress_nginx_images | unique }}"
         prometheus: "{{ prometheus_images | unique }}"
         elastic: "{{ elastic_images | unique }}"
         kafka: "{{ kafka_images | unique }}"

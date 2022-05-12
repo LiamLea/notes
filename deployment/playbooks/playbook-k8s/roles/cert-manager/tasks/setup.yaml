@@ -1,0 +1,21 @@
+- name: install cert-manager
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ basic.cert_manager.chart.path }}"
+    chart_repo_url: "{{ chart.repo['cert-manager'] }}"
+    chart_version: "{{ basic.cert_manager.chart.version }}"
+    release_name: "{{ basic.cert_manager.name }}"
+    release_namespace: "{{ basic.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image:
+        repository: "{{ basic.repository }}quay.io/jetstack/cert-manager-controller"
+      cainjector:
+        image:
+          repository: "{{ basic.repository }}quay.io/jetstack/cert-manager-cainjector"
+      startupapicheck:
+        image:
+          repository: "{{ basic.repository }}quay.io/jetstack/cert-manager-ctl"
+      webhook:
+        image:
+          repository: "{{ basic.repository }}quay.io/jetstack/cert-manager-webhook"

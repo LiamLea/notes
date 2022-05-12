@@ -1,0 +1,45 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- name: set fact
+  set_fact:
+    __path: "{{ chart.local_dir.rstrip('/') }}/"
+  when: chart.local_dir.strip() != ""
+
+- name: template ingress-nginx
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ basic.ingress_nginx.chart.path }}"
+    chart_repo_url: "{{ chart.repo['ingress-nginx'] }}"
+    chart_version: "{{ basic.ingress_nginx.chart.version }}"
+    release_values:
+      controller:
+        image:
+          registry: "{{ basic.repository }}k8s.gcr.io"
+          digest: ""
+        admissionWebhooks:
+          patch:
+            image:
+              registry: "{{ basic.repository }}k8s.gcr.io"
+              digest: ""
+        service:
+          type: NodePort
+          nodePorts:
+            http: "{{ basic.ingress_nginx.config.http_port }}"
+            https: "{{ basic.ingress_nginx.config.https_port }}"
+          externalTrafficPolicy: Local
+        metrics:
+          enabled: true
+      defaultBackend:
+        enabled: true
+        image:
+          registry: "{{ basic.repository }}k8s.gcr.io"
+  register: ingress_nginx_template_result
+
+- name: set facts
+  set_fact:
+    ingress_nginx_template_stdout: "{{ ingress_nginx_template_result.stdout_lines }}"
+
+- name: get images
+  set_fact:
+    ingress_nginx_images: "{{ ingress_nginx_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"
