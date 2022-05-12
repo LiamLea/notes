@@ -72,10 +72,31 @@ chart:
     grafana: https://grafana.github.io/helm-charts
     elastic: https://helm.elastic.co
     bitnami: https://charts.bitnami.com/bitnami
+    cert-manager: https://charts.jetstack.io
+    ingress-nginx: https://kubernetes.github.io/ingress-nginx
 
   #if the charts are local, set local directory
   #or will use the remote repo
   local_dir: ""
+
+basic:
+  namespace: basic-public
+  repository: "{{ registry_prefix }}"
+  #use default sc when set null
+  storage_class: null
+  cert_manager:
+    name: "cert-manager"
+    chart:
+      path: "cert-manager"
+      version: "1.7.2"
+  ingress_nginx:
+    name: "ingress-nginx"
+    chart:
+      path: "ingress-nginx"
+      version: "4.0.18"
+    config:
+      http_port: 30080
+      https_port: 30443
 
 monitor:
   namespace: monitor

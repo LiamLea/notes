@@ -27,6 +27,10 @@ run: docker
 test: docker
 	docker run --rm --network host --name ansible-lil-test -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/test.yaml -e @global.yaml"
 
+.PHONY := basic
+basic: docker
+	docker run --rm --network host --name ansible-lil-monitor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_basic.yaml -e @global.yaml"
+
 .PHONY := monitor
 monitor: docker
 	docker run --rm --network host --name ansible-lil-monitor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_monitor.yaml -e @global.yaml"

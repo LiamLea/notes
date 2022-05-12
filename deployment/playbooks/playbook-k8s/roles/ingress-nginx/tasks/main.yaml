@@ -1,0 +1,17 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- block:
+  - name: copy charts
+    copy:
+      src: "{{ chart.local_dir.rstrip('/') }}/"
+      dest: "/tmp/"
+      force: true
+  - name: set fact
+    set_fact:
+      __path: "/tmp/"
+  when: chart.local_dir.strip() != ""
+
+- name: setup ingress-nginx
+  include_tasks: setup.yaml

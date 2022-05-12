@@ -1,0 +1,31 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- block:
+  - name: copy charts
+    copy:
+      src: "{{ chart.local_dir.rstrip('/') }}/"
+      dest: "/tmp/"
+      force: true
+  - name: set fact
+    set_fact:
+      __path: "/tmp/"
+  when: chart.local_dir.strip() != ""
+
+- name: setup cert-manager
+  include_tasks: setup.yaml
+
+- name: copy files
+  copy:
+    src: "{{ item }}"
+    dest: /tmp/
+  with_items:
+  - "secrets.yaml"
+  - "issuer.yaml"
+
+- name: apply secret
+  shell: "kubectl apply -f /tmp/secrets.yaml -n {{ basic.namespace }}"
+
+- name: apply issuer
+  shell: "kubectl apply -f /tmp/issuer.yaml"

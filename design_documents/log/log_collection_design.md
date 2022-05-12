@@ -4,7 +4,10 @@
 
 ### 设计
 
-#### 1.采集流程设计
+#### 1.架构设计
+
+[是否使用kafka](https://www.elastic.co/guide/en/logstash/current/deploying-and-scaling.html)
+官方建议使用logstash自带的persistent queue（默认没有开启），但是没有kafka稳定
 
 * filebeat采集日志，并进行multiline处理，然后发往kafka
 * logstash从kafka中读取日志，并进行清洗，后存入es

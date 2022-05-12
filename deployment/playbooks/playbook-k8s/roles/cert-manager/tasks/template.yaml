@@ -1,0 +1,35 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- name: set fact
+  set_fact:
+    __path: "{{ chart.local_dir.rstrip('/') }}/"
+  when: chart.local_dir.strip() != ""
+
+- name: template cert-manager
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ basic.cert_manager.chart.path }}"
+    chart_repo_url: "{{ chart.repo['cert-manager'] }}"
+    chart_version: "{{ basic.cert_manager.chart.version }}"
+    release_values:
+      image:
+        repository: "{{ basic.repository }}quay.io/jetstack/cert-manager-controller"
+      cainjector:
+        image:
+          repository: "{{ basic.repository }}quay.io/jetstack/cert-manager-cainjector"
+      startupapicheck:
+        image:
+          repository: "{{ basic.repository }}quay.io/jetstack/cert-manager-ctl"
+      webhook:
+        image:
+          repository: "{{ basic.repository }}quay.io/jetstack/cert-manager-webhook"
+  register: certmanager_template_result
+
+- name: set facts
+  set_fact:
+    certmanager_template_stdout: "{{ certmanager_template_result.stdout_lines }}"
+
+- name: get images
+  set_fact:
+    certmanager_images: "{{ certmanager_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"
