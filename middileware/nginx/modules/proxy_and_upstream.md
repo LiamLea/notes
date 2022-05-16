@@ -24,6 +24,10 @@ For TCP: `proxy_pass backend:123`
 * http_500, http_502, http_503, http_504, and http_429
 * http_403 and http_404不认为是失败的请求
 
+#### 5.ip transparency
+[参考](https://www.nginx.com/blog/ip-transparency-direct-server-return-nginx-plus-transparent-proxy/)
+[proxy protocol方式](https://docs.nginx.com/nginx/admin-guide/load-balancer/using-proxy-protocol/?_ga=2.229775452.1571476713.1652681920-1927445333.1652432980)
+
 ***
 
 ### 配置

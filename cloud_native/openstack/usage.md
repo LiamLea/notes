@@ -256,6 +256,18 @@ openstack aggregate unset --property availability_zone <aggregate>
 * 注意：
   * 制作快照时，刚刚写入的数据可能不会被备份，需要等一会
 
+#### 8.LoadBalancer相关
+[参考](https://docs.openstack.org/api-ref/load-balancer/v2/)
+[参考](https://docs.openstack.org/octavia/latest/user/guides/basic-cookbook.html)
+##### （1）创建LoadBalancer
+
+* 创建LoadBalancer
+```shell
+openstack loadbalancer create --name <name> \
+--vip-address <ip> --vip-subnet-id <subnet_id> \
+--provider amphora
+```
+
 ***
 
 ### 管理
