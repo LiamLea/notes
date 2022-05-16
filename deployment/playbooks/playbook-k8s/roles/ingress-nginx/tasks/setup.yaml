@@ -9,6 +9,18 @@
     atomic: yes
     release_values:
       controller:
+        kind: DaemonSet
+        config:
+          #ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-real-ip
+          enable-real-ip: "true"
+          #if true,redirect ssl to the specific port which is set with https-port
+          use-port-in-redirects: "true"
+        containerPort:
+          http: "{{ basic.ingress_nginx.config.http_port }}"
+          https: "{{ basic.ingress_nginx.config.https_port }}"
+        extraArgs:
+          "http-port": "{{ basic.ingress_nginx.config.http_port }}"
+          "https-port": "{{ basic.ingress_nginx.config.https_port }}"
         image:
           registry: "{{ basic.repository }}k8s.gcr.io"
           digest: ""
@@ -18,6 +30,7 @@
               registry: "{{ basic.repository }}k8s.gcr.io"
               digest: ""
         service:
+          externalTrafficPolicy: Local
           type: NodePort
           nodePorts:
             http: "{{ basic.ingress_nginx.config.http_port }}"
