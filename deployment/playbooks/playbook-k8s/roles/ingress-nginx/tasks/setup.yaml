@@ -10,6 +10,8 @@
     release_values:
       controller:
         kind: DaemonSet
+        tolerations:
+        - operator: "Exists"
         config:
           #ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-real-ip
           enable-real-ip: "true"

@@ -14,9 +14,10 @@
       image:
         registry: "{{ log.repository.strip('/') }}"
       replicaCount: "{{ log.kafka.replicas }}"
+      numPartitions: "{{ log.kafka.replicas }}"
       externalAccess:
         enabled: true
         service:
           type: NodePort
           domain: "{{ __domain }}"
-          nodePort: "{{ log.kafka.node_ports }}"
+          nodePorts: "{{ log.kafka.node_ports }}"

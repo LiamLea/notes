@@ -81,9 +81,14 @@ __config_logstash_conf: |
        timezone => "%{[labels][timezone]}"
     }
 
+    #解析ip的地理位置信息（如果该ip是私有地址，或者在库中找不到，则会解析失败）
+    geoip {
+      source => "[request][remote_addr]"
+    }
+
     #统一清洗
     prune {
-      whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$"]
+      whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$","^geoip$"]
       add_field => {
         "[labels][app_id]" => "%{[labels][app_name]}-%{[labels][app_env]}-%{[labels][addition]}-%{[labels][log_type]}_log-%{+YYYY.MM.dd}"
       }
@@ -98,6 +103,8 @@ __config_logstash_conf: |
     elasticsearch {
       hosts => "elasticsearch-master:9200"
       index => "%{[labels][app_id]}"
+      user => "elastic"
+      password => "{{ log.elastic.security.password }}"
       timeout => 240    #240 sec, when es performance is poor
     }
   }

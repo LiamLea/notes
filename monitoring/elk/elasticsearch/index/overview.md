@@ -91,7 +91,6 @@ shards太大，会影响故障恢复的性能
 * 可以通过界面创建，也可以用api
 ```python
 PUT _template/common-template
-
 {
   "order": 0,
   "index_patterns": [
@@ -104,7 +103,15 @@ PUT _template/common-template
     }
   },
   "aliases": {},
-  "mappings": {}
+  "mappings": {
+    "properties": {
+      "geoip.location": {
+        "ignore_malformed": false,
+        "type": "geo_point",
+        "ignore_z_value": true
+      }
+    }
+  }
 }
 ```
 

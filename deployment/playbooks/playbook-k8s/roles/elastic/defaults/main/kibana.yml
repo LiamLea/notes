@@ -2,3 +2,4 @@ __config_kibana: |
   server:
     basePath: /kibana
     rewriteBasePath: true
+  xpack.security.enabled: true

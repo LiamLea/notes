@@ -179,6 +179,8 @@ log:
 
   elastic:
     version: "7.17.3"
+    security:
+      password: "elastic"
     elasticsearch:
       name: elasticsearch
       chart:
