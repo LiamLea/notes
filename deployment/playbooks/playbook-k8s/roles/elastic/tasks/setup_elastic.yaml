@@ -1,3 +1,15 @@
+- name: create ns
+  shell: kubectl create ns {{ log.namespace }}
+  ignore_errors: True
+
+- name: copy files
+  copy:
+    src: secrets.yaml
+    dest: /tmp/
+
+- name: apply secret
+  shell: "kubectl apply -f /tmp/secrets.yaml -n {{ log.namespace }}"
+
 - name: install elasticsearch
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ log.elastic.elasticsearch.chart.path }}"
@@ -17,6 +29,22 @@
           requests:
             storage: "{{ log.elastic.elasticsearch.resources.storage }}"
       esJavaOpts: "{{ log.elastic.elasticsearch.resources.esJavaOpts }}"
+      esConfig:
+        elasticsearch.yml: |
+          xpack.security.enabled: true
+          xpack.security.transport.ssl.enabled: true
+          xpack.security.transport.ssl.verification_mode: none
+          xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certs/server.key
+          xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certs/server.crt
+      extraEnvs:
+      - name: ELASTIC_PASSWORD
+        value: "{{ log.elastic.security.password }}"
+      - name: ELASTIC_USERNAME
+        value: elastic
+      secretMounts:
+        - name: elastic-certificates
+          secretName: elastic-certificates
+          path: /usr/share/elasticsearch/config/certs
 
 - name: install kibana
   kubernetes.core.helm:
@@ -32,6 +60,11 @@
       healthCheckPath: "/kibana/app/kibana"
       kibanaConfig:
         kibana.yml: "{{ __config_kibana }}"
+      extraEnvs:
+        - name: 'ELASTICSEARCH_USERNAME'
+          value: "elastic"
+        - name: 'ELASTICSEARCH_PASSWORD'
+          value: "{{ log.elastic.security.password }}"
 
 - name: install logstash
   kubernetes.core.helm:
@@ -66,5 +99,7 @@
     release_values:
       image: "{{ log.repository }}docker.elastic.co/beats/filebeat"
       daemonset:
+        tolerations:
+        - operator: "Exists"
         filebeatConfig:
           filebeat.yml: "{{ __config_filebeat }}"

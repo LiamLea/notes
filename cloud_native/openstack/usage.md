@@ -106,7 +106,7 @@ openstack flavor create --vcpus 16 --ram 65536 --disk 50 16c/64g
 ```shell
 # 必须要设置一个fixed ip（不指定的话根据dhcp随机）
 # 如果该网卡需要设置其他ip，则需要 allow指定的ip通过（--allowed-address ip-address=<ip>） 或者 --disable-port-security
-openstack port create --network <network_name> --fixed-ip ip-address=<ip> --allowed-address ip-address=<ip>
+openstack port create --network <network_name> --fixed-ip ip-address=<ip> --allowed-address ip-address=<ip> <name>
 ```
 
 * 给端口添加放行ip
@@ -267,6 +267,23 @@ openstack loadbalancer create --name <name> \
 --vip-address <ip> --vip-subnet-id <subnet_id> \
 --provider amphora
 ```
+
+#### 9.创建VIP（将floating ip与某个内部vip绑定）
+
+* 首先创建端口（需要明确vip）
+```shell
+openstack port create --network <network> --fixed-ip ip-address=<vip> <port_name>
+```
+
+* 创建floating ip
+
+* 将floating ip与某个port绑定
+```shell
+neutron floatingip-associate <floatingip_id> <port_id>
+```
+
+* 此时该vip其实还没有分配，只不过是与floating ip进行了绑定
+ * 然后多个虚拟机允许该vip通过，然后通过keepalived将这个vip配置在这些虚拟机间，这样访问floating ip就能实现高可用
 
 ***
 

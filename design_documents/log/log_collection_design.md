@@ -206,6 +206,25 @@ output.kafka:
     "status": <int> , #"返回码（整数类型）"
     "user_agent": "",
     "params": "请求中的参数"
+},
+
+#注意有些ip不能检测出来（比如私有ip）
+#有些ip不能检测到具体的城市（比如公有云等ip）
+"geoip": {
+  "country_code3": "CN",
+  "latitude": 39.9289,
+  "ip": "220.181.38.251",
+  "region_name": "Beijing",
+  "longitude": 116.3883,
+  "country_name": "China",
+  "timezone": "Asia/Shanghai",
+  "country_code2": "CN",
+  "region_code": "BJ",
+  "continent_code": "AS",
+  "location": {
+    "lon": 116.3883,
+    "lat": 39.9289
+  }
 }
 ```
 
@@ -297,9 +316,14 @@ filter {
      timezone => "%{[labels][timezone]}"
   }
 
+  #解析ip的地理位置信息（如果该ip是私有地址，或者在库中找不到，则会解析失败）
+  geoip {
+    source => "[request][remote_addr]"
+  }
+
   #统一清洗
   prune {
-    whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$"]
+    whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$","^geoip$"]
     add_field => {
       "[labels][app_id]" => "%{[labels][app_name]}-%{[labels][app_env]}-%{[labels][addition]}-%{[labels][log_type]}_log-%{+YYYY.MM.dd}"
     }
@@ -315,6 +339,38 @@ output {
     hosts => "<IP:PORT>"
     index => "%{[labels][app_id]}"
     timeout => 240    #240 sec, when es performance is poor
+  }
+}
+```
+
+***
+
+### elasticsearch设置
+
+#### 1.创建通用模板
+需要将geoip.location类型设置为geo_point
+```python
+PUT _template/common-template
+{
+  "order": 0,
+  "index_patterns": [
+    "*"
+  ],
+  "settings": {
+    "index": {
+      "number_of_shards": "3",
+      "number_of_replicas": "1"
+    }
+  },
+  "aliases": {},
+  "mappings": {
+    "properties": {
+      "geoip.location": {
+        "ignore_malformed": false,
+        "type": "geo_point",
+        "ignore_z_value": true
+      }
+    }
   }
 }
 ```
