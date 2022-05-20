@@ -1,0 +1,7 @@
+- name: copy files
+  template:
+    src: elastic_init_job.yml.j2
+    dest: /tmp/elastic_init_job.yml
+
+- name: apply init job
+  shell: "kubectl apply -f /tmp/elastic_init_job.yml"

@@ -47,3 +47,16 @@ set_fact:
     dst: "{{ dst | default([]) + [hostvars[item]['ansible_host'] + ':' + (monitor['node_exporter']['port']|string)]}}"
   with_items: "{{ groups['all'] }}"
 ```
+
+##### 4.使用原生字符串：`{% raw %} ... {% endraw %}`
+```yaml
+# {{ variable_1 }}: {{ aa }}
+variable_1: {% raw %} {{ aa }} {% endraw %}
+
+# {{ variable_2 }}: {{ aa }}\nbb
+variable_2: |
+  {% raw %}
+  {{ aa }}
+  bb
+  {% endraw %}
+```

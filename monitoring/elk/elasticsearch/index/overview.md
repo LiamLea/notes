@@ -29,6 +29,21 @@
 In most cases multiple indexes are better
 [参考](https://stackoverflow.com/questions/44700066/elastic-search-one-index-vs-multiple-indexes)
 
+#### 5.datastream
+![](./imgs/datastream_01.png)
+* 由多个隐藏的、自动生成的index组成
+* 只能进行append-only
+* 一个data stream需要至少匹配一个index template
+  * 包含index的settings和mappings，用于配置该datastream背后的index
+  * 包含ilm策略，会根据策略对当前index进行rollover（即产生一个新的index）
+* 必须包含@timestamp字段
+
+##### （1）读data stream
+![](./imgs/datastream_02.png)
+
+##### （2）写data strem
+![](./imgs/datastream_03.png)
+
 ***
 
 ### shards(数据分片)
@@ -58,6 +73,7 @@ shards太少，会影响indexing（添加和更新documents）的性能
 shards太大，会影响故障恢复的性能
 
 #### 4.确定shards的数量
+[参考](https://www.elastic.co/guide/en/elasticsearch/reference/current/size-your-shards.html)
 * 单个shard的大小
   * 10G ~ 50G
 * shard的数量

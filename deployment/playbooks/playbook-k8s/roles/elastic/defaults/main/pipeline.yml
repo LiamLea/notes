@@ -88,9 +88,12 @@ __config_logstash_conf: |
 
     #统一清洗
     prune {
-      whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$","^geoip$"]
+      whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$","^geoip$","^data_stream$"]
       add_field => {
-        "[labels][app_id]" => "%{[labels][app_name]}-%{[labels][app_env]}-%{[labels][addition]}-%{[labels][log_type]}_log-%{+YYYY.MM.dd}"
+        "[labels][app_id]" => "%{[labels][app_name]}.%{[labels][addition]}.%{[labels][log_type]}-%{[labels][app_env]}"
+        "[data_stream][type]" => "logs"
+        "[data_stream][dataset]" => "%{[labels][app_name]}.%{[labels][addition]}.%{[labels][log_type]}"
+        "[data_stream][namespace]" => "%{[labels][app_env]}"
       }
       remove_field => [ "[labels][timezone]" ]
     }
@@ -102,7 +105,9 @@ __config_logstash_conf: |
 
     elasticsearch {
       hosts => "elasticsearch-master:9200"
-      index => "%{[labels][app_id]}"
+      #index => "logs-%{[labels][app_id]}"
+      data_stream => "true"
+      data_stream_auto_routing => "true"
       user => "elastic"
       password => "{{ log.elastic.security.password }}"
       timeout => 240    #240 sec, when es performance is poor
