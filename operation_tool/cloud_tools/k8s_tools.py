@@ -97,9 +97,9 @@ def restore(resource_type, resources, rs_dir):
     for resource in resources:
         if resource not in present_resources:
             try:
-                run_shell("kubectl apply -f %s" % os.path.join(dir, resource))
+                run_shell("kubectl apply -f %s" % os.path.join(rs_dir, resource))
             except Exception:
-                print(print("restore failed:  %s" % os.path.join(rs_dir, resource)))
+                print("restore failed:  %s" % os.path.join(rs_dir, resource))
             else:
                 print("restore succeeded:     %s" % os.path.join(rs_dir, resource))
 

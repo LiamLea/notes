@@ -1,0 +1,78 @@
+__init_sh: |
+  #!/bin/sh
+      curl -u elastic:{{ log.elastic.security.password }} -XPUT "http://elasticsearch-master:9200/_ilm/policy/logs" -H 'Content-Type: application/json' -d'
+      {
+        "policy": {
+          "phases": {
+            "hot": {
+              "min_age": "0ms",
+              "actions": {
+                "rollover": {
+                  "max_age": "30d",
+                  "max_primary_shard_size": "50gb"
+                }
+              }
+            }
+          },
+          "_meta": {
+            "description": "default policy for the logs index template installed by x-pack",
+            "managed": true
+          }
+        }
+      }'
+
+      curl -u elastic:{{ log.elastic.security.password }} -XPUT "http://elasticsearch-master:9200/_component_template/logs-settings" -H 'Content-Type: application/json' -d'
+      {
+        "version": 1,
+        "template": {
+          "settings": {
+            "index": {
+              "number_of_shards": "1",
+              "number_of_replicas": "1",
+              "lifecycle": {
+                "name": "logs"
+              },
+              "codec": "best_compression",
+              "query": {
+                "default_field": [
+                  "message"
+                ]
+              }
+            }
+          }
+        },
+        "_meta": {
+          "description": "default settings for the logs index template installed by x-pack",
+          "managed": true
+        }
+      }'
+
+      curl -u elastic:{{ log.elastic.security.password }} -XPUT "http://elasticsearch-master:9200/_component_template/logs-mappings" -H 'Content-Type: application/json' -d'
+      {
+        "version": 1,
+        "template": {
+          "mappings": {
+            "properties": {
+              "data_stream": {
+                "properties": {
+                  "type": {
+                    "type": "constant_keyword",
+                    "value": "logs"
+                  }
+                }
+              },
+              "geoip.location": {
+                "ignore_malformed": false,
+                "type": "geo_point",
+                "ignore_z_value": true
+              }
+            }
+          }
+        },
+        "_meta": {
+          "managed": true,
+          "description": "default mappings for the logs index template installed by x-pack"
+        }
+      }'
+
+      curl -u elastic:{{ log.elastic.security.password }} -XPOST http://kibana-kibana:5601/kibana/api/saved_objects/_import?overwrite=true -H "kbn-xsrf: true" --form file=@/tmp/dashboard.ndjson

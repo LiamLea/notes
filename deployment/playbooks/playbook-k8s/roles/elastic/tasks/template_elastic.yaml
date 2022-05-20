@@ -64,7 +64,11 @@
 
 - name: set facts
   set_fact:
-    elastic_template_stdout: "{{ es_template_result.stdout_lines + kibana_template_result.stdout_lines + logstash_template_result.stdout_lines + filebeat_template_result.stdout_lines }}"
+    elastic_init_images:
+    - "{{ log.repository }}curlimages/curl:7.73.0"
+- name: set facts
+  set_fact:
+    elastic_template_stdout: "{{ es_template_result.stdout_lines + kibana_template_result.stdout_lines + logstash_template_result.stdout_lines + filebeat_template_result.stdout_lines + elastic_init_images }}"
 
 - name: get images
   set_fact:

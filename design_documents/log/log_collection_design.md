@@ -13,8 +13,8 @@
 * logstash从kafka中读取日志，并进行清洗，后存入es
 
 #### 2.index设计
-* 每个应用会分配一个app_id，是一个唯一的值，格式：`<app_name>-<app_env>-<addtition>-<log_type>`
-* 每个应用的index就是其app_id
+* 每个应用会分配一个app_id，是一个唯一的值，格式：`<app_name>.<addtition>.<log_type>-<app_env>`
+* 每个应用的index，`{type}-{dataset}-{namespace}`：`logs-<app_name>.<addtition>.<log_type>-<app_env>`
 * 在kibana中，可以使用index pattern进行index聚合
 
 #### 3.采集问题
@@ -323,9 +323,12 @@ filter {
 
   #统一清洗
   prune {
-    whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$","^geoip$"]
+    whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$","^geoip$","^data_stream$"]
     add_field => {
-      "[labels][app_id]" => "%{[labels][app_name]}-%{[labels][app_env]}-%{[labels][addition]}-%{[labels][log_type]}_log-%{+YYYY.MM.dd}"
+      "[labels][app_id]" => "%{[labels][app_name]}.%{[labels][addition]}.%{[labels][log_type]}-%{[labels][app_env]}"
+      "[data_stream][type]" => "logs"
+      "[data_stream][dataset]" => "%{[labels][app_name]}.%{[labels][addition]}.%{[labels][log_type]}"
+      "[data_stream][namespace]" => "%{[labels][app_env]}"
     }
     remove_field => [ "[labels][timezone]" ]
   }
@@ -337,7 +340,11 @@ output {
 
   elasticsearch {
     hosts => "<IP:PORT>"
-    index => "%{[labels][app_id]}"
+    #index => "logs-%{[labels][app_id]}"
+    #发送到指定的datastream（根据datastream中的变量）: "<type>-<dataset>-<namespace>"
+    #如果不需要使用变量，可以直接设置data_stream*等，直接指定发送到哪个datastream
+    data_stream => "true"
+    data_stream_auto_routing => "true"    
     timeout => 240    #240 sec, when es performance is poor
   }
 }
@@ -347,7 +354,95 @@ output {
 
 ### elasticsearch设置
 
-#### 1.创建通用模板
+#### 1.当使用datastream时，初始化
+
+* 设置ilm策略（默认会有一个logs策略，并且logs模板默认使用这个策略）
+```shell
+curl -u elastic:elastic -XPUT "http://elasticsearch-master:9200/_ilm/policy/logs" -H 'Content-Type: application/json' -d'
+{
+  "policy": {
+    "phases": {
+      "hot": {
+        "min_age": "0ms",
+        "actions": {
+          "rollover": {
+            "max_age": "30d",
+            "max_primary_shard_size": "50gb"
+          }
+        }
+      }
+    },
+    "_meta": {
+      "description": "default policy for the logs index template installed by x-pack",
+      "managed": true
+    }
+  }
+}'
+```
+
+* 设置settings
+```shell
+curl -u elastic:elastic -XPUT "http://elasticsearch-master:9200/_component_template/logs-settings" -H 'Content-Type: application/json' -d'
+{
+  "version": 1,
+  "template": {
+    "settings": {
+      "index": {
+        "number_of_shards": "1",
+        "number_of_replicas": "1",
+        "lifecycle": {
+          "name": "logs"
+        },
+        "codec": "best_compression",
+        "query": {
+          "default_field": [
+            "message"
+          ]
+        }
+      }
+    }
+  },
+  "_meta": {
+    "description": "default settings for the logs index template installed by x-pack",
+    "managed": true
+  }
+}'
+```
+
+* 设置mappings
+```shell
+curl -u elastic:elastic -XPUT "http://elasticsearch-master:9200/_component_template/logs-mappings" -H 'Content-Type: application/json' -d'
+{
+  "version": 1,
+  "template": {
+    "mappings": {
+      "properties": {
+        "data_stream": {
+          "properties": {
+            "type": {
+              "type": "constant_keyword",
+              "value": "logs"
+            }
+          }
+        },
+        "geoip.location": {
+          "ignore_malformed": false,
+          "type": "geo_point",
+          "ignore_z_value": true
+        }
+      }
+    }
+  },
+  "_meta": {
+    "managed": true,
+    "description": "default mappings for the logs index template installed by x-pack"
+  }
+}'
+```
+
+
+#### 2.当不使用datastream时，初始化
+
 需要将geoip.location类型设置为geo_point
 ```python
 PUT _template/common-template

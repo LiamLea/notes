@@ -66,6 +66,9 @@
         - name: 'ELASTICSEARCH_PASSWORD'
           value: "{{ log.elastic.security.password }}"
 
+- name: init elastic
+  include_tasks: init.yaml
+
 - name: install logstash
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ log.elastic.logstash.chart.path }}"
