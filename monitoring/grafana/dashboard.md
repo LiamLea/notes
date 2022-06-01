@@ -30,7 +30,12 @@
 #### 3.监控blackbox: 7587
 ![](./imgs/dashboard_blackbox.png)
 
-#### 4.监控k8s：15520
+#### 4.监控k8s：15520、11454
 
-![](./imgs/dashboard_prometheus_01.png)
-![](./imgs/dashboard_prometheus_02.png)
+* 系统状态: 15520
+![](./imgs/dashboard_k8s_01.png)
+![](./imgs/dashboard_k8s_02.png)
+
+* pv状态: 11454
+![](./imgs/dashboard_k8s_03.png)
+![](./imgs/dashboard_k8s_04.png)

@@ -228,3 +228,8 @@ kubectl get events --sort-by=.metadata.creationTimestamp -n xx
 ```shell
 kubectl get pods -n aiops-dev -o custom-columns="Name:metadata.name,CPU-request:spec.containers[*].resources.requests.cpu"
 ```
+
+#### 2.查询所有pod和其uid
+```shell
+kubectl get pods -A -o custom-columns=PodName:.metadata.name,PodUID:.metadata.uid
+```

@@ -4,12 +4,9 @@
 
 ### 部署istio
 
-#### 1.导入镜像（自动拉取太慢）
-```shell
-docker load -i istio_v1.5.0_images.tar.gz
-```
+#### 1.安装istio
 
-#### 2.安装istio
+
 ```shell
 istioctl install --set profile=demo -y
 #demo配置安装了所有的组件

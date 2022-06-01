@@ -2,46 +2,48 @@
 
 [toc]
 
-### 预备知识
+### Prerequisites
 
 #### 1.sidecar模式
 边车部署模式，一个单节点有两个容器组成，一个是应用容器，一个是配件容器，配件容器**共享**应用容器的**资源**和**生命周期**，即配件容器不能单独存活
->这里指的是把一个**微服务**和一个**proxy**部署在一起  
+* 这里指的是把一个**微服务**和一个**proxy**部署在一起  
 
 #### 2.service mesh
 
- a service mesh is a **dedicated infrastructure layer** for facilitating service-to-service communications between services or microservices, using a **sidecar proxy**.
-
-#### 3.通信架构
-* data plane
-所有用于**转发流量**的功能和过程
-
-* control plane
-所有用于**确定如何转发**（比如选择哪条路径等）的功能和过程
-
-* management plane
-所有用于**控制设备（即配置控制平面）和监控设备**(比如CLI，snmp等)的功能
+* 定义
+  * 一个service mesh是一个可配置的**infrastructure layer**，能够处理在此mesh中所有服务之间的通信（包括进入和外出的）
+* 实现方式
+  * sidecar proxy
 
 ***
 
-### 基础概念
+### Concepts
 
-#### 1.核心功能
-* traffic management
-依赖以sidecar模式部署envoy，所有流量由envoy转发
-无需对服务做任何更改
-* security
-* observability
-
-#### 2.整体架构
+#### 1.Architecture
 ![](./imgs/overview_01.png)
 
-#### 3.组件
-
 ##### （1）envoy
-处理数据平面的所有流量
+* 与控制平面通信，获取配置
+* 所有流量进出pod之前，都需要经过envoy
+* istio使用envoy实现了以下功能:
+  * Traffic control features
+    * enforce fine-grained traffic control with rich routing rules for HTTP, gRPC, WebSocket, and TCP traffic.
+  * Network resiliency features
+    * setup retries, failovers, circuit breakers, and fault injection.
+  * Security and authentication features
+    * enforce security policies and enforce access control and rate limiting defined through the configuration API.
+  * Pluggable extensions model based on WebAssembly that allows for custom policy enforcement and telemetry generation for mesh traffic.
+* 启动envoy时，会设置iptables，将所有进入流量转到15006端口，所有外出流量转到15001端口
 
-##### （2）pilot
+##### （2）istiod
+* service discovery（pilot）
+* configuration（galley）
+* certificate management（citadel）
+  * Istiod acts as a Certificate Authority (CA) and generates certificates to allow secure mTLS communication in the data plane.
+
+
+
+
 
 * service discovery
 发现service，然后注入到envoy配置中
@@ -61,36 +63,10 @@ istio维护了一个内部的**服务注册表**
 ##### （4）galley
 负责配置验证、配置提取、配置处理和配置分发
 
-***
 
-### 在k8s中使用时的注意事项
-
-#### 1.创建service，服务端口必须按照要求命名
-命名格式：`<protocol>[-<suffix>]`
-比如：
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: xx
-spec:
-  selector:
-    xx: xx
-  ports:
-  - name: http      #这里需要命名规范
-    port: xx
-```
-支持的协议：
-* grpc
-* grpc-web
-* http
-* http2
-* https
-* mongo
-* mysql
-默认关闭，需要在pilot配置文件中开启
-* redis
-默认关闭，需要在pilot配置文件中开启
-* tcp
-* tls
-* udp
+#### 2.核心功能
+* traffic management
+依赖以sidecar模式部署envoy，所有流量由envoy转发
+无需对服务做任何更改
+* security
+* observability

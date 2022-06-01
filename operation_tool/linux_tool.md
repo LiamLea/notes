@@ -146,10 +146,32 @@ dd if=/dev/zero of=/tmp/test2.img bs=512 count=1000 oflag=dsync
 ***
 
 ### io相关
+
 ##### `iostat -dx`
 显示io详细情况
+
 ##### `iotop`
-显示所有进程的io情况
+* 显示：
+  * 所有线程的io情况
+  * total DISK READ: 所有进程READ的总和
+  * actual DISK READ：内核从磁盘中READ的总和（有可能和上面不相等，因为存在缓存等原因）
+
+* 常用参数
+```shell
+#-p <pid>   显示指定的进程或线程
+#-P         只显示进程（默认显示线程）
+#-t         会加上时间戳
+
+#-o只显示真正在做io的进程
+iotop -P -o
+
+#-b不进行交互，即将结果打印
+#-n 5表示打印5次
+iotop -P -b -n 5
+
+#-a表示，统计累计值（即启动iotop，然后一直累计）
+iotop -P -o -a
+```
 
 ***
 ### `ps`和`top`
