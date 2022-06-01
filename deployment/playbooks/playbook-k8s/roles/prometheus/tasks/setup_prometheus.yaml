@@ -89,6 +89,7 @@
         port: 80
         path: /prometheus
       rules: "{{ __config_prometheus_adapter_rules }}"
+      logLevel: 2
 
 - name: install grafana
   kubernetes.core.helm:

@@ -99,7 +99,7 @@ __config_alerting_rules:
         description: "OOM kill detected\n  VALUE = {{  '{{ $value }}\n  LABELS = {{ $labels }}' }}"
 
     - alert: HostUnusualNetworkThroughputIn
-      expr: sum by (instance) (rate(node_network_receive_bytes_total[2m])) / 1024 / 1024 > 100
+      expr: sum by (instance) (rate(node_network_receive_bytes_total{device !~ "^(cali|docker|lo|tun|br-|qbr|qvo|qvb|tap|ovs|veth).*"}[2m])) / 1024 / 1024 > 100
       for: 5m
       labels:
         severity: warning
@@ -108,7 +108,7 @@ __config_alerting_rules:
         description: "Host network interfaces are probably receiving too much data (> 100 MB/s)\n  VALUE = {{  '{{ $value }}\n  LABELS = {{ $labels }}' }}"
 
     - alert: HostUnusualNetworkThroughputOut
-      expr: sum by (instance) (rate(node_network_transmit_bytes_total[2m])) / 1024 / 1024 > 100
+      expr: sum by (instance) (rate(node_network_transmit_bytes_total{device !~ "^(cali|docker|lo|tun|br-|qbr|qvo|qvb|tap|ovs|veth).*"}[2m])) / 1024 / 1024 > 100
       for: 5m
       labels:
         severity: warning

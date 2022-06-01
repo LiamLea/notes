@@ -2,18 +2,36 @@
 
 [toc]
 
-### VirtualService
-用于设置路由规则，将匹配的流量路由到指定destination（在k8s中destination一般就是service，也可以是ip地址或是可以解析的域名）
+### 概述
 
-#### 1.特点
-* 首先匹配流量的来源
-* 可以路由七层和四层的流量
-* 可以路由外部流量（需要指定gateways，会将规则应用到 从这些gateways进来的流量）
-* rule中可以设置匹配条件（如头部信息、url等）
-* rule遵循匹配即停止的规则
-* 在一个rule中可以设置多个destination，且可以设置权重
+#### 1.service registry
+* 通过调用k8s接口，发现services和endpoints
+  * 填充service registry
+  * 后续需要利用service registry的信息去配置envoy
 
-#### 2.清单文件格式
+* 也可以通过ServiceEntry在service registry中添加静态的条目
+
+#### 2.数据处理流程
+VirtualService需要通过hosts这个配置关联k8s的services（本质通过配置的hosts去查找该名字的virtualhosts，如果找到了，则修改，找不到则在80路由规则中添加）
+VirtualService用于将流量路由到指定DestinationRule
+* 如果没有匹配到VirtualService的流量，则正常处理（即发送到指定service进行负载）
+DestinationRule用于对service进行分组
+gateways to control ingress and egress traffic.
+
+***
+
+### 使用
+
+#### 1. VirtualService（本质是配置envoy的filter）
+* 路由流量
+  * 匹配流量
+    * 可以匹配七层和四层的流量
+    * 可以匹配从指定gateways进来的流量
+    * 遵循匹配即停止的规则
+  * 路由到相应的DestinationRule（即service集）
+
+##### （1）清单文件格式
+
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -21,18 +39,31 @@ metadata:
   name: xx
 spec:
   hosts:
-  - xx              #匹配客户端ip地址（或是可以解析的域名）
-                    # '*' 匹配所有客户端
+  - xx              #匹配目标地址（建议：填service名称并且部署到对应的namespace中，因为默认会对这个service名称补全，否则就要写全的域名）
+                    #对于http：
+                    #   会配置virtualhosts，如果能匹配到相应的virtualhosts，则会修改virtualhosts，如果匹配不到，则默认在80的路由规则中添加virtualhosts）
+                    #   所以一般使用service名称并且部署在其命名空间中 或者 使用 完整的域名，这样才能够使得路由规则应用到相关的service上
+                    #   当其他VirtualService使用同样的hosts不会生效（只有第一个生效）
+                    # '*' 匹配所有目标地址（用于tcp路由）
 
-#如果要路由外部进来的流量，这里就需要指定gateways
-#添加这个选项后，既会路由指定的外部流量，也会路由内部流量
+  #如果要路由外部进来的流量，这里就需要指定gateways
+  #添加这个选项后，既会路由指定的外部流量，也会路由内部流量
   gateways:
   - xx              #这里填GateWay的名字
 
-#配置规则，转发http流量 (如果要转发tcp流量，这里就设为tcp)
+  #配置tcp路由规则（好像要配合gateway一起使用，才能在envoy的listener产生配置，待确认）
+  tcp: []
+
+  #配置http路由规则（包括HTTP/1.1, HTTP2, gRPC）
   http: []          
+
+  #配置tls路由规则
+  tls: []
 ```
-#### 3.规则配置
+
+##### （2）路由http流量
+
+* 匹配http流量
 ```yaml
 #每条规则可以设置相关匹配条件（也可以不设置）
 - match:
@@ -41,15 +72,17 @@ spec:
         exact: jason
 
   route:
-#设置destination，指向一个地址
+  #设置destination，指向一个地址
   - destination:
-#这里可以填ip，或service的域名，或能够解析的域名
+      #这里可以填ip，或service的域名，或能够解析的域名
       host: reviews
       port:
         number: 8088
       subset: v2
 ```
-设置多个destination
+
+* 设置多个destination
+
 ```yaml
 - route:
   - destination:
@@ -61,6 +94,7 @@ spec:
       subset: v2
     weight: 25
 ```
+
 ***
 ### DestinationRule
 **应用于指定的destination**
