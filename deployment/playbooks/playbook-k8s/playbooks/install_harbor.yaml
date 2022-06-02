@@ -1,8 +1,6 @@
 - hosts: harbor
   gather_facts: True
   become: True
-  become_method: sudo
-  become_flags: "-i"
   roles:
   - init
   - docker

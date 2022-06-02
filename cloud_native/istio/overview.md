@@ -42,7 +42,14 @@
   * Istiod acts as a Certificate Authority (CA) and generates certificates to allow secure mTLS communication in the data plane.
 
 
+#### 2.与k8s的对应
 
+|envoy中|k8s中|
+|-|-|
+|workload|deployment|
+|workload instance|pod|
+|endpoint（不是k8s中的endpoints资源，而是endpoints中的一个个endpoint，所以可以理解为一个endpoint就是一个pod）||
+|service（包含k8s中的serivce）||
 
 
 * service discovery
