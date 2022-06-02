@@ -1,5 +1,5 @@
 - name: check nfs ntp installed
-  shell: rpm -qa | grep ntp
+  shell: rpm -qa | grep -E "^ntp-"
   ignore_errors: True
   register: ntp_installed
 
@@ -8,4 +8,3 @@
     name: ntp
     state: present
   when: ntp_installed.rc != 0
-

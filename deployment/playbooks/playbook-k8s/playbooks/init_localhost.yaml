@@ -1,8 +1,6 @@
 - hosts: ansible
   gather_facts: True
   become: True
-  become_method: sudo
-  become_flags: "-i"
   tasks:
   - name: disable selinux
     selinux:

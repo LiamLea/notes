@@ -73,3 +73,7 @@
 - name: get images
   set_fact:
     elastic_images: "{{ elastic_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"
+
+- name: set facts
+  set_fact:
+    elastic_images: "{{ elastic_images + elastic_init_images }}"

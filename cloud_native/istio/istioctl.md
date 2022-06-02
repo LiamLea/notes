@@ -20,3 +20,15 @@ istioctl proxy-status
 istioctl proxy-config all <proxy-name>
 #all包括：listener、cluster等
 ```
+
+* 查看某个service或pod的destinationRule配置
+```shell
+$ istioctl experimental describe service <svc_name>.<ns>
+# DestinationRule: my-destination-rule.istio-test for "reviews"
+#    Matching subsets: v1,v2,v3
+
+$ istioctl experimental describe pod <pod_name>.<ns>
+# DestinationRule: my-destination-rule.istio-test for "reviews"
+#    Matching subsets: v1
+#       (Non-matching subsets v2,v3)
+```

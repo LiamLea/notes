@@ -5,11 +5,22 @@
 ### 概述
 
 #### 1.service registry
-* 通过调用k8s接口，发现services和endpoints
-  * 填充service registry
-  * 后续需要利用service registry的信息去配置envoy
 
-* 也可以通过ServiceEntry在service registry中添加静态的条目
+##### （1）生成service registry
+* 自动发现
+  * 通过调用k8s接口，发现如下内容：
+    * service 即k8s的service
+    * endpoint 即k8s中的endpoints中的endpoint
+      * 并且会根据endpoint对应的**pod的labels**，**作为这个endpoint的labels**
+
+* 静态添加
+  * 通过ServiceEntry在service registry中添加
+
+##### （2）利用service registry配置envoy
+
+|通过service registry生成的envoy的配置项||
+|-|-|
+|envoy的cluster的命名|`<DIRECTION>|<PORT>|<SUBSET>|<SERVICE_FQDN>`|
 
 #### 2.数据处理流程
 VirtualService需要通过hosts这个配置关联k8s的services（本质通过配置的hosts去查找该名字的virtualhosts，如果找到了，则修改，找不到则在80路由规则中添加）
@@ -22,13 +33,13 @@ gateways to control ingress and egress traffic.
 
 ### 使用
 
-#### 1. VirtualService（本质是配置envoy的filter）
+#### 1. VirtualService（本质就是配置envoy的filter）
 * 路由流量
   * 匹配流量
     * 可以匹配七层和四层的流量
     * 可以匹配从指定gateways进来的流量
     * 遵循匹配即停止的规则
-  * 路由到相应的DestinationRule（即service集）
+  * 路由到相应的DestinationRule（即envoy中的cluster）
 
 ##### （1）清单文件格式
 
@@ -39,10 +50,10 @@ metadata:
   name: xx
 spec:
   hosts:
-  - xx              #匹配目标地址（建议：填service名称并且部署到对应的namespace中，因为默认会对这个service名称补全，否则就要写全的域名）
+  - xx              #匹配目标地址（建议使用 short name并部署在相应的namespace中）
                     #对于http：
                     #   会配置virtualhosts，如果能匹配到相应的virtualhosts，则会修改virtualhosts，如果匹配不到，则默认在80的路由规则中添加virtualhosts）
-                    #   所以一般使用service名称并且部署在其命名空间中 或者 使用 完整的域名，这样才能够使得路由规则应用到相关的service上
+                    #   两种方式：short name（会根据所在的namespace，自动生成完整的域名） 或者 完整的域名，这样才能够使得路由规则应用到相关的service上
                     #   当其他VirtualService使用同样的hosts不会生效（只有第一个生效）
                     # '*' 匹配所有目标地址（用于tcp路由）
 
@@ -61,9 +72,26 @@ spec:
   tls: []
 ```
 
+* destination设置
+  * 即指定路由到envoy的哪个cluster: `<DIRECTION>|<PORT>|<SUBSET>|<SERVICE_FDQN>`
+    * `<DIRECTION>: outbound`，因为对于当前服务，访问其他cluster是出站流量
+    * `<PORT>: 指定的port（若未设置则使用service使用的port）`
+    * `<SUBSET>: 指定的subset（若未指定则为空）`
+    * `<SERVICE_FQDN>: 根据指定的host生成（如果host是short name会自动填充成FQDN`
+  ```yaml
+  - destination:
+      #所以这里一般填servie名称
+      host: reviews
+      port:
+        number: 8088
+      subset: v2
+  ```
+
 ##### （2）路由http流量
 
 * 匹配http流量
+
+（建议在生成环境中使用 完整域名（这样对部署的namespace就没有要求了）
 ```yaml
 #每条规则可以设置相关匹配条件（也可以不设置）
 - match:
@@ -72,9 +100,8 @@ spec:
         exact: jason
 
   route:
-  #设置destination，指向一个地址
+  #设置destination
   - destination:
-      #这里可以填ip，或service的域名，或能够解析的域名
       host: reviews
       port:
         number: 8088
@@ -95,16 +122,17 @@ spec:
     weight: 25
 ```
 
-***
-### DestinationRule
-**应用于指定的destination**
-用于设置当流量达到destination后，如何分发到后端pods
-#### 1.特点
-* 会依据指定的若干个标签对后端pod进行分类，一个subset就是一类
-* 在DestinationRule中设置分发策略，即负载均衡（比如轮询等）
-* 某个subset中可以覆盖全局的分发策略
-* 在VirtualService中配置了路由到哪个subset
-#### 2.清单文件格式
+#### 2.DestinationRule（本质就是配置envoy的cluster）
+
+* 根据endpoint的labels，将一个service下的endpoint划分成多个subset
+  * istio对envoy的cluster的命名方式：`<DIRECTION>|<PORT>|<SUBSET>|<SERVICE_FQDN>`
+  * 如果cluster已存在，则修改，如果不存在，则添加
+
+##### （1）特点
+* 将一个service下的endpoint划分为多个subset
+* 可选的负载策略比较多
+
+##### （2）清单文件格式
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
@@ -112,18 +140,18 @@ metadata:
   name: xx
 spec:
 
-#指定应用于哪个destination（一般指service）
+  #service registry中的service（包含k8s中的service）
   host: xx     
 
-#配置如何将流量分发到后端       
+  #配置全局转发策略      
   trafficPolicy:
     loadBalancer:
-
-#还有ROUND_ROBIN，LEAST_CONN和PASSTHROUGH
+      #还有ROUND_ROBIN，LEAST_CONN和PASSTHROUGH
       simple: RANDOM  	
 
-#用于对后端Pods进行分类，这里一共分了三类，利用version这个标签  
-#第一类的名字是v1，有version=v1这个标签的pods属于这一类    
+  #根据endpoint的labels进行分类
+  #这里一共分了三个subset，利用version这个标签
+  #名为v1的subset，包含有version=v1标签的pods的endpoints   
   subsets:
   - name: v1
     labels:
@@ -138,6 +166,7 @@ spec:
     labels:
       version: v3
 ```
+
 ***
 ### GateWay
 用来管理k8s集群的进入和外出流量，**与VirtualService结合使用**
