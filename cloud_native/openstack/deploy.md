@@ -244,6 +244,14 @@ stores = rbd
 
 * 重启所有controller的glance-api这个容器
 
+##### （2）ceph-mgr内存使用越来越多
+* 关闭ceph-mgr的dashboard模块（下面这种更改方式是临时的）
+```shell
+docker exec -it <ceph_mgr_container> -it /bin/bash
+ceph mgr module disable dashboard
+ceph mgr module ls
+```
+
 #### 10.进行部署
 ```shell
 kolla-ansible -i ./multinode bootstrap-servers
