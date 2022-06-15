@@ -12,8 +12,9 @@
 * 注意在istio中：
   * 启动envoy之前，都会先设置**iptables**
   * 将所有 **进入流量** 转到envoy的 **15006** 端口
+    * 会利用 元数据（原始的目标地址、协议等信息），来匹配最佳的filter chain，进行处理
   * 将所有 **外出流量** 转到envoy的 **15001** 端口
-    * 设置了`"useOriginalDst": true`
+    * 设置了`"use_original_dst": true`
       * 会根据原始的目标地址，将该流量转到与之匹配的listener上
         * 发往："1.1.1.1:9080"，
         * 如果存在"1.1.1.1:9080"这个listener，则会匹配这个listener，不存在的话继续，
@@ -27,7 +28,8 @@
   "address": {},
   "listener_filters": [],     //增加一些额外的处理（比如检查tls、限制访问速率等）
   "filter_chains": [],
-  "default_filter_chain": {}  //当流量在filter_chains中没有匹配的filter_chain，则使用default_filter_chain
+  "default_filter_chain": {},  //当流量在filter_chains中没有匹配的filter_chain，则使用default_filter_chain
+  "traffic_direction": "<INBOUND | OUTBOUND>"   //流量的方向，是进入还是外出
 }
 ```
 
@@ -46,16 +48,19 @@
     ]
   },
 
+  //network filters
   "filters": []
 }
 ```
 
-##### （2）filter
+##### （2）network filters
 * 基本格式
 ```json
 {
   "name": "...",
-  "typed_config": {}
+  "typed_config": {
+    "@type": "filter的类型"
+  }
 }
 ```
 
@@ -140,3 +145,67 @@
 ##### （3）具体的request flow
 [参考istio文档](https://istio.io/latest/docs/ops/diagnostic-tools/proxy-cmd/)
 [参考envoy文档](https://www.envoyproxy.io/docs/envoy/latest/intro/life_of_a_request)
+
+***
+
+### observability
+
+#### 1.access logging
+通过filter（tcp_proxy或http_connection_manager）实现
+[参考](https://www.envoyproxy.io/docs/envoy/v1.22.0/intro/arch_overview/observability/access_logging)
+
+#### 2.traffic
+
+与tracing的区别：这里的流量不能串起来，只能是具体的某个envoy上的统计信息，比如rps（requests-per-second）、response time等
+
+##### （1）layer-4 traffic
+通过tcp_proxy这个filter获取tcp流量
+
+##### （2）layer-7 traffic
+通过http_connection_manager这个filter获取http、grpc等流量
+
+#### 3.tracing（http、grpc等）
+在一个调用链中，通过http头中添加trace context，然后传播trace context，从而能够串成一个链：
+* 生成uuid，填充x-request-id这个头，根据使用的provider生成相应的trace context（e.g. zipkin的trace header格式：`x-b3-*`)
+  * 应用可以利用这些头（但是需要修改代码）
+
+通过http_connection_manager这个filter中的tracing配置
+
+***
+
+### 常用filter
+
+[参考](https://www.envoyproxy.io/docs/envoy/v1.22.0/api-v3/config/filter/filter)
+
+#### 1.network filters
+
+##### （1）tcp_proxy
+```json
+{
+  "name": "",
+  "typed_config": {
+    "@type": "type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy",
+    "metadata_match": {},
+    "cluster": "...",
+    "access_log": []
+  }
+}
+```
+
+##### （2）http_connection_manager
+```json
+{
+    "name": "envoy.filters.network.http_connection_manager",
+    "typedConfig": {
+      "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager",
+      "routeConfig": {},
+      "httpFilters": {},
+      //配置tracing
+      "tracing": {
+        "random_sampling": {},   //配置采样率
+        "provider": {},          //配置tracing provider（采用什么tracing collector以及相关地址信息）（旧版本是在bootstrap中配置的）
+        "custom_tags": {}        //给span添加自定义标签
+      }
+    }
+}
+```

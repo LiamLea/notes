@@ -23,6 +23,9 @@
 ![](./imgs/overview_01.png)
 
 ##### （1）envoy
+* 包含下面组件：
+  * envoy
+  * pilot-agent（也叫istio agent, 用于envoy连接istiod）
 * 与控制平面通信，获取配置
 * 所有流量进出pod之前，都需要经过envoy
 * istio使用envoy实现了以下功能:
@@ -35,6 +38,7 @@
   * Pluggable extensions model based on WebAssembly that allows for custom policy enforcement and telemetry generation for mesh traffic.
 * 启动envoy时，会设置iptables，将所有进入流量转到15006端口，所有外出流量转到15001端口
 
+
 ##### （2）istiod
 * service discovery（pilot）
 * configuration（galley）
@@ -46,10 +50,21 @@
 
 |envoy中|k8s中|
 |-|-|
-|workload|deployment|
+|workload|controller（比如:deployment等）|
 |workload instance|pod|
 |endpoint（不是k8s中的endpoints资源，而是endpoints中的一个个endpoint，所以可以理解为一个endpoint就是一个pod）||
 |service（包含k8s中的serivce）||
+
+
+
+#### 3.integrations
+
+##### （1）jaeger（zipkin）
+
+##### （2）kiali
+
+##### （3）prometheus
+
 
 
 * service discovery

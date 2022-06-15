@@ -24,13 +24,27 @@
 ##### （1）Access layer（接入层）
 控制终端用户访问网络资源
 
-##### （2）Distribution layer（分发层/汇聚层）
+##### （2）Distribution layer（分发层/汇聚层
 提供路由、过滤、管理等功能
 
 ##### （3）Core layer（核心层）
 网络骨干网，负责传输大量流量
 
-#### 3.session相关概念
+#### 4.接入运营商MPLS网络
+
+##### （1）Access layer（接入层）: CE(customer edge) router
+本地所有流量通过CE router外出，接入到PE router
+CE设备特点：接口类型丰富，数据量不大
+
+##### （2）Distribution layer（分发层/汇聚层）: PE(provider edge) router
+连接不同运行商的网络
+PE设备特点：汇聚、封装/解封装能力强
+
+##### （3）Core layer（核心层）: P(provider) router
+根据标签进行路由
+P设备: 强大的交换能力
+
+#### 5.session相关概念
 
 ##### (1) session endpoint
 ip:port
