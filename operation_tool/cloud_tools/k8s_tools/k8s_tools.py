@@ -2,9 +2,12 @@
 
 import subprocess
 import os
+import requests
 
 dir = "/tmp/k8s"
 kube_config = "/root/.kube/config"
+
+registry_url = "http://192.168.6.111:5000"
 
 def run_shell(command, get_error = False):
 
@@ -117,6 +120,22 @@ def restore_global():
 
     for rs_type in resources_type:
         restore(rs_type, os.listdir(os.path.join(global_path, rs_type)), os.path.join(global_path, rs_type))
+
+def list_images():
+    ret = []
+    repo_url = registry_url.rstrip("/") + "/v2/_catalog"
+    response = requests.get(repo_url, verify = False)
+    repos = response.json()["repositories"]
+
+    for repo in repos:
+        image_url = registry_url.rstrip("/") + "/v2/%s" %repo + "/tags/list"
+        response = requests.get(image_url, verify = False)
+        tags = response.json()["tags"]
+        if tags:
+            for tag in tags:
+                ret.append("%s:%s" %(repo, tag))
+    for image in ret:
+        print(image)
 
 if __name__ == '__main__':
     import sys

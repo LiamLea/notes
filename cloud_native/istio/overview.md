@@ -17,7 +17,7 @@
 
 ***
 
-### Concepts
+### 概述
 
 #### 1.Architecture
 ![](./imgs/overview_01.png)
@@ -26,18 +26,8 @@
 * 包含下面组件：
   * envoy
   * pilot-agent（也叫istio agent, 用于envoy连接istiod）
-* 与控制平面通信，获取配置
-* 所有流量进出pod之前，都需要经过envoy
-* istio使用envoy实现了以下功能:
-  * Traffic control features
-    * enforce fine-grained traffic control with rich routing rules for HTTP, gRPC, WebSocket, and TCP traffic.
-  * Network resiliency features
-    * setup retries, failovers, circuit breakers, and fault injection.
-  * Security and authentication features
-    * enforce security policies and enforce access control and rate limiting defined through the configuration API.
-  * Pluggable extensions model based on WebAssembly that allows for custom policy enforcement and telemetry generation for mesh traffic.
 * 启动envoy时，会设置iptables，将所有进入流量转到15006端口，所有外出流量转到15001端口
-
+  * 所有流量进出pod之前，都需要经过envoy
 
 ##### （2）istiod
 * service discovery（pilot）
@@ -52,10 +42,8 @@
 |-|-|
 |workload|controller（比如:deployment等）|
 |workload instance|pod|
-|endpoint（不是k8s中的endpoints资源，而是endpoints中的一个个endpoint，所以可以理解为一个endpoint就是一个pod）||
-|service（包含k8s中的serivce）||
-
-
+|endpoint|是endpoints中的一个个endpoint，每个endpoint还会关联pod的相关信息（比如：labels等，所以可以理解为一个endpoint就是一个pod）|
+|service|service|
 
 #### 3.integrations
 
@@ -65,30 +53,98 @@
 
 ##### （3）prometheus
 
+***
+
+### 使用
+
+#### 1.工作原理
+* 启动envoy之前，都会先设置**iptables**
+* 将所有 **进入流量** 转到envoy的 **15006** 端口
+  * 会利用 元数据（原始的目标地址、协议等信息），来匹配最佳的filter chain，进行处理
+* 将所有 **外出流量** 转到envoy的 **15001** 端口
+  * 设置了`"use_original_dst": true`
+    * 会根据原始的目标地址，将该流量转到与之匹配的listener上
+      * 发往："1.1.1.1:9080"，
+      * 如果存在"1.1.1.1:9080"这个listener，则会匹配这个listener，不存在的话继续，
+      * 如果存在"0.0.0.0:9080"这个listener（0.0.0.0表示匹配所有），则会匹配这个listener
+    * 如果没有匹配的，则将流量发送到15001这个listener指定的cluster上（即PassthroughCluster）
+
+#### 2.支持转发的流量
+
+* 支持转发所有TCP的流量
+* 不支持转发非TCP的流量（比如UDP），即istio proxy不会拦截该流量（即该流量不经过istio proxy）
+
+##### （1）自动识别协议
+* 注意：
+  * server first protocol与此种方式不兼容，所以必须明确指定协议（比如：TCP、Mysql等）
+* istio能够自动识别的协议：http
+* 如果无法识别协议，则认为是纯TCP流量
 
 
-* service discovery
-发现service，然后注入到envoy配置中
-![](./imgs/overview_02.png)
+##### （2）明确指定协议（server first protocol需要明确指定）
+* 两种方式
+  * 通过端口的名称：`svc.spec.ports.name: <protocol>[-<suffix>]`
+  * 通过字段明确指定：`svc.spec.ports.appProtocol: <protocol>`
 
-* traffic management
-istio维护了一个内部的**服务注册表**
-该表是**services**和**其endpoints**的集合
-表中的内容是由 pilot组成 自动发现生成的
+#### 3.使用注意事项
 
-* resiliency
-弹性设置（比如超时时间、重试次数）
+##### （1）pod的要求
 
-##### （3）citadel
-利用**身份管理**和**凭证管理**实现服务到服务和终端用户的认证
+* 必须与service关联 （因为外出流量必须访问service，不能直接访问pod）
+  * 当与多个service关联时，同一个端口不能使用多种协议
+  * 直接访问pod，envoy无法找到相关listener，所以就会变为passthrough状态
+* uid`1337`必须预留
+  * 应用不能使用`1337`这个uid运行，这个是个sidecar proxy使用的
+* NET_ADMIN 、NET_RAW 能力 或者 使用istio cni插件
+  * 当需要用到security功能时，需要具备以上的条件
+* 设置标签（不是必须）：
+  * `app: <app>`
+  * `version: <version>`
+  * 这样采集的指标能够包含这些信息
+* service port使用的协议是server first protocol，必须明确指定协议（比如：TCP）
+* 不能设置` hostNetwork: true`
+  * 自动注入sidecar会忽略这种pod
 
-##### （4）galley
-负责配置验证、配置提取、配置处理和配置分发
+##### （2）被istio使用的端口
+[参考](https://istio.io/latest/docs/ops/deployment/requirements/)
 
+##### （3）server first protocol
+* 由server发送第一个字节，会影响 PERMISSIVE mTLS 和 协议自动识别
+* 常见的server first protocol:
+  * SMTP
+  * DNS
+  * MySQL
+  * MongoDB
 
-#### 2.核心功能
-* traffic management
-依赖以sidecar模式部署envoy，所有流量由envoy转发
-无需对服务做任何更改
-* security
-* observability
+#### 4.以sidecar形式注入到pod中
+
+利用admission controller实现注入的
+
+##### （1）限制
+* 不能注入到kube-system和kube-public这两个命名空间
+* pod不能设置` hostNetwork: true`
+
+##### （2）会对健康检查进行修改
+因为http和tcp健康检查是kubelet发送健康检查请求到相应的pod，如果加上了sidecar，
+如果进行http检查，且开启了mTLS，kubelet无法知道证书，所以会失败
+如果进行tcp检查，因为sidecar进行转发，所以不管目标容器有没有开启这个端口，一定会成功
+* 对exec检查不修改
+* 对httpGet和tcpSocket进行修改
+  * 修改前
+  ```yaml
+  tcpSocket:
+    port: 8001
+
+  #或者
+
+  httpGet:
+    path: /foo
+    port: 8001
+  ```
+  * 修改后
+  ```yaml
+  httpGet:
+    path: /app-health/<container_name>/livez
+    port: 15020
+    scheme: HTTP
+  ```
