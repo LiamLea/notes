@@ -122,8 +122,11 @@ spec:
   meshConfig:
     accessLogFile: "/dev/stdout"
 
-    #合并应用和envoy的metrics（默认是true）
-    enablePrometheusMerge: true
+    #是否开启auto mutual tls
+    enableAutoMtls: <bool | default=true>
+
+    #合并应用和envoy的metrics
+    enablePrometheusMerge: <bool | default=true>
 
     #provider会在telemetry配置中用到
     #配置外部的providers
