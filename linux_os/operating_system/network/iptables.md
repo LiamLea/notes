@@ -37,10 +37,10 @@ target描述了对包的处理过程（比如：DROP，会将匹配到的包丢�
 #### 4.四张表
 |表名|说明|
 |-|-|
-|raw|状态跟踪表|
+|raw|状态跟踪表（应该支持所有的target）|
 |mangle|修改数据包的头部|
-|nat|地址转换表|
-|filter|过滤表|
+|nat|地址转换表（不支持filter相关的target）|
+|filter|过滤表（不支持nat相关的target）|
 
 #### 5.五条链
 |链名|说明|
@@ -51,7 +51,7 @@ target描述了对包的处理过程（比如：DROP，会将匹配到的包丢�
 |OUTPUT|输出|
 |FORWARD|路由（不会 与 输入和输出 出现在同一个表中）|
 
-#### 6.常用target
+#### 6.常用target（不同的表支持不同的target）
 
 target也可以是某条chain
 
@@ -121,8 +121,8 @@ iptables [-t <TABLE>] <OPTIONS> [<CHAIN>] [<CONDITIONS>] [-j <TARGET> [<TARGET_O
 
 * 删除规则
 ```shell
--D      #删除链内指定序号的规则
--F      #flush,删除所有规则
+-D <int>      #删除链内指定序号的规则
+-F [<chain>]  #flush，不指定chain则删除该表中的所有规则
 ```
 
 * 默认策略

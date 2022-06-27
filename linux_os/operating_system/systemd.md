@@ -84,7 +84,7 @@ systemctl start <unit-name>@<instance-name>.<unit-type>
 
 ##### （1）查看某个unit的日志
 ```shell
-journalctl -u <unit>
+journalctl -xe -u <unit>
 ```
 
 ***

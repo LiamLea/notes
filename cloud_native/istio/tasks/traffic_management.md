@@ -4,6 +4,8 @@
 
 ### 概述
 
+![](./imgs/traffic_management_01.png)
+
 #### 1.service registry
 
 ##### （1）生成service registry
