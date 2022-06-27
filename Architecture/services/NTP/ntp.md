@@ -56,8 +56,9 @@ restrict 192.168.100.0 mask 255.255.255.0 nomodify
 ```shell
 #127.127.1.0表示本机系统时间源
 #当没有时间同步来源的时候以自身的硬件时钟为准（如果有其他时间服务器，不会使用本地时钟）
+#并伪装127.127.1.0在第10层
 server 127.127.1.0
-fudge 127.127.1.0 stratum <STRATUM_NUMBER>
+fudge 127.127.1.0 stratum 10
 ```
 
 #### 2.客户端: `/etc/ntp.conf`
@@ -108,7 +109,8 @@ LOCAL(0)        .LOCL.          10 l   9h   64    0    0.000    0.000   0.000
   * `.LOCL.`，即本机 (当没有远程节点或服务器可用时）
 </br>
 * st（stratum）
-ntp服务器所在的层
+ntp服务器所在的层（0-15）
+当为16时，表示没有同步的时间源
 </br>
 * when
   几秒钟前曾经做过时间同步化更新的动作
@@ -126,7 +128,7 @@ ntp服务器所在的层
   * 主机通过NTP时钟同步与所同步时间源的时间偏移量
   * offset越接近于0，主机和ntp服务器的时间越接近
 
-##### （2）`ntpq -c associations`
+##### （2）查看ntp服务状态：`ntpq -c associations`
 查询各个服务器的关联id，为了进一步获取更多信息
 ```shell
 $ ntpq -c associations

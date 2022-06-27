@@ -2,9 +2,7 @@ task_id: 8
 
 ntp:
   server:
-  - ntp.ntsc.ac.cn
-  - ntp1.aliyun.com
-  - 210.72.145.44
+  - ntp.aliyun.com
 
 timezone: Asia/Shanghai
 
