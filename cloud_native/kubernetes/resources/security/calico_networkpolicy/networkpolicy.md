@@ -64,3 +64,27 @@ spec:
   source: {}
   destination: {}
 ```
+
+#### 2.GloalNetworkPolicy
+
+用于设置全局策略或hostendpoint策略
+
+```yaml
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: <name>
+  namespace: <namespace>    #在该namespace下生效
+spec:
+
+  #下面这几个字段只对hostendpoint有意义：preDNAT、applyOnForward、doNotTrack
+  #是否用于PREROUTING chain
+  preDNAT: <bool | default=false>  
+  #preDNAT和doNotTrack只有一个能为true
+  doNotTrack: <bool | default=false>
+
+  #当上面其中一个为true，这里必须为true
+  applyOnForward: <bool | default=false>
+
+  #其他跟NetworkPolicy一样
+```
