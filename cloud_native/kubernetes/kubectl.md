@@ -222,6 +222,19 @@ kubectl get events --sort-by=.metadata.creationTimestamp -n xx
 
 ***
 
+### 查看集群信息
+
+#### 1.查看集群信息
+```shell
+kubectl cluster-info dump
+
+#可以查找以下信息：
+# service-cluster-ip-range
+# cluster-cidr
+```
+
+***
+
 ### 常用命令
 
 #### 1.查询所有Pods的requests和limits

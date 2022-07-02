@@ -30,5 +30,5 @@ spec:
       <resource>: <value>
     min:              #当 设置的requests < 这里的值，则创建pod时会报错
       <resource>: <value>
-    type: ontainer      #指定限制哪类资源（Container和pod）
+    type: Container      #指定限制哪类资源（Container和pod）
 ```

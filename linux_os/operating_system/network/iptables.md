@@ -133,7 +133,7 @@ iptables [-t <TABLE>] <OPTIONS> [<CHAIN>] [<CONDITIONS>] [-j <TARGET> [<TARGET_O
 
 #### 4.通用条件
 ```shell
-数字              #匹配第几条规则,从而进行插入
+数字              #匹配第几条规则,从而进行插入（-I 和 -D可以使用）
 -p 协议名         #支持 cat /etc/protocols 里面的所有协议
 -s 源地址
 -d 目标地址
@@ -224,7 +224,22 @@ iptables-restore < /tmp/iptables.rules
 默认重启后，iptables就会清空
 可以在redhat上安装`iptables-services`，在debian上安装`iptables-persistent`，从而能够实现iptables规则持久化（本质就是利用iptables save/restore命令）
 
-#### 10.调试iptables（利用TRACE target）
+***
+
+### 调试iptables
+
+#### 1.利用LOG target（建议）
+```shell
+#创建一个新的链，用于 DROP并记录日志
+iptables -t raw -N DROP-LOGGING
+iptables -t raw -A DROP-LOGGING -j LOG --log-prefix "iptables-dropped: " --log-level 6
+iptables -t raw -A DROP-LOGGING -j DROP
+
+#设置要DROP的条件
+iptables -t raw -A PREROUTING ... -j DROP-LOGGING
+```
+
+#### 2.利用TRACE target
 
 TRACE target会**标记数据包**（所以需要在最开始标记，所以在raw表中的PREROUTING链中标记是最合适的），如果某个rule匹配了该数据包，会在日志中进行记录
 
@@ -266,4 +281,9 @@ iptables -t nat -A PREROUTING -d <DST_IP> -p tcp --dport <DST_PORT> -j DNAT --to
 ```shell
 iptables -A INPUT -p tcp -m conntrack --ctstate ESTABLISHED -j ACCEPT
 iptables -A OUTPUT -p tcp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+```
+
+#### 3.捕捉端口扫描器
+```shell
+iptables -t raw -I PREROUTING -p tcp --dport 2222 -j LOG --log-prefix "iptables-scanner: " --log-level 6
 ```

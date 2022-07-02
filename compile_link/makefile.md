@@ -4,26 +4,11 @@
 
 ### 概述
 
-#### 1.c语言编译四步（通常说的编译包含指的是前三步）
-* preprocessing（预处理）
-  * 去除注释
-  * 填充宏
-  * 填充included文件
-
-* compiling（编译）
-  * 生成汇编代码
-
-* assembly（汇编）
-  * 将编码转换成二进制机器码
-
-* linking（链接）
-  * 将所有目标代码链接到一个文件中
-
-#### 2.configure
+#### 1.configure
 * 检查 编译 所需的依赖
 * 生成makefile文件
 
-#### 3.makefile
+#### 2.makefile
 * makefile 用于组织代码编译 的文件
 * 不仅仅可用于c语言，还可以用于任何可以用shell命令进行编译的语言
 
