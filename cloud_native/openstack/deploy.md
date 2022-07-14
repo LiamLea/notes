@@ -8,10 +8,10 @@
 
 |节点类型|服务|
 |-|-|
-|control|基础服务：heat（调度服务），keystone（认证服务），glance（镜像管理服务），cinder（块存储服务），swift（对象存储服务）等|
+|controller（奇数）|基础服务：heat（调度服务），keystone（认证服务），glance（镜像管理服务），cinder（块存储服务），swift（对象存储服务）等|
 |compute|nova等|
 |network|neutron等|
-|storage|ceph等|
+|storage（奇数）|ceph等|
 |monitoring||
 
 ***
@@ -63,7 +63,9 @@ reboot
 ##### （2）加载kvm模块
 所有机器上加载kvm_intel（或者kvm_amd）模块
 
-##### （3）高可用：奇数台controller
+##### （3）高可用：奇数台controller，奇数台storage
+奇数台controller: 因为rabbitmq需要奇数个
+奇数台storage: 因为ceph的mon需要奇数个
 
 #### 4.准备好ansible部署机
 
@@ -180,15 +182,22 @@ docker_registry_insecure: yes
 docker_registry_username: admin
 #  docker_registry_password在passwords.yml文件中设置
 
+#给network_interface设置vip
 kolla_internal_vip_address: "10.172.0.226"
 
 #  openstack集群内部通信的网卡
 #   tunnel等网络都会放在上面
 network_interface: "eth0"
-#  这张网卡用于openstack环境连接公网（网络节点的br-ex会用到该网卡）
+
+# 存储网络使用的网卡
+storage_interface: "{{ network_interface }}"
+
+#  在network节点上，该网卡用于openstack环境连接公网（网络节点的br-ex会用到该网卡）
 #  需要未配置ip，且能够设置为promiscous模式
 #  该网卡需要up
 neutron_external_interface: "eth1"
+
+
 
 enable_ceph: "yes"
 enable_ceph_mds: "yes"

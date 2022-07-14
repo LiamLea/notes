@@ -24,7 +24,7 @@
 ##### （1）Access layer（接入层）
 控制终端用户访问网络资源
 
-##### （2）Distribution layer（分发层/汇聚层
+##### （2）Distribution layer（分发层/汇聚层）
 提供路由、过滤、管理等功能
 
 ##### （3）Core layer（核心层）

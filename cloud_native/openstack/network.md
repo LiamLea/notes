@@ -4,14 +4,16 @@
 
 ### 概述
 
+![](./imgs/network_00.png)
+
 #### 1.neutron组件
 
 |组件|说明|
 |-|-|
 |neutron server|neutron的后端服务|
-|neutron openvswitch agent（L2 agent）|为虚拟网络提供 二层 交换服务|
+|neutron openvswitch agent（L2 agent）|实现二层虚拟网络（project networks 和 provider networks）|
+|neutron l3 agent|连接二层虚拟网络（即连接project networks和provider networks），包括路由、浮动ip分配、地址转换和安全组管理（通过iptables实现安全组、路由以及地址转换）|
 |neutron dhcp agent|为虚拟机提供dns和dhcp服务（有几个租户网络，在network节点上就有几个dnsmasq进程）|
-|neutron l3 agent|为虚拟机访问外部网络提供 三层 转发服务，包括路由、浮动ip分配、地址转换和安全组管理（通过iptables实现安全组、路由以及地址转换）|
 
 * controller-node：neutron-server
 * compute-node：L2 agent
@@ -93,6 +95,7 @@
 在controller和network节点上都有这个文件
 ```shell
 [ml2]
+#设置l2层支持的类型
 type_drivers = flat,vlan,vxlan
 tenant_network_types = vxlan
 mechanism_drivers = openvswitch,l2population
@@ -102,6 +105,7 @@ extension_drivers = port_security
 network_vlan_ranges =
 
 [ml2_type_flat]
+#设置physnet1这个网络只能创建flat类型的二层虚拟网络
 flat_networks = physnet1
 
 [ml2_type_vxlan]
@@ -111,11 +115,13 @@ vni_ranges = 1:1000
 firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
 [agent]
+#配置隧道使用vxlan类型
 tunnel_types = vxlan
 l2_population = true
 arp_responder = true
 
 [ovs]
+#配置physnet1这个网络对应br-ex虚拟交换机（会自动创建br-ex这个虚拟交换机，并将指定的外出网卡加入到br-ex中）
 bridge_mappings = physnet1:br-ex
 datapath_type = system
 ovsdb_connection = tcp:127.0.0.1:6640

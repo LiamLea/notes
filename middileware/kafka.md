@@ -348,7 +348,7 @@ log.dirs=<DIR>
 #如果一条消息大于该值，则该消息不会存放kafka中
 log.segment.bytes=<NUM>
 
-#指定日志清理策略
+#指定日志清理策略（注意：针对旧的log segment）
 #   delete策略，根据时间或者大小删除日志
 #   compact策略，根据key，每个key只保留最新的数据
 log.cleanup.policy=<delete or compact>
@@ -356,7 +356,7 @@ log.cleanup.policy=<delete or compact>
 #多长时间检查一次是否满足删除条件
 log.retention.check.interval.ms=<NUM>
 
-#该大小必须设为大于日志分片的大小，否则不生效
+#该值 小于 log segment大小时，则不会有旧的log segment
 log.retention.bytes=<NUM>
 
 #根据 设置的时间 和 log segemnt创建的时间删除，不依赖检查时间（log.retention.check.interval.ms）

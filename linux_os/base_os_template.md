@@ -23,3 +23,9 @@
 |firewalld|防火墙|
 |selinux||
 |cloud-init|`touch /etc/cloud/cloud-init.disabled`|
+
+### 需要开启的服务
+
+|服务名|说明|
+|-|-|
+|kdump|用于记录kernel panic时的信息|
