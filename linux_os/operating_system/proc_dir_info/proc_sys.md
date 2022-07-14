@@ -14,6 +14,7 @@ echo 1 > /proc/sys/kernel/sysrq     #开启sysrq功能
 echo h > /proc/sysrq-trigger        #查看帮助
 echo f > /proc/sysrq-trigger        #人为触发OOM killer
 ```
+
 #### 2.`/proc/sys/kernel/printk`
 调整内核打印的级别
 ```shell
@@ -24,6 +25,13 @@ cat /proc/sys/kernel/printk       #有四个值（数值越小，优先级越高
 #minimum_console_loglevel           #控制台日志最高可以设置成该优先级，如：printk("<6>Hello, world!\n"); 所以尖括号中最小可以设置为该选项指定的值
 #default_console_loglevel           #控制台日志级别的缺省值，如：printk("Hello, world!\n"); 所以该消息的级别为该选项设置的默认值
 ```
+
+#### 3.`/proc/sys/kernel/panic`
+决定当kernel panic时的操作
+
+* `0`: 表示不做任何操作
+* 负数： 表示立即重启
+* 正数： 表示等n秒后重启
 
 ***
 

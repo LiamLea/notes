@@ -11,6 +11,13 @@
   include_tasks: install_on_redhat.yaml
   when: ansible_distribution_file_variety == "RedHat"
 
+- name: stop  chronyd service
+  service:
+    name: chronyd
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
 - name: start  ntp service
   service:
     name: "{{ item }}"
