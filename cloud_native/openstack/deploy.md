@@ -182,7 +182,7 @@ docker_registry_insecure: yes
 docker_registry_username: admin
 #  docker_registry_password在passwords.yml文件中设置
 
-#给network_interface设置vip
+#给network节点上的network_interface设置vip（network上有haproxy对controller做代理）
 kolla_internal_vip_address: "10.172.0.226"
 
 #  openstack集群内部通信的网卡

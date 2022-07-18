@@ -37,11 +37,12 @@ In most cases multiple indexes are better
   * 包含index的settings和mappings，用于配置该datastream背后的index
   * 包含ilm策略，会根据策略对当前index进行rollover（即产生一个新的index）
 * 必须包含@timestamp字段
+* 不能对 写index 执行一下操作：clone、delete、shrink、split
 
-##### （1）读data stream
+##### （1）读数据
 ![](./imgs/datastream_02.png)
 
-##### （2）写data strem
+##### （2）写数据
 ![](./imgs/datastream_03.png)
 
 ***
