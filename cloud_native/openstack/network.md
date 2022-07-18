@@ -87,6 +87,14 @@
 |flat|不能进行网络隔离等，通常用于external网络|
 |vxlan|可以对网络进行隔离等，通常用于租户网络|
 
+#### 8.neutron的架构
+
+##### （1）目前的（使用OVS）
+![](./imgs/network_04.png)
+
+##### （2）之后的（使用OVN，包含OVS的能力）
+![](./imgs/network_05.png)
+
 ***
 
 ### 配置

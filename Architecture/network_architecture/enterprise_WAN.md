@@ -23,3 +23,17 @@
 * 基于internet网络
 * 有统一的控制平面，能够控制edge device、cloud的virtual gateway
 * 可以基于SD-WAN实现VPN
+
+#### 2.接入运营商MPLS网络
+
+##### （1）Access layer（接入层）: CE(customer edge) router
+本地所有流量通过CE router外出，接入到PE router
+CE设备特点：接口类型丰富，数据量不大
+
+##### （2）Distribution layer（分发层/汇聚层）: PE(provider edge) router
+连接不同运行商的网络
+PE设备特点：汇聚、封装/解封装能力强
+
+##### （3）Core layer（核心层）: P(provider) router
+根据标签进行路由
+P设备: 强大的交换能力
