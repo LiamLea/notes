@@ -20,45 +20,51 @@
 * network-node：L2 agent，L3agent，DHCP agent
 
 #### 2.基本术语
+![](./imgs/network_06.png)
 
-|术语|说明|
-|-|-|
-|qbr|bridge|
-|qvb|veth pair bridge side（master qbr）|
-|qvo|veth pair openvswitch side（master ovs-system）|
-|qr|l3 agent managed port, router side|
-|qg|l3 agent managed port, gateway side|
+|术语|说明|用途|查看命令|
+|-|-|-|-|
+|tap|虚拟网卡|**虚拟机的网卡**（不是成对的，只有一个，类似于物理网卡）|参考linux_os目录下的tap相关文档|
+|qbr|linux bridge| 一个 **虚拟机** 连接到 **单独的** 一个linux bridge上; 利用iptables实现 **security groups**（为什么这么设计的原因）|brctl show|
+|OVS|open virtual switch|提供SDN能力，所有 **linux bridge 和 qr、qg、dhcp的tap 和 物理网卡** 连接到OVS上|ovs-vsctl show|
+|qvb|veth pair bridge side（master qbr）|linux虚拟交换机上的端口，对应的veth（即qvo）是OVS上的端口，**连接 linux bridge 和 OVS**|ip link|
+|qvo|veth pair openvswitch side（master ovs）|OVS上的端口，对应的veth（即qvb）是linux虚拟交换机上的端口，**连接 linux bridge 和 OVS**|ip link|
+|qg|l3 agent managed port, gateway side|在另一个netns中，是OVS上的一个端口，所有 **浮动ip** 都配置在该网卡上|ip netnes exec <ns_name> ip link|
+|qr|l3 agent managed port, router side|在另一个netns中，是OVS上的一个端口，用于 **路由** |ip netnes exec <ns_name> ip link|
 
 #### 3.用到的虚拟网络设备
-|虚拟网络设备|说明|
-|-|-|
-|tap device|虚拟网卡，跟物理网卡一样，一端连着协议栈（内核空间），另一端连着用户空间|
-|veth pairs|虚拟的网线，用于连接虚拟网络设备（可以跨越网络命名空间）|
-|linux bridges|虚拟交换机|
-|openvswitch bridges|虚拟交换机，能够做更高级的配置（比如vlan等）|
+|虚拟网络设备|说明|对应的命名|
+|-|-|-|
+|linux bridges|linux虚拟交换机|qbr|
+|tap device|虚拟网卡，跟物理网卡一样，一端连着协议栈（内核空间），另一端连着用户空间|tap|
+|veth pairs|虚拟的网线，用于连接虚拟网络设备（可以跨越网络命名空间）|qvb、qvo|
+|OVS|open virtual switch，能够做更高级的配置（比如vlan等）|br-|
 
 #### 4.网络架构
+
 ![](./imgs/network_03.png)
 
 * tap: 虚拟的网卡，是虚拟机的网卡（master qbr）
-* qbr: 虚拟的bridge
+* qbr: linux bridge
 * veth: veth pairs
 * patch port: 是OVS中的veth pairs
 * qvb: veth pair bridge side（master qbr）
 * qvo：veth pair openvswitch side（master ovs-system）
 * br-int（integration)
-  * 集成网桥，每个compute-node上都有一个，该节点的vm都连接到该虚拟机上
-  * 所有 instance 的虚拟网卡（tap）都将连接到该网桥
+  * 集成网桥，每个compute-node上都有一个
+  * 该节点的vm都通过linux bridge连到该网桥上
+  * br-int和br-tun连接
 * br-tun（tunnel）
   * 隧道网桥，基于隧道技术的 VxLAN 和 GRE 网络将使用该网桥进行通信
   * 能够实现跨节点通信
 * br-ex（external）
   * 只在network node上，用于连接外部网络，会与一个混杂模式的网卡绑定，作为外出的出口
   * 在图中就是interface2
+  * br-ex与br-int连接
 
 ##### （1）虚拟机之间的通信
 ![](./imgs/network_02.png)
-* qbr: 虚拟的bridge
+* qbr: linux bridge
 * tap: 虚拟的网卡，是虚拟机的网卡（master qbr）
 * qvb: veth pair bridge side（master qbr）
 * qvo：veth pair openvswitch side（master ovs-system）
