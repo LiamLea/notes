@@ -147,6 +147,7 @@ ip link set veth1 master br0
 
 ##### （1）查询bridge的连接情况
 ```shell
+brctl show
 bridge link show
 ```
 ![](./imgs/bridge_02.png)
@@ -275,6 +276,23 @@ Kernel Space    +-------------+    +-------------+
 ip tuntap add tap0 mode tap
 ```
 
+##### （2）查看应用程序使用的是哪个tap
+
+* 查看哪个文件描述符打开`/dev/net/tun`
+```shell
+ls -l /proc/<pid>/fd/
+```
+
+* 查看具体的tap
+```shell
+$ cat /proc/<pid>/fdinfo/<fd>
+
+pos:	74
+flags:	0104002
+mnt_id:	5565
+iff:	tapf8d27a1f-62
+```
+
 #### 3.TUN/TAP和veth的区别
 
 ![](./imgs/basic_01.png)
@@ -282,7 +300,7 @@ ip tuntap add tap0 mode tap
 ||TUN/TAP|veth|
 |-|-|-|
 |数量|单个|成对|
-|用途|虚拟网卡（跟物理网卡一样用）</br>进程如果想使用该网卡（比如获取发到该网卡的数据包），通过`/dev/net/tun`这个文件|用于连接，比如连接不同network namespace|
+|用途|虚拟网卡驱动（类似物理网卡）</br>进程如果想使用该网卡（比如获取发到该网卡的数据包），通过`/dev/net/tun`这个文件|用于连接，比如连接不同network namespace|
 |本质|虚拟的网卡（跟物理网卡功能一样）|像虚拟的一根线|
 
 ***
