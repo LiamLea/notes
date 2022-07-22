@@ -26,33 +26,90 @@ istioctl install -f istio-1.13.4/manifests/profiles/default.yaml
 #或者 在命令行中进行配置 istioctl install --set profile=<profile> ...
 ```
 
+##### （3）安装附件
+* 需要安装这些附近，监控功能才能用（不建议使用istio提供的yaml文件，因为不适合生产环境）：
+  * prometheus
+  * grafana
+  * jaeger
 
+#### 2.命名空间打标
 
-#### 2.给default命名空间打标
+打标后，当在该ns中启动pod时，admission controllers会利用webhook注入envoy
+已启动的pod，需要重启才能注入envoy
 
-**用于之后部署应用，可以注入envoy代理**
 ```shell
-kubectl label namespace default istio-injection=enabled
+kubectl label namespace <ns> istio-injection=enabled
 ```
->给已经安装的应用注入envoy代理
->* 给该应用所在命名空间打上标签
->* 然后更新一下该应用的pods即可
 
 #### 3.访问istio的dashboard（kiali）
 
->首先要kiali这个service设置成NodePort类型  
 ```shell
 kubectl edit svc kiali -n istio-system
+#账号密码为：admin/admin
 ```
->访问即可  
->>http://3.1.5.15:20001/kiali/
-账号密码为：admin/admin
 
 #### 4.卸载istio
 ```shell
+#删除插件
+kubectl delete -f samples/addons
+
 istioctl manifest generate -f <path> | kubectl delete -f -
 #或者：istioctl manifest generate --set profile=<profile> | kubectl delete -f -
 ```
+
+***
+
+### 集成附件
+
+#### 1.jaeger
+
+#### 2.prometheus/grafana
+
+#### 3.kiali
+
+[参考](https://kiali.io/docs/configuration/p8s-jaeger-grafana/)
+
+##### （1）集成prometheus
+
+* 修改配置
+```yaml
+spec:
+  external_services:
+    prometheus:
+      url: "http://metrics.telemetry:9090/"
+```
+
+##### （2）集成jaeger
+
+* 修改配置文件
+```yaml
+spec:
+  external_services:
+    tracing:
+      enabled: true
+
+      #query over gRPC
+      use_grpc: true
+      in_cluster_url: 'http://tracing.telemetry:16685/jaeger'
+
+      #jaeger dashboard
+      url: 'http://10.10.10.163:8080/jaeger'
+```
+
+##### （3）集成grafana
+
+* 修改配置
+```yaml
+spec:
+  external_services:
+    grafana:
+      enabled: true
+      in_cluster_url: 'http://grafana.telemetry:3000/'
+      url: 'http://my-ingress-host/grafana'
+```
+
+* 还需要设置custome dashboards
+[参考](https://kiali.io/docs/configuration/custom-dashboard/)
 
 ***
 

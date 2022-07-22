@@ -165,9 +165,14 @@
 通过http_connection_manager这个filter获取http、grpc等流量
 
 #### 3.tracing（http、grpc等）
+
+##### （1）前提
+* 应用需要支持传递 `x-b3-*`http header
+  * 因为envoy不能将进入流量和外出流量进行关联，所以需要应用传递相应的http头
+
+##### （2）原理
 在一个调用链中，通过http头中添加trace context，然后传播trace context，从而能够串成一个链：
 * 生成uuid，填充x-request-id这个头，根据使用的provider生成相应的trace context（e.g. zipkin的trace header格式：`x-b3-*`)
-  * 应用可以利用这些头（但是需要修改代码）
 
 通过http_connection_manager这个filter中的tracing配置
 

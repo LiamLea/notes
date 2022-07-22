@@ -36,10 +36,11 @@
   * Istiod acts as a Certificate Authority (CA) and generates certificates to allow secure mTLS communication in the data plane.
 
 
-#### 2.与k8s的对应
+#### 2.istio中的基本概念
 
 |envoy中|k8s中|
 |-|-|
+|application|属于同一个application: 同一个ns下，有相同`app`标签的pods的controller </br> application名称就是`app`标签的值 </br> application由workload（即controller）组成|
 |workload|controller（比如:deployment等）|
 |workload instance|pod|
 |endpoint|是endpoints中的一个个endpoint，每个endpoint还会关联pod的相关信息（比如：labels等，所以可以理解为一个endpoint就是一个pod）|
@@ -48,6 +49,7 @@
 #### 3.integrations
 
 ##### （1）jaeger（zipkin）
+默认使用的就是jaeger
 
 ##### （2）kiali
 
@@ -86,7 +88,7 @@
   * 通过端口的名称：`svc.spec.ports.name: <protocol>[-<suffix>]`
   * 通过字段明确指定：`svc.spec.ports.appProtocol: <protocol>`
 
-#### 3.使用注意事项
+#### 3.使用注意事项（非常重要）
 
 ##### （1）pod的要求
 
