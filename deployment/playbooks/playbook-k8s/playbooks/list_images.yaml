@@ -35,6 +35,9 @@
   - name: include template kafka
     include_tasks: ../roles/kafka/tasks/template_kafka.yaml
 
+  - name: include template mysql
+    include_tasks: ../roles/mysql/tasks/template_mysql.yaml
+
   - name: set images
     set_fact:
       my_dict:
@@ -49,6 +52,7 @@
         prometheus: "{{ prometheus_images | unique }}"
         elastic: "{{ elastic_images | unique }}"
         kafka: "{{ kafka_images | unique }}"
+        mysql: "{{ mysql_images | unique }}"
 
   - name: list_images
     debug:

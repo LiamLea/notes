@@ -10,26 +10,26 @@
 
 - name: set domain fact
   set_fact:
-    __domain: "{{ log.kafka.domain }}"
-  when: log.kafka.domain.strip() != ""
+    __domain: "{{ service.kafka.domain }}"
+  when: service.kafka.domain.strip() != ""
 
 - name: template kafka
   kubernetes.core.helm_template:
-    chart_ref: "{{ __path }}{{ log.kafka.chart.path }}"
+    chart_ref: "{{ __path }}{{ service.kafka.chart.path }}"
     chart_repo_url: "{{ chart.repo['bitnami'] }}"
-    chart_version: "{{ log.kafka.chart.version }}"
+    chart_version: "{{ service.kafka.chart.version }}"
     release_values:
       zookeeper:
         image:
-          registry: "{{ log.repository.strip('/') }}"
+          registry: "{{ service.repository.strip('/') }}"
       image:
-        registry: "{{ log.repository.strip('/') }}"
-      replicaCount: "{{ log.kafka.replicas }}"
+        registry: "{{ service.repository.strip('/') }}"
+      replicaCount: "{{ service.kafka.replicas }}"
       externalAccess:
         service:
           type: NodePort
           domain: "{{ __domain }}"
-          nodePort: "{{ log.kafka.node_ports }}"
+          nodePort: "{{ service.kafka.node_ports }}"
   register: kafka_template_result
 
 - name: set facts

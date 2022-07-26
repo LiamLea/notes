@@ -17,7 +17,7 @@
 - block:
   - name: set kafka fact
     set_fact:
-      __kafka: ["{{ log.kafka.name }}.{{ log.kafka.namespace}}:9092"]
+      __kafka: ["{{ service.kafka.name }}.{{ service.namespace}}:9092"]
   - name: include kafka role
     include_role:
       name: kafka

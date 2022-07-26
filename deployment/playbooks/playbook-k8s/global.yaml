@@ -166,18 +166,9 @@ log:
   storage_class: null
   kafka:
     #if false, must set bootstrap_servers to use the existing kafka
+    #if true, use service.kafka vars above to install new kafka
     enabled: true
     bootstrap_servers: []
-    #install new kafka
-    name: kafka
-    namespace: middleware-public
-    chart:
-      path: "kafka"
-      version: "16.2.10"
-    replicas: 3
-    node_ports: [19092, 19093, 19094]
-    #if empty work_master ip will be used
-    domain: ""
 
   elastic:
     version: "7.17.3"
@@ -222,3 +213,61 @@ log:
       name: filebeat
       chart:
         path: "filebeat"
+
+service:
+  namespace: public
+  repository: "{{ registry_prefix }}"
+  #use default sc when set null
+  storage_class: null
+  kafka:
+    enabled: true
+    name: kafka
+    chart:
+      path: "kafka"
+      version: "16.2.10"
+    replicas: 3
+    node_ports: [19092, 19093, 19094]
+    #if empty work_master ip will be used
+    domain: ""
+    resources:
+      heapOpts: "-Xmx1024m -Xms1024m"
+      requests:
+        cpu: "250m"
+        memory: "1.5Gi"
+      limits:
+        cpu: "1000m"
+        memory: "1.5Gi"
+      zookeeper:
+        jvmFlags: "-Xmx1024m -Xms1024m"
+        requests:
+          cpu: "250m"
+          memory: "1.5Gi"
+        limits:
+          cpu: "1000m"
+          memory: "1.5Gi"
+
+  mysql:
+    enabled: true
+    name: mysql
+    chart:
+      path: "mysql"
+      version: "9.2.1"
+    root_password: cangoal
+    #standalone or replication
+    architecture: replication
+    resources:
+      requests:
+        cpu: "4000m"
+        memory: "8Gi"
+      limits:
+        cpu: "4000m"
+        memory: "8Gi"
+      storage: 10Gi
+
+  redis:
+    enabled: true
+    name: redis
+    chart:
+      path: "redis"
+      version: "15.7.0"
+    password: cangoal

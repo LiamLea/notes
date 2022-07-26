@@ -6,10 +6,12 @@
 
 #### 1.三个维度
 * metrics
-* distributed tracing（目前只支持http协议）
+  * traffic
+* tracing（目前只支持http协议）
 * logs
+  * pod log
 
-#### 2.distributed tracing
+#### 2.tracing
 
 ##### （1）前提
 * 应用需要支持传递 `x-b3-*`http header
