@@ -1,23 +1,35 @@
 - name: install kafka
   kubernetes.core.helm:
-    chart_ref: "{{ __path }}{{ log.kafka.chart.path }}"
+    chart_ref: "{{ __path }}{{ service.kafka.chart.path }}"
     chart_repo_url: "{{ chart.repo['bitnami'] }}"
-    chart_version: "{{ log.kafka.chart.version }}"
-    release_name: "{{ log.kafka.name }}"
-    release_namespace: "{{ log.kafka.namespace }}"
+    chart_version: "{{ service.kafka.chart.version }}"
+    release_name: "{{ service.kafka.name }}"
+    release_namespace: "{{ service.namespace }}"
     create_namespace: yes
     atomic: yes
     release_values:
       zookeeper:
         image:
-          registry: "{{ log.repository.strip('/') }}"
+          registry: "{{ service.repository.strip('/') }}"
+        persistence:
+          storageClass: "{{ service.storage_class }}"
+        jvmFlags: "{{ service.kafka.resources.zookeeper.jvmFlags }}"
+        resources:
+          limits: "{{ service.kafka.resources.zookeeper.limits }}"
+          requests: "{{ service.kafka.resources.zookeeper.requests }}"
       image:
-        registry: "{{ log.repository.strip('/') }}"
-      replicaCount: "{{ log.kafka.replicas }}"
-      numPartitions: "{{ log.kafka.replicas }}"
+        registry: "{{ service.repository.strip('/') }}"
+      replicaCount: "{{ service.kafka.replicas }}"
+      numPartitions: "{{ service.kafka.replicas }}"
       externalAccess:
         enabled: true
         service:
           type: NodePort
           domain: "{{ __domain }}"
-          nodePorts: "{{ log.kafka.node_ports }}"
+          nodePorts: "{{ service.kafka.node_ports }}"
+      persistence:
+        storageClass: "{{ service.storage_class }}"
+      heapOpts: "{{ service.kafka.resources.heapOpts }}"
+      resources:
+        limits: "{{ service.kafka.resources.limits }}"
+        requests: "{{ service.kafka.resources.requests }}"

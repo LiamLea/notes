@@ -1,0 +1,31 @@
+- name: install mysql
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ service.mysql.chart.path }}"
+    chart_repo_url: "{{ chart.repo['bitnami'] }}"
+    chart_version: "{{ service.mysql.chart.version }}"
+    release_name: "{{ service.mysql.name }}"
+    release_namespace: "{{ service.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image:
+        registry: "{{ service.repository.strip('/') }}"
+      auth:
+        rootPassword: "{{ service.mysql.root_password }}"
+      architecture: "{{ service.mysql.architecture }}"
+      primary:
+        configuration: "{{ __my_cnf }}"
+        resources:
+          limits: "{{ service.mysql.resources.limits }}"
+          requests: "{{ service.mysql.resources.requests }}"
+        persistence:
+          storageClass: "{{ service.storage_class }}"
+          size: "{{ service.mysql.resources.storage }}"
+      secondary:
+        configuration: "{{ __my_cnf }}"
+        resources:
+          limits: "{{ service.mysql.resources.limits }}"
+          requests: "{{ service.mysql.resources.requests }}"
+        persistence:
+          storageClass: "{{ service.storage_class }}"
+          size: "{{ service.mysql.resources.storage }}"

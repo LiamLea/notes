@@ -1,17 +1,13 @@
-- name: copy redis charts
-  copy:
-    src: redis
-    dest: "{{ workdir }}"
-
 - name: install redis
-  community.kubernetes.helm:
-    chart_ref: "{{ workdir }}/redis"
-    release_name: redis
-    release_namespace: redis
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ service.redis.chart.path }}"
+    chart_repo_url: "{{ chart.repo['bitnami'] }}"
+    chart_version: "{{ service.redis.chart.version }}"
+    release_name: "{{ service.redis.name }}"
+    release_namespace: "{{ service.namespace }}"
     create_namespace: yes
     atomic: yes
     release_values:
       image:
-        registry: "{{ redis.repository.rsplit('/', 1)[0] }}"
-        repository: "{{ redis.repository.rsplit('/', 1)[-1] }}"
-      password: "{{ redis.password }}"
+        registry: "{{ service.repository.strip('/') }}"
+      password: "{{ service.redis.password }}"

@@ -16,8 +16,8 @@
 
 - name: set domain fact
   set_fact:
-    __domain: "{{ log.kafka.domain }}"
-  when: log.kafka.domain.strip() != ""
+    __domain: "{{ service.kafka.domain }}"
+  when: service.kafka.domain.strip() != ""
 
 - name: setup kafka
   include_tasks: setup_kafka.yaml

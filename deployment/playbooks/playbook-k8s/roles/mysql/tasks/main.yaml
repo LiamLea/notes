@@ -1,22 +1,17 @@
-- name: copy mysql chart
-  copy:
-    src: mysql
-    dest: "{{ workdir }}"
-    force: no
+- name: set fact
+  set_fact:
+    __path: ""
 
-- name: install mysql
-  community.kubernetes.helm:
-    chart_ref: "{{ workdir }}/mysql"
-    release_name: mysql
-    release_namespace: mysql
-    create_namespace: yes
-    atomic: yes
-    release_values:
-      image:
-        repository: "{{ mysql.repository }}"
-      auth:
-        rootPassword: "{{ mysql.root_password }}"
-      service:
-        nodePort: "{{ mysql.node_port }}"
-      persistence:
-        storageClass: "{{ storage_class }}"
+- block:
+  - name: copy charts
+    copy:
+      src: "{{ chart.local_dir.rstrip('/') }}/"
+      dest: "/tmp/"
+      force: true
+  - name: set fact
+    set_fact:
+      __path: "/tmp/"
+  when: chart.local_dir.strip() != ""
+
+- name: setup mysql
+  include_tasks: setup_mysql.yaml

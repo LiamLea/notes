@@ -1,0 +1,17 @@
+- name: copy redis charts
+  copy:
+    src: redis
+    dest: "{{ workdir }}"
+
+- name: install redis
+  community.kubernetes.helm:
+    chart_ref: "{{ workdir }}/redis"
+    release_name: redis
+    release_namespace: redis
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image:
+        registry: "{{ redis.repository.rsplit('/', 1)[0] }}"
+        repository: "{{ redis.repository.rsplit('/', 1)[-1] }}"
+      password: "{{ redis.password }}"

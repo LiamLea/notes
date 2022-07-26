@@ -32,8 +32,11 @@ roles_path = roles:/opt/dire/purist/ansible:/opt/dire/kolla-ansible/ansible/role
 ```
 
 ***
+
 ### 使用
+
 #### 1.playbook调用角色的三种方法
+
 ##### （1）直接调用：
 ```yaml
 - hosts: websrvs
