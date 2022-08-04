@@ -195,3 +195,23 @@ modinfo /lib/modules/3.10.0-957.el7.x86_64/kernel/drivers/net/bonding/bonding.ko
 
 buff是将内存当磁盘用
 cache是将数据存储在内存中，加快数据的访问
+
+#### 57.helm仓库无法查找旧的chart问题
+
+helm repo add的本质就是添加`index.yaml`文件到本地，
+由于index的文件过大，且helmhub对各个仓库的index文件大小有限制，所以无法查找到比较旧的chart，
+所以需要使用全量的index文件，以bitnami为例（[相关issue](https://github.com/bitnami/charts/issues/10539))：
+* 在helmhub上的提供的`index.yaml`: `https://charts.bitnami.com/bitnami`
+* 全量的`index.yaml`: `https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami`
+  * 通过页面访问的地址：`https://github.com/bitnami/charts/tree/archive-full-index/bitnami`
+
+#### 58.out-of-band
+
+是在定义的电信频带之外的活动，或者，隐喻地，在任何主要通信渠道之外的活动
+
+##### (1) out-of-band management
+in-band management 指ssh、VNC等，依赖操作系统等
+out-of-band management 指远程管理卡等，当操作系统宕机，依然能够管理机器
+
+##### (2) out-of-band data
+独立的数据通道，用作特殊用途

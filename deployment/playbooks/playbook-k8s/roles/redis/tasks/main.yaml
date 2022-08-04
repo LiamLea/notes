@@ -1,13 +1,17 @@
-- name: install redis
-  kubernetes.core.helm:
-    chart_ref: "{{ __path }}{{ service.redis.chart.path }}"
-    chart_repo_url: "{{ chart.repo['bitnami'] }}"
-    chart_version: "{{ service.redis.chart.version }}"
-    release_name: "{{ service.redis.name }}"
-    release_namespace: "{{ service.namespace }}"
-    create_namespace: yes
-    atomic: yes
-    release_values:
-      image:
-        registry: "{{ service.repository.strip('/') }}"
-      password: "{{ service.redis.password }}"
+- name: set fact
+  set_fact:
+    __path: ""
+
+- block:
+  - name: copy charts
+    copy:
+      src: "{{ chart.local_dir.rstrip('/') }}/"
+      dest: "/tmp/"
+      force: true
+  - name: set fact
+    set_fact:
+      __path: "/tmp/"
+  when: chart.local_dir.strip() != ""
+
+- name: setup redis
+  include_tasks: setup_redis.yaml

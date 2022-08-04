@@ -1,0 +1,7 @@
+- hosts: work_master
+  gather_facts: True
+  become: True
+  roles:
+  - { role: kafka , when: "service.kafka.enabled" }
+  - { role: mysql , when: "service.mysql.enabled" }
+  - { role: redis , when: "service.redis.enabled" }

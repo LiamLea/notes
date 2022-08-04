@@ -38,6 +38,9 @@
   - name: include template mysql
     include_tasks: ../roles/mysql/tasks/template_mysql.yaml
 
+  - name: include template redis
+    include_tasks: ../roles/redis/tasks/template_redis.yaml
+
   - name: set images
     set_fact:
       my_dict:
@@ -53,6 +56,7 @@
         elastic: "{{ elastic_images | unique }}"
         kafka: "{{ kafka_images | unique }}"
         mysql: "{{ mysql_images | unique }}"
+        redis: "{{ redis_images | unique }}"
 
   - name: list_images
     debug:
