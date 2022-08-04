@@ -73,9 +73,9 @@ ceph orch device ls   #--hostname=xx --wide --refresh
 ceph orch ps
 ```
 
-##### （2）添加daemon
+##### （2）添加service
 ```shell
-ceph orch daemon add <service_type> [<placement>]
+ceph orch daemon add <service_type> [<args>]
 ```
 
 ***

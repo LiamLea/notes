@@ -217,3 +217,9 @@ delegate_to: <HOSTNAME>   #主机名是在主机清单中定义的
   ...
 run_once: True
 ```
+
+##### （6）给某个task设置环境变量：`environment`
+```yaml
+<MODULE>: {}
+environment: {}
+```

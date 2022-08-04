@@ -269,5 +269,18 @@ service:
     name: redis
     chart:
       path: "redis"
-      version: "15.7.0"
+      version: "17.0.5"
     password: cangoal
+    architecture: replication
+    resources:
+      requests:
+        cpu: "2000m"
+        memory: "4Gi"
+      limits:
+        cpu: "2000m"
+        memory: "4Gi"
+      storage: 5Gi
+    master:
+      count: 1
+    replica:
+      count: 1

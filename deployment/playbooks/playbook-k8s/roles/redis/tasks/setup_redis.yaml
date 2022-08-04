@@ -1,0 +1,29 @@
+- name: install redis
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ service.redis.chart.path }}"
+    chart_repo_url: "{{ chart.repo['bitnami'] }}"
+    chart_version: "{{ service.redis.chart.version }}"
+    release_name: "{{ service.redis.name }}"
+    release_namespace: "{{ service.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image:
+        registry: "{{ service.repository.strip('/') }}"
+      password: "{{ service.redis.password }}"
+      architecture: "{{ service.redis.architecture }}"
+      master:
+        count: "{{ service.redis.master.count }}"
+        resources:
+          limits: "{{ service.redis.resources.limits }}"
+          requests: "{{ service.redis.resources.requests }}"
+          persistence:
+            storageClass: "{{ service.storage_class }}"
+            size: "{{ service.redis.resources.storage }}"
+      replica:
+        replicaCount: "{{ service.redis.replica.count }}"
+        limits: "{{ service.redis.resources.limits }}"
+        requests: "{{ service.redis.resources.requests }}"
+        persistence:
+          storageClass: "{{ service.storage_class }}"
+          size: "{{ service.redis.resources.storage }}"

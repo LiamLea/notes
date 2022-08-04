@@ -1,0 +1,43 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- name: set fact
+  set_fact:
+    __path: "{{ chart.local_dir.rstrip('/') }}/"
+  when: chart.local_dir.strip() != ""
+
+- name: template redis
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ service.redis.chart.path }}"
+    chart_repo_url: "{{ chart.repo['bitnami'] }}"
+    chart_version: "{{ service.redis.chart.version }}"
+    release_values:
+      image:
+        registry: "{{ service.repository.strip('/') }}"
+      password: "{{ service.redis.password }}"
+      architecture: "{{ service.redis.architecture }}"
+      master:
+        count: "{{ service.redis.master.count }}"
+        resources:
+          limits: "{{ service.redis.resources.limits }}"
+          requests: "{{ service.redis.resources.requests }}"
+          persistence:
+            storageClass: "{{ service.storage_class }}"
+            size: "{{ service.redis.resources.storage }}"
+      replica:
+        replicaCount: "{{ service.redis.replica.count | int }}"
+        limits: "{{ service.redis.resources.limits }}"
+        requests: "{{ service.redis.resources.requests }}"
+        persistence:
+          storageClass: "{{ service.storage_class }}"
+          size: "{{ service.redis.resources.storage }}"
+  register: redis_template_result
+
+- name: set facts
+  set_fact:
+    redis_template_stdout: "{{ redis_template_result.stdout_lines }}"
+
+- name: get images
+  set_fact:
+    redis_images: "{{ redis_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"

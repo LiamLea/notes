@@ -9,16 +9,18 @@
 
 |组件（per daemon）|CPU|RAM|STORAGE|
 |-|-|-|-|
-|OSD|1|4G|根据存储需求|
+|OSD|1|4G+|根据存储需求|
 |MON|2|2-4G|60G|
 |MDS|2|2G|忽略|
 
 #### 2.部署建议
+* osd节点上应该预留20%内存，防止出现峰值
 * 一个磁盘驱动，只应该跑一个OSD
 * OSD应该尽可能分散在多台机器上
-* 如果一台机器上跑多个OSD
+* 如果一台机器上跑多个OSD（建议不超过8个）
   * 需要确保操作系统能支持这种情况
   * 总的OSD驱动吞吐量不应该超过网络带宽
+* 万兆网卡(10GbE+)
 
 #### 3.orchestrator
 [参考](https://docs.ceph.com/en/latest/mgr/orchestrator/)
@@ -72,6 +74,12 @@ data_devices:
 ```shell
 #部署或者更新service
 ceph orch apply -i xx.yaml
+
+#查看错误信息
+ceph orch ls <service_type> <service_name> -f yaml
+
+#删除service
+ceph orch rm <sevice_name>
 ```
 
 ***
@@ -190,18 +198,58 @@ ceph orch apply osd --all-available-devices
 #表示orchestrator不再管理osd服务类型的all-available-devices这个服务（即不会自动编排）
 #需要手动添加osd
 ceph orch apply osd --all-available-devices --unmanaged=true
+#查看是否设置成功：ceph orch ls osd
 #手动添加osd
 ceph orch daemon add osd <HOST>:<DEVICE_PATH>
 ```
 
+##### （1）通过yaml文件并实现data、WAL、DB分离
+* yaml文件
+```yaml
+service_type: osd
+service_id: <service_naem>
+placement:
+  hosts:
+  - <hostname>
+
+#指定数据盘
+#db和wal若使用磁盘，则会将磁盘按数据盘的数量进行均分
+#db和wal若使用lvm，则lvm的数量必须和这里磁盘的数量相等
+#   lvm必须提前划分好，lvm的路径必须使用这种（而不是/dev/mapper/): /dev/<vg>/<lv>
+data_devices:
+
+  paths:
+  - /dev/vdb
+  - /dev/vdd
+db_devices:
+  paths:
+  - /dev/ceph-db/1
+  - /dev/ceph-db/2
+wal_devices:
+  paths:
+  - /dev/ceph-wal/1
+  - /dev/ceph-wal/2
+```
+* 部署
+```shell
+ceph orch apply -i <file>
+```
+
 #### 6.删除某个osd
+
+##### (1) 通用方法
 
 * 将osd踢出集群
 ```shell
 ceph osd out <osd_id>
 ```
 
-* 等所有pg都处于`active+clean`状态（ceph status查看），再进行下面得步骤
+* 确保数据已经安全转移，再进行下面得步骤
+  * 等所有pg都处于`active+clean`状态（ceph status查看）
+  * 使用下面命令检查数据是否转移：
+  ```shell
+  ceph osd safe-to-destroy <ids>
+  ```
 
 * 删除配置文件中关于该osd的配置：`ceph.conf`
 
@@ -210,11 +258,6 @@ ceph osd out <osd_id>
 ceph osd crush remove  <osd_id>
 ceph auth del <osd_id>
 ceph osd rm <osd_id>
-
-#查看删除状态（直到PG数量降为0才算真正的删除）
-ceph orch osd rm status
-#等osd删除之后，执行这个命令清理磁盘，保证磁盘还可以再次使用
-ceph orch device zap <hostname> <device_path> --force
 ```
 
 * 如果未删干净，请执行
@@ -223,4 +266,24 @@ ceph orch device zap <hostname> <device_path> --force
 ceph osd crush remove <osd_id>
 #删除该osd的key
 ceph psd del <osd_id>
+```
+
+##### (2) ceph orch方法
+```shell
+#停止相关服务，防止重新拉起来
+ceph orch stop <service_name>
+
+#删除osd
+ceph orch osd rm <osd_id>
+#查看删除状态
+ceph orch osd rm status
+
+#删除相关daemon
+ceph orch daemon rm <daemon_name> --force
+
+#删除服务
+ceph orch rm <service_name>
+
+#删除磁盘
+ceph orch device zap <hostname> <path>
 ```

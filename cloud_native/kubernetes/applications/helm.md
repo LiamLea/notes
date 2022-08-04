@@ -77,9 +77,15 @@ helm version      #会列出client端和server端的版本信息
 ```
 
 #### 3.chart仓库管理
+helm repo add的本质就是添加`index.yaml`文件到本地，
+由于index的文件过大，且helmhub对各个仓库的index文件大小有限制，所以无法查找到比较旧的chart，
+所以需要使用全量的index文件，以bitnami为例（[相关issue](https://github.com/bitnami/charts/issues/10539))：
+* 在helmhub上的提供的`index.yaml`: `https://charts.bitnami.com/bitnami`
+* 全量的`index.yaml`: `https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami`
+  * 通过页面访问的地址：`https://github.com/bitnami/charts/tree/archive-full-index/bitnami`
 ```shell
 helm repo list
-helm search xx -l
+helm search repo -l <chart>
 ```
 
 #### 4.chart管理

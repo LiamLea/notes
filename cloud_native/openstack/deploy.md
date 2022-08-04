@@ -63,9 +63,17 @@ reboot
 ##### （2）加载kvm模块
 所有机器上加载kvm_intel（或者kvm_amd）模块
 
-##### （3）高可用：奇数台controller，奇数台storage
-奇数台controller: 因为rabbitmq需要奇数个
-奇数台storage: 因为ceph的mon需要奇数个
+##### （3）高可用：奇数台controller
+奇数台controller: 因为rabbitmq、ceph-mon等需要奇数个
+
+##### （4）网络规划
+
+* 测试环境
+  * 分为两个网络：管理网、业务网
+  * 每个节点一张网卡，网络节点两张网卡
+* 生产环境
+  * 分为三个网络：管理网、存储网、业务网
+  * 每个节点两张网卡，网路节点三张网卡
 
 #### 4.准备好ansible部署机
 
@@ -182,6 +190,9 @@ docker_registry_insecure: yes
 docker_registry_username: admin
 #  docker_registry_password在passwords.yml文件中设置
 
+
+#网络配置参考：https://docs.openstack.org/kolla-ansible/train/admin/production-architecture-guide.html
+
 #给network节点上的network_interface设置vip（network上有haproxy对controller做代理）
 kolla_internal_vip_address: "10.172.0.226"
 
@@ -189,10 +200,13 @@ kolla_internal_vip_address: "10.172.0.226"
 #   tunnel等网络都会放在上面
 network_interface: "eth0"
 
-# 存储网络使用的网卡
+#当有单独的存储网时，修改下面的两个网卡
+# compute节点往ceph写数据使用的网卡
 storage_interface: "{{ network_interface }}"
+# ceph进行数据复制使用的网卡
+cluster_interface: "{{ network_interface }}"
 
-#  在network节点上，该网卡用于openstack环境连接公网（网络节点的br-ex会用到该网卡）
+#  在network节点上，该网卡用于openstack环境连接公网（网络节点的br-ex会用到该网卡）（这个也叫业务网卡）
 #  需要未配置ip，且能够设置为promiscous模式
 #  该网卡需要up
 neutron_external_interface: "eth1"
@@ -213,19 +227,40 @@ nova_compute_virt_type: "kvm"
 #### 8.使用ceph
 
 注意：ceph osd数量**至少是3个**，因为pool的默认副本数为3，如果osd数量小于3，会导致ceph不可用
+
+##### （1）修改配置
+
 如果要修改ceph的配置（比如默认的副本数等），[参考这里](https://docs.openstack.org/kolla-ansible/queens/reference/ceph-guide.html)
 * 修改`/etc/kolla/globals.yml`
 ```yaml
 enable_ceph: "yes"
 ```
 
-* 标记磁盘（@storage-nodes）
+##### （2）标记磁盘（@storage-nodes）
+[参考](https://docs.openstack.org/kolla-ansible/train/reference/storage/ceph-guide.html)
+
 这样就会在该磁盘上创建osd
+
+* data、WAL、DB放在一起
+
 ```shell
 parted <disk> -s -- mklabel gpt mkpart KOLLA_CEPH_OSD_BOOTSTRAP_BS 1 -1
 #为什么这样标记，参考：
 # roles/ceph/tasks/bootstrap_osds.yml
 # roles/ceph/defaults/main.yml
+```
+
+* data、WAL、DB分开（DB/WAL放在ssd上）
+```shell
+#xx对应一个osd，即xx相同的分区用于同一个osd
+#标记用于存储metadata和data的磁盘
+parted <disk> -s -- mklabel gpt mkpart KOLLA_CEPH_OSD_BOOTSTRAP_BS_xx 1 -1
+
+#一般：同一个磁盘上的不同分区
+#标记WAL分区
+parted <ssd_disk> -s -- mklabel gpt mkpart KOLLA_CEPH_OSD_BOOTSTRAP_BS_xx_W 1 -1
+#标记DB分区
+parted <ssd_disk> -s -- mklabel gpt mkpart KOLLA_CEPH_OSD_BOOTSTRAP_BS_xx_D  1 -1
 ```
 
 #### 9.修改配置解决相关bug

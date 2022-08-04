@@ -71,7 +71,7 @@
 
 #### 1.基础概念
 
-##### （1）bluestore
+##### （1）bluestore（一个osd是一个bluestore）
 OSD使用的新的后端对象存储，以前的是filestore，即对象先写入文件系统，再存入块设备，现在bluestore是直接可以存入块设备，不需要经过文件系统，提高了性能
 
 ##### （2）erasure code
@@ -83,7 +83,33 @@ OSD使用的新的后端对象存储，以前的是filestore，即对象先写�
 ##### （3）CRUSH map
 用于计算 对象 存储的位置，避免需要维护查询表的方式，从而提高性能
 
-#### 2.pool
+![](./imgs/overview_05.png)
+
+#### 2.BlueStore
+
+[参考](https://docs.ceph.com/en/latest/rados/configuration/bluestore-config-ref/)
+
+一个osd是一个bluestore
+
+##### (1) filestore vs bluestore
+![](./imgs/overview_06.png)
+
+##### (2) 存储结构（四个存储）
+
+* 四个存储：
+  * metadata（`/var/lib/ceph/osd/xx`）: A small partition formatted with XFS that contains basic metadata for the OSD.
+    * 新版的不会弄一个新的分区，而是放在根文件系统上或者tmpfs上
+  * data（`block`）: contains all the OSD data
+  * WAL（`block.wal`）: BlueStore internal journal or write-ahead Log
+  * DB（`block.db`）: BlueStore internal metadata
+* WAL/DB使用ssd，能够提高性能
+* WAL/DB可以没有（没有就是相关数据都放在data中）
+* 大小
+  * DB大小必须 > data的4%（当DB满了，相关数据会放到data中，但会影响性能）
+  * WAL 2G就够了
+
+
+#### 3.pool
 
 存储对象的逻辑分组，定义一些存储的策略：pg、副本数量、CRUSH rule、snpashots等
 
@@ -129,7 +155,7 @@ ceph osd pool set <pool_name> <key> <value>
 ceph osd pool application enable {pool-name} {application-name}
 ```
 
-#### 3.placement group
+#### 4.placement group
 实现数据的分发
 
 ##### （1）原理
@@ -179,6 +205,7 @@ ceph osd pool application enable {pool-name} {application-name}
 
 |状态|说明|可能问题|
 |-|-|-|
+|undersized|副本数没有达到设置的要求||
 |degraded|数据存在，副本数不够</br>或者某一个或更多object找不到|可能某个osd挂掉（正好其中一个副本在上面）|
 |down|某个副本down了||
 |peering|该pg中的osd正在尝试通信，达成共识|osd之间无法通信，可能某个osd挂掉了|
@@ -196,7 +223,7 @@ ceph osd pool application enable {pool-name} {application-name}
 
 ##### （6）需要保证pg都处于up的状态，才能看出数据的真实状态（否则数据丢失，可能看不出来）
 
-#### 4.OSD（提供存储服务）
+#### 5.OSD（提供存储服务）
 
 每一个磁盘启动一个OSD服务，就可以提供存储服务了
 pg与OSD关联，从而进行数据的分发

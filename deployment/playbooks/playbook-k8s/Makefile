@@ -39,6 +39,10 @@ monitor: docker
 log: docker
 	docker run --rm --network host --name ansible-lil-log -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_log.yaml -e @global.yaml"
 
+.PHONY := service
+service: docker
+	docker run --rm --network host --name ansible-lil-service -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_service.yaml -e @global.yaml"
+
 .PHONY := stop
 stop:
 	docker stop ansible-lil
