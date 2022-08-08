@@ -41,7 +41,7 @@ log: docker
 
 .PHONY := service
 service: docker
-	docker run --rm --network host --name ansible-lil-service -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_service.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil-service -e ANSIBLE_JINJA2_NATIVE=1 -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_service.yaml -e @global.yaml"
 
 .PHONY := stop
 stop:
@@ -49,7 +49,11 @@ stop:
 
 .PHONY := list_images
 list_images: docker
-	docker run --rm --network host --name ansible-lil-list -v ${ansible_dir}/roles/k8s/files/helm:/bin/helm -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "chmod +x /bin/helm;cd /root/ansible;ansible-playbook playbooks/list_images.yaml -e @global.yaml"
+	docker run --rm --network host --name ansible-lil-list -e ANSIBLE_JINJA2_NATIVE=1 -v ${ansible_dir}/roles/k8s/files/helm:/bin/helm -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "chmod +x /bin/helm;cd /root/ansible;ansible-playbook playbooks/list_images.yaml -e @global.yaml"
+
+.PHONY := download_charts
+download_charts: docker
+	docker run --rm --network host --name ansible-lil-download_charts -v ${ansible_dir}/roles/k8s/files/helm:/bin/helm -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "chmod +x /bin/helm;python3 /root/ansible/scripts/download_charts.py"
 
 .PHONY := check
 check: docker

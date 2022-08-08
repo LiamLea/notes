@@ -12,6 +12,7 @@
 |`trim('<string>')`|两端去除<string>内容|
 |使用python字符串函数：`{{ <var>.<func> }}`|参考下面的例子|
 |`unique`|去重|
+|`combine`|合并dict|
 
 ```jinja2
 {{ result.stdout_lines | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}
@@ -29,7 +30,16 @@ set_fact:
   list_new: "{{ list1 + list2 }}"
 ```
 
-##### 3.创建列表
+##### 3.合并两个dict
+```jinja2
+{{ {'a':1, 'b':2}|combine({'b':3, 'c':4}) }}
+```
+* 结果
+```python
+{'a': 1, 'b':2, 'c':3}
+```
+
+##### 4.创建列表
 * 方式一：
 ```jinja2
 {# (monitor['node_exporter']['port']|string))  使用变量，并且将这个变量转换成字符串#}
@@ -48,7 +58,7 @@ set_fact:
   with_items: "{{ groups['all'] }}"
 ```
 
-##### 4.使用原生字符串：`{% raw %} ... {% endraw %}`
+##### 5.使用原生字符串：`{% raw %} ... {% endraw %}`
 ```yaml
 # {{ variable_1 }}: {{ aa }}
 variable_1: {% raw %} {{ aa }} {% endraw %}

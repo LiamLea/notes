@@ -1,7 +1,8 @@
 - name: install cert-manager
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ basic.cert_manager.chart.path }}"
-    chart_repo_url: "{{ chart.repo['cert-manager'] }}"
+    chart_repo_url: "{{ basic.cert_manager.chart.repo }}"
     chart_version: "{{ basic.cert_manager.chart.version }}"
     release_name: "{{ basic.cert_manager.name }}"
     release_namespace: "{{ basic.namespace }}"

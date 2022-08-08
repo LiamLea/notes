@@ -1,7 +1,8 @@
 - name: install kafka
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ service.kafka.chart.path }}"
-    chart_repo_url: "{{ chart.repo['bitnami'] }}"
+    chart_repo_url: "{{ service.kafka.chart.repo }}"
     chart_version: "{{ service.kafka.chart.version }}"
     release_name: "{{ service.kafka.name }}"
     release_namespace: "{{ service.namespace }}"

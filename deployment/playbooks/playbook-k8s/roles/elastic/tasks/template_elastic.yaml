@@ -7,10 +7,19 @@
     __path: "{{ chart.local_dir.rstrip('/') }}/"
   when: chart.local_dir.strip() != ""
 
+- name: set proxy fact
+  set_fact:
+    __proxy_env:
+      HTTP_PROXY: "{{ chart.http_proxy.server }}"
+      HTTPS_PROXY: "{{ chart.http_proxy.server }}"
+      NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
+  when: chart.http_proxy.enabled == True
+
 - name: template elasticsearch
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm_template:
     chart_ref: "{{ __path }}{{ log.elastic.elasticsearch.chart.path }}"
-    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_repo_url: "{{ log.elastic.elasticsearch.chart.repo }}"
     chart_version: "{{ log.elastic.version }}"
     release_values:
       image: "{{ log.repository }}docker.elastic.co/elasticsearch/elasticsearch"
@@ -25,9 +34,10 @@
   register: es_template_result
 
 - name: template kibana
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm_template:
     chart_ref: "{{ __path }}{{ log.elastic.kibana.chart.path }}"
-    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_repo_url: "{{ log.elastic.kibana.chart.repo }}"
     chart_version: "{{ log.elastic.version }}"
     release_values:
       image: "{{ log.repository }}docker.elastic.co/kibana/kibana"
@@ -40,9 +50,10 @@
   register: kibana_template_result
 
 - name: template logstash
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm_template:
     chart_ref: "{{ __path }}{{ log.elastic.logstash.chart.path }}"
-    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_repo_url: "{{ log.elastic.logstash.chart.repo }}"
     chart_version: "{{ log.elastic.version }}"
     release_values:
       image: "{{ log.repository }}docker.elastic.co/logstash/logstash"
@@ -54,9 +65,10 @@
   register: logstash_template_result
 
 - name: template filebeat
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm_template:
     chart_ref: "{{ __path }}{{ log.elastic.filebeat.chart.path }}"
-    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_repo_url: "{{ log.elastic.filebeat.chart.repo }}"
     chart_version: "{{ log.elastic.version }}"
     release_values:
       image: "{{ log.repository }}docker.elastic.co/beats/filebeat"

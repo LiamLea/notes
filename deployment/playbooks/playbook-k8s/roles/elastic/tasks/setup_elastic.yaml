@@ -11,9 +11,10 @@
   shell: "kubectl apply -f /tmp/secrets.yaml -n {{ log.namespace }}"
 
 - name: install elasticsearch
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ log.elastic.elasticsearch.chart.path }}"
-    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_repo_url: "{{ log.elastic.elasticsearch.chart.repo }}"
     chart_version: "{{ log.elastic.version }}"
     release_name: "{{ log.elastic.elasticsearch.name }}"
     release_namespace: "{{ log.namespace }}"
@@ -47,9 +48,10 @@
           path: /usr/share/elasticsearch/config/certs
 
 - name: install kibana
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ log.elastic.kibana.chart.path }}"
-    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_repo_url: "{{ log.elastic.kibana.chart.repo }}"
     chart_version: "{{ log.elastic.version }}"
     release_name: "{{ log.elastic.kibana.name }}"
     release_namespace: "{{ log.namespace }}"
@@ -70,9 +72,10 @@
   include_tasks: init.yaml
 
 - name: install logstash
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ log.elastic.logstash.chart.path }}"
-    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_repo_url: "{{ log.elastic.logstash.chart.repo }}"
     chart_version: "{{ log.elastic.version }}"
     release_name: "{{ log.elastic.logstash.name }}"
     release_namespace: "{{ log.namespace }}"
@@ -91,9 +94,10 @@
         logstash.conf: "{{ __config_logstash_conf }}"
 
 - name: install filebeat
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ log.elastic.filebeat.chart.path }}"
-    chart_repo_url: "{{ chart.repo['elastic'] }}"
+    chart_repo_url: "{{ log.elastic.filebeat.chart.repo }}"
     chart_version: "{{ log.elastic.version }}"
     release_name: "{{ log.elastic.filebeat.name }}"
     release_namespace: "{{ log.namespace }}"

@@ -7,10 +7,19 @@
     __path: "{{ chart.local_dir.rstrip('/') }}/"
   when: chart.local_dir.strip() != ""
 
+- name: set proxy fact
+  set_fact:
+    __proxy_env:
+      HTTP_PROXY: "{{ chart.http_proxy.server }}"
+      HTTPS_PROXY: "{{ chart.http_proxy.server }}"
+      NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
+  when: chart.http_proxy.enabled == True
+
 - name: template redis
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm_template:
     chart_ref: "{{ __path }}{{ service.redis.chart.path }}"
-    chart_repo_url: "{{ chart.repo['bitnami'] }}"
+    chart_repo_url: "{{ service.redis.chart.repo }}"
     chart_version: "{{ service.redis.chart.version }}"
     release_values:
       image:

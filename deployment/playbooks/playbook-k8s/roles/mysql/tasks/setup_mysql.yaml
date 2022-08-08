@@ -1,7 +1,8 @@
 - name: install mysql
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ service.mysql.chart.path }}"
-    chart_repo_url: "{{ chart.repo['bitnami'] }}"
+    chart_repo_url: "{{ service.mysql.chart.repo }}"
     chart_version: "{{ service.mysql.chart.version }}"
     release_name: "{{ service.mysql.name }}"
     release_namespace: "{{ service.namespace }}"
