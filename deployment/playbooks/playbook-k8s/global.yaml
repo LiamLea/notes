@@ -15,6 +15,10 @@ hosts:
   hostname:
   - localhost
 
+http_proxy:
+  server: http://10.10.10.250:8123
+  no_proxy: ""
+
 #if registry is changed,you should pay attention to registry_prefix
 registry: "10.10.10.250"
 #when registry is empty, this should be empty too
@@ -29,7 +33,7 @@ docker:
   registry-mirrors: []
   http_proxy:
     enabled: True
-    server: http://10.10.10.250:8123
+    server: "{{ http_proxy.server }}"
     #must include service and pod network: 10.0.0.0/8
     no_proxy: ["{{ registry }}", "10.0.0.0/8", "quay.io", "docker.com", "docker.io", "localhost", "127.0.0.1", "aliyuncs.com", "myhuaweicloud.com"]
 
@@ -65,6 +69,10 @@ keepalived:
   image: "{{ registry_prefix }}osixia/keepalived:latest"
 
 chart:
+  http_proxy:
+    enabled: True
+    server: "{{ http_proxy.server }}"
+    no_proxy: "{{ kubernetes.apiserver.control_plane.ip }}, {{ http_proxy.no_proxy }}"
   repo:
     prometheus-community: https://prometheus-community.github.io/helm-charts
     grafana: https://grafana.github.io/helm-charts
@@ -85,11 +93,13 @@ basic:
   cert_manager:
     name: "cert-manager"
     chart:
+      repo: "{{ chart.repo['cert-manager'] }}"
       path: "cert-manager"
       version: "1.7.2"
   ingress_nginx:
     name: "ingress-nginx"
     chart:
+      repo: "{{ chart.repo['ingress-nginx'] }}"
       path: "ingress-nginx"
       version: "4.0.18"
     config:
@@ -104,6 +114,7 @@ monitor:
   prometheus:
     name: prometheus
     chart:
+      repo: "{{ chart.repo['prometheus-community'] }}"
       #the path is relative path
       path: "prometheus"
       version: "15.8.5"
@@ -122,16 +133,19 @@ monitor:
     blackbox:
       name: "blackbox-exporter"
       chart:
+        repo: "{{ chart.repo['prometheus-community'] }}"
         path: "prometheus-blackbox-exporter"
         version: "5.7.0"
     adapter:
       name: "prometheus-adapter"
       chart:
+        repo: "{{ chart.repo['prometheus-community'] }}"
         path: "prometheus-adapter"
         version: "3.2.2"
     grafana:
       name: "grafana"
       chart:
+        repo: "{{ chart.repo['grafana'] }}"
         path: "grafana"
         version: "6.28.0"
       dashboards:
@@ -177,6 +191,7 @@ log:
     elasticsearch:
       name: elasticsearch
       chart:
+        repo: "{{ chart.repo['elastic'] }}"
         #the path is relative path
         path: "elasticsearch"
       resources:
@@ -192,10 +207,12 @@ log:
     kibana:
       name: kibana
       chart:
+        repo: "{{ chart.repo['elastic'] }}"
         path: "kibana"
     logstash:
       name: logstash
       chart:
+        repo: "{{ chart.repo['elastic'] }}"
         path: "logstash"
       replicas: "3"
       resources:
@@ -212,6 +229,7 @@ log:
     filebeat:
       name: filebeat
       chart:
+        repo: "{{ chart.repo['elastic'] }}"
         path: "filebeat"
 
 service:
@@ -223,6 +241,7 @@ service:
     enabled: true
     name: kafka
     chart:
+      repo: "{{ chart.repo['bitnami'] }}"
       path: "kafka"
       version: "16.2.10"
     replicas: 3
@@ -250,8 +269,9 @@ service:
     enabled: true
     name: mysql
     chart:
+      repo: "{{ chart.repo['bitnami'] }}"
       path: "mysql"
-      version: "9.2.1"
+      version: "8.5.7"
     root_password: cangoal
     #standalone or replication
     architecture: replication
@@ -268,8 +288,9 @@ service:
     enabled: true
     name: redis
     chart:
+      repo: "{{ chart.repo['bitnami'] }}"
       path: "redis"
-      version: "17.0.5"
+      version: "10.7.1"
     password: cangoal
     architecture: replication
     resources:

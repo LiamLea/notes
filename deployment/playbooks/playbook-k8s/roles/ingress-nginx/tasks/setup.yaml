@@ -1,7 +1,8 @@
 - name: install ingress-nginx
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ basic.ingress_nginx.chart.path }}"
-    chart_repo_url: "{{ chart.repo['ingress-nginx'] }}"
+    chart_repo_url: "{{ basic.ingress_nginx.chart.repo }}"
     chart_version: "{{ basic.ingress_nginx.chart.version }}"
     release_name: "{{ basic.ingress_nginx.name }}"
     release_namespace: "{{ basic.namespace }}"

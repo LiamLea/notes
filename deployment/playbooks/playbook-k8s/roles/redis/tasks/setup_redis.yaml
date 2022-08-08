@@ -1,7 +1,8 @@
 - name: install redis
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ service.redis.chart.path }}"
-    chart_repo_url: "{{ chart.repo['bitnami'] }}"
+    chart_repo_url: "{{ service.redis.chart.repo }}"
     chart_version: "{{ service.redis.chart.version }}"
     release_name: "{{ service.redis.name }}"
     release_namespace: "{{ service.namespace }}"

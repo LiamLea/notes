@@ -7,10 +7,19 @@
     __path: "{{ chart.local_dir.rstrip('/') }}/"
   when: chart.local_dir.strip() != ""
 
+- name: set proxy fact
+  set_fact:
+    __proxy_env:
+      HTTP_PROXY: "{{ chart.http_proxy.server }}"
+      HTTPS_PROXY: "{{ chart.http_proxy.server }}"
+      NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
+  when: chart.http_proxy.enabled == True
+
 - name: template prometheus
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm_template:
     chart_ref: "{{ __path }}{{ monitor.prometheus.chart.path }}"
-    chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
+    chart_repo_url: "{{ monitor.prometheus.chart.repo }}"
     chart_version: "{{ monitor.prometheus.chart.version }}"
     release_values:
       alertmanager:
@@ -44,9 +53,10 @@
   register: prometheus_template_result
 
 - name: template blackbox
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm_template:
     chart_ref: "{{ __path }}{{ monitor.prometheus.blackbox.chart.path }}"
-    chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
+    chart_repo_url: "{{ monitor.prometheus.blackbox.chart.repo }}"
     chart_version: "{{ monitor.prometheus.blackbox.chart.version }}"
     release_values:
       image:
@@ -54,9 +64,10 @@
   register: blackbox_template_result
 
 - name: template prometheus-adapter
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm_template:
     chart_ref: "{{ __path }}{{ monitor.prometheus.adapter.chart.path }}"
-    chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
+    chart_repo_url: "{{ monitor.prometheus.adapter.chart.repo }}"
     chart_version: "{{ monitor.prometheus.adapter.chart.version }}"
     release_values:
       image:
@@ -64,9 +75,10 @@
   register: adapter_template_result
 
 - name: install grafana
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm_template:
     chart_ref: "{{ __path }}{{ monitor.prometheus.grafana.chart.path }}"
-    chart_repo_url: "{{ chart.repo['grafana'] }}"
+    chart_repo_url: "{{ monitor.prometheus.grafana.chart.repo }}"
     chart_version: "{{ monitor.prometheus.grafana.chart.version }}"
     release_values:
       image:

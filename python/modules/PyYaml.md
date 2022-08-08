@@ -10,6 +10,10 @@ from yaml import CLoader
 #<CONTEXT>为yaml的内容
 #既支持字符串类型，也支持bytes类型
 obj = load(<CONTENT>, Loader = CLoader)    #原先默认的Loader被废弃了，需要指定Loader          
+
+#或者加载yaml文件
+with open(filename, "r", encoding="utf8") as fobj:
+    obj = load(fobj, Loader=CLoader)
 ```
 
 #### （2）将 python对象 转换成 yaml格式内容

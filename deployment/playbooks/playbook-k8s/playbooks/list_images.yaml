@@ -18,7 +18,7 @@
       result: "{% for c_v in calico_k8s %} {% for k_v in calico_k8s[c_v]['k8s'] %} {% if k_v in kubernetes.version %} {{ c_v }} {% endif %} {% endfor %}{% endfor %}"
   - name: select calico version
     set_fact:
-      calico_version: "{{ result | trim }}"
+      calico_version: "{{ result | trim | string }}"
 
   - name: include template certmanager
     include_tasks: ../roles/cert-manager/tasks/template.yaml

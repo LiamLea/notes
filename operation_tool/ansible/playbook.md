@@ -79,6 +79,53 @@ import_role: xx         #是一个task
 |task选项（如when）不会被应用到子任务|对于静态的加载，task选项会被应用到子任务|
 |不能在里面触发外面的handler|不能从外面触发里面的handler|
 
+#### 4.jinja2返回的都是string
+
+及时使用`|int`等进行转换，也只是在内部处理时进行转换，最终返回的还是string
+
+##### （1）问题描述
+
+```yaml
+- hosts: localhost
+  gather_facts: no
+  vars:
+    foo: "{{ 1 + 2 | int }}"
+  tasks:
+    - debug:
+        msg: "{{ foo + 3 }}"
+```
+```shell
+"Unexpected templating type error occurred on ({{ foo + 3 }}): can only concatenate str (not \"int\") to str"
+```
+
+##### （2）解决方法：在内部进行类型转换（不能改最终返回的类型）
+
+```yaml
+- hosts: localhost
+  gather_facts: no
+  vars:
+    foo: "{{ 1 + 2 }}"
+  tasks:
+    - debug:
+        msg: "{{ foo | int + 3 }}"
+```
+
+##### （3）解决方法：jinja2_native（保留最终返回的类型）
+* 配置: `jinja2_native=True`
+
+```yaml
+- hosts: localhost
+  gather_facts: no
+  vars:
+    foo: "{{ 1 + 2 }}"
+  tasks:
+    - debug:
+        msg: "{{ foo + 3 }}"
+```
+
+##### （4）jinja2_native的影响
+* 对template module没有影响
+
 ***
 
 ### 使用

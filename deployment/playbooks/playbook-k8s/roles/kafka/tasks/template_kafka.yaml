@@ -8,15 +8,24 @@
     __path: "{{ chart.local_dir.rstrip('/') }}/"
   when: chart.local_dir.strip() != ""
 
+- name: set proxy fact
+  set_fact:
+    __proxy_env:
+      HTTP_PROXY: "{{ chart.http_proxy.server }}"
+      HTTPS_PROXY: "{{ chart.http_proxy.server }}"
+      NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
+  when: chart.http_proxy.enabled == True
+
 - name: set domain fact
   set_fact:
     __domain: "{{ service.kafka.domain }}"
   when: service.kafka.domain.strip() != ""
 
 - name: template kafka
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm_template:
     chart_ref: "{{ __path }}{{ service.kafka.chart.path }}"
-    chart_repo_url: "{{ chart.repo['bitnami'] }}"
+    chart_repo_url: "{{ service.kafka.chart.repo }}"
     chart_version: "{{ service.kafka.chart.version }}"
     release_values:
       zookeeper:

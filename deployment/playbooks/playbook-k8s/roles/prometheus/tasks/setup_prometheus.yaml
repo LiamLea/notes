@@ -1,7 +1,8 @@
 - name: install prometheus
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ monitor.prometheus.chart.path }}"
-    chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
+    chart_repo_url: "{{ monitor.prometheus.chart.repo }}"
     chart_version: "{{ monitor.prometheus.chart.version }}"
     release_name: "{{ monitor.prometheus.name }}"
     release_namespace: "{{ monitor.namespace }}"
@@ -51,9 +52,10 @@
         alertmanager.yml: "{{ __config_alertmanager }}"
 
 - name: install blackbox-exporter
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ monitor.prometheus.blackbox.chart.path }}"
-    chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
+    chart_repo_url: "{{ monitor.prometheus.blackbox.chart.repo }}"
     chart_version: "{{ monitor.prometheus.blackbox.chart.version }}"
     release_name: "{{ monitor.prometheus.blackbox.name }}"
     release_namespace: "{{ monitor.namespace }}"
@@ -73,9 +75,10 @@
                 insecure_skip_verify: true
 
 - name: install prometheus-adapter
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ monitor.prometheus.adapter.chart.path }}"
-    chart_repo_url: "{{ chart.repo['prometheus-community'] }}"
+    chart_repo_url: "{{ monitor.prometheus.adapter.chart.repo }}"
     chart_version: "{{ monitor.prometheus.adapter.chart.version }}"
     release_name: "{{ monitor.prometheus.adapter.name }}"
     release_namespace: "{{ monitor.namespace }}"
@@ -92,9 +95,10 @@
       logLevel: 2
 
 - name: install grafana
+  environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
     chart_ref: "{{ __path }}{{ monitor.prometheus.grafana.chart.path }}"
-    chart_repo_url: "{{ chart.repo['grafana'] }}"
+    chart_repo_url: "{{ monitor.prometheus.grafana.chart.repo }}"
     chart_version: "{{ monitor.prometheus.grafana.chart.version }}"
     release_name: "{{ monitor.prometheus.grafana.name }}"
     release_namespace: "{{ monitor.namespace }}"

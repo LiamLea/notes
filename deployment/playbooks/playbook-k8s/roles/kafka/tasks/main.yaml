@@ -3,6 +3,14 @@
     __path: ""
     __domain: "{{ ansible_host }}"
 
+- name: set proxy fact
+  set_fact:
+    __proxy_env:
+      HTTP_PROXY: "{{ chart.http_proxy.server }}"
+      HTTPS_PROXY: "{{ chart.http_proxy.server }}"
+      NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
+  when: chart.http_proxy.enabled == True
+  
 - block:
   - name: copy charts
     copy:
