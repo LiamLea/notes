@@ -13,6 +13,7 @@
         registry: "{{ service.repository.strip('/') }}"
       auth:
         rootPassword: "{{ service.mysql.root_password }}"
+        replicationPassword: "{{ service.mysql.replication_password }}"
       architecture: "{{ service.mysql.architecture }}"
       primary:
         configuration: "{{ __my_cnf }}"

@@ -45,7 +45,9 @@ echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
 本身就需要能够通信
 
 ##### （5）outside-to-service/pod
-会对非cluster-cidr的源地址进行masquerade，然后就相当于node-to-service/pod
+* 会对 非cluster-cidr（即不是pod的ip地址）的源地址进行masquerade
+  * 源地址会转换成 该node用于与那个pod通信地址（如果建立隧道，那就是隧道地址）
+* 然后就相当于node-to-service/pod
 
 ##### （6）pod-to-outside
 会对源地址进行masquerade

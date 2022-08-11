@@ -128,6 +128,17 @@ externalIPs:
 ```
 相当于在所有节点上监听：`1.1.1.1:80`（如果节点上没有这个地址，则无效），外部只能通过1.1.1.1这个地址访问
 
+#### 9.externalTrafficPolicy 和 internalTrafficPolicy
+
+* externalTrafficPolicy：决定 **外部** 访问service的路由策略
+* internalTrafficPolicy：决定 **内部** 访问service的路由策略
+* 两种策略
+  * Local
+    * 如果该service有本地的endpoint则路由过去，如果不存在则不路由过去
+    * 影响：保留client的source ip
+  * Cluster
+    * 以负载均衡的方式路由到该service所有的endpoint上
+
 ***
 
 ### 使用
