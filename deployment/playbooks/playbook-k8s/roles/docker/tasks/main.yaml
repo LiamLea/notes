@@ -42,13 +42,18 @@
   template:
     src: config.toml.j2
     dest: /etc/containerd/config.toml
-  notify: restart containerd
+  notify:
+  - "restart containerd"
 
+- name: flush handlers
+  meta: flush_handlers
+  
 - name: config docker
   template:
     src: daemon.json.j2
     dest: /etc/docker/daemon.json
-  notify: restart docker
+  notify:
+  - "restart docker"
 
 - name: flush handlers
   meta: flush_handlers

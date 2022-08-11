@@ -26,7 +26,16 @@
       src: harbor.yml.j2
       dest: /root/harbor/harbor.yml
 
+  - name: prepare harbor
+    shell: "/root/harbor/prepare"
+    args:
+      chdir: "/root/harbor"
+    register: prepare_result
+
   - name: install harbor
-    shell: "cd /root/harbor;./prepare;docker-compose up -d"
+    shell: "docker-compose up -d"
+    args:
+      chdir: "/root/harbor"
+    when: prepare_result.rc == 0
 
   when: harbor_installed.rc != 0

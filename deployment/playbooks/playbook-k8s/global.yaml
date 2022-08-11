@@ -273,6 +273,7 @@ service:
       path: "mysql"
       version: "8.5.7"
     root_password: cangoal
+    replication_password: cangoal
     #standalone or replication
     architecture: replication
     resources:
@@ -290,9 +291,8 @@ service:
     chart:
       repo: "{{ chart.repo['bitnami'] }}"
       path: "redis"
-      version: "10.7.1"
+      version: "17.0.8"
     password: cangoal
-    architecture: replication
     resources:
       requests:
         cpu: "2000m"
@@ -301,7 +301,5 @@ service:
         cpu: "2000m"
         memory: "4Gi"
       storage: 5Gi
-    master:
-      count: 1
     replica:
-      count: 1
+      count: 2

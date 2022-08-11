@@ -24,20 +24,20 @@
     release_values:
       image:
         registry: "{{ service.repository.strip('/') }}"
-      password: "{{ service.redis.password }}"
-      architecture: "{{ service.redis.architecture }}"
+      auth:
+        password: "{{ service.redis.password }}"
       master:
-        count: "{{ service.redis.master.count }}"
         resources:
           limits: "{{ service.redis.resources.limits }}"
           requests: "{{ service.redis.resources.requests }}"
-          persistence:
-            storageClass: "{{ service.storage_class }}"
-            size: "{{ service.redis.resources.storage }}"
+        persistence:
+          storageClass: "{{ service.storage_class }}"
+          size: "{{ service.redis.resources.storage }}"
       replica:
-        replicaCount: "{{ service.redis.replica.count | int }}"
-        limits: "{{ service.redis.resources.limits }}"
-        requests: "{{ service.redis.resources.requests }}"
+        replicaCount: "{{ service.redis.replica.count }}"
+        resources:
+          limits: "{{ service.redis.resources.limits }}"
+          requests: "{{ service.redis.resources.requests }}"
         persistence:
           storageClass: "{{ service.storage_class }}"
           size: "{{ service.redis.resources.storage }}"

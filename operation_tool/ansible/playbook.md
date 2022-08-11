@@ -165,12 +165,14 @@ set_fact:
 ##### （2）触发器：`notify`和`handlers`
 * 当状态**changed**，才会发送notify
 * handler必须有**全局唯一**的名字
+* 按照 **定义的顺序** 执行handler（不是按照notify的顺序），而且每个handler只会执行一次
 * 注意：默认在一个play中，所有tasks执行完，才会执行handlers中的任务，可以通过meta立即执行已经触发的handlers中的任务
 ```yaml
 tasks:
   - name: <NAME>
     <MODULE>: ...
-    notify: <TASK_NAME>
+    notify:
+    - <TASK_NAME>
 
   #当该task执行成功且造成了实际的改变,会运行handlers中指定的task
   - name: reboot immediately
@@ -182,6 +184,27 @@ tasks:
 handlers:
   - name: <NAME>
     <MODULE>: ...
+```
+
+* 一个notify通知多个handlers
+```yaml
+tasks:
+  - name: Restart everything
+    command: echo "this task will restart the web services"
+    notify: "restart web services"
+
+handlers:
+  - name: Restart memcached
+    service:
+      name: memcached
+      state: restarted
+    listen: "restart web services"
+
+  - name: Restart apache
+    service:
+      name: apache
+      state: restarted
+    listen: "restart web services"
 ```
 
 ##### （3）循环：`with_items`
