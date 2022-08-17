@@ -216,7 +216,10 @@ out-of-band management 指远程管理卡等，当操作系统宕机，依然能
 ##### (2) out-of-band data
 独立的数据通道，用作特殊用途
 
-#### 56.查看某个端口
+#### 56.在没有工具的请求下：查看容器中的某个端口
+
+##### （1）利用文件查找
+
 * 查看端口是否被打开，并获取inode号
 ```shell
 PORT=4822;cat /proc/net/* | awk -F " " '{print $2 ":" $10 }' | grep -i `printf "%x:" $PORT` | awk -F ":" '{print "PORT=" $2 ", INODE=" $3 }'
@@ -225,3 +228,5 @@ PORT=4822;cat /proc/net/* | awk -F " " '{print $2 ":" $10 }' | grep -i `printf "
 ```shell
 INODE=8036871;find /proc -lname "socket:\[$INODE\]" 2> /dev/null | head -n 1 | awk -F "/" '{print "PID="$3}'
 ```
+
+##### （2）将该容器的网络命名空间挂载出来

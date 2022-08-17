@@ -1,8 +1,13 @@
 # DNS
+
 [toc]
+
 ### 概述
 
-#### 1.基础概念
+#### 1.域名结构
+![](./imgs/dns_01.png)
+
+#### 2.基础概念
 ![](./imgs/dns_01.gif)
 
 ##### （1）stub resolver（存根解析器）
@@ -22,7 +27,7 @@
 * 客户端会自己去 转发到的DNS服务器 查询结果
 * 递归服务器会帮忙查询到结果并返回
 
-#### 2.域名解析时的各项解析记录
+#### 3.域名解析时的各项解析记录
 
 * A记录
   将域名指向一个IPv4地址
@@ -51,7 +56,7 @@
 * PTR记录
   PTR记录是A记录的逆向记录，又称做IP反查记录或指针记录，负责将IP反向解析为域名
 
-#### 3.DNS的search选项
+#### 4.DNS的search选项
 ```shell
 #vim /etc/resolv.conf
 nameserver <DNS_SERVER>
@@ -67,6 +72,7 @@ ping <HOST>
 ***
 
 ### 使用
+
 #### 1.`dig`
 ```shell
 dig <SERVER>

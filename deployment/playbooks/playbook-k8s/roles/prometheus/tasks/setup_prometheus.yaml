@@ -16,6 +16,18 @@
           storageClass: "{{ monitor.storage_class }}"
         prefixURL: "/alertmanager"
         baseURL: "http://localhost:9093/alertmanager"
+        ingress:
+          enabled: "{{ ingress.enabled }}"
+          annotations:
+            cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
+          ingressClassName: "{{ ingress.class_name }}"
+          hosts:
+          - "{{ ingress.hosts['alertmanager'].host }}"
+          path: "{{ ingress.hosts['alertmanager'].path }}"
+          tls:
+          - secretName: "{{ ingress.hosts['alertmanager'].host }}"
+            hosts:
+            - "{{ ingress.hosts['alertmanager'].host }}"
       configmapReload:
         prometheus:
           image:
@@ -37,6 +49,18 @@
         baseURL: "{{ monitor.prometheus.config.external_url }}"
         global:
           scrape_interval: "{{ monitor.prometheus.config.scrape_interval }}"
+        ingress:
+          enabled: "{{ ingress.enabled }}"
+          annotations:
+            cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
+          ingressClassName: "{{ ingress.class_name }}"
+          hosts:
+          - "{{ ingress.hosts['prometheus'].host }}"
+          path: "{{ ingress.hosts['prometheus'].path }}"
+          tls:
+          - secretName: "{{ ingress.hosts['prometheus'].host }}"
+            hosts:
+            - "{{ ingress.hosts['prometheus'].host }}"
       pushgateway:
         image:
           repository: "{{ monitor.repository }}prom/pushgateway"
@@ -147,3 +171,16 @@
              path: /var/lib/grafana/dashboards/default
 
       dashboards: "{{ monitor.prometheus.grafana.dashboards }}"
+
+      ingress:
+        enabled: "{{ ingress.enabled }}"
+        annotations:
+          cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
+        ingressClassName: "{{ ingress.class_name }}"
+        hosts:
+        - "{{ ingress.hosts['grafana'].host }}"
+        path: "{{ ingress.hosts['grafana'].path }}"
+        tls:
+        - secretName: "{{ ingress.hosts['grafana'].host }}"
+          hosts:
+          - "{{ ingress.hosts['grafana'].host }}"

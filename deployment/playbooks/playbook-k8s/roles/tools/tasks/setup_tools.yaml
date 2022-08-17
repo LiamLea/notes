@@ -1,0 +1,94 @@
+- name: install adminer
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ service.tools.adminer.chart.path }}"
+    chart_repo_url: "{{ service.tools.adminer.chart.repo }}"
+    chart_version: "{{ service.tools.adminer.chart.version }}"
+    release_name: "{{ service.tools.adminer.name }}"
+    release_namespace: "{{ service.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image:
+        repository: "{{ service.repository }}dockette/adminer"
+      ingress:
+        enabled: "{{ ingress.enabled }}"
+        annotations:
+          cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
+        className: "{{ ingress.class_name }}"
+        hosts:
+        - host: "{{ ingress.hosts['adminer'].host }}"
+          paths:
+            - path: "{{ ingress.hosts['adminer'].path }}"
+              pathType: ImplementationSpecific
+        tls:
+        - secretName: "{{ ingress.hosts['adminer'].host }}"
+          hosts:
+          - "{{ ingress.hosts['adminer'].host }}"
+
+- name: install redis-commander
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ service.tools.redis.chart.path }}"
+    chart_repo_url: "{{ service.tools.redis.chart.repo }}"
+    chart_version: "{{ service.tools.redis.chart.version }}"
+    release_name: "{{ service.tools.redis.name }}"
+    release_namespace: "{{ service.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image:
+        repository: "{{ service.repository }}rediscommander/redis-commander"
+        pullPolicy: IfNotPresent
+      redis: {}
+      ingress:
+        enabled: "{{ ingress.enabled }}"
+        annotations:
+          cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
+        ingressClassName: "{{ ingress.class_name }}"
+        hosts:
+        - host: "{{ ingress.hosts['redis-commander'].host }}"
+          paths:
+          - "{{ ingress.hosts['redis-commander'].path }}"
+        tls:
+        - secretName: "{{ ingress.hosts['redis-commander'].host }}"
+          hosts:
+          - "{{ ingress.hosts['redis-commander'].host }}"
+
+- name: install kafka-ui
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ service.tools.kafka.chart.path }}"
+    chart_repo_url: "{{ service.tools.kafka.chart.repo }}"
+    chart_version: "{{ service.tools.kafka.chart.version }}"
+    release_name: "{{ service.tools.kafka.name }}"
+    release_namespace: "{{ service.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image:
+        registry: "{{ service.repository.strip('/') }}"
+      yamlApplicationConfig:
+        kafka:
+          clusters: "{{ service.tools.kafka.kafka_clusters }}"
+        spring:
+          security:
+            user:
+              name: "{{ service.tools.kafka.auth.user }}"
+              password: "{{ service.tools.kafka.auth.password }}"
+        auth:
+          type: LOGIN_FORM
+        management:
+          health:
+            ldap:
+              enabled: false
+      ingress:
+        enabled: "{{ ingress.enabled }}"
+        annotations:
+          cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
+        ingressClassName: "{{ ingress.class_name }}"
+        path: "{{ ingress.hosts['kafka-ui'].path }}"
+        host: "{{ ingress.hosts['kafka-ui'].host }}"
+        tls:
+          enable: true
+          secretName: "{{ ingress.hosts['kafka-ui'].host }}"
