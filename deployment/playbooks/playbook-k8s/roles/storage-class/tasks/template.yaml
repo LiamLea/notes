@@ -1,0 +1,110 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- name: set fact
+  set_fact:
+    __path: "{{ chart.local_dir.rstrip('/') }}/"
+  when: chart.local_dir.strip() != ""
+
+- name: set proxy fact
+  set_fact:
+    __proxy_env:
+      HTTP_PROXY: "{{ chart.http_proxy.server }}"
+      HTTPS_PROXY: "{{ chart.http_proxy.server }}"
+      NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
+  when: chart.http_proxy.enabled == True
+
+- name: template cephfs
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ storage_class.ceph.cephfs.chart.path }}"
+    chart_repo_url: "{{ storage_class.ceph.cephfs.chart.repo }}"
+    chart_version: "{{ storage_class.ceph.cephfs.chart.version }}"
+    release_values:
+      csiConfig:
+      - clusterID: "{{ storage_class.ceph.cluster.id }}"
+        monitors: "{{ storage_class.ceph.cluster.mons }}"
+      nodeplugin:
+        httpMetrics:
+          containerPort: "{{ storage_class.ceph.cephfs.config.nodeplugin_metric_port }}"
+        registrar:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-node-driver-registrar"
+        plugin:
+          image:
+            repository: "{{ storage_class.repository }}quay.io/cephcsi/cephcsi"
+      provisioner:
+        provisioner:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-provisioner"
+        attacher:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-attacher"
+        resizer:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-resizer"
+        snapshotter:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-snapshotter"
+      storageClass:
+        create: true
+        name: "{{ storage_class.ceph.cephfs.config.class_name }}"
+        clusterID: "{{ storage_class.ceph.cluster.id }}"
+        fsName: "{{ storage_class.ceph.cephfs.config.fs_name }}"
+        volumeNamePrefix: "{{ storage_class.ceph.cephfs.config.volume_name_prefix }}"
+      secret:
+        adminID: "{{ storage_class.ceph.cluster.admin.id }}"
+        adminKey: "{{ storage_class.ceph.cluster.admin.key }}"
+  register: cephfs_template_result
+
+- name: template rbd
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ storage_class.ceph.rbd.chart.path }}"
+    chart_repo_url: "{{ storage_class.ceph.rbd.chart.repo }}"
+    chart_version: "{{ storage_class.ceph.rbd.chart.version }}"
+    release_values:
+      csiConfig:
+      - clusterID: "{{ storage_class.ceph.cluster.id }}"
+        monitors: "{{ storage_class.ceph.cluster.mons }}"
+      nodeplugin:
+        httpMetrics:
+          containerPort: "{{ storage_class.ceph.rbd.config.nodeplugin_metric_port }}"
+        registrar:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-node-driver-registrar"
+        plugin:
+          image:
+            repository: "{{ storage_class.repository }}quay.io/cephcsi/cephcsi"
+      provisioner:
+        provisioner:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-provisioner"
+        attacher:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-attacher"
+        resizer:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-resizer"
+        snapshotter:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-snapshotter"
+      storageClass:
+        create: true
+        name: "{{ storage_class.ceph.rbd.config.class_name }}"
+        clusterID: "{{ storage_class.ceph.cluster.id }}"
+        pool: "{{ storage_class.ceph.rbd.config.pool }}"
+        volumeNamePrefix: "{{ storage_class.ceph.rbd.config.volume_name_prefix }}"
+      secret:
+        adminID: "{{ storage_class.ceph.cluster.admin.id }}"
+        adminKey: "{{ storage_class.ceph.cluster.admin.key }}"
+  register: rbd_template_result
+
+- name: set facts
+  set_fact:
+    sc_template_stdout: "{{ cephfs_template_result.stdout_lines + rbd_template_result.stdout_lines }}"
+
+- name: get images
+  set_fact:
+    sc_images: "{{ sc_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"

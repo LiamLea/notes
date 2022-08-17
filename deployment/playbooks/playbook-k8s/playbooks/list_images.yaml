@@ -20,6 +20,9 @@
     set_fact:
       calico_version: "{{ result | trim | string }}"
 
+  - name: include template storage class
+    include_tasks: ../roles/storage-class/tasks/template.yaml
+
   - name: include template certmanager
     include_tasks: ../roles/cert-manager/tasks/template.yaml
 
@@ -53,6 +56,7 @@
         - "{{ keepalived.image }}"
         - "{{ docker.containerd.sandbox_image }}"
         calico: "{{ calico_k8s[calico_version]['images'] }}"
+        storage_class: "{{ sc_images | unique }}"
         certmanager: "{{ certmanager_images | unique }}"
         ingress_nginx: "{{ ingress_nginx_images | unique }}"
         prometheus: "{{ prometheus_images | unique }}"

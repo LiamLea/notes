@@ -74,6 +74,7 @@ chart:
     server: "{{ http_proxy.server }}"
     no_proxy: "{{ kubernetes.apiserver.control_plane.ip }}, {{ http_proxy.no_proxy }}"
   repo:
+    ceph-csi: https://ceph.github.io/csi-charts
     prometheus-community: https://prometheus-community.github.io/helm-charts
     grafana: https://grafana.github.io/helm-charts
     elastic: https://helm.elastic.co
@@ -87,6 +88,45 @@ chart:
   #if the charts are local, set local directory
   #or will use the remote repo
   local_dir: ""
+
+storage_class:
+  repository: "{{ registry_prefix }}"
+  ceph:
+    enabled: true
+    cluster:
+      id: ""
+      mons: []
+      admin:
+        id: ""
+        key: ""
+    cephfs:
+      namespace: "ceph-csi-cephfs"
+      name: "ceph-csi-cephfs"
+      chart:
+        repo: "{{ chart.repo['ceph-csi'] }}"
+        path: "ceph-csi-cephfs"
+        version: "3.4.0"
+      config:
+        default: true
+        class_name: "csi-cephfs-sc"
+        fs_name: "ceph-fs"
+        volume_name_prefix: "dev-k8s-vol-"
+        nodeplugin_metric_port: 8082
+
+    rbd:
+      namespace: "ceph-csi-rbd"
+      name: "ceph-csi-rbd"
+      chart:
+        repo: "{{ chart.repo['ceph-csi'] }}"
+        path: "ceph-csi-rbd"
+        version: "3.4.0"
+      config:
+        default: false
+        class_name: "csi-rbd-sc"
+        pool: "rbd-replicated-pool"
+        volume_name_prefix: "dev-k8s-vol-"
+        nodeplugin_metric_port: 8081
+
 
 basic:
   namespace: basic-public
