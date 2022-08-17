@@ -1,0 +1,91 @@
+- name: install cephfs
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ storage_class.ceph.cephfs.chart.path }}"
+    chart_repo_url: "{{ storage_class.ceph.cephfs.chart.repo }}"
+    chart_version: "{{ storage_class.ceph.cephfs.chart.version }}"
+    release_name: "{{ storage_class.ceph.cephfs.name }}"
+    release_namespace: "{{ storage_class.ceph.cephfs.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      csiConfig:
+      - clusterID: "{{ storage_class.ceph.cluster.id }}"
+        monitors: "{{ storage_class.ceph.cluster.mons }}"
+      nodeplugin:
+        httpMetrics:
+          containerPort: "{{ storage_class.ceph.cephfs.config.nodeplugin_metric_port }}"
+        registrar:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-node-driver-registrar"
+        plugin:
+          image:
+            repository: "{{ storage_class.repository }}quay.io/cephcsi/cephcsi"
+      provisioner:
+        provisioner:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-provisioner"
+        attacher:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-attacher"
+        resizer:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-resizer"
+        snapshotter:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-snapshotter"
+      storageClass:
+        create: true
+        name: "{{ storage_class.ceph.cephfs.config.class_name }}"
+        clusterID: "{{ storage_class.ceph.cluster.id }}"
+        fsName: "{{ storage_class.ceph.cephfs.config.fs_name }}"
+        volumeNamePrefix: "{{ storage_class.ceph.cephfs.config.volume_name_prefix }}"
+      secret:
+        adminID: "{{ storage_class.ceph.cluster.admin.id }}"
+        adminKey: "{{ storage_class.ceph.cluster.admin.key }}"
+
+- name: install rbd
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ storage_class.ceph.rbd.chart.path }}"
+    chart_repo_url: "{{ storage_class.ceph.rbd.chart.repo }}"
+    chart_version: "{{ storage_class.ceph.rbd.chart.version }}"
+    release_name: "{{ storage_class.ceph.rbd.name }}"
+    release_namespace: "{{ storage_class.ceph.rbd.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      csiConfig:
+      - clusterID: "{{ storage_class.ceph.cluster.id }}"
+        monitors: "{{ storage_class.ceph.cluster.mons }}"
+      nodeplugin:
+        httpMetrics:
+          containerPort: "{{ storage_class.ceph.rbd.config.nodeplugin_metric_port }}"
+        registrar:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-node-driver-registrar"
+        plugin:
+          image:
+            repository: "{{ storage_class.repository }}quay.io/cephcsi/cephcsi"
+      provisioner:
+        provisioner:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-provisioner"
+        attacher:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-attacher"
+        resizer:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-resizer"
+        snapshotter:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-snapshotter"
+      storageClass:
+        create: true
+        name: "{{ storage_class.ceph.rbd.config.class_name }}"
+        clusterID: "{{ storage_class.ceph.cluster.id }}"
+        pool: "{{ storage_class.ceph.rbd.config.pool }}"
+        volumeNamePrefix: "{{ storage_class.ceph.rbd.config.volume_name_prefix }}"
+      secret:
+        adminID: "{{ storage_class.ceph.cluster.admin.id }}"
+        adminKey: "{{ storage_class.ceph.cluster.admin.key }}"

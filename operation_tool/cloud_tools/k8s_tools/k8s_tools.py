@@ -3,11 +3,14 @@
 import subprocess
 import os
 import requests
+import base64
 
 dir = "/tmp/k8s"
 kube_config = "/root/.kube/config"
 
-registry_url = "http://192.168.6.111:5000"
+#http://192.168.1.1:5000
+registry_url = "http://10.10.10.250"
+username_password = "admin:Harbor12345"
 
 def run_shell(command, get_error = False):
 
@@ -124,12 +127,19 @@ def restore_global():
 def list_images():
     ret = []
     repo_url = registry_url.rstrip("/") + "/v2/_catalog"
-    response = requests.get(repo_url, verify = False)
+    if username_password.strip():
+        headers = {
+            "Authorization": "Basic %s" %base64.b64encode(username_password.encode()).decode("utf-8")
+        }
+    else:
+        headers = {}
+
+    response = requests.get(repo_url, verify = False, headers = headers)
     repos = response.json()["repositories"]
 
     for repo in repos:
         image_url = registry_url.rstrip("/") + "/v2/%s" %repo + "/tags/list"
-        response = requests.get(image_url, verify = False)
+        response = requests.get(image_url, verify = False, headers = headers)
         tags = response.json()["tags"]
         if tags:
             for tag in tags:

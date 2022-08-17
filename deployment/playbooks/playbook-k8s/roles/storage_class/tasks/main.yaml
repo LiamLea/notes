@@ -1,5 +1,0 @@
-- name: create tidb sc
-  include_tasks: setup_tidb_sc.yaml
-
-- name: create prometheus sc
-  include_tasks: setup_prometheus_sc.yaml
