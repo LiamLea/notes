@@ -186,6 +186,6 @@ ctr images import <xx.tar.gz>
 
 * container和task相关
 ```shell
-ctr container ls
-ctr task ls
+ctr -n <ns> container ls
+ctr -n <ns> task ls 
 ```

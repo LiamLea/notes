@@ -10,6 +10,7 @@
     atomic: yes
     release_values:
       controller:
+        ingressClass: "{{ basic.ingress_nginx.config.ingress_class }}"
         kind: DaemonSet
         tolerations:
         - operator: "Exists"

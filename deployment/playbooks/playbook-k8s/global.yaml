@@ -80,6 +80,9 @@ chart:
     bitnami: https://charts.bitnami.com/bitnami
     cert-manager: https://charts.jetstack.io
     ingress-nginx: https://kubernetes.github.io/ingress-nginx
+    paradeum-team: https://paradeum-team.github.io/helm-charts/
+    kfirfer: https://kfirfer.github.io/helm/
+    kafka-ui: https://provectus.github.io/kafka-ui
 
   #if the charts are local, set local directory
   #or will use the remote repo
@@ -103,8 +106,38 @@ basic:
       path: "ingress-nginx"
       version: "4.0.18"
     config:
+      ingress_class: nginx
       http_port: 30080
       https_port: 30443
+
+#speficy domain
+domain: home.bongli.local
+ingress:
+  enabled: true
+  cluster_issuer: ca-issuer
+  class_name: "{{ basic.ingress_nginx.config.ingress_class }}"
+  hosts:
+    prometheus:
+      host: "{{ domain }}"
+      path: "/prometheus"
+    alertmanager:
+      host: "{{ domain }}"
+      path: "/alertmanager"
+    grafana:
+      host: "{{ domain }}"
+      path: "/grafana"
+    kibana:
+      host: "{{ domain }}"
+      path: "/kibana"
+    adminer:
+      host: "adminer.{{ domain }}"
+      path: "/"
+    redis-commander:
+      host: "redis-commander.{{ domain }}"
+      path: "/"
+    kafka-ui:
+      host: "kafka-ui.{{ domain }}"
+      path: "/"
 
 monitor:
   namespace: monitor
@@ -303,3 +336,37 @@ service:
       storage: 5Gi
     replica:
       count: 2
+
+  tools:
+    enabled: true
+
+    #database tool
+    adminer:
+      name: adminer
+      chart:
+        repo: "{{ chart.repo['paradeum-team'] }}"
+        path: "adminer"
+        version: "0.1.9"
+
+    #redis tool
+    redis:
+      name: redis-commander
+      chart:
+        repo: "{{ chart.repo['kfirfer'] }}"
+        path: "redis-commander"
+        version: "0.1.3"
+
+    #kafka tool
+    kafka:
+      name: kafka-ui
+      chart:
+        repo: "{{ chart.repo['kafka-ui'] }}"
+        path: "kafka-ui"
+        version: "0.4.1"
+      auth:
+        user: admin
+        password: cangoal
+      #add kafka clusters
+      kafka_clusters:
+      - name: kafka-k8s
+        bootstrapServers: kafka.public:9092

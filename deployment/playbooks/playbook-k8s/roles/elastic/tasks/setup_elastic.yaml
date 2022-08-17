@@ -67,6 +67,20 @@
           value: "elastic"
         - name: 'ELASTICSEARCH_PASSWORD'
           value: "{{ log.elastic.security.password }}"
+      ingress:
+        enabled: "{{ ingress.enabled }}"
+        annotations:
+          cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
+        className: "{{ ingress.class_name }}"
+        pathtype: Prefix
+        hosts:
+        - host: "{{ ingress.hosts['kibana'].host }}"
+          paths:
+          - path: "{{ ingress.hosts['kibana'].path }}"
+        tls:
+        - secretName: "{{ ingress.hosts['kibana'].host }}"
+          hosts:
+          - "{{ ingress.hosts['kibana'].host }}"
 
 - name: init elastic
   include_tasks: init.yaml
