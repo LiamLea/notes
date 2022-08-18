@@ -115,7 +115,7 @@ ceph fs subvolume info <fs_name> <subvolume_name> <subvolumegroup_group_name>
 #### 3.挂载cephfs
 
 ##### （1）前提准备
-* 生成ceph.conf文件
+* 生成ceph.conf文件（需要在ceph机器上生成，然后移动到目标机器）
   * 也可以不生成，通过<mon_ip_list>指定地址
 ```shell
 ceph config generate-minimal-conf

@@ -27,6 +27,10 @@ run: docker
 test: docker
 	docker run --rm --network host --name ansible-lil-test -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/test.yaml -e @global.yaml"
 
+.PHONY := storageclass
+storageclass: docker
+	docker run --rm --network host --name ansible-lil-storageclass -e ANSIBLE_JINJA2_NATIVE=1 -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_storageclass.yaml -e @global.yaml"
+
 .PHONY := basic
 basic: docker
 	docker run --rm --network host --name ansible-lil-monitor -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_basic.yaml -e @global.yaml"

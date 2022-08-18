@@ -53,6 +53,10 @@ rdb remove <pool_name>/<image_name>
 ##### （1）提前准备
 * 需要存在rbd命令（安装ceph-common）
 * 需要存在`/etc/ceph/ceph.conf`
+  * 生成ceph.conf文件（需要在ceph机器上生成，然后移动到目标机器）
+  ```shell
+  ceph config generate-minimal-conf
+  ```
 * 需要一个用户（`rbd ... --id xx --keyring xx`，或者直接拷贝`/etc/ceph/ceph.client.admin.keyring`文件，就不需要指定用户了）
 
 ##### （2）加载image
@@ -128,6 +132,7 @@ storageClass:
 storageClass中指定的pool需提前创建好
 ```shell
 ceph osd pool create rbd-replicated-pool
+rbd pool init rbd-replicated-pool
 ```
 
 ##### （5）安装
