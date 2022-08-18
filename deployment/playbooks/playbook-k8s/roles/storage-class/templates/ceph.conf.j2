@@ -1,0 +1,3 @@
+[global]
+	fsid = {{ storage_class.ceph.cluster.id }}
+	mon_host = "{{ storage_class.ceph.cluster.mons | join(',') }}"

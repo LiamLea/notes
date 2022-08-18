@@ -1,3 +1,60 @@
+- name: template ceph
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ storage_class.ceph.cephfs.chart.path }}"
+    chart_repo_url: "{{ storage_class.ceph.cephfs.chart.repo }}"
+    chart_version: "{{ storage_class.ceph.cephfs.chart.version }}"
+    release_values:
+      nodeplugin:
+        httpMetrics:
+          containerPort: "{{ storage_class.ceph.cephfs.config.nodeplugin_metric_port }}"
+        registrar:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-node-driver-registrar"
+        plugin:
+          image:
+            repository: "{{ storage_class.repository }}quay.io/cephcsi/cephcsi"
+      provisioner:
+        provisioner:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-provisioner"
+        attacher:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-attacher"
+        resizer:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-resizer"
+        snapshotter:
+          image:
+            repository: "{{ storage_class.repository }}k8s.gcr.io/sig-storage/csi-snapshotter"
+  register: __ceph_template_result
+
+- name: get ceph images
+  set_fact:
+    __ceph_images: "{{ __ceph_template_result.stdout_lines | select('match', '.*image:.*') | select('match', '.*cephcsi.*') | regex_replace(' *image: *', '') | replace('\"', '')}}"
+
+- name: get ceph images
+  set_fact:
+    __ceph_image: "{{ __ceph_images[0] }}"
+
+- name: template ceph.conf
+  template:
+    src: ceph.conf.j2
+    dest: /tmp/ceph.conf
+- name: template keyring
+  template:
+    src: keyring.j2
+    dest: /tmp/keyring
+
+- name: check cephfs
+  shell: "docker run --rm -v /tmp/ceph.conf:/etc/ceph/ceph.conf -v /tmp/keyring:/etc/ceph/ceph.client.{{ storage_class.ceph.cluster.admin.id }}.keyring -it --entrypoint /bin/bash {{ __ceph_image }} -c 'ceph fs get {{ storage_class.ceph.cephfs.config.fs_name }}'"
+  register: __cephfs_result
+  ignore_errors: True
+
+- name: create cephfs
+  shell: "docker run --rm -v /tmp/ceph.conf:/etc/ceph/ceph.conf -v /tmp/keyring:/etc/ceph/ceph.client.{{ storage_class.ceph.cluster.admin.id }}.keyring -it --entrypoint /bin/bash {{ __ceph_image }} -c 'ceph fs volume create {{ storage_class.ceph.cephfs.config.fs_name }}'"
+  when: __cephfs_result.rc != 0
+
 - name: install cephfs
   environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
@@ -41,8 +98,22 @@
         fsName: "{{ storage_class.ceph.cephfs.config.fs_name }}"
         volumeNamePrefix: "{{ storage_class.ceph.cephfs.config.volume_name_prefix }}"
       secret:
+        create: true
         adminID: "{{ storage_class.ceph.cluster.admin.id }}"
         adminKey: "{{ storage_class.ceph.cluster.admin.key }}"
+
+- name: set default sc
+  shell: "kubectl patch sc {{ storage_class.ceph.cephfs.config.class_name }} -p '{\"metadata\":{\"annotations\":{\"storageclass.kubernetes.io/is-default-class\": \"true\"}}}'"
+  when: storage_class.ceph.cephfs.config.default == true
+
+- name: check rbd pool
+  shell: "docker run --rm -v /tmp/ceph.conf:/etc/ceph/ceph.conf -v /tmp/keyring:/etc/ceph/ceph.client.{{ storage_class.ceph.cluster.admin.id }}.keyring -it --entrypoint /bin/bash {{ __ceph_image }} -c 'ceph osd pool get {{ storage_class.ceph.rbd.config.pool }} size'"
+  register: __cephrbd_result
+  ignore_errors: True
+
+- name: create rbd pool
+  shell: "docker run --rm -v /tmp/ceph.conf:/etc/ceph/ceph.conf -v /tmp/keyring:/etc/ceph/ceph.client.{{ storage_class.ceph.cluster.admin.id }}.keyring -it --entrypoint /bin/bash {{ __ceph_image }} -c 'ceph osd pool create {{ storage_class.ceph.rbd.config.pool }} 0 && rbd pool init {{ storage_class.ceph.rbd.config.pool }}'"
+  when: __cephrbd_result.rc != 0
 
 - name: install rbd
   environment: "{{ __proxy_env | default(omit) }}"
@@ -87,5 +158,18 @@
         pool: "{{ storage_class.ceph.rbd.config.pool }}"
         volumeNamePrefix: "{{ storage_class.ceph.rbd.config.volume_name_prefix }}"
       secret:
-        adminID: "{{ storage_class.ceph.cluster.admin.id }}"
-        adminKey: "{{ storage_class.ceph.cluster.admin.key }}"
+        create: true
+        userID: "{{ storage_class.ceph.cluster.admin.id }}"
+        userKey: "{{ storage_class.ceph.cluster.admin.key }}"
+
+- name: set default sc
+  shell: "kubectl patch sc {{ storage_class.ceph.rbd.config.class_name }} -p '{\"metadata\":{\"annotations\":{\"storageclass.kubernetes.io/is-default-class\": \"true\"}}}'"
+  when: storage_class.ceph.rbd.config.default == true
+
+- name: delete ceph files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+  - "/tmp/ceph.conf"
+  - "/tmp/keyring"

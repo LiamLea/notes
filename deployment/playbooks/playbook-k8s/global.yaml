@@ -111,6 +111,7 @@ storage_class:
         class_name: "csi-cephfs-sc"
         fs_name: "ceph-fs"
         volume_name_prefix: "dev-k8s-vol-"
+        #host network mode, so this port must be available
         nodeplugin_metric_port: 8082
 
     rbd:
@@ -125,6 +126,7 @@ storage_class:
         class_name: "csi-rbd-sc"
         pool: "rbd-replicated-pool"
         volume_name_prefix: "dev-k8s-vol-"
+        #host network mode, so this port must be available
         nodeplugin_metric_port: 8081
 
 
