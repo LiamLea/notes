@@ -15,6 +15,7 @@
         enabled: "{{ ingress.enabled }}"
         annotations:
           cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
+          nginx.ingress.kubernetes.io/proxy-body-size: 64m
         className: "{{ ingress.class_name }}"
         hosts:
         - host: "{{ ingress.hosts['adminer'].host }}"

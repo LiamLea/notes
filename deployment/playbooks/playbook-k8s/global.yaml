@@ -360,6 +360,26 @@ service:
         memory: "8Gi"
       storage: 10Gi
 
+  pgsql:
+    enabled: true
+    name: postgresql
+    chart:
+      repo: "{{ chart.repo['bitnami'] }}"
+      path: "postgresql"
+      version: "11.7.3"
+    postgres_password: cangoal
+    replication_password: cangoal
+    #standalone or replication
+    architecture: replication
+    resources:
+      requests:
+        cpu: "4000m"
+        memory: "8Gi"
+      limits:
+        cpu: "4000m"
+        memory: "8Gi"
+      storage: 10Gi
+
   redis:
     enabled: true
     name: redis
