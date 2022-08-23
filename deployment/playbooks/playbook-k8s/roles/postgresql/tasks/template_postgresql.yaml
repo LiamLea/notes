@@ -1,0 +1,55 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- name: set fact
+  set_fact:
+    __path: "{{ chart.local_dir.rstrip('/') }}/"
+  when: chart.local_dir.strip() != ""
+
+- name: set proxy fact
+  set_fact:
+    __proxy_env:
+      HTTP_PROXY: "{{ chart.http_proxy.server }}"
+      HTTPS_PROXY: "{{ chart.http_proxy.server }}"
+      NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
+  when: chart.http_proxy.enabled == True
+
+- name: template pgsql
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ service.pgsql.chart.path }}"
+    chart_repo_url: "{{ service.pgsql.chart.repo }}"
+    chart_version: "{{ service.pgsql.chart.version }}"
+    release_values:
+      image:
+        registry: "{{ service.repository.strip('/') }}"
+      auth:
+        postgresPassword: "{{ service.pgsql.postgres_password }}"
+        replicationPassword: "{{ service.pgsql.replication_password }}"
+      architecture: "{{ service.pgsql.architecture }}"
+      replication:
+        synchronousCommit: "local"
+      primary:
+        resources:
+          limits: "{{ service.pgsql.resources.limits }}"
+          requests: "{{ service.pgsql.resources.requests }}"
+        persistence:
+          storageClass: "{{ service.storage_class }}"
+          size: "{{ service.pgsql.resources.storage }}"
+      readReplicas:
+        resources:
+          limits: "{{ service.pgsql.resources.limits }}"
+          requests: "{{ service.pgsql.resources.requests }}"
+        persistence:
+          storageClass: "{{ service.storage_class }}"
+          size: "{{ service.pgsql.resources.storage }}"
+  register: pgsql_template_result
+
+- name: set facts
+  set_fact:
+    pgsql_template_stdout: "{{ pgsql_template_result.stdout_lines }}"
+
+- name: get images
+  set_fact:
+    pgsql_images: "{{ pgsql_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"
