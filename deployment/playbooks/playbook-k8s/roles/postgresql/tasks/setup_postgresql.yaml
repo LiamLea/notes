@@ -1,0 +1,35 @@
+- name: install postgresql
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ service.pgsql.chart.path }}"
+    chart_repo_url: "{{ service.pgsql.chart.repo }}"
+    chart_version: "{{ service.pgsql.chart.version }}"
+    release_name: "{{ service.pgsql.name }}"
+    release_namespace: "{{ service.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      image:
+        registry: "{{ service.repository.strip('/') }}"
+      auth:
+        postgresPassword: "{{ service.pgsql.postgres_password }}"
+        replicationPassword: "{{ service.pgsql.replication_password }}"
+      architecture: "{{ service.pgsql.architecture }}"
+      replication:
+        synchronousCommit: "local"
+      primary:
+        extendedConfiguration: "{{ __postgresql_extend_conf }}"
+        pgHbaConfiguration: "{{ __hba_conf }}"
+        resources:
+          limits: "{{ service.pgsql.resources.limits }}"
+          requests: "{{ service.pgsql.resources.requests }}"
+        persistence:
+          storageClass: "{{ service.storage_class }}"
+          size: "{{ service.pgsql.resources.storage }}"
+      readReplicas:
+        resources:
+          limits: "{{ service.pgsql.resources.limits }}"
+          requests: "{{ service.pgsql.resources.requests }}"
+        persistence:
+          storageClass: "{{ service.storage_class }}"
+          size: "{{ service.pgsql.resources.storage }}"
