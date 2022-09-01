@@ -31,6 +31,8 @@
 ##### （1）定义一个类
 ```java
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DataConfig {
     private String url;
     private String driverName;
@@ -103,6 +105,8 @@ public class Test {
 * 定义类时，通过注解说明使用IoC创建该对象
 ```java
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Component   //表示该类是一个组件（即对象），即会创建一个bean（使用下面的value）
 public class DataConfig {
     @Value("localhost:3306")
@@ -134,6 +138,8 @@ public class Test {
 * `GlobalConfig.java`
 ```java
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Component
 public class GlobalConfig {
     private String name;
@@ -143,6 +149,8 @@ public class GlobalConfig {
 ```java
 //默认为byType策略
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Component
 public class DataConfig {
     private String url;
@@ -156,6 +164,8 @@ public class DataConfig {
 //或者
 //明确指定使用byName策略
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Component
 public class DataConfig {
     private String url;

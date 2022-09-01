@@ -43,6 +43,8 @@ public class HelloController {
 * 定义一个符合参数模型的polo对象: `polo/User.java`
 ```java
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
     private String username;
     private String password;

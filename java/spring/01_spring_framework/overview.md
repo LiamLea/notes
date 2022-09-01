@@ -12,4 +12,4 @@
 |AOP（Aspect Oriented Programming）|面向切面编程|
 |Testing|提供了对junit或TestNG测试框架的整合|
 |Data Access/Integration|提供了对数据访问/集成的功能|
-|Spting MVC|提供了面向web应用程序的集成功能|
+|Spting MVC|提供了面向web应用程序的集成功能| 
