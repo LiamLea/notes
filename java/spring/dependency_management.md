@@ -24,6 +24,13 @@
   -->
   <packaging>jar</packaging>
 
+  <!-- 用于父工程：
+      指定该工程的子模块
+  -->
+  <modules>
+    <module>xx</module>
+  </modules>
+
   <!--
     指定父项目: 会继承该父项目的依赖的各种包的版本信息
   -->
@@ -38,15 +45,41 @@
     比如明确指定版本信息
   -->
   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <java.version>1.8</java.version>
-      <mysql.version>5.1.43</mysql.version>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <spring.boot.version>2.7.1</spring.boot.version>
+      <spring.cloud.version>2021.0.3</spring.cloud.version>
+      <alibaba.cloud.version>2021.0.1.0</alibaba.cloud.version>
   </properties>
 
-  <!--
-    用于锁定版本，即子模块继承之后，不用写version
+  <!-- 用于父工程：
+    锁定版本，即子模块继承之后，不用写version
   -->
   <dependencyManagement>
-    <!--里面是<dependencies></dependencies>-->
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring.cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+        <version>${alibaba.cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
   </dependencyManagement>
 
   <!--
@@ -62,6 +95,7 @@
 
   <!--
     描述了如何来编译及打包项目
+    父工程的build内容会被子工程继承
   -->
   <build>
 
@@ -86,6 +120,7 @@
           <plugin>
               <groupId>org.springframework.boot</groupId>
               <artifactId>spring-boot-maven-plugin</artifactId>
+              <version>${spring.boot.version}</version>
           </plugin>
       </plugins>
 

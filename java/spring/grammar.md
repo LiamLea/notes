@@ -69,3 +69,33 @@ public class Car {
 @Configuration
 public class Myconfig {}
 ```
+
+#### 3.调用接口: RestTemplate
+* 注册RestTemplate组件: `config/ApplicationContextConfig.java`
+```java
+@Configuration
+public class ApplicationContextConfig {
+    @Bean
+    public RestTemplate getRestTemplate(){
+        return new RestTemplate();
+    }
+}
+```
+* 使用
+```java
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@RestController
+public class CustomerController {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @RequestMapping("/customer/payment/get")
+    public String callPaymentService(){
+        String msg = restTemplate.getForObject("http://127.0.0.1:8081/pay", String.class);
+        return "call successfully: " + msg;
+    }
+}
+```

@@ -45,6 +45,8 @@
 ```java
 //表中有两个字段: int(id)、string(name)
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
     private Integer id;
     private String name;
@@ -98,6 +100,8 @@ public interface UserMapper {
 ##### （4）使用mapper的接口
 ```java
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Controller
 public class MyController {
 
