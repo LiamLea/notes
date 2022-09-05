@@ -82,7 +82,10 @@ main
 * 命令行
 * java系统属性（`System.getProperties()`）
 * 系统环境变量（`System.getEnv()`）
+* `bootstrap.yml`
+* `<application_name>-<active>.yml`
 * `application-<active>.yml`
+* `<application_name>.yml`
 * `application.yml`
 
 #### 2.配置文件的查找顺序（后面的会覆盖前面的）

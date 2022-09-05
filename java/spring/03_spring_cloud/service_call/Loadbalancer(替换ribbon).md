@@ -22,3 +22,23 @@ public class ApplicationContextConfig {
     }
 }
 ```
+
+* 使用
+```java
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@RestController
+public class CustomerController {
+
+  @Autowired
+  private RestTemplate restTemplate;
+
+  @RequestMapping("/customer/payment/get")
+  public String callPaymentService(){
+         String msg = restTemplate.getForObject("http://CLOUD-PAYMENT-SERVICE/pay", String.class);
+         System.out.println(user);
+         return "call successfully: " + msg;
+  }
+}
+```
