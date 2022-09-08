@@ -105,6 +105,7 @@ spring:
         input:  
           destination: stream-demo        #指定topic
           content-type: application/json  #格式
+          group: group1       #设置该消费者所在的组
 ```
 
 ##### （2）使用
