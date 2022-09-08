@@ -78,7 +78,7 @@ spring:
     sentinel:
       eager: true
       transport:
-        dashboard: localhost:8880yaml
+        dashboard: localhost:8880
 ```
 
 #### 部署其他服务

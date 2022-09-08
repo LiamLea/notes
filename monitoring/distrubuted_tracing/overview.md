@@ -4,6 +4,11 @@
 
 ### 概述
 
+![](./imgs/overview_04.png)
+* 服务发送请求，会生成一个新的span（比如图中的span B是service 1生成的）
+  * 展示的时候，这个span会跟发起的服务关联（比如图中的B是service 1关联）
+* 服务收到请求后，会生成一个新的span（比如图中的span A 和 C）
+
 #### 1.distributed tracing
 * 现有的分布式Trace基本都是采用了google 的Dapper设计
 * 在一个请求链中传播context，从而记录一条请求链的状态
@@ -34,8 +39,14 @@
 * 同一个颜色：代表同一个service
 
 * 同一个服务，连续有两个span
-  * 一个是server类型的，一个是client类型的（即这个服务首先被访问，然后这个服务去访问其他服务）
+  * 一个是server类型的，一个是client类型的（即这个服务首先接收请求，然后这个服务去访问其他服务）
 ![](./imgs/overview_03.png)
+
+##### （3）时间分析
+![](./imgs/overview_05.png)
+* 红色标注的是productpage服务的self-time（即自身所用时间）
+* 绿色标注的是reviews服务的self-time（即自身所用时间）
+* 蓝色标注的是**网络中损耗的时间**
 
 #### 3.tracing fields
 
