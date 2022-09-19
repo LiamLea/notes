@@ -200,7 +200,7 @@ monitor:
       external_url: "https://{{ domain }}:{{ basic.ingress_nginx.config.https_port }}/prometheus"
       # e.g. {send_resolved: true, url: "<url|no empty>"}
       webhook_configs: []
-      scrape_interval: "1m"
+      scrape_interval: "30s"
       icmp_probe: []
       tcp_probe: []
       http_probe: []
@@ -241,6 +241,14 @@ monitor:
           k8s-pv:
             gnetId: 11454
             revision: 14
+            datasource: Prometheus
+          etcd:
+            gnetID: 9733
+            revision: 1
+            datasource: Prometheus
+          node-full:
+            gnetID: 1860
+            revision: 27
             datasource: Prometheus
   node_exporter:
     version: 1.3.0

@@ -288,6 +288,10 @@ __config_prometheus:
       - target_label: __address__
         replacement: blackbox
 
+  - job_name: master-etcd-cluster
+    static_configs:
+      - targets: "{{ __etcd }}"
+
   - job_name: node-exporter
     static_configs:
       - targets: "{{ __node_exporter }}"

@@ -15,13 +15,17 @@
 
 [dashboard网站](https://grafana.com/grafana/dashboards/)
 
-#### 1.监控Linux：8919
+#### 1.监控Node（基础信息）：8919
 
 ![](./imgs/dashboard_linux_01.png)
 
 * 可能需要修改一下table（存在bug）:
 ![](./imgs/bug_01.png)
 
+#### 2.监控Node（全量信息）: 1860
+* 包括网络的详细信息、系统的详细信息等
+
+![](./imgs/dashboard_linux_02.png)
 
 #### 2.监控prometheus：3681
 
