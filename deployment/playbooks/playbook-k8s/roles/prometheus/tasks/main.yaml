@@ -9,7 +9,7 @@
       HTTPS_PROXY: "{{ chart.http_proxy.server }}"
       NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
   when: chart.http_proxy.enabled == True
-  
+
 - block:
   - name: copy charts
     copy:
@@ -21,14 +21,21 @@
       __path: "/tmp/"
   when: chart.local_dir.strip() != ""
 
-- name: set __node_exporter
+- name: set fact
   set_fact:
     __node_exporter: []
-- name: set fact
+    __etcd: []
+
+- name: set __node_exporter fact
   set_fact:
     __node_exporter: "{{ __node_exporter | default([]) + [hostvars[item]['ansible_host'] + ':' + (monitor['node_exporter']['port']|string)] + monitor.prometheus.config.node_exporter }}"
   when: item not in groups['monitor_exceptions']
   with_items: "{{ groups['all'] }}"
+
+- name: set __etcd fact
+  set_fact:
+    __etcd: "{{ __etcd | default([]) + [hostvars[item]['ansible_host'] + ':2381'] }}"
+  with_items: "{{ groups['master'] }}"
 
 - name: setup prometheus
   include_tasks: setup_prometheus.yaml

@@ -9,8 +9,41 @@
 ##### （1）what
 本质就是filters chain（过滤器链）
 
+#### 2.相关概念
+
+##### （1）会话超时
+
+##### （2）自动登录
+
+##### （3）单点登录: SSO（single sign on）
+只要在一个地方登录，其他服务都可以进行访问
+
 #### 2.自动登录实现原理
 ![](./imgs/overview_01.png)
+
+#### 3.认证授权实现的两种方式
+
+##### （1）基于session（cookie）
+* 不适合分布式应用
+  * 这种就需要集中式session（比如通过redis实现）
+  * 当应用越来越多时，这种方式就会存在性能瓶颈
+
+##### （2）基于token
+
+##### （3）对比
+
+||session-based|token-based|
+|-|-|-|
+|状态|有状态（用户数据存在server端的session中）|无状态（用户数据存在token中，token存在client的cookie中）|
+|验证方式|根据sessionid，server端需要进行查询验证|根据token的签名进行验证|
+|应用场景|单体应用|分布式应用|
+
+#### 4.JWT（json web token）
+* 本质就是 encode的字符串，本身携带了相关信息，无需再去查询
+* 原始格式 就是json
+* token格式（即对原数据进行了签名）: `<header>.<payload>.<signature>`
+* 存储在客户端，一般在请求头中使用：`Authorization: Bearer <token>`
+
 
 ***
 
@@ -137,4 +170,18 @@ public class HelloController {
 * 用户注销
 ```java
 http.logout()
+```
+
+#### 4.结合oauth2.0使用
+
+* 引入依赖
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+    <groupId>ru.mynewtons</groupId>
+    <artifactId>spring-boot-starter-oauth2</artifactId>
+</dependency>
 ```

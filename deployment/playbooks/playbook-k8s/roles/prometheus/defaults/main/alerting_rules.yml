@@ -1,5 +1,7 @@
 __config_alerting_rules:
   groups:
+
+  #blackbox
   - name: blackbox rules
     rules:
     - alert: BlackboxProbeFailed
@@ -38,7 +40,8 @@ __config_alerting_rules:
         summary: Blackbox probe slow HTTP (instance {{  '{{ $labels.instance }}' }})
         description: "HTTP request took more than 1s\n  VALUE = {{  '{{ $value }}\n  LABELS = {{ $labels }}' }}"
 
-  - name: basic rules
+  #Prometheus self-monitoring
+  - name: Prometheus self-monitoring
     rules:
     - alert: PrometheusTooManyRestarts
       expr: changes(process_start_time_seconds{job=~"prometheus|pushgateway|alertmanager"}[15m]) > 2
@@ -67,7 +70,8 @@ __config_alerting_rules:
         summary: Prometheus target missing (instance {{  '{{ $labels.instance }}' }})
         description: "A Prometheus target has disappeared. An exporter might be crashed.\n  VALUE = {{  '{{ $value }}\n  LABELS = {{ $labels }}' }}"
 
-  - name: instance
+  #Host and hardware
+  - name: Host and hardware
     rules:
     - alert: HostOutOfMemory
       expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
@@ -415,14 +419,14 @@ __config_alerting_rules:
         summary: Kubernetes Volume out of disk space (instance {{  '{{ $labels.instance }}' }})
         description: "Volume is almost full (< 10% left)\n  VALUE = {{  '{{ $value }}\n  LABELS = {{ $labels }}' }}"
 
-    - alert: KubernetesVolumeFullInFourDays
-      expr: predict_linear(kubelet_volume_stats_available_bytes[6h], 4 * 24 * 3600) < 0
+    - alert: KubernetesVolumeFullInOneDay
+      expr: predict_linear(kubelet_volume_stats_available_bytes[6h], 1 * 24 * 3600) < 0
       for: 0m
       labels:
         severity: critical
       annotations:
-        summary: Kubernetes Volume full in four days (instance {{  '{{ $labels.instance }}' }})
-        description: "{{  '{{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is expected to fill up within four days. Currently {{ $value | humanize }}% is available.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+        summary: Kubernetes Volume full in one day (instance {{  '{{ $labels.instance }}' }})
+        description: "{{  '{{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is expected to fill up within one day. Currently {{ $value | humanize }}% is available.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
 
     - alert: KubernetesPersistentvolumeError
       expr: kube_persistentvolume_status_phase{phase=~"Failed|Pending", job="kube-state-metrics"} > 0
@@ -621,3 +625,12 @@ __config_alerting_rules:
       annotations:
         summary: Kubernetes API server latency (instance {{  '{{ $labels.instance }}' }})
         description: "Kubernetes API server has a 99th percentile latency of {{  '{{ $value }} seconds for {{ $labels.verb }} {{ $labels.resource }}.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: KubernetesPodRestarted
+      expr: increase(kube_pod_container_status_restarts_total[1m]) + on(pod,container) group_left(reason) kube_pod_container_status_last_terminated_reason > 1
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: Kubernetes pod restarted (instance {{ $labels.instance }})
+        description: "Pod {{ $labels.pod }} is restarted\n  REASON = {{ $labels.reason }}\n  LABELS = {{ $labels }}"

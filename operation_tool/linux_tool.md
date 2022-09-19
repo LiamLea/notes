@@ -106,8 +106,8 @@ lsof -i -a -p <PID>   #-a就是and
 dd if=输入文件 of=输出文件
 
 #参数
-bs=xx         #设置读入/输出的 块大小 为 xx 个字节
-count=xx      #仅拷贝xx个块
+bs=xx         #一次I/O的大小（默认512B）
+count=xx      #进行多少次I/O
 ```
 
 #### 3.应用
@@ -135,20 +135,51 @@ dd if=/dev/sda of=<path>/<file> conv=noerror,sync
 ```
 
 ##### (4) test disk performance
-```shell
-#test throughout
-dd if=/dev/zero of=/tmp/test1.img bs=1G count=1 oflag=dsync
 
-#test latency
+相关概念和合理的值，查看linux_os/operating_system/basic/disk.md
+
+* 测量throughout
+```shell
+#进行一次I/O，每次I/O大小为1G
+dd if=/dev/zero of=/tmp/test1.img bs=1G count=1 oflag=dsync
+```
+```
+吞吐量为：60.7 MB/s，即每秒最多写60.7MB数据
+1+0 records in
+1+0 records out
+1073741824 bytes (1.1 GB, 1.0 GiB) copied, 17.6771 s, 60.7 MB/s
+```
+
+* 测试latency
+```shell
+#进行1000次I/O，每次I/O大小为512字节
 dd if=/dev/zero of=/tmp/test2.img bs=512 count=1000 oflag=dsync
+```
+```
+延迟为0.85ms（0.85029s/1000），即一次 512字节 的请求，需要等0.85ms左右完成
+1000+0 records in
+1000+0 records out
+512000 bytes (512 kB, 500 KiB) copied, 0.85029 s, 602 kB/s
 ```
 
 ***
 
 ### io相关
 
-##### `iostat -dx`
-显示io详细情况
+##### `iostat -dx 10`
+* 说明
+```
+第一个report记录的是从开启到现在的一个统计指标，所以相关数据不能反应磁盘目前的状况
+10 表示每10s输出一个report，后面输出的report能够反应磁盘目前的状况
+```
+* 输出结果（[参考](https://coderwall.com/p/utc42q/understanding-iostat)）
+```shell
+avgqu-sz（aqu-sz） 显示排队或正在服务的操作数（正常值：个位数、偶尔会有两位数）
+r_await 读请求从发起到完成的平均时间（单位：ms）
+w_await 写请求从发起到完成的平均时间（单位：ms）
+%util 用于io的时间使用率（time spent doing I/Os，单位：百分比）（对于并行的设备：比如ssd、raid，这个值参考意义不大）
+```
+
 
 ##### `iotop`
 * 显示：
