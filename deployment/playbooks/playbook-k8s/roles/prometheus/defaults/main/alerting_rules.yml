@@ -63,7 +63,7 @@ __config_alerting_rules:
 
     - alert: PrometheusTargetMissing
       expr: up == 0
-      for: 0m
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -581,8 +581,19 @@ __config_alerting_rules:
         summary: Kubernetes job slow completion (instance {{  '{{ $labels.instance }}' }})
         description: "Kubernetes Job {{  '{{ $labels.namespace }}/{{ $labels.job_name }} did not complete in time.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
 
+    - alert: KubernetesPodRestarted
+      expr: increase(kube_pod_container_status_restarts_total[1m]) + on(pod,container) group_left(reason) kube_pod_container_status_last_terminated_reason > 1
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: Kubernetes pod restarted (instance {{  '{{ $labels.instance }}' }})
+        description: "Pod {{  '{{ $labels.pod }} is restarted\n  REASON = {{ $labels.reason }}\n  LABELS = {{ $labels }}' }}"
+
+  - name: apiserver
+    rules:
     - alert: KubernetesApiServerErrors
-      expr: sum(rate(apiserver_request_total{job="apiserver",code=~"^(?:5..)$"}[1m])) / sum(rate(apiserver_request_total{job="apiserver"}[1m])) * 100 > 3
+      expr: sum(rate(apiserver_request_total{job="kubernetes-apiservers",code=~"^(?:5..)$"}[1m])) / sum(rate(apiserver_request_total{job="kubernetes-apiservers"}[1m])) * 100 > 3
       for: 2m
       labels:
         severity: critical
@@ -600,7 +611,7 @@ __config_alerting_rules:
         description: "Kubernetes API client is experiencing high error rate\n  VALUE = {{  '{{ $value }}\n  LABELS = {{ $labels }}' }}"
 
     - alert: KubernetesClientCertificateExpiresNextWeek
-      expr: apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m]))) < 7*24*60*60
+      expr: apiserver_client_certificate_expiration_seconds_count{job="kubernetes-apiservers"} > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="kubernetes-apiservers"}[5m]))) < 7*24*60*60
       for: 0m
       labels:
         severity: warning
@@ -609,7 +620,7 @@ __config_alerting_rules:
         description: "A client certificate used to authenticate to the apiserver is expiring next week.\n  VALUE = {{  '{{ $value }}\n  LABELS = {{ $labels }}' }}"
 
     - alert: KubernetesClientCertificateExpiresSoon
-      expr: apiserver_client_certificate_expiration_seconds_count{job="apiserver"} > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="apiserver"}[5m]))) < 24*60*60
+      expr: apiserver_client_certificate_expiration_seconds_count{job="kubernetes-apiservers"} > 0 and histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="kubernetes-apiservers"}[5m]))) < 24*60*60
       for: 0m
       labels:
         severity: critical
@@ -618,19 +629,138 @@ __config_alerting_rules:
         description: "A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.\n  VALUE = {{  '{{ $value }}\n  LABELS = {{ $labels }}' }}"
 
     - alert: KubernetesApiServerLatency
-      expr: histogram_quantile(0.99, sum(rate(apiserver_request_latencies_bucket{subresource!="log",verb!~"^(?:CONNECT|WATCHLIST|WATCH|PROXY)$"} [10m])) WITHOUT (instance, resource)) / 1e+06 > 1
+      expr: histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{verb!~"CONNECT|WATCH"}[5m])) by (le, instance)) > 1
       for: 2m
       labels:
         severity: warning
       annotations:
         summary: Kubernetes API server latency (instance {{  '{{ $labels.instance }}' }})
-        description: "Kubernetes API server has a 99th percentile latency of {{  '{{ $value }} seconds for {{ $labels.verb }} {{ $labels.resource }}.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+        description: "Kubernetes API server has a 99th percentile latency of {{  '{{ $value }} seconds for {{ $labels.instance }}.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
 
-    - alert: KubernetesPodRestarted
-      expr: increase(kube_pod_container_status_restarts_total[1m]) + on(pod,container) group_left(reason) kube_pod_container_status_last_terminated_reason > 1
+    - alert: KubernetesApiServerRequestEtcdLatency
+      expr: histogram_quantile(0.99, sum(rate(etcd_request_duration_seconds_bucket[5m])) by (le, instance)) > 1
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Kubernetes request ectd latency (instance {{  '{{ $labels.instance }}' }})
+        description: "Kubernetes request etcd has a 99th percentile latency of {{  '{{ $value }} seconds for {{ $labels.instance }}.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+  - name: etcd
+    rules:
+    - alert: EtcdInsufficientMembers
+      expr: sum(up{job=~".*etcd.*"} == bool 1) by (job) < ((count(up{job=~".*etcd.*"}) by (job) + 1) / 2)
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: Etcd insufficient Members (instance {{  '{{ $labels.instance }}' }})
+        description: "Etcd cluster should have an odd number of members\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdNoLeader
+      expr: etcd_server_has_leader == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: Etcd no Leader (instance {{  '{{ $labels.instance }}' }})
+        description: "Etcd cluster have no leader\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdHighNumberOfLeaderChanges
+      expr: rate(etcd_server_leader_changes_seen_total{job=~".*etcd.*"}[15m]) > 3
       for: 0m
       labels:
         severity: warning
       annotations:
-        summary: Kubernetes pod restarted (instance {{ $labels.instance }})
-        description: "Pod {{ $labels.pod }} is restarted\n  REASON = {{ $labels.reason }}\n  LABELS = {{ $labels }}"
+        summary: Etcd high number of leader changes (instance {{  '{{ $labels.instance }}' }})
+        description: "Etcd leader changed more than 3 times during 15 minutes\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdHighNumberOfFailedGrpcRequests
+      expr: sum(rate(grpc_server_handled_total{grpc_code!="OK"}[1m])) BY (grpc_service, grpc_method, instance) / sum(rate(grpc_server_handled_total[1m])) BY (grpc_service, grpc_method, instance) > 0.01
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Etcd high number of failed GRPC requests (instance {{ '{{ $labels.instance }}' }})
+        description: "More than 1% GRPC request failure detected in Etcd\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdHighNumberOfFailedGrpcRequests
+      expr: sum(rate(grpc_server_handled_total{grpc_code!="OK"}[1m])) BY (grpc_service, grpc_method, instance) / sum(rate(grpc_server_handled_total[1m])) BY (grpc_service, grpc_method, instance) > 0.05
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: Etcd high number of failed GRPC requests (instance {{ '{{ $labels.instance }}' }})
+        description: "More than 5% GRPC request failure detected in Etcd\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdGrpcRequestsSlow
+      expr: histogram_quantile(0.99, sum(rate(grpc_server_handling_seconds_bucket{grpc_type="unary"}[1m])) by (grpc_service, grpc_method, le)) > 0.15
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Etcd GRPC requests slow (instance {{ '{{ $labels.instance }}' }})
+        description: "GRPC requests slowing down, 99th percentile is over 0.15s\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdHighNumberOfFailedHttpRequests
+      expr: sum(rate(etcd_http_failed_total[1m])) BY (method) / sum(rate(etcd_http_received_total[1m])) BY (method) > 0.01
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Etcd high number of failed HTTP requests (instance {{ '{{ $labels.instance }}' }})
+        description: "More than 1% HTTP failure detected in Etcd\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdHighNumberOfFailedHttpRequests
+      expr: sum(rate(etcd_http_failed_total[1m])) BY (method) / sum(rate(etcd_http_received_total[1m])) BY (method) > 0.05
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: Etcd high number of failed HTTP requests (instance {{ '{{ $labels.instance }}' }})
+        description: "More than 5% HTTP failure detected in Etcd\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdHttpRequestsSlow
+      expr: histogram_quantile(0.99, rate(etcd_http_successful_duration_seconds_bucket[1m])) > 0.15
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Etcd HTTP requests slow (instance {{ '{{ $labels.instance }}' }})
+        description: "HTTP requests slowing down, 99th percentile is over 0.15s\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdMemberCommunicationSlow
+      expr: histogram_quantile(0.99, rate(etcd_network_peer_round_trip_time_seconds_bucket[1m])) > 0.15
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Etcd member communication slow (instance {{ '{{ $labels.instance }}' }})
+        description: "Etcd member communication slowing down, 99th percentile is over 0.15s\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdHighNumberOfFailedProposals
+      expr: increase(etcd_server_proposals_failed_total[1h]) > 5
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Etcd high number of failed proposals (instance {{ '{{ $labels.instance }}' }})
+        description: "Etcd server got more than 5 failed proposals past hour\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdHighFsyncDurations
+      expr: histogram_quantile(0.99, rate(etcd_disk_wal_fsync_duration_seconds_bucket[1m])) > 0.5
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Etcd high fsync durations (instance {{ '{{ $labels.instance }}' }})
+        description: "Etcd WAL fsync duration increasing, 99th percentile is over 0.5s\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
+
+    - alert: EtcdHighCommitDurations
+      expr: histogram_quantile(0.99, rate(etcd_disk_backend_commit_duration_seconds_bucket[1m])) > 0.25
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Etcd high commit durations (instance {{ '{{ $labels.instance }}' }})
+        description: "Etcd commit duration increasing, 99th percentile is over 0.25s\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
