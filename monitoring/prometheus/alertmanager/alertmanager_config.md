@@ -61,6 +61,7 @@ url: <string>
 
 http_config: <http_config | default = global.http_config>
 
+#这个需要进行限制（因为webhook的接收端有大小限制，如果消息很多，数据则发布过去）
 #单个消息中最多包含的告警数量
 #默认为0，表示不限制
 max_alerts: <NUM | default = 0>
