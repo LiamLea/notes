@@ -48,7 +48,7 @@
 
 ##### （3）目录项（dentry：directory entry）
 
-![](./imgs/dentry_01.jpg)
+![](./imgs/filesystem_07.jpg)
 
 * 用来描述目录中文件层次结构（树形结构）
 * 一个目录由多个目录项组成

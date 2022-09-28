@@ -133,6 +133,7 @@ dd if=/dev/zero of=/tmp/test1.img bs=1G count=1 oflag=dsync
 * 测试latency
 ```shell
 #进行1000次I/O，每次I/O大小为512字节
+#当内存的page_size为4K时，I/O request size 为 512B 和 4KB效果一样，因为读写的**最小单元**为**page**
 dd if=/dev/zero of=/tmp/test2.img bs=512 count=1000 oflag=dsync
 ```
 ```

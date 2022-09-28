@@ -24,21 +24,23 @@
 
 ### 安装步骤
 
-#### 1.做好前提准备并且配置好yum源
+#### 1.pre check
 
-##### （1）硬件资源要求（重要）
-
+##### （1）检查cpu/memory
 * 最小资源为：4c/8g
   * 由于kublet预留了2c/2g
-* etcd对磁盘的性能有要求
-  * 如果磁盘性能比较差，会导致etcd读写延迟高，从而导致心跳包发送超时等问题
-    * 影响etcd，进而影响到使用到etcd的各种应用
 
-##### （2）时间同步（非常重要）
+##### （2）检查磁盘性能
+磁盘的延迟要小于10ms
+* etcd对磁盘的性能有要求，如果磁盘性能比较差，会导致etcd读写延迟高，从而导致使用etcd的应用都会有问题
+
+#### 2.做好前提准备并且配置好yum源
+
+##### （1）时间同步（非常重要）
 因为有些跑在k8s集群中的服务，依赖时间同步，如果时间不同步，会导致该服务出现问题
 比如：token具有时效性，当时间不同步时，token就会失效
 
-##### （3）设置主机名（必须要设置好）
+##### （2）设置主机名（必须要设置好）
 * 主机名之后要保证不变，如果变化了，重启apiserver，该节点就无法加入集群
 * 主机名必须能够反向解析
   * 所以在hosts文件中，一个ip最好只对应一个host
@@ -47,14 +49,14 @@
 /etc/hostname       #必须要修改主机名，因为节点的名字默认是主机名
 /etc/hosts
 ```
-##### （4）防火墙关闭
-##### （5）卸载swap
+##### （3）防火墙关闭
+##### （4）卸载swap
 ```shell
 #注释/etc/fstab中swap项
 swapoff -a
 ```
 
-##### （6）设置网络参数
+##### （5）设置网络参数
 ```shell
 cat << EOF >> /etc/sysctl.conf
 net.bridge.bridge-nf-call-iptables=1
@@ -65,7 +67,7 @@ EOF
 sysctl -p
 ```
 
-#### 2.在所有节点上安装组件
+#### 3.在所有节点上安装组件
 ```shell
 #设置docker-ce的yum源
 docker-ce     
@@ -76,7 +78,7 @@ kubeadm
 kubectl
 ```
 
-#### 3.修改docker配置
+#### 4.修改docker配置
 
 `vim /etc/docker/daemon.json`
 ```json
@@ -94,13 +96,13 @@ kubectl
 }
 ```
 
-#### 4.设置相关服务开机自启（而不是现在就启动）
+#### 5.设置相关服务开机自启（而不是现在就启动）
 ```shell
 systemctl restart docker
 systemctl enable docker kubelet
 ```
 
-#### 5.初始化master节点
+#### 6.初始化master节点
 ```shell
 ##kubeadm config images list --kubernetes-version=<kubeadm-version>
 ##可以先拉取镜像，再初始化
@@ -130,7 +132,7 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
-#### 6.修改所有的kubelet配置然后重启
+#### 7.修改所有的kubelet配置然后重启
 
 * 下面的预留资源一定要配置，能够保证k8s节点不会因为资源使用过量，而导致卡死等情况
 ```yaml
@@ -158,7 +160,7 @@ containerLogMaxSize: 10Mi
 containerLogMaxFiles: 5
 ```
 
-#### 7.安装calico（注意版本）
+#### 8.安装calico（注意版本）
 
 参考官网的安装步骤
 
@@ -180,7 +182,7 @@ containerLogMaxFiles: 5
 ##### （4）验证是否可用
 * 安装后需要通过`ip r`去**检查路由**（因为可能pod网络不通，也不报错）
 
-#### 8.添加node节点
+#### 9.添加node节点
 
 （1）获取token用于加入该集群（在初始化节点上执行）
 ```shell
@@ -197,7 +199,7 @@ kubeadm join ...
 cp -r ~/.kube ip:~
 ```
 
-#### 9.添加mster节点
+#### 10.添加mster节点
 （1）获取token和证书（在初始化节点上执行）
 ```shell
 kubeadm token create --print-join-command
@@ -215,7 +217,7 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 ```
 
-#### 10.删除节点
+#### 11.删除节点
 （1））还原节点（需要到该节点上执行，执行kubeadm init或join等后想要还原）
 ```shell
 #master先驱逐该节点
