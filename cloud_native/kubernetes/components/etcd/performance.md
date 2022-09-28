@@ -19,8 +19,10 @@
 |disk_wal_fsync_duration_seconds|在执行wal之前，需要先将wal从内存flush到磁盘|p99 < 10ms|
 |disk_backend_commit_duration_seconds|将增量快照提交到磁盘|p99 < 25ms|
 
-### 3.调优
+#### 3.调优
 
+##### （1）调整`heartbeat-interval`和`election-timeout`
+能够避免etcd的**leader频繁切换**，频繁的切换会导致etcd client会读写超时
 * heartbeat interval（默认：`100ms`）
   * leader向follower发送心跳包的时间间隔
     * leader在发送心跳包之前需要persist the metadata to disk
