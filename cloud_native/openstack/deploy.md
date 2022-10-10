@@ -498,6 +498,17 @@ ip route add 10.172.0.0/16 via 10.10.10.68
 
 ***
 
+### 测试
+
+#### 1.测试 ceph性能
+参考ceph性能相关文档
+
+#### 2.测试镜像上传、创建虚拟机等功能
+
+#### 3.测试 虚拟机性能
+
+***
+
 ### 添加或删除节点
 
 [参考](https://docs.openstack.org/kolla-ansible/xena/user/adding-and-removing-hosts.html)
