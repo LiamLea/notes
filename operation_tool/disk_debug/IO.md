@@ -1,4 +1,4 @@
-# overview
+# IO
 
 [toc]
 
@@ -7,7 +7,7 @@
 [参考](https://www.ibm.com/cloud/blog/using-fio-to-tell-whether-your-storage-is-fast-enough-for-etcd)
 
 ```shell
-fio --rw=write --ioengine=sync --fdatasync=1 --directory=test-data --size=22m --bs=2300 --name=mytest
+fio --rw=write --ioengine=sync --fdatasync=1 --size=22m --bs=2300 --name=mytest
 ```
 
 ```
@@ -57,6 +57,7 @@ Disk stats (read/write):
 * 需要关注的数据
   * wirte数据没什么意义，因为写入内存，所以比较快
   * fsync相关数据
+    * 测出的延迟要小于dd命令测出的，因为dd那里只是粗略的测试，不只包含了sync操作，还有其他，比如write等
 
 ***
 
@@ -183,4 +184,11 @@ iotop -P -b -n 5
 
 #-a表示，统计累计值（即启动iotop，然后一直累计）
 iotop -P -o -a
+```
+
+##### `ioping`（测试延迟）
+```shell
+ioping -W -y -s 4k <path>  #e.g.: ioping -W -y -s 4k .
+# -W use write I/O
+# -y use data sync I/O (O_DSYNC)
 ```

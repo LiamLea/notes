@@ -88,9 +88,12 @@ ceph orch rm <sevice_name>
 
 #### 1.安装前准备
 
-##### （1）时间同步（非常重要，需要安装，不然后面会报错）
+##### （1）选择操作系统
+[参考](https://docs.ceph.com/en/quincy/start/os-recommendations/)
 
-##### （2）设置主机名（必须要设置好）
+##### （2）时间同步（非常重要，需要安装，不然后面会报错）
+
+##### （3）设置主机名（必须要设置好）
 * 主机名之后要保证不变，如果变化了
 * 主机名必须能够反向解析
   * 所以在hosts文件中，一个ip最好只对应一个host
@@ -99,9 +102,9 @@ ceph orch rm <sevice_name>
 /etc/hostname
 /etc/hosts
 ```
-##### （3）防火墙关闭
+##### （4）防火墙关闭
 
-##### （4）安装依赖软件
+##### （5）安装依赖软件
 * python3
 * docker-ce
 
@@ -255,8 +258,9 @@ ceph osd out <osd_id>
 
 * 删除osd
 ```shell
-ceph osd crush remove  <osd_id>
-ceph auth del <osd_id>
+#需要都执行一下
+ceph osd crush remove  <osd_id> #或：osd.<osd_id>
+ceph auth del <osd_id> #或：osd.<osd_id>
 ceph osd rm <osd_id>
 ```
 
@@ -265,7 +269,7 @@ ceph osd rm <osd_id>
 #删除该osd的crush
 ceph osd crush remove <osd_id>
 #删除该osd的key
-ceph psd del <osd_id>
+ceph osd del <osd_id>
 ```
 
 ##### (2) ceph orch方法

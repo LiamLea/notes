@@ -30,7 +30,7 @@ stress-ng --oomable --brk 4 --stack 4 --bigheap 4
 ```
 
 #### 5.模拟高I/O（测试文件系统）
-* 原理：持续写、读和删除临时文件
+* 原理：在当前目录下，持续写、读和删除临时文件
 ```shell
 stress-ng -d <NUM> --hdd-write-size <BYTES> -i <NUM>
 #-d：开启<NUM>个负责，执行读、写和删除临时文件

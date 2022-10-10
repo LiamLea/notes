@@ -230,3 +230,8 @@ INODE=8036871;find /proc -lname "socket:\[$INODE\]" 2> /dev/null | head -n 1 | a
 ```
 
 ##### （2）将该容器的网络命名空间挂载出来
+
+#### 57.格式化磁盘
+```shell
+wipefs -a /dev/sda
+```

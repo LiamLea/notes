@@ -279,7 +279,12 @@ monitor:
     ceph_exporter:
       name: "ceph-exporter"
       chart: {}
-      target_config: {}
+      target_config:
+      - id: ""
+        mons: []
+        admin:
+          id: ""
+          key: ""
 
 log:
   namespace: log

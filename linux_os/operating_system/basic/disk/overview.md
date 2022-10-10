@@ -40,9 +40,9 @@
 
 [参考](https://louwrentius.com/understanding-storage-performance-iops-and-latency.html)
 
-|指标|说明|意义|合理的值|
-|-|-|-|-|
-|IOPS|每秒进行的I/O操作次数|吞吐量固定，I/O的大小决定了IOPS|硬盘（55-180）</br>固态（3,000 – 40,000）|
-|throughout（Bandwidth ）|每秒最大的写入|`IOPS * I/O size`||
-|latency|完成一次I/O请求需要的时间|IOPS越多 或 一次I/O数据越多，会导致latency升高|硬盘（10 ~ 20 ms）</br>固态（1 ~ 3 ms）|
+|指标|说明|意义|HDD合理的值|SSD（SATA）合理的值|
+|-|-|-|-|-|
+|IOPS|每秒进行的I/O操作次数|影响IOPS的因素比较多（延迟、吞吐量、bs等），所以通过这个值判断磁盘性能比较困难|55 - 180|3,000 – 40,000|
+|throughout（Bandwidth ）|每秒最大的写入|`IOPS * I/O size`|80 ~ 160 MB/s|200 ~ 550MB/s|
+|latency|完成一次I/O请求需要的时间|IOPS越多 或 一次I/O数据越多，会导致latency升高|`I/O size < 4k`: 10 ~ 20 ms|`I/O size < 4k`: 1 ~ 3 ms|
 |time spent doing I/Os（单位：百分比）|查看磁盘的忙碌情况，对于并行的设备：比如ssd、raid，这个值参考意义不大||
