@@ -37,29 +37,34 @@
 ##### （5）RADOSGW
 基于bucket的网关，兼容s3和swift接口，对外提供对象存储服务
 
-#### 3.ceph storage cluster组件
+#### 3.RADOS组件
 
-##### （1）RADOS组件
-* ceph OSD（ceph-osd，object storage device）
-  * 运行OSD服务，处理数据（包括存储、处理副本、恢复等等）
-  * 提供其他OSD的状态给ceph-mon和ceph-mgr
-</br>
-* ceph monitor（ceph-mon）
-  * 维护集群组件的映射（包括monitor的映射，manager的映射、OSD映射等）
-    * 映射中存储各个组件的信息和状态
-  * 管理认证信息
+#####（1）ceph-osd（object storage device）
+* 运行OSD服务，处理数据（包括存储、处理副本、恢复等等）
+* 提供其他OSD的状态给ceph-mon和ceph-mgr
 
-##### （2）其他组件
-* ceph manager（ceph-mgr）
-  * 对外暴露接口，用于管理和查看ceph集群
-  * 监控ceph
-</br>
-* ceph MDS（ceph-mds，metadata server）
-  * 给ceph文件系统存储元数据（块存储和对象存储不使用ceph-mds）
-  * 一个文件系统（metadata pool），会有一个单独的MDS（和指定数量的standby MDS）
-</br>
-* rados gateway（RGW）
-  * 对外提供对象存储接口，支持两种接口（S3和swift）
+#####（2）ceph-mon（monitor）
+* 是集群的 **controller**
+  * 没有mon，集群无法工作
+* 维护集群组件的映射（包括monitor的映射，manager的映射、OSD映射等）
+  * 映射中存储各个组件的信息和状态
+* 管理认证信息
+
+#### 4.其他基础组件
+
+#####（1）ceph-mgr（manager）
+* 通过各种 **modules** 提供相应的能力，比如：
+  * orchestrator module：提供集群的编排能力
+  * dashboard module: 提供监控页面的能力
+  * prometheus module: 通过ceph-exporter暴露监控指标
+* 对外暴露接口，用于管理和查看ceph集群
+
+#####（2）ceph-mds（metadata server）
+* 给ceph **文件系统** 存储 **元数据**（块存储和对象存储不使用ceph-mds）
+* 一个文件系统（metadata pool），会有一个单独的MDS（和指定数量的standby MDS）
+
+#####（3）RGW（rados gateway）
+* 对外提供对象存储接口，支持两种接口（S3和swift）
 
 #### 4.目录规划
 * 日志路径：`/var/log/ceph/`

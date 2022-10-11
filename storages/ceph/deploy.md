@@ -291,3 +291,19 @@ ceph orch rm <service_name>
 #删除磁盘
 ceph orch device zap <hostname> <path>
 ```
+
+***
+
+### 开启ceph-exporter
+
+[参考](https://docs.ceph.com/en/quincy/mgr/prometheus/)
+
+#### 1.enable prometheus mgr module
+```shell
+ceph mgr module enable prometheus
+```
+
+* 查看
+```shell
+ceph mgr services
+```

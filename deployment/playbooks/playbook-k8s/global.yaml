@@ -201,10 +201,17 @@ monitor:
       # e.g. {send_resolved: true, url: "<url|no empty>", max_alerts: 10}
       webhook_configs: []
       scrape_interval: "30s"
+      #e.g. "10.10.10.1"
       icmp_probe: []
+      #e.g. "10.10.10.1:80"
       tcp_probe: []
+      #e.g. "http://10.10.10.1:80/test"
       http_probe: []
+      #e.g. "10.10.10.1:9092"
       node_exporter: []
+      jobs:
+        #e.g. {"targets": [], "labels": {}}
+        ceph_exporter: []
     blackbox:
       name: "blackbox-exporter"
       chart:
@@ -229,6 +236,10 @@ monitor:
             gnetId: 8919
             revision: 24
             datasource: Prometheus
+          node-full:
+            gnetID: 1860
+            revision: 27
+            datasource: Prometheus
           blackbox-exporter:
             gnetId: 7587
             revision: 3
@@ -242,17 +253,17 @@ monitor:
             gnetId: 11454
             revision: 14
             datasource: Prometheus
+          apiserver:
+            gnetID: 12006
+            revision: 1
+            datasource: Prometheus
           etcd:
             gnetID: 9733
             revision: 1
             datasource: Prometheus
-          node-full:
-            gnetID: 1860
-            revision: 27
-            datasource: Prometheus
-          apiserver:
-            gnetID: 12006
-            revision: 1
+          ceph:
+            gnetID: 2842
+            revision: 14
             datasource: Prometheus
 
   node_exporter:
@@ -276,15 +287,6 @@ monitor:
           #     user_domain_name: 'Default'
           #     auth_url: 'http://10.10.10.10:35357/v3'
           #     verify: false
-    ceph_exporter:
-      name: "ceph-exporter"
-      chart: {}
-      target_config:
-      - id: ""
-        mons: []
-        admin:
-          id: ""
-          key: ""
 
 log:
   namespace: log

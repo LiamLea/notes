@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := run
 
-ansible_image = bongli/ansible:debian-2.10
+ansible_image = liamlea/ansible:debian-2.10
 ansible_dir = $(shell pwd)
 docker_version = $(shell grep -Ev '^\s*\#|^\s*$$' global.yaml | grep -A 2 '^docker' | grep 'version' | awk '{print $$2}')
 
