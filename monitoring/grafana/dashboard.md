@@ -27,14 +27,14 @@
 
 ![](./imgs/dashboard_linux_02.png)
 
-#### 2.监控prometheus：3681
+#### 3.监控prometheus：3681
 
 ![](./imgs/dashboard_prometheus_01.png)
 
-#### 3.监控blackbox: 7587
+#### 4.监控blackbox: 7587
 ![](./imgs/dashboard_blackbox.png)
 
-#### 4.监控k8s：15520、11454
+#### 5.监控k8s：15520、11454
 
 * 系统状态: 15520
 ![](./imgs/dashboard_k8s_01.png)
@@ -43,3 +43,12 @@
 * pv状态: 11454
 ![](./imgs/dashboard_k8s_03.png)
 ![](./imgs/dashboard_k8s_04.png)
+
+* apiserver: 12006
+![](./imgs/dashboard_k8s_05.png)
+
+#### 6.监控etcd: 9733
+![](./imgs/dashboard_etcd_01.png)
+
+#### 7.监控ceph: 2842
+![](./imgs/dashboard_ceph_01.png)

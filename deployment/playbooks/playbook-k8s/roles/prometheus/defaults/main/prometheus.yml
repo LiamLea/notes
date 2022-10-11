@@ -55,6 +55,9 @@ __config_prometheus:
         target_label: __metrics_path__
         replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
 
+  #service must have the annotation: prometheus.io/scrape: "true"
+  #if there is path(starting with /), add the annotation: prometheus.io/path: <path>
+  #__address__ includes port info
   - job_name: 'kubernetes-service-endpoints'
     honor_labels: true
     kubernetes_sd_configs:
@@ -220,7 +223,8 @@ __config_prometheus:
 
   #service must have the annotation: prometheus.io/probe: "true"
   #if there is path(starting with /), add the annotation: prometheus.io/path: <path>
-  - job_name: 'kubernetes-services'
+  #__address__ includes port info
+  - job_name: 'http-probe-services'
     honor_labels: true
     metrics_path: /probe
     params:
@@ -296,3 +300,6 @@ __config_prometheus:
   - job_name: node-exporter
     static_configs:
       - targets: "{{ __node_exporter }}"
+
+  - job_name: ceph-exporter
+    static_configs: "{{ monitor.prometheus.config.jobs.ceph_exporter}}"

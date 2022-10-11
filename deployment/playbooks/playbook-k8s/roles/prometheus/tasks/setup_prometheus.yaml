@@ -45,6 +45,7 @@
           repository: "{{ monitor.repository }}quay.io/prometheus/prometheus"
         persistentVolume:
           storageClass: "{{ monitor.storage_class }}"
+          size: "10Gi"
         prefixURL: "/prometheus"
         baseURL: "{{ monitor.prometheus.config.external_url }}"
         global:

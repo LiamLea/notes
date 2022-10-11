@@ -82,14 +82,45 @@ ceph orch daemon add <service_type> [<args>]
 
 ### 配置相关：`ceph config`
 
+#### 1.查看配置
 ```shell
-#查看所有的配置
+#查看所有的配置（有些版本无法列出来）
 ceph config dump
+
+#查看daemon的id
+#会列出daemon在node上的分布，从而能够获取到daemon的id
+ceph node ls all
+
+#下面方式查出的配置最准确，因为是运行时的
+#查看指定daemon的 所有的配置
+ceph config show show-with-defaults <type>.<id>
+
+#查看指定daemon的 指定的配置
+ceph config show <type>.<id>
 ```
 
-#### 1.monitor服务相关：`ceph config set mon`
+#### 2.进行配置
+
+* 注意：有些配置后，需要重启相关服务
+  * 比如: mon_warn_on_pool_no_redundancy 需要重启osd和mon
 ```shell
-ceph config set mon public_network <CIDR>   #声明monitor的网段，当node在这个网段内，才可以部署ceph-mon服务
+#比如：ceph config set global mon_warn_on_pool_no_redundancy  false
+ceph config set <section> <key> <value>
+```
+
+***
+
+### mgr module相关: `ceph mgr`
+
+```shell
+#查看启动的模块
+ceph mgr module ls
+
+#启动指定模块
+ceph mgr module enable <module>
+
+#查看模块对外暴露的接口
+ceph mgr services
 ```
 
 ***
