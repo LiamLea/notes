@@ -1,6 +1,20 @@
 # usage specification
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [usage specification](#usage-specification)
+    - [1.应用的部署](#1应用的部署)
+      - [（1）指定资源的需求和限制](#1指定资源的需求和限制)
+      - [（2）进行存活和就绪探测](#2进行存活和就绪探测)
+      - [（3）通过configmap注入配置](#3通过configmap注入配置)
+    - [2.通信方式](#2通信方式)
+      - [（1）集群内部通信](#1集群内部通信)
+      - [（2）集群外部通信](#2集群外部通信)
+    - [3.应用的访问](#3应用的访问)
+      - [（1）通过ingress转发http请求](#1通过ingress转发http请求)
+
+<!-- /code_chunk_output -->
 
 ### 1.应用的部署
 

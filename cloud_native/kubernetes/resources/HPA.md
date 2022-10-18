@@ -1,6 +1,21 @@
 # horizontal pod autoscaler
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [horizontal pod autoscaler](#horizontal-pod-autoscaler)
+    - [概述](#概述)
+      - [1.HPA可以应用于以下资源](#1hpa可以应用于以下资源)
+      - [2.指标的来源](#2指标的来源)
+      - [3.算法](#3算法)
+        - [（1）contrller manager中关于HPA的配置](#1contrller-manager中关于hpa的配置)
+      - [2.服务的要求](#2服务的要求)
+    - [使用](#使用)
+      - [1.清单文件格式](#1清单文件格式)
+        - [（1）有三种metrics来源](#1有三种metrics来源)
+      - [2.demo](#2demo)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 ![](./imgs/hpa_01.png)

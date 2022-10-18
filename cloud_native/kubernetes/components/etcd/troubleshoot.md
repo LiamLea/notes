@@ -1,6 +1,16 @@
 # troubleshoot
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [troubleshoot](#troubleshoot)
+      - [1.leader经常切换，导致相关服务连接etcd超时](#1leader经常切换导致相关服务连接etcd超时)
+        - [（1）分析](#1分析)
+        - [（2）解决](#2解决)
+      - [2.`etcd took too long to execute`](#2etcd-took-too-long-to-execute)
+        - [（1）分析](#1分析-1)
+
+<!-- /code_chunk_output -->
 
 #### 1.leader经常切换，导致相关服务连接etcd超时
 

@@ -1,5 +1,32 @@
 # service
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [service](#service)
+    - [概述](#概述)
+      - [1.service（**service负载的是4层流量**）](#1serviceservice负载的是4层流量)
+      - [2.service三种工作模式](#2service三种工作模式)
+      - [3.service四种类型](#3service四种类型)
+        - [（1）ClusterIP（默认）](#1clusterip默认)
+        - [（2）NodePort](#2nodeport)
+        - [（3）LoadBalancer（需要插件支持）](#3loadbalancer需要插件支持)
+        - [（4）ExternalName](#4externalname)
+      - [4.headless service](#4headless-service)
+      - [5.service的FQDN](#5service的fqdn)
+      - [6.service可以代理的后端资源](#6service可以代理的后端资源)
+      - [7.Endpoints](#7endpoints)
+        - [（1）service与endponts的关系](#1service与endponts的关系)
+        - [（2）可以利用endpoints和无selector的service实现引入外部服务](#2可以利用endpoints和无selector的service实现引入外部服务)
+      - [8.service暴露的两种方式：nodeport 和 external ip](#8service暴露的两种方式nodeport-和-external-ip)
+      - [9.externalTrafficPolicy 和 internalTrafficPolicy](#9externaltrafficpolicy-和-internaltrafficpolicy)
+    - [使用](#使用)
+      - [1.资源清单](#1资源清单)
+      - [2.创建ExternalName类型的service](#2创建externalname类型的service)
+      - [3.Endpoints清单](#3endpoints清单)
+
+<!-- /code_chunk_output -->
+
 ### 概述
 
 #### 1.service（**service负载的是4层流量**）

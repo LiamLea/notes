@@ -1,6 +1,17 @@
 # storage
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [storage](#storage)
+    - [概述](#概述)
+      - [1.有三类存储](#1有三类存储)
+      - [2.controoler-fs包括](#2controoler-fs包括)
+      - [3.数据同步技术：drbd（distributed replicated block device）](#3数据同步技术drbddistributed-replicated-block-device)
+    - [使用](#使用)
+      - [1.查看存储](#1查看存储)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,6 +1,31 @@
 # guacamole
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [guacamole](#guacamole)
+    - [概述](#概述)
+      - [1.支持的远程协议（远程桌面协议和远程终端协议）](#1支持的远程协议远程桌面协议和远程终端协议)
+        - [（1）VNC（590*）](#1vnc590)
+        - [（2）RDP（3389）](#2rdp3389)
+        - [（3）ssh（22）](#3ssh22)
+        - [（4）telnet（23）](#4telnet23)
+        - [（5）k8s](#5k8s)
+      - [2.架构](#2架构)
+      - [3.端口](#3端口)
+    - [使用](#使用)
+      - [1.部署guacd](#1部署guacd)
+      - [2.部署guacamole（client）](#2部署guacamoleclient)
+        - [（1）创建数据库（以PostgreSQL为例子）](#1创建数据库以postgresql为例子)
+        - [（2）启动guacamole](#2启动guacamole)
+        - [（3）访问guacamole](#3访问guacamole)
+    - [使用](#使用-1)
+      - [1.创建连接](#1创建连接)
+        - [（1）以ssh为例](#1以ssh为例)
+        - [（2）以rdp为例](#2以rdp为例)
+      - [2.连接后的使用](#2连接后的使用)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

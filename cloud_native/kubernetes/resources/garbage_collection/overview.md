@@ -1,6 +1,22 @@
 # garbage collection
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [garbage collection](#garbage-collection)
+    - [概述](#概述)
+      - [1.GC的对象](#1gc的对象)
+      - [2.对象的关系：owner和dependents](#2对象的关系owner和dependents)
+      - [3.finalizers](#3finalizers)
+      - [4.删除方式](#4删除方式)
+        - [（1）后台删除（默认）](#1后台删除默认)
+        - [（2）前台删除](#2前台删除)
+        - [（3）孤儿资源](#3孤儿资源)
+      - [5.容器和镜像的回收](#5容器和镜像的回收)
+        - [（1）镜像回收](#1镜像回收)
+        - [（2）容器回收](#2容器回收)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

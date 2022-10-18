@@ -1,5 +1,35 @@
 # helm
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [helm](#helm)
+    - [基础概念](#基础概念)
+      - [1.chart](#1chart)
+      - [2.repository](#2repository)
+      - [3.release](#3release)
+      - [4.程序架构](#4程序架构)
+      - [5.chart目录结构](#5chart目录结构)
+      - [6.heml安装资源的顺序](#6heml安装资源的顺序)
+      - [7.手动设置安装资源的顺序](#7手动设置安装资源的顺序)
+    - [使用](#使用)
+      - [1.初始化helm（即生成tiller服务端，新版已经弃用）](#1初始化helm即生成tiller服务端新版已经弃用)
+      - [2.检测是否可用](#2检测是否可用)
+      - [3.chart仓库管理](#3chart仓库管理)
+      - [4.chart管理](#4chart管理)
+      - [5.release管理](#5release管理)
+      - [6.查看历史release](#6查看历史release)
+    - [helm模板语法](#helm模板语法)
+      - [1.基本语法](#1基本语法)
+      - [2.helm内置对象和内置变量](#2helm内置对象和内置变量)
+      - [3.判断语句](#3判断语句)
+      - [4.with语句（修改作用域）](#4with语句修改作用域)
+      - [5.range语句（遍历）](#5range语句遍历)
+      - [6.常见例子](#6常见例子)
+    - [自定义chart](#自定义chart)
+
+<!-- /code_chunk_output -->
+
 ### 基础概念
 #### 1.chart
 一个helm程序包，包含定义资源的清单文件

@@ -1,6 +1,23 @@
 # netperf test
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [netperf test](#netperf-test)
+    - [使用](#使用)
+      - [1.修改nptest源码并生成镜像](#1修改nptest源码并生成镜像)
+        - [（1）修改nptest源码](#1修改nptest源码)
+        - [（2）生成镜像](#2生成镜像)
+      - [2.修改launch源码（存在一个bug）并编译](#2修改launch源码存在一个bug并编译)
+        - [（1）修改launch.go源码](#1修改launchgo源码)
+        - [（2）构建代码](#2构建代码)
+      - [3.执行测试](#3执行测试)
+      - [4.查看执行进度（如果MSS跨度大的话，需要很久）](#4查看执行进度如果mss跨度大的话需要很久)
+      - [5.分析执行结果](#5分析执行结果)
+        - [（1）先将csv DATA数据复制出来](#1先将csv-data数据复制出来)
+        - [（2）生成图表](#2生成图表)
+
+<!-- /code_chunk_output -->
 
 ### 使用
 [github地址](https://github.com/kubernetes/perf-tests/tree/master/network/benchmarks/netperf)

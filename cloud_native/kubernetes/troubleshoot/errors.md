@@ -1,4 +1,27 @@
-[toc]
+# errors
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [errors](#errors)
+      - [1.当pod处于evictd状态，且原因为The node was low on resource: ephemeral-storage](#1当pod处于evictd状态且原因为the-node-was-low-on-resource-ephemeral-storage)
+        - [（1）原因分析](#1原因分析)
+        - [（2）解决](#2解决)
+      - [2.一直处于pulling image的状态的可能原因](#2一直处于pulling-image的状态的可能原因)
+        - [（1）原因分析](#1原因分析-1)
+      - [3.当pod一直处于pending状态，且不报错，处理方式](#3当pod一直处于pending状态且不报错处理方式)
+        - [（1）原因分析](#1原因分析-2)
+        - [（2）解决](#2解决-1)
+      - [4.当pod已经被调度后，出现问题的终极排错方法：](#4当pod已经被调度后出现问题的终极排错方法)
+      - [5.删除namespace一直处于Terminating状态](#5删除namespace一直处于terminating状态)
+        - [（1）解决](#1解决)
+      - [6.更换网络插件后一定要重启所有机器](#6更换网络插件后一定要重启所有机器)
+      - [7.`Error response from daemon: Conflict.`](#7error-response-from-daemon-conflict)
+      - [8.`kubelet：pleg is not healthy`](#8kubeletpleg-is-not-healthy)
+      - [9.`Orphaned pod found：but volume subpaths are still present on disk`](#9orphaned-pod-foundbut-volume-subpaths-are-still-present-on-disk)
+      - [10.pod重启，状态为terminated，错误码为137，没有错误日志： 内存超过了系统的限制，而不是超过limits的限制](#10pod重启状态为terminated错误码为137没有错误日志-内存超过了系统的限制而不是超过limits的限制)
+
+<!-- /code_chunk_output -->
 
 #### 1.当pod处于evictd状态，且原因为The node was low on resource: ephemeral-storage
 

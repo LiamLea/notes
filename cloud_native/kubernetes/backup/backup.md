@@ -1,6 +1,40 @@
 # backup and restore
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [backup and restore](#backup-and-restore)
+    - [etcdctl命令格式](#etcdctl命令格式)
+    - [备份数据](#备份数据)
+      - [1.备份etcd数据](#1备份etcd数据)
+      - [2.备份kubeadm-config配置文件（如果从0恢复最好备份）](#2备份kubeadm-config配置文件如果从0恢复最好备份)
+    - [在现有集群上进行恢复](#在现有集群上进行恢复)
+      - [1.其他master需要停止](#1其他master需要停止)
+      - [2.恢复第一个master](#2恢复第一个master)
+        - [（1）恢复etcd数据](#1恢复etcd数据)
+        - [（2）验证](#2验证)
+      - [3.恢复第二个master](#3恢复第二个master)
+        - [（1）需要在etcd中添加member](#1需要在etcd中添加member)
+        - [（2）重启服务](#2重启服务)
+      - [4.按顺序恢复其他master](#4按顺序恢复其他master)
+      - [5.node节点不需要做任何操作](#5node节点不需要做任何操作)
+      - [6.更简单的恢复方法](#6更简单的恢复方法)
+    - [从0恢复](#从0恢复)
+      - [1.初始换第一个master](#1初始换第一个master)
+        - [（1）选择其中一个master，进行初始化](#1选择其中一个master进行初始化)
+        - [（2）恢复etcd数据](#2恢复etcd数据)
+        - [（3）验证](#3验证)
+      - [2.修改旧数据](#2修改旧数据)
+        - [（1）cluster-info中的ca证书](#1cluster-info中的ca证书)
+        - [（2）kubeadm-coonfig中的ClusterStatus](#2kubeadm-coonfig中的clusterstatus)
+      - [3.添加其他master节点](#3添加其他master节点)
+        - [（1）获取加入命令](#1获取加入命令)
+        - [（2）加入该集群](#2加入该集群)
+      - [4.加入node](#4加入node)
+        - [（1）获取token用于加入该集群（在初始化节点上执行）](#1获取token用于加入该集群在初始化节点上执行)
+        - [（2）加入该集群](#2加入该集群-1)
+
+<!-- /code_chunk_output -->
 
 ### etcdctl命令格式
 

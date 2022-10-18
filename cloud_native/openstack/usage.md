@@ -1,6 +1,41 @@
 # usage
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [usage](#usage)
+    - [基本使用](#基本使用)
+      - [1.镜像相关](#1镜像相关)
+        - [（1）在cloud镜像基础上制作镜像](#1在cloud镜像基础上制作镜像)
+        - [（2）制作镜像](#2制作镜像)
+        - [（3）上传镜像](#3上传镜像)
+      - [2.flavor相关](#2flavor相关)
+      - [3.port（网卡）相关](#3port网卡相关)
+      - [4.volume（磁盘）相关](#4volume磁盘相关)
+        - [（1）基本使用](#1基本使用)
+        - [（2）扩容](#2扩容)
+      - [5.创建虚拟机模板（即image）](#5创建虚拟机模板即image)
+      - [6.创建虚拟机](#6创建虚拟机)
+        - [（1）依赖cloud-init的功能](#1依赖cloud-init的功能)
+        - [（2）手动进行扩容（如果不支持自动扩容）](#2手动进行扩容如果不支持自动扩容)
+      - [7.虚拟机的调度：zone和aggregate](#7虚拟机的调度zone和aggregate)
+        - [（1）zone](#1zone)
+        - [（2）aggregate](#2aggregate)
+      - [8.snapshot和backup](#8snapshot和backup)
+        - [（1）instance snapshot](#1instance-snapshot)
+        - [（2）volume snapshot](#2volume-snapshot)
+        - [（3）volume backup](#3volume-backup)
+        - [（4）总结](#4总结)
+      - [8.LoadBalancer相关](#8loadbalancer相关)
+        - [（1）创建LoadBalancer](#1创建loadbalancer)
+      - [9.创建VIP（将floating ip与某个内部vip绑定）](#9创建vip将floating-ip与某个内部vip绑定)
+    - [管理](#管理)
+      - [1.project管理](#1project管理)
+        - [（1）project管理](#1project管理-1)
+        - [（2）限额（quota）管理](#2限额quota管理)
+      - [2.server管理](#2server管理)
+
+<!-- /code_chunk_output -->
 
 ### 基本使用
 

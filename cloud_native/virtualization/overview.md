@@ -1,6 +1,22 @@
 # overview
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [overview](#overview)
+    - [概述](#概述)
+      - [1.hypervisor（虚拟层，管理程序）](#1hypervisor虚拟层管理程序)
+      - [2.两类hypervisor](#2两类hypervisor)
+        - [（1）bare metal](#1bare-metal)
+        - [（2）hosted](#2hosted)
+      - [3. full virtulization vs paravirtulization](#3-full-virtulization-vs-paravirtulization)
+        - [（1）paravirtualizatio常用的设备驱动标准： virtio](#1paravirtualizatio常用的设备驱动标准-virtio)
+      - [4.其他](#4其他)
+        - [（1）虚拟机分配](#1虚拟机分配)
+        - [（2）物理cpu支持虚拟化](#2物理cpu支持虚拟化)
+        - [（3）cpu分配](#3cpu分配)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

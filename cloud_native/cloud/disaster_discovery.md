@@ -1,6 +1,35 @@
 # disaster recovery（容灾，灾备）
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [disaster recovery（容灾，灾备）](#disaster-recovery容灾灾备)
+    - [概述](#概述)
+      - [1.disaster recovery](#1disaster-recovery)
+      - [2.容灾方案的五个要素](#2容灾方案的五个要素)
+        - [（1）disaster recovery team（容灾团队）](#1disaster-recovery-team容灾团队)
+        - [（2）risk evaluation（风险评估）](#2risk-evaluation风险评估)
+        - [（3）Business-critical asset identification（关键业务资产确认）](#3business-critical-asset-identification关键业务资产确认)
+        - [（4）backups（备份）](#4backups备份)
+        - [（5）Testing and optimization（测试和优化）](#5testing-and-optimization测试和优化)
+      - [3.容灾系统的分类](#3容灾系统的分类)
+        - [（1）数据级容灾](#1数据级容灾)
+        - [（2）应用级容灾](#2应用级容灾)
+        - [（3）业务级容灾](#3业务级容灾)
+      - [4.容灾的等级](#4容灾的等级)
+        - [（1）第0级：没有备份中心](#1第0级没有备份中心)
+        - [（2）第1级：本地磁带备份，异地保存](#2第1级本地磁带备份异地保存)
+        - [（3）第2级：热备份站点备份（主备模式）](#3第2级热备份站点备份主备模式)
+        - [（4）第3级：活动备份中心（双活模式，需要实时进行数据的复制）](#4第3级活动备份中心双活模式需要实时进行数据的复制)
+      - [5.容灾的关键技术](#5容灾的关键技术)
+        - [（1）远程镜像技术](#1远程镜像技术)
+        - [（2）快照技术](#2快照技术)
+        - [（3）互连技术](#3互连技术)
+      - [6.技术指标](#6技术指标)
+        - [（1）RPO（recovery point objective）](#1rporecovery-point-objective)
+        - [（2）RTO（recovery time objective）](#2rtorecovery-time-objective)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,6 +1,16 @@
 # performance
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [performance](#performance)
+    - [概述](#概述)
+      - [1.两个因素](#1两个因素)
+      - [2.参数](#2参数)
+      - [3.调优](#3调优)
+        - [（1）调整`heartbeat-interval`和`election-timeout`](#1调整heartbeat-interval和election-timeout)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

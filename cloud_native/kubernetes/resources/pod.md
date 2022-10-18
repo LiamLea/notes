@@ -1,6 +1,34 @@
 # pod
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [pod](#pod)
+    - [基础概念](#基础概念)
+      - [1.定义](#1定义)
+      - [2.pod phase（生命周期）](#2pod-phase生命周期)
+      - [2.pod conditions（pod状态）](#2pod-conditionspod状态)
+      - [3.container states（容器状态）](#3container-states容器状态)
+      - [4.container probes（ 容器 探测）](#4container-probes-容器-探测)
+        - [（1）每次探测有三种结果](#1每次探测有三种结果)
+        - [（2）三种探针](#2三种探针)
+        - [（3）三种情形下的探测](#3三种情形下的探测)
+      - [5.Init containers](#5init-containers)
+        - [（1）特点](#1特点)
+        - [（2）使用init containers的好处](#2使用init-containers的好处)
+      - [6.Container Lifecycle Hooks（容器生命周期钩子）](#6container-lifecycle-hooks容器生命周期钩子)
+      - [7.`kubectl get pods`能够查看到的pods状态](#7kubectl-get-pods能够查看到的pods状态)
+      - [8.priority和preemption](#8priority和preemption)
+        - [（1）priority](#1priority)
+        - [（2）preemption policy](#2preemption-policy)
+    - [资源清单](#资源清单)
+      - [1.基本格式](#1基本格式)
+      - [2.环境变量设置](#2环境变量设置)
+        - [（1）常用于statefulSet](#1常用于statefulset)
+        - [（2）环境变量的来源](#2环境变量的来源)
+      - [3.探测](#3探测)
+
+<!-- /code_chunk_output -->
 
 ### 基础概念
 

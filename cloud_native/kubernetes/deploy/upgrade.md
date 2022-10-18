@@ -1,6 +1,40 @@
 # upgrade
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [upgrade](#upgrade)
+    - [概述](#概述)
+      - [1.版本控制：semantic versioning](#1版本控制semantic-versioning)
+        - [（1）版本号命名规则：`<major>.<minor>.<patch>`](#1版本号命名规则majorminorpatch)
+        - [（2）预发布版本：`<major>.<minor>.<patch>-<pre-release>`](#2预发布版本majorminorpatch-pre-release)
+        - [（3）build medata：`<...>+<build_metadata>`](#3build-medatabuild_metadata)
+      - [2.k8s版本管理](#2k8s版本管理)
+        - [（1）版本更新顺序:](#1版本更新顺序)
+        - [（2）version skew](#2version-skew)
+      - [3.升级需要考虑的方面](#3升级需要考虑的方面)
+        - [（1）API的改变（需要特别关注）](#1api的改变需要特别关注)
+        - [（2）相关功能的改变](#2相关功能的改变)
+      - [4.升级前先预演](#4升级前先预演)
+        - [（1）移除升级后不存在的API](#1移除升级后不存在的api)
+      - [5.升级后的影响](#5升级后的影响)
+      - [6.升级的主要步骤](#6升级的主要步骤)
+    - [upgrade](#upgrade-1)
+      - [1.准备](#1准备)
+      - [2.升级前预演API移除](#2升级前预演api移除)
+      - [3.升级其中一个master](#3升级其中一个master)
+        - [（1）升级该master](#1升级该master)
+        - [（2）升级calico](#2升级calico)
+      - [4.升级其他master](#4升级其他master)
+        - [（1）升级该master](#1升级该master-1)
+      - [5.升级master的kubelet和kubectl](#5升级master的kubelet和kubectl)
+        - [（1）升级kubelet](#1升级kubelet)
+        - [（2）安装指定版本的kubectl](#2安装指定版本的kubectl)
+      - [6.升级node](#6升级node)
+        - [（1）升级该node](#1升级该node)
+        - [（2）升级kubelet](#2升级kubelet)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

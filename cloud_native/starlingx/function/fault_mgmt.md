@@ -1,6 +1,19 @@
 # fault management
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [fault management](#fault-management)
+    - [概述](#概述)
+      - [1.告警的影响范围](#1告警的影响范围)
+        - [（1）Management Affecting](#1management-affecting)
+        - [（2）Degrade Affecting](#2degrade-affecting)
+    - [使用](#使用)
+      - [1.查看](#1查看)
+    - [常见错误](#常见错误)
+      - [1.为什么drbd同步失败，activity会不断转移](#1为什么drbd同步失败activity会不断转移)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

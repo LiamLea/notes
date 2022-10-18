@@ -1,6 +1,58 @@
 # volume
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [volume](#volume)
+    - [概述](#概述)
+      - [1.在kubernetes中，存储卷是针对pod而言的，而不是container](#1在kubernetes中存储卷是针对pod而言的而不是container)
+      - [2.存储卷种类](#2存储卷种类)
+        - [（1）emptyDir](#1emptydir)
+        - [（2）hostPath](#2hostpath)
+        - [（3）local](#3local)
+        - [（3）nfs](#3nfs)
+        - [（4）PersistentVolumeClaim](#4persistentvolumeclaim)
+        - [（5）ConfigMap（挂载时需要特别注意）](#5configmap挂载时需要特别注意)
+        - [（6）Secret](#6secret)
+      - [3.pvc](#3pvc)
+      - [4.pv（是集群级别的资源，不属于某个名称空间，所有名称都可以用）](#4pv是集群级别的资源不属于某个名称空间所有名称都可以用)
+        - [（1）与pvc关系](#1与pvc关系)
+        - [（2）三种AccessModes](#2三种accessmodes)
+        - [（3）两种pv reclaim policy（回收策略）](#3两种pv-reclaim-policy回收策略)
+        - [（4）pv的4种阶段](#4pv的4种阶段)
+      - [5.StorageClass](#5storageclass)
+        - [（1）基本概念](#1基本概念)
+        - [（2）StorageClass 资源是用于实现动态pv的](#2storageclass-资源是用于实现动态pv的)
+      - [6.动态pv](#6动态pv)
+      - [6.mountPath和subPath（注意！！！！！）](#6mountpath和subpath注意)
+    - [基本使用](#基本使用)
+      - [1.emptyDir的使用](#1emptydir的使用)
+      - [2.hostPath的使用](#2hostpath的使用)
+      - [3.nfs的使用](#3nfs的使用)
+      - [4.pv和pvc的使用](#4pv和pvc的使用)
+        - [（1）创建pv资源](#1创建pv资源)
+        - [（2）创建pvc资源](#2创建pvc资源)
+        - [（3）挂载pv](#3挂载pv)
+      - [5.ConfigMap的使用](#5configmap的使用)
+        - [（1）创建ConfigMap资源](#1创建configmap资源)
+        - [（2）将ConfigMap中的配置注入pod](#2将configmap中的配置注入pod)
+      - [6.Secret的使用](#6secret的使用)
+        - [（1）创建Secret资源](#1创建secret资源)
+        - [（2）查看某个secret的具体内容](#2查看某个secret的具体内容)
+      - [7.动态pv（以nfs为例）](#7动态pv以nfs为例)
+        - [（1）项目地址](#1项目地址)
+        - [（2）存储信息](#2存储信息)
+        - [（3）创建provisioner](#3创建provisioner)
+        - [（4）创建StorageClass](#4创建storageclass)
+        - [（5）创建一个pvc测试](#5创建一个pvc测试)
+      - [8.local类型的pv的使用（使用指定node上的存储）](#8local类型的pv的使用使用指定node上的存储)
+        - [（1）创建pv资源](#1创建pv资源-1)
+        - [（2）使用该pv资源](#2使用该pv资源)
+      - [9.创建动态local pv（新版本的k8s，不支持动态pv）](#9创建动态local-pv新版本的k8s不支持动态pv)
+        - [（1）创建local pv provisioner](#1创建local-pv-provisioner)
+        - [（2）创建storage class](#2创建storage-class)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

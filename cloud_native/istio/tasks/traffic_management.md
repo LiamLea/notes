@@ -1,6 +1,37 @@
 # traffic management
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [traffic management](#traffic-management)
+    - [概述](#概述)
+      - [1.service registry](#1service-registry)
+        - [（1）生成service registry](#1生成service-registry)
+        - [（2）利用service registry配置envoy](#2利用service-registry配置envoy)
+      - [2.数据处理流程](#2数据处理流程)
+    - [使用](#使用)
+      - [1. VirtualService（本质就是配置envoy的filter）](#1-virtualservice本质就是配置envoy的filter)
+        - [（1）清单文件格式](#1清单文件格式)
+        - [（2）路由http流量](#2路由http流量)
+      - [2.DestinationRule（本质就是配置envoy的cluster）](#2destinationrule本质就是配置envoy的cluster)
+        - [（1）特点](#1特点)
+        - [（2）清单文件格式](#2清单文件格式)
+    - [GateWay](#gateway)
+      - [1.特点](#1特点-1)
+      - [2.资源清单格式](#2资源清单格式)
+    - [ServiceEntry](#serviceentry)
+      - [1.特点](#1特点-2)
+      - [2.清单格式](#2清单格式)
+    - [unknown 和 passthroughcluster 和 BlackHole](#unknown-和-passthroughcluster-和-blackhole)
+    - [更多流量治理（无需修改代码）](#更多流量治理无需修改代码)
+      - [1.timeout](#1timeout)
+      - [2.retries](#2retries)
+      - [3.circuit breakers（断路器，是一种保护机制）](#3circuit-breakers断路器是一种保护机制)
+      - [4.fault injection（故障注入，是一种测试机制）](#4fault-injection故障注入是一种测试机制)
+      - [5.failure recovery（故障恢复）](#5failure-recovery故障恢复)
+    - [总结](#总结)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

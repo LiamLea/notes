@@ -1,6 +1,29 @@
 # metric
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [metric](#metric)
+    - [概述](#概述)
+      - [1.所有的指标都来自kubelet cadvisor](#1所有的指标都来自kubelet-cadvisor)
+      - [2.metric分类](#2metric分类)
+        - [（1）两类指标](#1两类指标)
+        - [（2）三类metric api](#2三类metric-api)
+      - [3.查看各个api中的指标](#3查看各个api中的指标)
+        - [（1）查看`metrics.k8s.io` api](#1查看metricsk8sio-api)
+        - [（2）查看`custom.metrics.k8s.io` api](#2查看custommetricsk8sio-api)
+    - [部署](#部署)
+      - [1.前提：apiserver需要`--enable-aggregator-routing=true`](#1前提apiserver需要-enable-aggregator-routingtrue)
+      - [2.安装metrics-server](#2安装metrics-server)
+      - [3.prometheus-adapter的rules](#3prometheus-adapter的rules)
+        - [（1）rule的分类](#1rule的分类)
+        - [（2）rule的四个部分](#2rule的四个部分)
+        - [（3）rule的编写](#3rule的编写)
+        - [（4）custom metrics API提供的某个指标的详情](#4custom-metrics-api提供的某个指标的详情)
+      - [4.安装prometheus-adapter](#4安装prometheus-adapter)
+        - [（1）`values.yaml`](#1valuesyaml)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

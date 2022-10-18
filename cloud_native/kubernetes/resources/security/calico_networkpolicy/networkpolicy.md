@@ -1,6 +1,18 @@
 # network policy
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [network policy](#network-policy)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+      - [2.默认规则](#2默认规则)
+      - [3.匹配原则](#3匹配原则)
+    - [使用](#使用)
+      - [1.NetworkPolicy](#1networkpolicy)
+      - [2.GloalNetworkPolicy](#2gloalnetworkpolicy)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

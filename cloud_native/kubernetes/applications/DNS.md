@@ -1,5 +1,20 @@
 # DNS
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [DNS](#dns)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+      - [2.支持的记录](#2支持的记录)
+        - [（1）service相关](#1service相关)
+        - [（2）pod相关](#2pod相关)
+      - [3.pod的DNS policy](#3pod的dns-policy)
+      - [4.增加DNS配置](#4增加dns配置)
+      - [5.在容器的hosts文件中增加解析记录](#5在容器的hosts文件中增加解析记录)
+
+<!-- /code_chunk_output -->
+
 ### 概述
 #### 1.特点
 * k8s会创建一个DNS的pod和service

@@ -1,6 +1,19 @@
 # host management
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [host management](#host-management)
+    - [概述](#概述)
+      - [1.host的生命周期](#1host的生命周期)
+        - [（1）oprational state（操作状态）](#1oprational-state操作状态)
+        - [（2）administrative state（管理状态）](#2administrative-state管理状态)
+        - [（3）availability states（可用状态）](#3availability-states可用状态)
+      - [2.available、degraded、failed之间的状态切换](#2available-degraded-failed之间的状态切换)
+    - [使用](#使用)
+      - [](#)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

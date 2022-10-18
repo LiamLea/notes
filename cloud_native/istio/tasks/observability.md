@@ -1,6 +1,15 @@
 # observability
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [observability](#observability)
+    - [概述](#概述)
+      - [1.三个维度](#1三个维度)
+      - [2.tracing](#2tracing)
+        - [（1）前提](#1前提)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

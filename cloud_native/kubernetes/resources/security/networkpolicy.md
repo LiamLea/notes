@@ -1,6 +1,18 @@
 # networkpolicy
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [networkpolicy](#networkpolicy)
+    - [概述](#概述)
+      - [1.networkpolicy](#1networkpolicy)
+      - [2.前提](#2前提)
+    - [使用](#使用)
+      - [1.设置默认规则（如果不设置，默认都允许所有流量）](#1设置默认规则如果不设置默认都允许所有流量)
+        - [（1）某个namespace默认拒绝所有流量](#1某个namespace默认拒绝所有流量)
+        - [（2）某个namespace默认允许所有流量](#2某个namespace默认允许所有流量)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,6 +1,15 @@
 # ResourceQuota
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ResourceQuota](#resourcequota)
+    - [概述](#概述)
+      - [1.ResourceQuota资源](#1resourcequota资源)
+    - [使用](#使用)
+      - [1.简单使用](#1简单使用)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

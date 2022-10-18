@@ -1,6 +1,18 @@
 # admission control（准入控制）
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [admission control（准入控制）](#admission-control准入控制)
+    - [概述](#概述)
+      - [1.admission control分为两个阶段](#1admission-control分为两个阶段)
+        - [（1）变更阶段（Mutating Admission Webhook）](#1变更阶段mutating-admission-webhook)
+        - [（2）验证阶段（Validating Admission Webhook）](#2验证阶段validating-admission-webhook)
+      - [2.查看默认启用的admission controllers（admission plugins）](#2查看默认启用的admission-controllersadmission-plugins)
+      - [3.常见admission controllers（admission plugins）](#3常见admission-controllersadmission-plugins)
+      - [4.查看Mutating Admission Webhook 和 Validating Admission Webhook](#4查看mutating-admission-webhook-和-validating-admission-webhook)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 
