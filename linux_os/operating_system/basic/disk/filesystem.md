@@ -80,3 +80,17 @@ foo 和 bar2
 
 #### 9.文件系统架构的demo
 ![](./imgs/filesystem_04.png)
+
+#### 10.几种特殊的文件系统类型
+
+##### （1）`tmpfs`、`ramfs或/dev/ram*`
+* `tmpfs`将数据放在虚拟内存中
+  * 使用场景：
+    * 1.`/dev/shm`，用于进程间通信的共享内存
+    * 2.pod的临时存储（ephemeral storage）
+* `ramfs或/dev/ram*`将数据放在物理内存中（不能swap）
+
+##### （2）`/dev/loop*`
+使普通文件可以作为块存储访问
+  * 使用场景：
+    * 挂载disk images

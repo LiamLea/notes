@@ -193,6 +193,14 @@ monitor:
       #the path is relative path
       path: "prometheus"
       version: "15.8.5"
+    resources:
+      requests:
+        cpu: "4000m"
+        memory: "8Gi"
+      limits:
+        cpu: "4000m"
+        memory: "8Gi"
+      storage: 16Gi
     config:
       #this url will send with alerting msg which user can click to access prometheus to get alerting details
       #  e.g. https://k8s.my.local:30443/prometheus
