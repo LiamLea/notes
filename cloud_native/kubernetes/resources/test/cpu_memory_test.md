@@ -1,3 +1,13 @@
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [1.模拟高内存（触发OOM）](#1模拟高内存触发oom)
+- [2.模拟持续高内存（OOM且系统卡死）](#2模拟持续高内存oom且系统卡死)
+- [3.模拟大量进程](#3模拟大量进程)
+
+<!-- /code_chunk_output -->
+
 * 注意下面的镜像必须用：stress（而不是stress-ng）
 因为设置了limits后，stress-ng使用不会超过limits设置的值，所以不会触发OOM
 
@@ -72,7 +82,7 @@ spec:
       - operator: "Exists"
 ```
 
-##### 3.模拟大量进程
+#### 3.模拟大量进程
 ```yaml
 apiVersion: apps/v1
 kind: Deployment

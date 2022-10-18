@@ -1,6 +1,30 @@
 # API
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [API](#api)
+    - [预备知识](#预备知识)
+      - [1.声明式（declarative）和 命令式（imperative ）](#1声明式declarative和-命令式imperative)
+    - [概述](#概述)
+      - [1.在top-level分类](#1在top-level分类)
+        - [（1）核心组（没有group name）](#1核心组没有group-name)
+        - [（2）命名组](#2命名组)
+        - [（3）系统范围的实体](#3系统范围的实体)
+      - [2.有三类api version](#2有三类api-version)
+        - [（1）Alpha (experimental)](#1alpha-experimental)
+        - [（2）Beta (pre-release)](#2beta-pre-release)
+        - [（3）	GA (generally available, stable)](#3ga-generally-available-stable)
+      - [3.扩展api的两种方式](#3扩展api的两种方式)
+        - [（1）通过CRD](#1通过crd)
+        - [（2） API Aggregation](#2-api-aggregation)
+    - [查看](#查看)
+      - [1.列出所有的api](#1列出所有的api)
+      - [2.列出所有apiReousrces](#2列出所有apireousrces)
+      - [3.访问api](#3访问api)
+      - [4.watch api](#4watch-api)
+
+<!-- /code_chunk_output -->
 
 ### 预备知识
 

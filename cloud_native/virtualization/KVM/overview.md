@@ -1,6 +1,23 @@
 # KVM
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [KVM](#kvm)
+    - [概述](#概述)
+      - [1.KVM（kernel virtual machine）](#1kvmkernel-virtual-machine)
+      - [2.构建KVM虚拟化服务器平台](#2构建kvm虚拟化服务器平台)
+        - [（1）主要软件包](#1主要软件包)
+        - [（2）虚拟化服务：libvirtd](#2虚拟化服务libvirtd)
+        - [（3）图形管理虚拟化工具:virt-manager](#3图形管理虚拟化工具virt-manager)
+        - [（4）虚拟机的磁盘镜像文件格式:qcow2](#4虚拟机的磁盘镜像文件格式qcow2)
+      - [3.一台KVM虚拟机的组成](#3一台kvm虚拟机的组成)
+        - [（1）xml配置文件(虚拟机配置文件)](#1xml配置文件虚拟机配置文件)
+        - [（2）磁盘镜像文件](#2磁盘镜像文件)
+    - [virsh管理命令](#virsh管理命令)
+    - [复制一台虚拟机](#复制一台虚拟机)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

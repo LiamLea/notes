@@ -1,5 +1,20 @@
 # cert-manager
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [cert-manager](#cert-manager)
+    - [概述](#概述)
+    - [部署](#部署)
+    - [使用](#使用)
+      - [1.创建证书签发机构](#1创建证书签发机构)
+        - [（1）方式一：Issuer（指定命名空间中的证书签发机构）](#1方式一issuer指定命名空间中的证书签发机构)
+        - [（2）方式二：ClusterIssuer（全局证书签发机构）](#2方式二clusterissuer全局证书签发机构)
+      - [2.生成证书(Certificate)](#2生成证书certificate)
+        - [（1）方式一：手动生成](#1方式一手动生成)
+        - [（2）方式二：创建Ingress时，自动生成](#2方式二创建ingress时自动生成)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 
@@ -120,7 +135,7 @@ spec:
 ```yaml
 metadata:
   annotations:
-    
+
     #使用clusterissuer
     cert-manager.io/cluster-issuer: xx
 

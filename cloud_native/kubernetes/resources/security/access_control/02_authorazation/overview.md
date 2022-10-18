@@ -1,7 +1,28 @@
-
 # authorization（授权）
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [authorization（授权）](#authorization授权)
+    - [概述](#概述)
+      - [1.常用的授权插件：](#1常用的授权插件)
+      - [2.k8s上角色有两个级别](#2k8s上角色有两个级别)
+      - [3.相关资源](#3相关资源)
+        - [（1）Role（命名空间级别资源）](#1role命名空间级别资源)
+        - [（2）ClusterRole（集群级别资源）](#2clusterrole集群级别资源)
+        - [（3）RoleBinding（命名空间级别资源）](#3rolebinding命名空间级别资源)
+        - [（4）ClusterRoleBinding（集群级别资源）](#4clusterrolebinding集群级别资源)
+        - [（5）最常用的方式](#5最常用的方式)
+      - [4.verbs](#4verbs)
+    - [使用](#使用)
+      - [1.定义角色](#1定义角色)
+      - [2.将角色与账号（包括UserAccount和ServieAccount）绑定](#2将角色与账号包括useraccount和servieaccount绑定)
+      - [3.使得某个Pod有权限管理整个k8s集群](#3使得某个pod有权限管理整个k8s集群)
+        - [（1）首先创建一个serviceaccount](#1首先创建一个serviceaccount)
+        - [（2）绑定cluster-admin这个角色（这个角色是创建集群时生成的，所以不需要额外创建角色了）](#2绑定cluster-admin这个角色这个角色是创建集群时生成的所以不需要额外创建角色了)
+        - [（3）获取该serviceaccount的secret，从而获取token](#3获取该serviceaccount的secret从而获取token)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

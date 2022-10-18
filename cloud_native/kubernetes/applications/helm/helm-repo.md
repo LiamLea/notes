@@ -1,6 +1,18 @@
 # helm repo
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [helm repo](#helm-repo)
+    - [概述](#概述)
+      - [1.helm repo结构](#1helm-repo结构)
+      - [2.`index.yaml`格式](#2indexyaml格式)
+    - [自定义helm repo（以github.io为例子）](#自定义helm-repo以githubio为例子)
+      - [1.前提：http服务](#1前提http服务)
+      - [2.准备好charts](#2准备好charts)
+      - [3.生成`index.yaml`索引文件](#3生成indexyaml索引文件)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,6 +1,20 @@
 # cloud-init
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [cloud-init](#cloud-init)
+    - [概述](#概述)
+      - [1.cloud-init](#1cloud-init)
+      - [2.有两类配置](#2有两类配置)
+      - [3.根据以下数据进行初始化](#3根据以下数据进行初始化)
+        - [（1）cloud metadata](#1cloud-metadata)
+        - [（2）user data](#2user-data)
+        - [（3）vendor data](#3vendor-data)
+        - [（4）cloud init的配置文件中的配置](#4cloud-init的配置文件中的配置)
+    - [使用](#使用)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

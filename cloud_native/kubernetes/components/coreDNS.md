@@ -1,5 +1,16 @@
 # coreDNS
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [coreDNS](#coredns)
+    - [概述](#概述)
+      - [1.容器如何使用DNS](#1容器如何使用dns)
+    - [配置](#配置)
+      - [1.配置文件：Corefile](#1配置文件corefile)
+      - [2.修改配置](#2修改配置)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 
@@ -45,7 +56,7 @@ kubectl get svc -n kube-system
 
     #hosts后面加域，如果域为空，表示匹配配置文件上面设置的域，即所有域
     hosts {
-      
+
         #添加域名解析
         172.28.202.162 gitlab.devops.nari
 

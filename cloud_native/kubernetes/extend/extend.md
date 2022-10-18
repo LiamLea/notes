@@ -1,6 +1,23 @@
 # 扩展
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [扩展](#扩展)
+    - [概述](#概述)
+      - [1.custom resource](#1custom-resource)
+      - [2.custom controller](#2custom-controller)
+      - [3.operator](#3operator)
+      - [4.Aggregation Layer](#4aggregation-layer)
+      - [5.创建custom resource的两种方式](#5创建custom-resource的两种方式)
+        - [（1）CRD（custom resource definition）](#1crdcustom-resource-definition)
+        - [（2）API Aggregation](#2api-aggregation)
+        - [（3）两种方式的比较](#3两种方式的比较)
+        - [（4）查看所有注册的api](#4查看所有注册的api)
+    - [使用](#使用)
+      - [1.创建CRD](#1创建crd)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

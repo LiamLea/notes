@@ -1,6 +1,21 @@
 # config
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [config](#config)
+    - [calicoctl](#calicoctl)
+      - [1.查看pod的网卡信息](#1查看pod的网卡信息)
+        - [2.查看用于路由的ip](#2查看用于路由的ip)
+    - [配置bgp](#配置bgp)
+      - [1.默认配置](#1默认配置)
+      - [2.添加一条peer记录](#2添加一条peer记录)
+    - [配置Felix](#配置felix)
+      - [1.FelixConfiguration配置文件](#1felixconfiguration配置文件)
+    - [配置calico-node](#配置calico-node)
+      - [1.配置用于路由的ip](#1配置用于路由的ip)
+
+<!-- /code_chunk_output -->
 
 ### calicoctl
 

@@ -1,6 +1,34 @@
 # overview
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [overview](#overview)
+    - [基础概念](#基础概念)
+      - [1.利用linux kernel的特性](#1利用linux-kernel的特性)
+        - [（1）namespaces特性](#1namespaces特性)
+        - [（2）cgroups（control groups）特性](#2cgroupscontrol-groups特性)
+      - [2.docker组件](#2docker组件)
+        - [（1）dockerd](#1dockerd)
+        - [（2）containerd](#2containerd)
+        - [（3）runc（containerd子组件）](#3runccontainerd子组件)
+        - [（4）containerd-ctr（containerd子组件）](#4containerd-ctrcontainerd子组件)
+        - [（5）containerd-shim（containerd子组件）](#5containerd-shimcontainerd子组件)
+      - [3.使用docker的前提](#3使用docker的前提)
+      - [4.有两种存储卷](#4有两种存储卷)
+      - [5.container的状态](#5container的状态)
+      - [6..docker的端口映射，需要开启主机的ip转发功能](#6docker的端口映射需要开启主机的ip转发功能)
+      - [7.容器共享宿主机的时钟](#7容器共享宿主机的时钟)
+    - [相关操作和概念](#相关操作和概念)
+      - [1.容器相关](#1容器相关)
+      - [2.镜像相关](#2镜像相关)
+      - [3.网络相关](#3网络相关)
+      - [4.其他](#4其他)
+      - [5.docker镜像加速](#5docker镜像加速)
+    - [注意事项](#注意事项)
+        - [1.在容器中跑任何程序都不能运行在后台，否则容器会认为程序终止了，容器也就会结束](#1在容器中跑任何程序都不能运行在后台否则容器会认为程序终止了容器也就会结束)
+
+<!-- /code_chunk_output -->
 
 ### 基础概念
 

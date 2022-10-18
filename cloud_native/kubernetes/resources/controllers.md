@@ -1,6 +1,39 @@
 # controllers
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [controllers](#controllers)
+    - [概述](#概述)
+      - [1.controller定义](#1controller定义)
+      - [2.owner and dependent](#2owner-and-dependent)
+    - [控制器](#控制器)
+      - [1.ReplicaSet](#1replicaset)
+        - [（1）特点](#1特点)
+        - [（2）资源清单](#2资源清单)
+      - [2.Deployment](#2deployment)
+        - [（1）特点](#1特点-1)
+        - [（2）更新（生成新版本）](#2更新生成新版本)
+        - [（3）有两种更新策略（strategy）](#3有两种更新策略strategy)
+        - [（4）资源清单](#4资源清单)
+      - [3.DaemonSet（两种更新策略：OnDelete和RollingUpdate，只能先删再更新）](#3daemonset两种更新策略ondelete和rollingupdate只能先删再更新)
+        - [（1）特点](#1特点-2)
+        - [（2）清单内容](#2清单内容)
+      - [4.StatefulSet](#4statefulset)
+        - [（1）特点](#1特点-3)
+        - [（2）为什么pod是有状态的](#2为什么pod是有状态的)
+        - [（3）注意](#3注意)
+        - [（4）其他](#4其他)
+        - [（5）更新策略](#5更新策略)
+        - [（6）创建statefulSet控制器](#6创建statefulset控制器)
+      - [5.Job](#5job)
+      - [6.Cronjob](#6cronjob)
+    - [运维](#运维)
+      - [1.更新](#1更新)
+      - [2.回滚](#2回滚)
+      - [3.暂停和恢复](#3暂停和恢复)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

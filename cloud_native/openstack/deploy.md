@@ -1,6 +1,61 @@
 # deploy
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [deploy](#deploy)
+    - [概述](#概述)
+      - [1.节点类型](#1节点类型)
+    - [部署](#部署)
+      - [1.确定相关版本](#1确定相关版本)
+      - [2.注意](#2注意)
+        - [（1）deploy执行是幂等](#1deploy执行是幂等)
+      - [3.准备openstack相关机器](#3准备openstack相关机器)
+        - [（1）建议选择ubuntu系统](#1建议选择ubuntu系统)
+        - [（2）加载kvm模块](#2加载kvm模块)
+        - [（3）高可用：奇数台controller](#3高可用奇数台controller)
+        - [（4）网络规划](#4网络规划)
+      - [4.准备好ansible部署机](#4准备好ansible部署机)
+        - [（1）安装ansible所需依赖](#1安装ansible所需依赖)
+        - [（2）在虚拟环境中安装python包依赖](#2在虚拟环境中安装python包依赖)
+        - [（3）配置ansible](#3配置ansible)
+        - [（4）准备好kolla配置文件](#4准备好kolla配置文件)
+      - [5.配置清单文件（@ansible）](#5配置清单文件ansible)
+      - [6.生成和修改密码](#6生成和修改密码)
+      - [7.配置：`/etc/kolla/globals.yml`](#7配置etckollaglobalsyml)
+      - [8.使用ceph](#8使用ceph)
+        - [（1）修改配置](#1修改配置)
+        - [（2）标记磁盘（@storage-nodes）](#2标记磁盘storage-nodes)
+      - [9.修改配置解决相关bug](#9修改配置解决相关bug)
+        - [（1）解决无法从volume-based image创建volume的问题](#1解决无法从volume-based-image创建volume的问题)
+        - [（2）ceph-mgr内存使用越来越多](#2ceph-mgr内存使用越来越多)
+      - [10.进行部署](#10进行部署)
+      - [11.使用openstack](#11使用openstack)
+      - [12.部署Loadbalancer](#12部署loadbalancer)
+      - [12.执行一个demo](#12执行一个demo)
+        - [（1）创建供应商网络（即external网络）](#1创建供应商网络即external网络)
+        - [（2）创建租户网络](#2创建租户网络)
+        - [（3）创建路由器](#3创建路由器)
+      - [13.创建security group用于对外（即当使用floating ip时）](#13创建security-group用于对外即当使用floating-ip时)
+      - [14.从host能够ping instance（默认不可以）](#14从host能够ping-instance默认不可以)
+        - [（1）分配floating ip](#1分配floating-ip)
+        - [（2）在host上配置路由](#2在host上配置路由)
+    - [测试](#测试)
+      - [1.测试 ceph性能](#1测试-ceph性能)
+      - [2.测试镜像上传、创建虚拟机等功能](#2测试镜像上传-创建虚拟机等功能)
+      - [3.测试 虚拟机性能](#3测试-虚拟机性能)
+    - [添加或删除节点](#添加或删除节点)
+      - [1.添加controller](#1添加controller)
+      - [2.添加compute](#2添加compute)
+      - [3.删除controller](#3删除controller)
+      - [4.可能遇到的问题及恢复办法](#4可能遇到的问题及恢复办法)
+        - [（1）mariadb无法启动](#1mariadb无法启动)
+    - [覆盖配置（除了`global.yaml`）](#覆盖配置除了globalyaml)
+    - [trouble shooting](#trouble-shooting)
+      - [1.检查时，python sdk报错](#1检查时python-sdk报错)
+      - [2.创建instance时，Sending discover failed（通过dhcp获取ip失败）](#2创建instance时sending-discover-failed通过dhcp获取ip失败)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,6 +1,20 @@
 # migration
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [migration](#migration)
+    - [概述](#概述)
+      - [1.基本思路](#1基本思路)
+    - [具体步骤](#具体步骤)
+      - [1.导出资源](#1导出资源)
+      - [2.恢复资源](#2恢复资源)
+        - [（1）安装好基础组件](#1安装好基础组件)
+        - [（2）恢复全局资源](#2恢复全局资源)
+        - [（3）恢复storageclass和pv](#3恢复storageclass和pv)
+        - [（4）恢复某个namespace](#4恢复某个namespace)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

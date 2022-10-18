@@ -1,6 +1,24 @@
 # Bookinfo Demo
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [Bookinfo Demo](#bookinfo-demo)
+    - [概述](#概述)
+      - [1.Bookinfo应用被分解为4个微服务](#1bookinfo应用被分解为4个微服务)
+      - [2.reviews微服务有3个版本](#2reviews微服务有3个版本)
+    - [整体架构](#整体架构)
+      - [1.未使用istio时的架构](#1未使用istio时的架构)
+      - [2.使用istio时的架构](#2使用istio时的架构)
+    - [具体说明](#具体说明)
+      - [1.外部流量控制（GateWay)](#1外部流量控制gateway)
+      - [2.外部流量和内部流量的路由（VirtualService）](#2外部流量和内部流量的路由virtualservice)
+      - [3.productpage这个service将所有流量路由到productpage这个应用上（只有一个)](#3productpage这个service将所有流量路由到productpage这个应用上只有一个)
+      - [4.productpage应用会发送请求到details和reviews这两个服务](#4productpage应用会发送请求到details和reviews这两个服务)
+      - [5.reviews应用会发送请求到ratings这个服务](#5reviews应用会发送请求到ratings这个服务)
+      - [6.ratings应用会发送请求到productpage这个服务](#6ratings应用会发送请求到productpage这个服务)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

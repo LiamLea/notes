@@ -1,6 +1,19 @@
 # client
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [client](#client)
+    - [使用](#使用)
+      - [1.分布式云管理（distributed cloud manager）：dcmanager](#1分布式云管理distributed-cloud-managerdcmanager)
+      - [2.故障管理（fault management）：fm](#2故障管理fault-managementfm)
+      - [3.系统管理：system](#3系统管理system)
+        - [（1）主机相关](#1主机相关)
+        - [（2）服务相关](#2服务相关)
+        - [（3）应用相关](#3应用相关)
+      - [4.打补丁：sw-patch](#4打补丁sw-patch)
+
+<!-- /code_chunk_output -->
 
 ### 使用
 

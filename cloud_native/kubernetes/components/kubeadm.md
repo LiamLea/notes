@@ -1,6 +1,33 @@
 # kubeadm
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [kubeadm](#kubeadm)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+    - [kubeadm使用](#kubeadm使用)
+      - [1.配置kubeadm](#1配置kubeadm)
+      - [2.`kubeadm init`上传的文件](#2kubeadm-init上传的文件)
+      - [3.`kubeadm init`阶段解析](#3kubeadm-init阶段解析)
+        - [（1）预检查：`kubeadm init phase preflight`](#1预检查kubeadm-init-phase-preflight)
+        - [（2）生成证书：`kubeadm init phase certs`](#2生成证书kubeadm-init-phase-certs)
+        - [（3）生成kubeconfig配置文件：`kubeadm init phase kubeconfig`](#3生成kubeconfig配置文件kubeadm-init-phase-kubeconfig)
+        - [（4）生成kubelet的配置并启动Kubelet：`kubeadm init phase kubelet-start`](#4生成kubelet的配置并启动kubeletkubeadm-init-phase-kubelet-start)
+        - [（5）生成用于构建控制平面的pod的清单文件：`kubeadm init phase control-plane`](#5生成用于构建控制平面的pod的清单文件kubeadm-init-phase-control-plane)
+        - [（6）生成etcd pod的清单文件：`kubeadm init phase etcd`](#6生成etcd-pod的清单文件kubeadm-init-phase-etcd)
+        - [（7）上传配置到configmap：`kubeadm init phase upload-config`](#7上传配置到configmapkubeadm-init-phase-upload-config)
+        - [（8）上传密钥：`kubeadm init phase upload-certs`](#8上传密钥kubeadm-init-phase-upload-certs)
+        - [（9）标识控制平面（即标识该节点为master）：`kubeadm init phase mark-control-plane`](#9标识控制平面即标识该节点为masterkubeadm-init-phase-mark-control-plane)
+        - [（10）生成引导令牌，用于其他节点加入该集群：`kubeadm init phase bootstrap-token`](#10生成引导令牌用于其他节点加入该集群kubeadm-init-phase-bootstrap-token)
+        - [（11）更新kubelet的最终配置：`kubeadm init phase kubelet-finalize`](#11更新kubelet的最终配置kubeadm-init-phase-kubelet-finalize)
+        - [（12）安装必要的插件：`kubeadm init phase addon`](#12安装必要的插件kubeadm-init-phase-addon)
+      - [3.`kubeadm alpha`](#3kubeadm-alpha)
+        - [（1）重新生成证书：`kubeadm alpha certs renew`](#1重新生成证书kubeadm-alpha-certs-renew)
+    - [修改已有k8s集群的相关配置](#修改已有k8s集群的相关配置)
+      - [1.修改controlplane endpoint](#1修改controlplane-endpoint)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

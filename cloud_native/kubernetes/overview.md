@@ -1,4 +1,33 @@
-[toc]
+# overview
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [overview](#overview)
+    - [基础架构](#基础架构)
+      - [1.master核心组件](#1master核心组件)
+      - [2.node核心组件](#2node核心组件)
+      - [3.创建和删除pod时，各组件交互过程](#3创建和删除pod时各组件交互过程)
+      - [4.存储组件（一般放在master上，非常重要）](#4存储组件一般放在master上非常重要)
+      - [5.核心附件](#5核心附件)
+        - [（1）coredns](#1coredns)
+        - [（2）metrics-server](#2metrics-server)
+        - [（3）dashboard](#3dashboard)
+        - [（4）ingress controller](#4ingress-controller)
+        - [（5）fluentd](#5fluentd)
+      - [6.网络组件（有很多，选择其中一个即可）](#6网络组件有很多选择其中一个即可)
+    - [基础概念](#基础概念)
+      - [1.pod](#1pod)
+      - [2.controller](#2controller)
+      - [3.service](#3service)
+      - [4.label selector](#4label-selector)
+      - [5.k8s中的资源就是api，创建资源就是使用api进行操作](#5k8s中的资源就是api创建资源就是使用api进行操作)
+    - [网络架构](#网络架构)
+      - [1.有三种网络](#1有三种网络)
+      - [2.三种通信](#2三种通信)
+
+<!-- /code_chunk_output -->
+
 ### 基础架构
 master/node架构，master一般设为3个（高可用）
 

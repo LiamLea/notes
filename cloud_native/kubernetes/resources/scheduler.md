@@ -1,6 +1,34 @@
 # scheduler
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [scheduler](#scheduler)
+    - [基础概念](#基础概念)
+      - [1.调度有三个过程](#1调度有三个过程)
+        - [（1）Filtering（筛选）](#1filtering筛选)
+        - [（2）Scoring（计分）](#2scoring计分)
+        - [（3）Assign（分配）](#3assign分配)
+      - [2.调度需要考虑的几个方面](#2调度需要考虑的几个方面)
+        - [（1）资源需求](#1资源需求)
+        - [（2）根据标签或名称选择节点](#2根据标签或名称选择节点)
+        - [（3）亲和性](#3亲和性)
+        - [（4）污点（taints）](#4污点taints)
+        - [（5）其他约束](#5其他约束)
+      - [2.亲和性（反亲和性）](#2亲和性反亲和性)
+        - [（1）与node的亲和性](#1与node的亲和性)
+        - [（2）与pod的亲和性](#2与pod的亲和性)
+        - [（3）硬亲和（requested）](#3硬亲和requested)
+        - [（4）软亲和（preferred）](#4软亲和preferred)
+      - [3.污点（taints）](#3污点taints)
+        - [（1）说明](#1说明)
+        - [（2）三种排斥效果（effect）](#2三种排斥效果effect)
+    - [基本使用](#基本使用)
+      - [1.给node打标签和打污点（永久）](#1给node打标签和打污点永久)
+      - [2.删除标签和污点](#2删除标签和污点)
+      - [3.pod设置能够忍受的污点](#3pod设置能够忍受的污点)
+
+<!-- /code_chunk_output -->
 
 ### 基础概念
 

@@ -1,4 +1,18 @@
-[toc]
+# log
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [log](#log)
+    - [概述](#概述)
+      - [1.容器日志的存放位置](#1容器日志的存放位置)
+      - [2.k8s三种日志架构方式](#2k8s三种日志架构方式)
+        - [（1）基本方式](#1基本方式)
+        - [（2）node-level](#2node-level)
+        - [（3）cluster-level](#3cluster-level)
+
+<!-- /code_chunk_output -->
+
 **kubernetes中的应用的日志 都是 docker 管理的**
 ### 概述
 #### 1.容器日志的存放位置

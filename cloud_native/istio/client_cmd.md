@@ -1,6 +1,18 @@
 # 客户端命令
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [客户端命令](#客户端命令)
+    - [istioctl](#istioctl)
+      - [1.查看envoy状态和配置](#1查看envoy状态和配置)
+      - [2.利用envoy接口查看envoy信息](#2利用envoy接口查看envoy信息)
+      - [3.查看envoy的配置（本质就是看filters等信息）](#3查看envoy的配置本质就是看filters等信息)
+    - [查看pilot的信息](#查看pilot的信息)
+      - [1.查看service registry](#1查看service-registry)
+      - [2.查看当前的mesh配置](#2查看当前的mesh配置)
+
+<!-- /code_chunk_output -->
 
 ### istioctl
 

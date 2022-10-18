@@ -1,6 +1,49 @@
 # 部署k8s集群
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [部署k8s集群](#部署k8s集群)
+    - [概述](#概述)
+      - [1.两种架构模式](#1两种架构模式)
+        - [（1）内部etcd](#1内部etcd)
+        - [（2）外部etcd](#2外部etcd)
+      - [2.kube-apiserver、kube-scheduler和kube-controller-manager的清单文件](#2kube-apiserver-kube-scheduler和kube-controller-manager的清单文件)
+    - [安装步骤](#安装步骤)
+      - [1.pre check](#1pre-check)
+        - [（1）检查cpu/memory](#1检查cpumemory)
+        - [（2）检查磁盘性能](#2检查磁盘性能)
+      - [2.做好前提准备并且配置好yum源](#2做好前提准备并且配置好yum源)
+        - [（1）时间同步（非常重要）](#1时间同步非常重要)
+        - [（2）设置主机名（必须要设置好）](#2设置主机名必须要设置好)
+        - [（3）防火墙关闭](#3防火墙关闭)
+        - [（4）卸载swap](#4卸载swap)
+        - [（5）设置网络参数](#5设置网络参数)
+      - [3.在所有节点上安装组件](#3在所有节点上安装组件)
+      - [4.修改docker配置](#4修改docker配置)
+      - [5.设置相关服务开机自启（而不是现在就启动）](#5设置相关服务开机自启而不是现在就启动)
+      - [6.初始化master节点](#6初始化master节点)
+      - [7.修改所有的kubelet配置然后重启](#7修改所有的kubelet配置然后重启)
+      - [8.安装calico（注意版本）](#8安装calico注意版本)
+        - [（1）注意版本](#1注意版本)
+        - [（2）指定网卡](#2指定网卡)
+        - [（3）pod的cidr](#3pod的cidr)
+        - [（4）验证是否可用](#4验证是否可用)
+      - [9.添加node节点](#9添加node节点)
+      - [10.添加mster节点](#10添加mster节点)
+      - [11.删除节点](#11删除节点)
+    - [FAQ](#faq)
+      - [1.从其他节点无法访问该节点上开放的NodePort](#1从其他节点无法访问该节点上开放的nodeport)
+      - [2.配置kube-proxy](#2配置kube-proxy)
+      - [3.centos7和flannel的vxlan模式存在bug（ubuntu也存在bug）](#3centos7和flannel的vxlan模式存在bugubuntu也存在bug)
+        - [（1）存在的问题](#1存在的问题)
+        - [（2）几种解决方案：](#2几种解决方案)
+      - [4.更换网络插件的操作](#4更换网络插件的操作)
+        - [（1）需要清空原先网络插件的配置](#1需要清空原先网络插件的配置)
+        - [（2）安装新的网络插件](#2安装新的网络插件)
+        - [（3）安装后](#3安装后)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,6 +1,21 @@
 # docker registry
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [docker registry](#docker-registry)
+    - [概述](#概述)
+      - [1.insecure registry](#1insecure-registry)
+        - [（1）没有设置insecure registry](#1没有设置insecure-registry)
+        - [（2)设置了insecure registry](#2设置了insecure-registry)
+      - [2.registry分类](#2registry分类)
+    - [使用](#使用)
+      - [1.查看有哪些docker仓库](#1查看有哪些docker仓库)
+      - [2.查看某个仓库有哪些标签](#2查看某个仓库有哪些标签)
+      - [3.删除某个镜像](#3删除某个镜像)
+      - [4.去仓库服务器上清理刚刚删除的镜像](#4去仓库服务器上清理刚刚删除的镜像)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

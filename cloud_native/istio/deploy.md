@@ -1,6 +1,35 @@
 # deploy
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [deploy](#deploy)
+    - [部署istio](#部署istio)
+      - [1.安装istio](#1安装istio)
+        - [（1）profile](#1profile)
+        - [（2）安装istio](#2安装istio)
+        - [（3）安装附件](#3安装附件)
+      - [2.命名空间打标](#2命名空间打标)
+      - [3.访问istio的dashboard（kiali）](#3访问istio的dashboardkiali)
+      - [4.卸载istio](#4卸载istio)
+    - [集成附件](#集成附件)
+      - [1.jaeger](#1jaeger)
+      - [2.prometheus/grafana](#2prometheusgrafana)
+      - [3.kiali](#3kiali)
+        - [（1）集成prometheus](#1集成prometheus)
+        - [（2）集成jaeger](#2集成jaeger)
+        - [（3）集成grafana](#3集成grafana)
+    - [部署demo](#部署demo)
+      - [1.创建应用](#1创建应用)
+      - [2.创建istio ingress GateWay](#2创建istio-ingress-gateway)
+      - [3.访问该应用，获取对外暴露的端口号](#3访问该应用获取对外暴露的端口号)
+    - [配置（本质就是配置envoy，主要就是filters）](#配置本质就是配置envoy主要就是filters)
+      - [1.IstioOperator](#1istiooperator)
+      - [2.Telemetry（本质就是配置filters）](#2telemetry本质就是配置filters)
+        - [（1）使用telemetry进行配置](#1使用telemetry进行配置)
+      - [3.查看配置是否生效的方法（查看envoy的filters等信息）](#3查看配置是否生效的方法查看envoy的filters等信息)
+
+<!-- /code_chunk_output -->
 
 ### 部署istio
 

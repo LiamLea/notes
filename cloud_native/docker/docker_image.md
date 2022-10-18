@@ -1,6 +1,24 @@
 # docker镜像
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [docker镜像](#docker镜像)
+    - [概述](#概述)
+      - [1.image](#1image)
+      - [2.container](#2container)
+      - [3.镜像采用分层构建机制](#3镜像采用分层构建机制)
+        - [3.1 概述](#31-概述)
+        - [3.2 分层的优点](#32-分层的优点)
+      - [4.docker支持的存储驱动](#4docker支持的存储驱动)
+      - [5.overlay2驱动](#5overlay2驱动)
+        - [（1） 特点](#1-特点)
+        - [（2）`/var/lib/docker/overlay2/<id>/`目录下可能有的内容](#2varlibdockeroverlay2id目录下可能有的内容)
+        - [（3）根据overlay2的`<id>`获取`<container_id>`](#3根据overlay2的id获取container_id)
+      - [6.docker registry](#6docker-registry)
+      - [7.打包镜像](#7打包镜像)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,5 +1,30 @@
 # ingress
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ingress](#ingress)
+    - [概述](#概述)
+      - [1.ingress controller](#1ingress-controller)
+      - [2.ingress controller对外暴露的两个方式](#2ingress-controller对外暴露的两个方式)
+      - [3.Ingress](#3ingress)
+      - [4.Ingress如何指定代理的pod](#4ingress如何指定代理的pod)
+      - [5.整个流程：](#5整个流程)
+    - [安装](#安装)
+      - [1.设置转发TCP](#1设置转发tcp)
+        - [（1）方式一：](#1方式一)
+        - [（2）方式二：](#2方式二)
+        - [（3）方式三：](#3方式三)
+    - [使用](#使用)
+      - [1.清单文件](#1清单文件)
+        - [（1）基本配置](#1基本配置)
+        - [（2）修改转发到后端的url](#2修改转发到后端的url)
+        - [（3）当后端是https协议时](#3当后端是https协议时)
+        - [（4）存在解码问题的解决方案](#4存在解码问题的解决方案)
+      - [2.查看是否注入](#2查看是否注入)
+      - [3.排错](#3排错)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 #### 1.ingress controller

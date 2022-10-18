@@ -1,6 +1,17 @@
 # kubelet log分析
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [kubelet log分析](#kubelet-log分析)
+    - [代码模块](#代码模块)
+      - [1.`kubelet.go`](#1kubeletgo)
+      - [2.`server.go`](#2servergo)
+      - [3.`kubelet_node_status.go`、](#3kubelet_node_statusgo)
+      - [4.`pod_workers.go`](#4pod_workersgo)
+        - [5.`eviction_manager`](#5eviction_manager)
+
+<!-- /code_chunk_output -->
 
 ### 代码模块
 

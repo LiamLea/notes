@@ -1,6 +1,15 @@
 # LimitRange
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [LimitRange](#limitrange)
+    - [概述](#概述)
+      - [1.LimitRange 资源](#1limitrange-资源)
+    - [使用](#使用)
+      - [1.LimitRange](#1limitrange)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

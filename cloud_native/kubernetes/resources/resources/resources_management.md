@@ -1,6 +1,30 @@
 # resources management
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [resources management](#resources-management)
+    - [概述](#概述)
+      - [1.kubelet只支持两种文件系统](#1kubelet只支持两种文件系统)
+        - [（1） nodefs](#1-nodefs)
+        - [（2）imagefs](#2imagefs)
+      - [2.kubelet预留资源](#2kubelet预留资源)
+        - [（1）为k8s组件预留资源](#1为k8s组件预留资源)
+        - [（2）为系统（非k8s组件）预留资源](#2为系统非k8s组件预留资源)
+      - [3.可用资源计算方法](#3可用资源计算方法)
+    - [Eviction Policy(驱逐策略)](#eviction-policy驱逐策略)
+      - [1.驱逐策略](#1驱逐策略)
+      - [2.驱逐信号](#2驱逐信号)
+      - [3.驱逐阈值（可以是百分比，可以是有单位的数值）](#3驱逐阈值可以是百分比可以是有单位的数值)
+        - [（1）hard evication threshold](#1hard-evication-threshold)
+        - [（2）soft evication threshold](#2soft-evication-threshold)
+      - [4.驱逐信号导致节点的状态](#4驱逐信号导致节点的状态)
+      - [5.ephemeral storage过低，导致相关资源被驱逐](#5ephemeral-storage过低导致相关资源被驱逐)
+      - [6.影响驱逐哪些pod的因素](#6影响驱逐哪些pod的因素)
+        - [（1）影响因素](#1影响因素)
+        - [（2）驱逐算法](#2驱逐算法)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 
