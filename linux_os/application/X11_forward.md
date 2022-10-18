@@ -1,3 +1,14 @@
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [1.安装xorg-x11-xouath](#1安装xorg-x11-xouath)
+- [2.安装](#2安装)
+- [3.测试（不要使用sudo）](#3测试不要使用sudo)
+- [4.xmanager设置](#4xmanager设置)
+
+<!-- /code_chunk_output -->
+
 #### 1.安装xorg-x11-xouath
 用于授权转发 X11 到X server
 ```shell

@@ -1,6 +1,28 @@
 # usage
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [usage](#usage)
+    - [安装jenkins](#安装jenkins)
+      - [1.docker方式安装](#1docker方式安装)
+      - [2.端口说明](#2端口说明)
+    - [使用jenkins agent](#使用jenkins-agent)
+      - [1.controller 与 agent的三种连接方式](#1controller-与-agent的三种连接方式)
+      - [2.常用镜像](#2常用镜像)
+        - [（1）通用配置（即每个镜像都需要配置）](#1通用配置即每个镜像都需要配置)
+        - [（2）镜像列表](#2镜像列表)
+      - [3.传统的静态agent](#3传统的静态agent)
+      - [4.基于docker的动态agent](#4基于docker的动态agent)
+        - [（1）demo: 基于docker配置maven agent](#1demo-基于docker配置maven-agent)
+      - [5.基于k8s的动态agent（建议）](#5基于k8s的动态agent建议)
+        - [（1）基于k8s配置agent（即pod模板）](#1基于k8s配置agent即pod模板)
+        - [（2）添加maven容器](#2添加maven容器)
+        - [（3）添加nodejs容器](#3添加nodejs容器)
+        - [（4）在pipeline中使用k8s agent](#4在pipeline中使用k8s-agent)
+      - [6.debug动态agent](#6debug动态agent)
+
+<!-- /code_chunk_output -->
 
 ### 安装jenkins
 

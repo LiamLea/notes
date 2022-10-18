@@ -1,6 +1,27 @@
 # proxy and upstream
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [proxy and upstream](#proxy-and-upstream)
+    - [概述](#概述)
+      - [1.相关模块](#1相关模块)
+      - [2.`proxy_pass`能够代理的协议](#2proxy_pass能够代理的协议)
+      - [3.proxy基本过程](#3proxy基本过程)
+      - [4.unsuccessful attempt（失败的请求）](#4unsuccessful-attempt失败的请求)
+      - [5.ip transparency](#5ip-transparency)
+    - [配置](#配置)
+      - [1.http proxy](#1http-proxy)
+      - [2.stream proxy](#2stream-proxy)
+      - [3.转发websocket请求的配置](#3转发websocket请求的配置)
+      - [4.在stream上下文中的upstream](#4在stream上下文中的upstream)
+      - [5.在http上下文中的upstream](#5在http上下文中的upstream)
+      - [6.http反向代理 需要注意 解码问题](#6http反向代理-需要注意-解码问题)
+        - [（1）`proxy_pass`后面不加任何url](#1proxy_pass后面不加任何url)
+        - [（2）利用`$request_uri`这个变量](#2利用request_uri这个变量)
+        - [（3）在ingress中的解决方案](#3在ingress中的解决方案)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

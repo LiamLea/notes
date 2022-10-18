@@ -1,6 +1,26 @@
 # cgroup
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [cgroup](#cgroup)
+    - [概述](#概述)
+      - [1.cgroups（control groups）特性](#1cgroupscontrol-groups特性)
+        - [（1）基本概念](#1基本概念)
+        - [（2）cgroup driver](#2cgroup-driver)
+        - [（2）目录组织](#2目录组织)
+      - [2.kmem（kernel memory）](#2kmemkernel-memory)
+    - [使用](#使用)
+      - [1.查看cgroup版本](#1查看cgroup版本)
+      - [2.查看cgroup的使用情况](#2查看cgroup的使用情况)
+      - [3.查看内存使用量](#3查看内存使用量)
+        - [（1）查看内存使用情况](#1查看内存使用情况)
+        - [（2）查看kernel内存使用量（关闭后就为0）](#2查看kernel内存使用量关闭后就为0)
+        - [（3）查看当前内存使用量](#3查看当前内存使用量)
+        - [（4）docker stats查出来的值（不包含cache）](#4docker-stats查出来的值不包含cache)
+      - [4.关闭cgroup的kmem](#4关闭cgroup的kmem)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

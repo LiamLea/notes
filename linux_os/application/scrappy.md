@@ -1,4 +1,20 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [wifi](#wifi)
+  - [1.基础概念](#1基础概念)
+    - [（1）ssid（service set id）](#1ssidservice-set-id)
+    - [（2）wpa](#2wpa)
+  - [2.连接wifi](#2连接wifi)
+    - [（1）查看wifi设备](#1查看wifi设备)
+    - [（2）开启wifi](#2开启wifi)
+    - [（3）查看可用的无线网](#3查看可用的无线网)
+    - [（4）连接无线网](#4连接无线网)
+    - [（5）获取ip](#5获取ip)
+
+<!-- /code_chunk_output -->
+
 ### wifi
 
 #### 1.基础概念

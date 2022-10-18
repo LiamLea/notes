@@ -1,6 +1,28 @@
 # grammar
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [grammar](#grammar)
+    - [概述](#概述)
+      - [1.基本格式](#1基本格式)
+      - [2.变量和常量](#2变量和常量)
+        - [（1）声明变量：`var`](#1声明变量var)
+        - [（2）声明常量：`const` 和 `iota`](#2声明常量const-和-iota)
+      - [3.字符串](#3字符串)
+        - [（1）概述](#1概述)
+        - [（2）相关操作](#2相关操作)
+        - [（3）字符类型](#3字符类型)
+      - [4.流程控制](#4流程控制)
+        - [（1）if](#1if)
+        - [（2）循环（只有for循环）](#2循环只有for循环)
+        - [（3）switch](#3switch)
+      - [5.指针](#5指针)
+      - [6.定义一个新的类型：type](#6定义一个新的类型type)
+      - [7.new和make](#7new和make)
+      - [8.反射:`reflect`](#8反射reflect)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

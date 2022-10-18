@@ -1,6 +1,23 @@
 # IoC container
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [IoC container](#ioc-container)
+    - [概述](#概述)
+      - [1.spring IoC(inversion of control) containers](#1spring-iocinversion-of-control-containers)
+      - [2.基本概念](#2基本概念)
+        - [（1）组件（即对象，即bean）](#1组件即对象即bean)
+      - [3.组件的三种类型](#3组件的三种类型)
+    - [使用](#使用)
+      - [1.注册组件](#1注册组件)
+        - [（1）定义一个类](#1定义一个类)
+        - [（2）手动方式创建对象](#2手动方式创建对象)
+        - [（3）基于 配置类注解 注册组件](#3基于-配置类注解-注册组件)
+        - [（4）基于`@Component`注解注册组件](#4基于component注解注册组件)
+      - [2.自动装配](#2自动装配)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

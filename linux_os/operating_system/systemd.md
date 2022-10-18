@@ -1,6 +1,35 @@
 # systemd
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [systemd](#systemd)
+    - [概述](#概述)
+      - [1.systemd新特性](#1systemd新特性)
+      - [2.systemd units](#2systemd-units)
+        - [（1）socket unit：`<unit-name>.socket`](#1socket-unitunit-namesocket)
+      - [3.systemd units文件位置](#3systemd-units文件位置)
+      - [4.unit的依赖关系和启动顺序](#4unit的依赖关系和启动顺序)
+        - [（1）定义启动顺序：`After`、`Before`](#1定义启动顺序after-before)
+        - [（2）定义强依赖：`Requires`、`Requisite`](#2定义强依赖requires-requisite)
+        - [（3）定义弱依赖：`Wants`](#3定义弱依赖wants)
+        - [（4）隐含依赖](#4隐含依赖)
+      - [5.unit模板（`<unit-name>@.<unit-type>`）](#5unit模板unit-nameunit-type)
+      - [6.特殊目录](#6特殊目录)
+      - [7.unit日志](#7unit日志)
+        - [（1）查看某个unit的日志](#1查看某个unit的日志)
+    - [使用](#使用)
+      - [1.unit文件结构](#1unit文件结构)
+        - [（1）`[Unit]`](#1unit)
+        - [（2）`[<unit type>]`](#2unit-type)
+        - [（3）`[Install]`（没有这个，service就是`static`的，不能enable）](#3install没有这个service就是static的不能enable)
+      - [2.`[service]`配置](#2service配置)
+        - [（1）Type的类型](#1type的类型)
+      - [3.systemd target units](#3systemd-target-units)
+        - [（1）跟系统运行有关的targets](#1跟系统运行有关的targets)
+        - [（2）普通targets](#2普通targets)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

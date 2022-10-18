@@ -1,5 +1,43 @@
 # gerrit
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [gerrit](#gerrit)
+    - [概述](#概述)
+      - [1.gerrit的常用引用](#1gerrit的常用引用)
+      - [2.引用权限的设置](#2引用权限的设置)
+    - [安装](#安装)
+      - [1.初始化gerrit（生成gerrit目录）](#1初始化gerrit生成gerrit目录)
+      - [2.修改配置](#2修改配置)
+      - [3.启动gerrit](#3启动gerrit)
+      - [4.设置管理员账号](#4设置管理员账号)
+        - [（1）暂时修改认证方式](#1暂时修改认证方式)
+        - [（2）用admin账号登录，将相应账号设为管理员](#2用admin账号登录将相应账号设为管理员)
+        - [（3）将认证方式改回来](#3将认证方式改回来)
+    - [利用ssh命令管理gerrit](#利用ssh命令管理gerrit)
+      - [1.上传所在机器的公钥到指定账号](#1上传所在机器的公钥到指定账号)
+      - [2.命令格式](#2命令格式)
+      - [3.常用命令](#3常用命令)
+    - [gerrit与gitlab集成](#gerrit与gitlab集成)
+      - [1.将gerrit机器上的ssh公钥添加到gitlab上](#1将gerrit机器上的ssh公钥添加到gitlab上)
+      - [2.在gerrit上添加同名仓库](#2在gerrit上添加同名仓库)
+      - [3.添加replication配置](#3添加replication配置)
+      - [4.客户端使用](#4客户端使用)
+        - [（1）克隆gerrit上的仓库](#1克隆gerrit上的仓库)
+        - [（2）使用](#2使用)
+        - [（3）提交被打回如何处理](#3提交被打回如何处理)
+    - [gerrit和jenkins集成](#gerrit和jenkins集成)
+      - [1.gerrit开启verified功能](#1gerrit开启verified功能)
+        - [（1）修改All-Projects的配置](#1修改all-projects的配置)
+        - [（2）All-Projects添加label verified](#2all-projects添加label-verified)
+      - [2.配置jenkins](#2配置jenkins)
+        - [（1）配置Gerrit Trigger](#1配置gerrit-trigger)
+        - [（2）配置 进行verify 的流水线](#2配置-进行verify-的流水线)
+    - [FAQ](#faq)
+      - [1.gerrit和gitlab冲突的问题](#1gerrit和gitlab冲突的问题)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 #### 1.gerrit的常用引用

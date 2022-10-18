@@ -1,6 +1,17 @@
 # sync
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [sync](#sync)
+    - [使用](#使用)
+      - [1.互斥锁：mutex](#1互斥锁mutex)
+      - [2.读写锁](#2读写锁)
+      - [3.执行多次时，确保某个函数只执行一次（常在并发中使用）](#3执行多次时确保某个函数只执行一次常在并发中使用)
+      - [4.协程安全的map](#4协程安全的map)
+      - [5.提供一些原子函数：`atomic.xx`](#5提供一些原子函数atomicxx)
+
+<!-- /code_chunk_output -->
 
 ### 使用
 

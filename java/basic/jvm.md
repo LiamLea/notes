@@ -1,5 +1,33 @@
 # JVM
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [JVM](#jvm)
+    - [概述](#概述)
+      - [1.相关术语](#1相关术语)
+      - [2.基础概念](#2基础概念)
+        - [（1）jvm](#1jvm)
+        - [（2）java是编译和解释型语言](#2java是编译和解释型语言)
+      - [3.java编译和c编译比较](#3java编译和c编译比较)
+    - [GC（Garbage Collection）](#gcgarbage-collection)
+      - [1.垃圾的定义](#1垃圾的定义)
+      - [2.三种GC回收算法](#2三种gc回收算法)
+        - [（1）Mark-Sweep（标记清除）](#1mark-sweep标记清除)
+        - [（2）Copying（拷贝）](#2copying拷贝)
+        - [（3）Mark-compact（压缩标记）](#3mark-compact压缩标记)
+      - [3.十种垃圾回收器（garbage collector）](#3十种垃圾回收器garbage-collector)
+      - [4.分代模型（新生代和老年代）](#4分代模型新生代和老年代)
+      - [5.回收过程](#5回收过程)
+      - [6.回收过程其他说明](#6回收过程其他说明)
+    - [jvm监控工具](#jvm监控工具)
+      - [1.`jps`（JVM process status）](#1jpsjvm-process-status)
+      - [2.`jstat`（JVM statistics Monitoring）](#2jstatjvm-statistics-monitoring)
+      - [3.`jinfo`（JVM configuration info）](#3jinfojvm-configuration-info)
+      - [4.`jmap`（jvm memory map）](#4jmapjvm-memory-map)
+      - [5.`jstack`（thread stack trace for a java process）](#5jstackthread-stack-trace-for-a-java-process)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 #### 1.相关术语

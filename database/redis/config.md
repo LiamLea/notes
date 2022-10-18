@@ -1,5 +1,14 @@
 # config
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [config](#config)
+    - [配置](#配置)
+
+<!-- /code_chunk_output -->
+
+### 配置
 ```yaml
 #当client idle时间持续<INT>秒时，则关闭这个连接
 #默认为0，表示disable这个功能

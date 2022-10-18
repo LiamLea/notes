@@ -1,6 +1,24 @@
 # editor
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [editor](#editor)
+    - [sed](#sed)
+      - [1.特点](#1特点)
+      - [2.命令](#2命令)
+        - [（1）选项](#1选项)
+        - [（2）表达式](#2表达式)
+        - [（3）行控制](#3行控制)
+        - [（4）命令](#4命令)
+        - [（5）特殊字符](#5特殊字符)
+        - [（6）demo](#6demo)
+      - [3.正则的使用](#3正则的使用)
+    - [awk](#awk)
+      - [1.利用awk给一组数据加标题](#1利用awk给一组数据加标题)
+      - [2.将命令的输出存入变量](#2将命令的输出存入变量)
+
+<!-- /code_chunk_output -->
 
 ### sed
 

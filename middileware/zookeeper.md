@@ -1,7 +1,22 @@
 # zookeeper
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
 
-[toc]
+- [zookeeper](#zookeeper)
+    - [概述](#概述)
+      - [1.数据模型](#1数据模型)
+        - [（1）namespace（类似文件系统）](#1namespace类似文件系统)
+        - [（2）nodes 和 ephemeral nodes](#2nodes-和-ephemeral-nodes)
+      - [2.核心功能](#2核心功能)
+      - [3.集群](#3集群)
+        - [（1）leader 和 follower](#1leader-和-follower)
+        - [（2）observer](#2observer)
+        - [（3）选举机制](#3选举机制)
+      - [4.应用场景](#4应用场景)
+    - [配置](#配置)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

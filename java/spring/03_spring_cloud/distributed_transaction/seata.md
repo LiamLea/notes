@@ -1,6 +1,19 @@
 # seata
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [seata](#seata)
+    - [概述](#概述)
+      - [1.seata](#1seata)
+      - [1.相关术语](#1相关术语)
+      - [2.工作流程](#2工作流程)
+      - [3.工作原理](#3工作原理)
+        - [（1）第一阶段](#1第一阶段)
+        - [（2）第二阶段（如果顺利提交）](#2第二阶段如果顺利提交)
+        - [（3）第二阶段（如果回滚）](#3第二阶段如果回滚)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

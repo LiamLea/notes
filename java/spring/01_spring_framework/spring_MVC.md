@@ -1,6 +1,20 @@
 # spring MVC
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [spring MVC](#spring-mvc)
+    - [概述](#概述)
+      - [1.spring MVC](#1spring-mvc)
+    - [使用](#使用)
+      - [1.基本使用](#1基本使用)
+        - [（1）通过pojo获取参数（即通过实体类，即对象）](#1通过pojo获取参数即通过实体类即对象)
+      - [2.域共享数据](#2域共享数据)
+        - [（1）请求域共享数据](#1请求域共享数据)
+        - [（2）会话域共享数据](#2会话域共享数据)
+        - [（3）应用域共享数据](#3应用域共享数据)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

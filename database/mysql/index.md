@@ -1,3 +1,15 @@
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [基础概念](#基础概念)
+  - [1.B树](#1b树)
+  - [2.B+树](#2b树)
+  - [索引](#索引)
+  - [查找方式](#查找方式)
+
+<!-- /code_chunk_output -->
+
 ### 基础概念
 
 #### 1.B树

@@ -1,6 +1,24 @@
 # eureka
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [eureka](#eureka)
+    - [服务端](#服务端)
+      - [1.单机版](#1单机版)
+        - [（1）引入依赖: `pom.xml`](#1引入依赖-pomxml)
+        - [（2）配置: `application.yml`](#2配置-applicationyml)
+      - [（3）在主函数上启用eureka server](#3在主函数上启用eureka-server)
+      - [2.集群版本](#2集群版本)
+      - [3.自我保护模式](#3自我保护模式)
+    - [客户端](#客户端)
+      - [1.引入依赖](#1引入依赖)
+      - [2.配置: `application.yml`](#2配置-applicationyml-1)
+      - [4.在主函数上启用eureka client](#4在主函数上启用eureka-client)
+      - [5.使用注册中心中注册的地址](#5使用注册中心中注册的地址)
+      - [6.相关配置](#6相关配置)
+
+<!-- /code_chunk_output -->
 
 ### 服务端
 

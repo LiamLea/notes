@@ -1,6 +1,23 @@
 # OpenFeign
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [OpenFeign](#openfeign)
+    - [概述](#概述)
+      - [1.OpenFeign](#1openfeign)
+        - [（1）what](#1what)
+        - [（2）why](#2why)
+        - [（3）集成了LoadBalancer](#3集成了loadbalancer)
+    - [使用](#使用)
+      - [1.基本使用](#1基本使用)
+        - [（1）引入依赖](#1引入依赖)
+        - [（2）在主函数上启用feign](#2在主函数上启用feign)
+        - [（3）创建feign接口](#3创建feign接口)
+        - [（4）使用feign接口](#4使用feign接口)
+      - [2、feign的超时时间设置（默认1s）](#2-feign的超时时间设置默认1s)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

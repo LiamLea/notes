@@ -1,4 +1,15 @@
-[toc]
+# debian
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [debian](#debian)
+    - [修改网络配置](#修改网络配置)
+      - [1.配置文件](#1配置文件)
+      - [2.安装一些基础软件](#2安装一些基础软件)
+      - [3.修改易用配置](#3修改易用配置)
+
+<!-- /code_chunk_output -->
 
 ### 修改网络配置
 

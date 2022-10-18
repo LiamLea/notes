@@ -1,6 +1,31 @@
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [rsyslog(rocket-fast syslog)](#rsyslogrocket-fast-syslog)
+    - [概述](#概述)
+      - [1.rsyslog功能](#1rsyslog功能)
+      - [2.处理流程](#2处理流程)
+      - [3.input](#3input)
+      - [4.rules](#4rules)
+        - [（1）selector（选择器）](#1selector选择器)
+        - [（2）actions](#2actions)
+- [systemd-journald](#systemd-journald)
+    - [概述](#概述-1)
+      - [1.特点](#1特点)
+      - [2.收集以下日志：](#2收集以下日志)
+- [logrotate](#logrotate)
+    - [概述](#概述-2)
+      - [特点](#特点)
+    - [配置](#配置)
+    - [demo](#demo)
+      - [1.对docker日志进行logrotate](#1对docker日志进行logrotate)
+
+<!-- /code_chunk_output -->
+
 # rsyslog(rocket-fast syslog)
+
 ### 概述
+
 #### 1.rsyslog功能
 * 接收多种方式的输入
 * 转换
@@ -57,8 +82,8 @@ emerg
 *.* @@<IP>:<PORT>   #通过TCP协议发送
 ```
 
-
 ***
+
 # systemd-journald
 ### 概述
 #### 1.特点

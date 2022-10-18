@@ -1,6 +1,31 @@
 # maven
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [maven](#maven)
+    - [基本概念](#基本概念)
+      - [1.maven](#1maven)
+      - [2.构建的步骤：](#2构建的步骤)
+      - [3.约定的目录结构](#3约定的目录结构)
+      - [4.POM(project object model)](#4pomproject-object-model)
+      - [5.坐标](#5坐标)
+      - [6.依赖](#6依赖)
+      - [7.仓库的分类：](#7仓库的分类)
+      - [8.继承](#8继承)
+      - [9.聚合](#9聚合)
+      - [10.artifact](#10artifact)
+    - [maven命令](#maven命令)
+      - [1.常用命令](#1常用命令)
+      - [2.常用组合](#2常用组合)
+    - [配置](#配置)
+      - [1.设置中央仓库镜像](#1设置中央仓库镜像)
+      - [2.设置使用的私库](#2设置使用的私库)
+      - [3.允许用http连接nexus仓库](#3允许用http连接nexus仓库)
+    - [FAQ](#faq)
+      - [1.本地有artifct，但是还是从远程下载](#1本地有artifct但是还是从远程下载)
+
+<!-- /code_chunk_output -->
 
 ### 基本概念
 

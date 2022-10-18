@@ -1,6 +1,14 @@
 # blue ocean
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [blue ocean](#blue-ocean)
+    - [概述](#概述)
+      - [1.blue ocean](#1blue-ocean)
+      - [2.使用说明](#2使用说明)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

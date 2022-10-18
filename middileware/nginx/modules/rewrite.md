@@ -1,6 +1,15 @@
 # ngx_http_rewrite_module
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ngx_http_rewrite_module](#ngx_http_rewrite_module)
+    - [概述](#概述)
+      - [1.作用](#1作用)
+    - [使用](#使用)
+      - [1.基础配置](#1基础配置)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

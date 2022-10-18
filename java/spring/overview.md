@@ -1,6 +1,20 @@
 # overview
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [overview](#overview)
+    - [常用注解](#常用注解)
+      - [1.容器相关](#1容器相关)
+        - [（1）`@Compnent`相关](#1compnent相关)
+      - [（2）`@Configuration`相关](#2configuration相关)
+    - [使用](#使用)
+      - [1.包结构](#1包结构)
+    - [配置](#配置)
+      - [1.配置的优先级（由高到低）](#1配置的优先级由高到低)
+      - [2.配置文件的查找顺序（后面的会覆盖前面的）](#2配置文件的查找顺序后面的会覆盖前面的)
+
+<!-- /code_chunk_output -->
 
 ### 常用注解
 

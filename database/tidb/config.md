@@ -1,6 +1,15 @@
 # config
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [config](#config)
+    - [tikv](#tikv)
+      - [1.忽略大小写（必须在初始化tidb时设置）](#1忽略大小写必须在初始化tidb时设置)
+    - [pd](#pd)
+      - [1.开启dashboard](#1开启dashboard)
+
+<!-- /code_chunk_output -->
 
 ### tikv
 

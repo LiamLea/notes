@@ -1,6 +1,45 @@
 # Log Collection Design
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [Log Collection Design](#log-collection-design)
+    - [设计](#设计)
+      - [1.架构设计](#1架构设计)
+      - [2.index设计](#2index设计)
+      - [3.采集问题](#3采集问题)
+        - [（1）采集容器内的文件](#1采集容器内的文件)
+      - [4.日志的分类](#4日志的分类)
+      - [5.使用方式](#5使用方式)
+        - [（1）filebeat](#1filebeat)
+        - [（2）logstash](#2logstash)
+    - [filebeat采集](#filebeat采集)
+      - [1.输出到kafka中的日志格式](#1输出到kafka中的日志格式)
+      - [2.filebeat的配置](#2filebeat的配置)
+    - [logstash清洗](#logstash清洗)
+      - [1.清洗后的格式](#1清洗后的格式)
+      - [2.logstash配置](#2logstash配置)
+    - [elasticsearch设置](#elasticsearch设置)
+      - [1.当使用datastream时，初始化](#1当使用datastream时初始化)
+      - [2.当不使用datastream时，初始化](#2当不使用datastream时初始化)
+    - [相关grok](#相关grok)
+      - [1.access日志](#1access日志)
+        - [（1）解析规则一](#1解析规则一)
+      - [2.app日志](#2app日志)
+        - [（1）解析规则一](#1解析规则一-1)
+        - [（2）解析规则二](#2解析规则二)
+        - [（3）解析规则三](#3解析规则三)
+    - [系统要求和性能优化](#系统要求和性能优化)
+      - [1.系统要求](#1系统要求)
+      - [2.采集优化](#2采集优化)
+      - [3.es优化](#3es优化)
+        - [（1）jvm heap优化](#1jvm-heap优化)
+      - [3.logstash优化](#3logstash优化)
+        - [（1）jvm heap优化](#1jvm-heap优化-1)
+        - [（2）batch size优化](#2batch-size优化)
+      - [4.配置示例](#4配置示例)
+
+<!-- /code_chunk_output -->
 
 ### 设计
 

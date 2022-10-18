@@ -1,6 +1,14 @@
 # time
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [time](#time)
+    - [使用](#使用)
+      - [1.基本使用](#1基本使用)
+      - [2.定时器](#2定时器)
+
+<!-- /code_chunk_output -->
 
 ### 使用
 

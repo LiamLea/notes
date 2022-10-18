@@ -1,6 +1,18 @@
 # spring boot
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [spring boot](#spring-boot)
+    - [概述](#概述)
+      - [1.场景启动器: starter](#1场景启动器-starter)
+        - [（1）作用：](#1作用)
+        - [（2）原理](#2原理)
+      - [2.spring boot启动过程](#2spring-boot启动过程)
+        - [（1）创建SpringApplication](#1创建springapplication)
+        - [（2）运行SpringApplication](#2运行springapplication)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

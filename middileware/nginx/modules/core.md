@@ -1,6 +1,15 @@
 # core module
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [core module](#core-module)
+    - [配置](#配置)
+      - [1.location](#1location)
+        - [（1）location寻找顺序](#1location寻找顺序)
+        - [（2）当使用正则时，需要注意结尾的`/`](#2当使用正则时需要注意结尾的)
+
+<!-- /code_chunk_output -->
 
 ### 配置
 

@@ -1,6 +1,15 @@
 # kernel modules
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [kernel modules](#kernel-modules)
+    - [概述](#概述)
+      - [1.启动时模块自动加载](#1启动时模块自动加载)
+    - [使用](#使用)
+      - [1.永久加载指定模块](#1永久加载指定模块)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

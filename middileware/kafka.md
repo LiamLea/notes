@@ -1,6 +1,48 @@
 # kafka
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [kafka](#kafka)
+    - [概述](#概述)
+      - [1.三个关键功能](#1三个关键功能)
+      - [2.主要概念](#2主要概念)
+        - [（1）broker（代理）](#1broker代理)
+        - [（2）event（message、record）](#2eventmessage-record)
+        - [（3）topic](#3topic)
+        - [（4）partition](#4partition)
+      - [3.使用的安全协议](#3使用的安全协议)
+      - [4.partition log](#4partition-log)
+        - [（1）partition log目录](#1partition-log目录)
+        - [（2）log segment的组成](#2log-segment的组成)
+        - [（3）日志操作](#3日志操作)
+      - [5.producer](#5producer)
+      - [6.consumer](#6consumer)
+        - [（1）group_id](#1group_id)
+        - [（2）client_id](#2client_id)
+      - [7.工作原理](#7工作原理)
+    - [集群（高可用）](#集群高可用)
+      - [1.安装集群](#1安装集群)
+        - [（1）broker的要求](#1broker的要求)
+        - [（2）在kubernets中安装kafka集群](#2在kubernets中安装kafka集群)
+      - [2.安全配置](#2安全配置)
+        - [（1）只设置SASL认证](#1只设置sasl认证)
+        - [（2）设置SSL和SASL](#2设置ssl和sasl)
+    - [配置](#配置)
+      - [1.broker配置](#1broker配置)
+        - [（1）基本配置](#1基本配置)
+        - [（2）监听器设置](#2监听器设置)
+        - [（3）topic默认配置](#3topic默认配置)
+        - [（4）zookeeper相关配置](#4zookeeper相关配置)
+        - [（5）日志相关](#5日志相关)
+      - [2.producer配置（客户端的配置）](#2producer配置客户端的配置)
+      - [3.consumer配置（客户端的配置）](#3consumer配置客户端的配置)
+        - [（1）基础概念](#1基础概念)
+        - [（2）configs：](#2configs)
+      - [4.安全配置](#4安全配置)
+        - [（1）认证配置：SASL（simple authentication and security layer）](#1认证配置saslsimple-authentication-and-security-layer)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

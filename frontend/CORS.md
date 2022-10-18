@@ -1,4 +1,19 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [预备知识](#预备知识)
+  - [1.源（域）的概念](#1源域的概念)
+  - [2.跨域的概念](#2跨域的概念)
+  - [3.同源（same-origin policy）策略的概念](#3同源same-origin-policy策略的概念)
+- [CORS(cross-origin resource sharing)](#corscross-origin-resource-sharing)
+  - [1.具体实现](#1具体实现)
+  - [2.当请求中包含了凭证的请求](#2当请求中包含了凭证的请求)
+    - [（1）解决方式一：允许的域需要明确指定](#1解决方式一允许的域需要明确指定)
+  - [3.Request header field token is not allowed by Access-Control-Allow-Headers in preflight response.](#3request-header-field-token-is-not-allowed-by-access-control-allow-headers-in-preflight-response)
+
+<!-- /code_chunk_output -->
+
 ### 预备知识
 #### 1.源（域）的概念
 * 协议

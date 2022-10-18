@@ -1,6 +1,19 @@
 # function
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [function](#function)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+    - [使用](#使用)
+      - [1.函数基本格式](#1函数基本格式)
+      - [2.传参](#2传参)
+      - [3.`defer`关键字](#3defer关键字)
+      - [4.万能类型（空接口）：`interface{}`](#4万能类型空接口interface)
+      - [5.接收可变数量的参数：`...`](#5接收可变数量的参数)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

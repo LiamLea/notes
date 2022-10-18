@@ -1,5 +1,15 @@
 # linux基础
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [linux基础](#linux基础)
+    - [shell](#shell)
+      - [1.login shell 和 non-login shell 的区别](#1login-shell-和-non-login-shell-的区别)
+      - [2.linux shell支持的匹配模式：glob pattern](#2linux-shell支持的匹配模式glob-pattern)
+
+<!-- /code_chunk_output -->
+
 ### shell
 **注意**：
 * `ssh <USER>@<IP> <COMMAND>`

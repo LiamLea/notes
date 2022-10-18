@@ -1,6 +1,23 @@
 # jmx（java management extensions）
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [jmx（java management extensions）](#jmxjava-management-extensions)
+    - [概述](#概述)
+      - [1.术语](#1术语)
+        - [（1）MBean](#1mbean)
+      - [2.架构](#2架构)
+        - [（1）probe level（探测层）](#1probe-level探测层)
+        - [（2）agent level（管理层）](#2agent-level管理层)
+        - [（3）remote management level（远程管理层）](#3remote-management-level远程管理层)
+    - [使用](#使用)
+      - [1.基本语法](#1基本语法)
+        - [（1）查看某台主机所有的MBean](#1查看某台主机所有的mbean)
+        - [（2）查看某个MBean的内容](#2查看某个mbean的内容)
+        - [（3）某些MBean含有context或path关键字](#3某些mbean含有context或path关键字)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

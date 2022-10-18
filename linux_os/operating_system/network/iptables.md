@@ -1,6 +1,55 @@
 # iptables
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [iptables](#iptables)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+      - [2.相关术语](#2相关术语)
+        - [（1）table](#1table)
+        - [（2）chain](#2chain)
+        - [（3）rule](#3rule)
+        - [（4）target](#4target)
+      - [3.相关文件](#3相关文件)
+      - [4.四张表](#4四张表)
+      - [5.五条链](#5五条链)
+      - [6.常用target（不同的表支持不同的target）](#6常用target不同的表支持不同的target)
+      - [7.数据包流程图](#7数据包流程图)
+      - [8.`iptables -nL`格式解析](#8iptables-nl格式解析)
+      - [9.跟踪数据包的状态（`conntrack`模块）](#9跟踪数据包的状态conntrack模块)
+    - [使用](#使用)
+      - [1.匹配规则](#1匹配规则)
+      - [2.命令格式:](#2命令格式)
+      - [3.常见选项](#3常见选项)
+      - [4.通用条件](#4通用条件)
+      - [5.扩展条件(需要指定模块):](#5扩展条件需要指定模块)
+        - [（1）tcp模块：`-m tcp`](#1tcp模块-m-tcp)
+        - [（2）icmp模块： `-m icmp`](#2icmp模块-m-icmp)
+        - [（3）mac模块（匹配mac地址）：`-m mac`](#3mac模块匹配mac地址-m-mac)
+        - [（4）multiport模块（匹配多端口）：`-m multiport`](#4multiport模块匹配多端口-m-multiport)
+        - [（5）iprange模块（匹配IP范围）：`-m iprange`](#5iprange模块匹配ip范围-m-iprange)
+      - [6.条件取反：`!`](#6条件取反)
+      - [7.custom chains（自定义链）](#7custom-chains自定义链)
+        - [（1）创建链](#1创建链)
+        - [（2）往链中添加rule](#2往链中添加rule)
+        - [（3）使用自定义链](#3使用自定义链)
+        - [（4）删除自定义链](#4删除自定义链)
+      - [8.通过文件批量修改iptables规则](#8通过文件批量修改iptables规则)
+      - [9.持久化iptables规则](#9持久化iptables规则)
+    - [调试iptables](#调试iptables)
+      - [1.利用LOG target（建议）](#1利用log-target建议)
+      - [2.利用TRACE target](#2利用trace-target)
+        - [（1） 开启内核功能](#1-开启内核功能)
+        - [（2） 添加跟踪规则（在raw表中添加）](#2-添加跟踪规则在raw表中添加)
+        - [（3） 查看日志：`/var/log/messages`](#3-查看日志varlogmessages)
+    - [相关应用](#相关应用)
+      - [1.nat表的应用](#1nat表的应用)
+      - [2.实现端口映射](#2实现端口映射)
+      - [3.只允许访问外部，不允许外部访问（利用conntrack模块）](#3只允许访问外部不允许外部访问利用conntrack模块)
+      - [3.捕捉端口扫描器](#3捕捉端口扫描器)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

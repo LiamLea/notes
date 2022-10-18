@@ -1,5 +1,19 @@
 # 基础使用
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [基础使用](#基础使用)
+    - [命令行](#命令行)
+      - [1.查询条目](#1查询条目)
+      - [2.添加条目](#2添加条目)
+      - [3.修改条目](#3修改条目)
+    - [filter（过滤器）](#filter过滤器)
+      - [1.格式](#1格式)
+      - [2.常用过滤器](#2常用过滤器)
+
+<!-- /code_chunk_output -->
+
 ### 命令行
 #### 1.查询条目
 ```shell

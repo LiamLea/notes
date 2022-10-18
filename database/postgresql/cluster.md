@@ -1,5 +1,32 @@
 # cluster
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [cluster](#cluster)
+    - [基础概念](#基础概念)
+      - [1.replication slot](#1replication-slot)
+      - [2.hot standby](#2hot-standby)
+    - [安装](#安装)
+      - [1.前期准备](#1前期准备)
+      - [2.Master设置](#2master设置)
+        - [（1）修改监听端口](#1修改监听端口)
+        - [（2）创建用于同步的用户](#2创建用于同步的用户)
+        - [（3）创建replication slot](#3创建replication-slot)
+        - [（4）设置访问权限](#4设置访问权限)
+      - [3.Standby设置](#3standby设置)
+        - [（1）复制master的数据](#1复制master的数据)
+        - [（2）开启hot standby](#2开启hot-standby)
+        - [（3）开启standby模式](#3开启standby模式)
+        - [（4）设置文件所属并重启](#4设置文件所属并重启)
+      - [4.验证](#4验证)
+    - [扩展](#扩展)
+      - [1.使用归档的wal](#1使用归档的wal)
+        - [（1）master的配置](#1master的配置)
+        - [（2）standby的配置](#2standby的配置)
+      - [2.开启同步模式](#2开启同步模式)
+
+<!-- /code_chunk_output -->
 
 ### 基础概念
 

@@ -1,6 +1,28 @@
 # servie fault tolerance
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [servie fault tolerance](#servie-fault-tolerance)
+    - [概述](#概述)
+      - [1.servie fault tolerance](#1servie-fault-tolerance)
+        - [（1）what](#1what)
+        - [（2）why](#2why)
+      - [2.原则：设置在消费侧（即调用方）](#2原则设置在消费侧即调用方)
+      - [3.服务降级（fallback）](#3服务降级fallback)
+        - [（1）发生的条件](#1发生的条件)
+      - [4.服务熔断（circuit breaker）](#4服务熔断circuit-breaker)
+        - [（1）断路器状态](#1断路器状态)
+        - [（2）降级策略](#2降级策略)
+        - [（3）断路器相关参数（以 异常比例 为例)](#3断路器相关参数以-异常比例-为例)
+        - [（4）断路器工作原理（以 异常比例 为例)](#4断路器工作原理以-异常比例-为例)
+      - [3.服务限流（以sentinel为例）](#3服务限流以sentinel为例)
+        - [（1）限流指标](#1限流指标)
+        - [（2）限流模式](#2限流模式)
+        - [（3）限流效果](#3限流效果)
+        - [（4）其他限流策略](#4其他限流策略)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

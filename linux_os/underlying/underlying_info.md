@@ -1,4 +1,27 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [相关基础概念](#相关基础概念)
+  - [1.计算机组件](#1计算机组件)
+  - [2.bus（总线）](#2bus总线)
+    - [（1）分类](#1分类)
+    - [（2）internal bus](#2internal-bus)
+    - [（3）external bus](#3external-bus)
+  - [3.pci（peripheral component interconnect）](#3pciperipheral-component-interconnect)
+  - [4.`COM`（communication port，串口）](#4comcommunication-port串口)
+  - [5.VGA（video graphics array）](#5vgavideo-graphics-array)
+  - [6.FC HBA（fiber channel host bus adapter）](#6fc-hbafiber-channel-host-bus-adapter)
+  - [7.硬盘相关接口](#7硬盘相关接口)
+  - [2.cpu相关](#2cpu相关)
+  - [3.系统uuid相关](#3系统uuid相关)
+    - [（1）system-serial_number](#1system-serial_number)
+    - [（2）system-uuid 和 machine-id区别](#2system-uuid-和-machine-id区别)
+- [获取底层信息](#获取底层信息)
+  - [1.DMI(desktop mamanger interface)](#1dmidesktop-mamanger-interface)
+
+<!-- /code_chunk_output -->
+
 ### 相关基础概念
 
 #### 1.计算机组件

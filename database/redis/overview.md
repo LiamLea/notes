@@ -1,6 +1,19 @@
 # overview
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [overview](#overview)
+    - [概述](#概述)
+      - [1.redis cluster模式架构](#1redis-cluster模式架构)
+      - [2.sentinel模式](#2sentinel模式)
+        - [（1）架构](#1架构)
+        - [（2）使用](#2使用)
+      - [3.redis常用功能](#3redis常用功能)
+        - [（1）`pub/sub`功能（数据不会暂存）](#1pubsub功能数据不会暂存)
+        - [（2）监视某一个key](#2监视某一个key)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

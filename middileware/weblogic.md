@@ -1,3 +1,26 @@
+# weblogic
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [weblogic](#weblogic)
+    - [基础概念](#基础概念)
+      - [1.domian](#1domian)
+      - [2.server](#2server)
+      - [3.administration server](#3administration-server)
+      - [4.managed server](#4managed-server)
+      - [5. as（administration server）的功能（通过JMX实现这些功能的）](#5-asadministration-server的功能通过jmx实现这些功能的)
+      - [6.NodeManager](#6nodemanager)
+    - [基本操作](#基本操作)
+      - [1.静默方式安装weblogic](#1静默方式安装weblogic)
+      - [2.创建域（利用wlst，weblogic script tool 创建）](#2创建域利用wlstweblogic-script-tool-创建)
+      - [3.启动weblogic控制台](#3启动weblogic控制台)
+      - [4.启动NodeManager](#4启动nodemanager)
+      - [5.使用NodeManager](#5使用nodemanager)
+      - [6.创建managed server](#6创建managed-server)
+
+<!-- /code_chunk_output -->
+
 ### 基础概念
 
 #### 1.domian

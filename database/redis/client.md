@@ -1,4 +1,17 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [client](#client)
+  - [1.连接redis](#1连接redis)
+  - [2.连接redis集群](#2连接redis集群)
+  - [3.常用命令](#3常用命令)
+    - [（1）配置相关](#1配置相关)
+    - [（2）基本信息相关](#2基本信息相关)
+    - [（3）集群相关](#3集群相关)
+    - [（4）pub/sub相关](#4pubsub相关)
+
+<!-- /code_chunk_output -->
 
 ### client
 

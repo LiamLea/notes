@@ -1,6 +1,20 @@
 # OOP(object oriented program)
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [OOP(object oriented program)](#oopobject-oriented-program)
+    - [概述](#概述)
+      - [1.结构体：`struct`](#1结构体struct)
+      - [2.类就是通过结构实现的](#2类就是通过结构实现的)
+      - [3.类的继承](#3类的继承)
+      - [4.通过接口实现多态：`interface`](#4通过接口实现多态interface)
+        - [（1）同一个结构体可以实现多个接口](#1同一个结构体可以实现多个接口)
+        - [（2）接口可以相关嵌套](#2接口可以相关嵌套)
+        - [（3）空接口](#3空接口)
+        - [（4）接口类型断言](#4接口类型断言)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

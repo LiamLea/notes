@@ -1,6 +1,24 @@
 # gateway
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [gateway](#gateway)
+    - [概述](#概述)
+      - [1.gateway](#1gateway)
+        - [（1）特性](#1特性)
+      - [2.工作原理](#2工作原理)
+      - [3.路由](#3路由)
+        - [（1）predicates（断言：用于匹配请求）](#1predicates断言用于匹配请求)
+        - [（2）filters（过滤器：用于处理请求或响应）](#2filters过滤器用于处理请求或响应)
+    - [使用](#使用)
+      - [1.引入依赖](#1引入依赖)
+      - [2.配置路由](#2配置路由)
+        - [（1）静态路由](#1静态路由)
+        - [（2）动态路由（需要注册中心）](#2动态路由需要注册中心)
+      - [3.设置全局过滤器](#3设置全局过滤器)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 
