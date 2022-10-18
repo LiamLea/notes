@@ -1,6 +1,34 @@
  # oauth2.0
 
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [概述](#概述)
+  - [1.oatuh2.0](#1oatuh20)
+  - [2.基础概念](#2基础概念)
+  - [3.oauth2.0 流程](#3oauth20-流程)
+  - [4.grant types](#4grant-types)
+    - [（1）authorization_code](#1authorization_code)
+    - [（2）client_credentials](#2client_credentials)
+    - [（3）refresh_token](#3refresh_token)
+- [使用](#使用)
+  - [1.授权服务（uaa: User Account and Authentication）](#1授权服务uaa-user-account-and-authentication)
+    - [（1）依赖](#1依赖)
+    - [（2）配置](#2配置)
+    - [（3）代码](#3代码)
+  - [2.测试认证服务器](#2测试认证服务器)
+    - [（1）使用client_credentials方式](#1使用client_credentials方式)
+    - [（2）使用password方式](#2使用password方式)
+    - [（3）使用grant_type方式](#3使用grant_type方式)
+    - [（4）使用refresh_token方式](#4使用refresh_token方式)
+  - [3.资源服务](#3资源服务)
+    - [（1）依赖](#1依赖-1)
+    - [（2）配置](#2配置-1)
+    - [（3）代码](#3代码-1)
+
+<!-- /code_chunk_output -->
+
 
 ### 概述
 
