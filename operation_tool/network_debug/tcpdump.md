@@ -117,3 +117,8 @@ SSLKEYLOGFILE="/tmp/ssl-key.log" curl --insecure https://10.172.1.207:443
 We can only decrypt TLS/SSL packet data if RSA keys are used to encrypt the data.因为很多并没有用RSA进行加密，而是利用RSA进密钥传递，然后用该密钥加密数据，所以导致无法用private key解密数据。
 
 根据serverhello中的Cipher Suite类型，当使用的是DHE或者RSA ephemeral cipher suite等，就不能用私钥进行https解密
+
+* 建议使用wireshark解析，使用ssldump解析可能会有问题
+```shell
+ssldump -i eth0 -dnq -k <server.key> port 443
+```

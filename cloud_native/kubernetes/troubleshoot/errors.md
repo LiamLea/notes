@@ -88,3 +88,5 @@ kubectl replace --raw "/api/v1/namespaces/<NAMESPACE>/finalize" -f /tmp/temp.jso
 * 现象：出现了孤儿pod，即pod无法被删除
 * 原因：pv被删除了，然而该pod仍然挂载着该volume
 * 解决：手动卸载该volume
+
+#### 10.pod重启，状态为terminated，错误码为137，没有错误日志： 内存超过了系统的限制，而不是超过limits的限制

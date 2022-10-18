@@ -11,6 +11,13 @@
 
 ![](./imgs/overview_02.png)
 
+* 架构说明
+
+|服务|说明|
+|-|-|
+|Auth Service|用于认证，实现SSO|
+|Account Service|提供用户和角色管理|
+
 #### 3.传统微服务架构 与 云原生微服务架构 对比
 [参考](https://dzone.com/articles/deploying-microservices-spring-cloud-vs-kubernetes)
 ![](./imgs/overview_03.png)
