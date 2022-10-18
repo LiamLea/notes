@@ -1,6 +1,21 @@
 # compile and link
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [compile and link](#compile-and-link)
+    - [概述](#概述)
+      - [1.c语言编译四步（通常说的编译包含指的是前三步）](#1c语言编译四步通常说的编译包含指的是前三步)
+    - [动态库](#动态库)
+      - [1.查看 gcc和系统 的动态链接库搜索路径](#1查看-gcc和系统-的动态链接库搜索路径)
+      - [2.系统动态链接库的相关文件](#2系统动态链接库的相关文件)
+        - [（1）配置文件：/etc/ld.so.conf](#1配置文件etcldsoconf)
+        - [（2）缓存文件：/etc/ld.so.cache](#2缓存文件etcldsocache)
+      - [3.查看系统动态链接的情况](#3查看系统动态链接的情况)
+    - [troubleshooting](#troubleshooting)
+      - [1.header version和current version不匹配](#1header-version和current-version不匹配)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

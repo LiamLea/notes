@@ -1,3 +1,16 @@
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [`pg_hba.conf`](#pg_hbaconf)
+    - [（1）TYPE:](#1type)
+    - [（2）DATABASE：](#2database)
+    - [（3）USER：](#3user)
+    - [（4）ADDRESS：](#4address)
+    - [（4）METHOD：](#4method)
+
+<!-- /code_chunk_output -->
+
 ### `pg_hba.conf`
 ```shell
 <TYPE>  <DATABASE>  <USER>  <ADDRESS>  <METHOD>

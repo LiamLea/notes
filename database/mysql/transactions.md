@@ -1,6 +1,24 @@
 # transactions
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [transactions](#transactions)
+    - [概述](#概述)
+      - [1.transactions（事务）](#1transactions事务)
+      - [2.ACID](#2acid)
+        - [（1）Atomicity（原子性）](#1atomicity原子性)
+        - [（2）Consistency（一致性）](#2consistency一致性)
+        - [（3）Isolation（隔离性）](#3isolation隔离性)
+        - [（4）Durability（持久性）](#4durability持久性)
+      - [3.事务隔离级别](#3事务隔离级别)
+        - [（1） 读未提交](#1-读未提交)
+        - [（2）读提交](#2读提交)
+        - [（3）可重复读](#3可重复读)
+        - [（4）串行化](#4串行化)
+      - [4.MVCC（multi-version concurrency control）](#4mvccmulti-version-concurrency-control)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

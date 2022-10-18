@@ -1,6 +1,14 @@
 # kernel
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [kernel](#kernel)
+    - [概述](#概述)
+      - [1.namespaces特性](#1namespaces特性)
+        - [（1）6中namespace](#16中namespace)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

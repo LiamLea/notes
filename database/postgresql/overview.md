@@ -1,5 +1,23 @@
 # postgrelsql
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [postgrelsql](#postgrelsql)
+    - [基本概念](#基本概念)
+      - [1.相关文件和目录](#1相关文件和目录)
+        - [（1）数据目录](#1数据目录)
+        - [（2）配置文件](#2配置文件)
+        - [（3）hba（host-based authencation）配置文件](#3hbahost-based-authencation配置文件)
+        - [（4）ident_file（用户名映射）](#4ident_file用户名映射)
+      - [1.安装注意事项](#1安装注意事项)
+    - [基础操作](#基础操作)
+      - [1.登录postgres](#1登录postgres)
+      - [2.创建操作](#2创建操作)
+      - [3.查询](#3查询)
+      - [4.授权](#4授权)
+
+<!-- /code_chunk_output -->
 
 ### 基本概念
 

@@ -1,6 +1,14 @@
 # os
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [os](#os)
+    - [Application](#application)
+      - [1.file operation](#1file-operation)
+      - [2.flag（command-line flag parsing）](#2flagcommand-line-flag-parsing)
+
+<!-- /code_chunk_output -->
 
 ### Application
 

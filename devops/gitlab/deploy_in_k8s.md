@@ -1,6 +1,19 @@
 # gitlab
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [gitlab](#gitlab)
+    - [概述](#概述)
+      - [1.组件](#1组件)
+      - [2.能够数据](#2能够数据)
+    - [安装](#安装)
+      - [1.配置](#1配置)
+
+<!-- /code_chunk_output -->
+
 ### 概述
+
 #### 1.组件
 |组件|说明|是否需要安装|
 |-|-|-|
@@ -17,7 +30,6 @@
 |GitLab/Workhorse|反向代理，处理 Git Push/Pull 请求，处理到 Rails 的连接|
 |Gitlab/Runner|执行CI/CD相关任务|
 
-
 #### 2.能够数据
 一些数据存在关系型数据库，一些数据存在非关系数据库（minio）
 * 代码
@@ -27,7 +39,10 @@
 * packages
 * MR diffs（merge request diffs）
 
+***
+
 ### 安装
+
 #### 1.配置
 ```shell
 vim gitlab/values.yaml

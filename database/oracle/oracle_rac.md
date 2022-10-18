@@ -1,4 +1,22 @@
-[toc]
+# oracle rac
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [oracle rac](#oracle-rac)
+    - [概述](#概述)
+      - [1.相关概念](#1相关概念)
+    - [查询](#查询)
+    - [servctl（server control）](#servctlserver-control)
+      - [1.查询](#1查询)
+        - [（1）查询数据库信息](#1查询数据库信息)
+        - [（2）查询端口信息](#2查询端口信息)
+        - [（3）查看ip信息](#3查看ip信息)
+      - [（4）查看具体node上的信息](#4查看具体node上的信息)
+    - [crsctl](#crsctl)
+      - [（1）查看域名的ip地址](#1查看域名的ip地址)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 #### 1.相关概念

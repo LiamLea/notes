@@ -1,4 +1,14 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [`/sys/`目录](#sys目录)
+  - [`/sys/class/` —— 分类存放设备驱动信息（都是链接文件）](#sysclass-分类存放设备驱动信息都是链接文件)
+  - [`/sys/devices/` —— 存放设备驱动信息](#sysdevices-存放设备驱动信息)
+  - [`/sys/block/` —— 存放块设备的链接文件，由于历史原因才没放在class下的](#sysblock-存放块设备的链接文件由于历史原因才没放在class下的)
+
+<!-- /code_chunk_output -->
+
 ### `/sys/`目录
 * `/sys`挂载的是sysfs文件系统，这是一个虚拟的文件系统（基于ram）  
 

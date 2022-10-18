@@ -1,6 +1,28 @@
 # overview
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [overview](#overview)
+    - [概述](#概述)
+      - [1.数据库的高可用](#1数据库的高可用)
+        - [（1）面临的问题](#1面临的问题)
+        - [（2）解决思路](#2解决思路)
+      - [2  .备份类型](#2-备份类型)
+      - [3.database schema](#3database-schema)
+    - [高可用解决方案对比](#高可用解决方案对比)
+      - [1.shared disk failover](#1shared-disk-failover)
+      - [2.file system（block device）replication](#2file-systemblock-devicereplication)
+      - [3.write-ahead log shipping](#3write-ahead-log-shipping)
+      - [4.logical replication](#4logical-replication)
+      - [5.trigger-based master-standby replication](#5trigger-based-master-standby-replication)
+      - [6.statement-based replication middleware](#6statement-based-replication-middleware)
+      - [7.synchronous multimaster replication](#7synchronous-multimaster-replication)
+      - [8.asynchronous multimaster replication](#8asynchronous-multimaster-replication)
+      - [9.data partitioning（数据分片）](#9data-partitioning数据分片)
+      - [10.Multiple-Server Parallel Query Execution](#10multiple-server-parallel-query-execution)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

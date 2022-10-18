@@ -1,6 +1,22 @@
 # ngx_http_limit_req_module
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ngx_http_limit_req_module](#ngx_http_limit_req_module)
+    - [概述](#概述)
+      - [1.作用](#1作用)
+      - [2.限流（Traffic shaping）算法](#2限流traffic-shaping算法)
+        - [（1）漏桶算法（leaky bucket）](#1漏桶算法leaky-bucket)
+        - [（2）令牌桶算法（token bucket）](#2令牌桶算法token-bucket)
+        - [（3）区别](#3区别)
+      - [2.实现原理](#2实现原理)
+        - [（1）burst突发量](#1burst突发量)
+        - [（2）delay（令牌桶，需要nginx版本大于1.15.7）](#2delay令牌桶需要nginx版本大于1157)
+    - [使用](#使用)
+      - [1.基础配置](#1基础配置)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

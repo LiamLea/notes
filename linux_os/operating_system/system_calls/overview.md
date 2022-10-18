@@ -1,6 +1,16 @@
 # 系统调用
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [系统调用](#系统调用)
+    - [I/O相关](#io相关)
+      - [1.打开文件（返回文件描述符）: `open()`](#1打开文件返回文件描述符-open)
+      - [2.关闭文件: `close()`](#2关闭文件-close)
+      - [3.I/O操作:`read()/write()`](#3io操作readwrite)
+      - [4.将内存中的数据flush到磁盘：`fsync()`、`fdatasync( )`、`sync()`](#4将内存中的数据flush到磁盘fsync-fdatasync-sync)
+
+<!-- /code_chunk_output -->
 
 ### I/O相关
 

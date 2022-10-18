@@ -1,6 +1,25 @@
 # network
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [network](#network)
+    - [概述](#概述)
+      - [1.netfilter](#1netfilter)
+      - [2.物理网卡](#2物理网卡)
+      - [3.network namesapce](#3network-namesapce)
+        - [（1）ip netns命令](#1ip-netns命令)
+        - [（2）容器的netns](#2容器的netns)
+      - [4.`ifindex`和`iflink`](#4ifindex和iflink)
+        - [（1）在同一network namespace下，`ifindex`是唯一的](#1在同一network-namespace下ifindex是唯一的)
+        - [（2）`iflink`标识对端设备`ifindex`](#2iflink标识对端设备ifindex)
+        - [（3）有对端设备的接口的命名方式：`@`](#3有对端设备的接口的命名方式)
+      - [5.`netnsid`和`link-netnsid`](#5netnsid和link-netnsid)
+        - [（1）`netnsid`唯一标识netns](#1netnsid唯一标识netns)
+        - [（2）`link-netnsid`标识对端设备所在的netns的id](#2link-netnsid标识对端设备所在的netns的id)
+      - [6.判断设备属于何种类型（TUN/TAP、veth等）](#6判断设备属于何种类型tuntap-veth等)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

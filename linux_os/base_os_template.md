@@ -1,3 +1,16 @@
+# os template
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [os template](#os-template)
+    - [需要安装的软件](#需要安装的软件)
+    - [需要的配置](#需要的配置)
+    - [需要关闭的服务](#需要关闭的服务)
+    - [需要开启的服务](#需要开启的服务)
+
+<!-- /code_chunk_output -->
+
 ### 需要安装的软件
 |软件名|说明|
 |-|-|

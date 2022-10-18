@@ -1,4 +1,18 @@
-[toc]
+# ubuntu
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ubuntu](#ubuntu)
+    - [修改网络配置](#修改网络配置)
+      - [1.配置文件](#1配置文件)
+      - [2.修改DNS](#2修改dns)
+    - [软件相关](#软件相关)
+      - [1.下载软件包即其依赖](#1下载软件包即其依赖)
+      - [2.安装有依赖关系的包](#2安装有依赖关系的包)
+      - [3.关闭自动升级](#3关闭自动升级)
+
+<!-- /code_chunk_output -->
 
 ### 修改网络配置
 [参考](https://wiki.debian.org/NetworkConfiguration#Starting_and_Stopping_Interfaces)

@@ -1,6 +1,58 @@
 # memory
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [memory](#memory)
+    - [基础概念](#基础概念)
+      - [1.MMU（memory management unit）](#1mmumemory-management-unit)
+        - [（1）功能：](#1功能)
+        - [（2）管理方式：](#2管理方式)
+      - [2.物理地址和逻辑地址](#2物理地址和逻辑地址)
+        - [（1）物理地址](#1物理地址)
+        - [（2）逻辑（虚拟）地址](#2逻辑虚拟地址)
+      - [3.非连续内存分配](#3非连续内存分配)
+        - [（1）连续内存分配的缺点](#1连续内存分配的缺点)
+        - [（2）三种方式](#2三种方式)
+        - [（3）页表](#3页表)
+        - [（4）段页式存储](#4段页式存储)
+      - [4.程序的内存分区（都是虚拟内存）](#4程序的内存分区都是虚拟内存)
+        - [（1）static](#1static)
+        - [（2）stack（栈，连续的内存空间，由cpu管理）](#2stack栈连续的内存空间由cpu管理)
+        - [（3）heap（堆，非连续内存空间，由程序管理）](#3heap堆非连续内存空间由程序管理)
+        - [（4）OS为什么要对stack的大小做限制（`ulimit -a`查看限制）](#4os为什么要对stack的大小做限制ulimit-a查看限制)
+        - [（5）python heap和stack](#5python-heap和stack)
+        - [（6）java heap和stack](#6java-heap和stack)
+      - [5.内核空间和用户空间](#5内核空间和用户空间)
+      - [6.解决内存不足的技术](#6解决内存不足的技术)
+        - [（1）覆盖技术](#1覆盖技术)
+        - [（2）交换技术（swap）](#2交换技术swap)
+        - [（3）虚拟内存](#3虚拟内存)
+      - [7.OOM（out of memory killer）](#7oomout-of-memory-killer)
+      - [8.跟内存有关的系统调用](#8跟内存有关的系统调用)
+        - [（1）`mmap()`](#1mmap)
+        - [（2）`brk()`](#2brk)
+    - [虚拟内存](#虚拟内存)
+      - [1.虚拟页式存储（基本置换单位是页）](#1虚拟页式存储基本置换单位是页)
+        - [（1）页表的结构](#1页表的结构)
+      - [2.页面置换](#2页面置换)
+        - [（1）页面置换算法](#1页面置换算法)
+        - [（2）缺页异常（page fault）](#2缺页异常page-fault)
+        - [（3）缺页率（page fault rate）](#3缺页率page-fault-rate)
+        - [（4）抖动问题（thrashing）](#4抖动问题thrashing)
+      - [3.WSS和RSS](#3wss和rss)
+        - [（1）工作集（Working Set Size）](#1工作集working-set-size)
+        - [（2）常驻集（Resident set size）](#2常驻集resident-set-size)
+        - [（3）工作集和常驻集关系](#3工作集和常驻集关系)
+      - [4.commit 和 overcommit](#4commit-和-overcommit)
+      - [5.cpu利用率与并发进程数关系](#5cpu利用率与并发进程数关系)
+    - [kernel memeory cache（缓存）](#kernel-memeory-cache缓存)
+      - [1.cache包含几种](#1cache包含几种)
+      - [2.清除cache](#2清除cache)
+      - [3.Slab](#3slab)
+      - [4.查看slab cache的情况](#4查看slab-cache的情况)
+
+<!-- /code_chunk_output -->
 
 ### 基础概念
 

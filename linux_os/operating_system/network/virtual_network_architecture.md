@@ -1,6 +1,59 @@
 # virtual networking
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [virtual networking](#virtual-networking)
+    - [准备知识](#准备知识)
+      - [1.查看指定类型设备能够配置的参数：](#1查看指定类型设备能够配置的参数)
+        - [（1）`man ip link`](#1man-ip-link)
+        - [（2）利用驱动查看（如果上面查不到）](#2利用驱动查看如果上面查不到)
+      - [2.-----------------------注意---------------------------------](#2-注意-)
+    - [veth pair](#veth-pair)
+      - [1.概述](#1概述)
+      - [2.使用](#2使用)
+        - [（1）连接两个netns](#1连接两个netns)
+        - [（2）通过Bridge相连](#2通过bridge相连)
+    - [bridge](#bridge)
+      - [1.概述](#1概述-1)
+      - [2.bridge特点](#2bridge特点)
+        - [（1）bridge不配置ip，无法处理网络层数据包](#1bridge不配置ip无法处理网络层数据包)
+        - [（2）bridge上的interface，无法处理网络层数据包](#2bridge上的interface无法处理网络层数据包)
+      - [3.设置](#3设置)
+      - [3.查询bridge详细信息](#3查询bridge详细信息)
+        - [（1）查询bridge的连接情况](#1查询bridge的连接情况)
+        - [（2）查询fdb（forwading database）](#2查询fdbforwading-database)
+    - [bond 和 team](#bond-和-team)
+      - [1.概述](#1概述-2)
+      - [2.bond使用](#2bond使用)
+      - [3.team使用](#3team使用)
+    - [VLAN](#vlan)
+      - [1.概述](#1概述-3)
+      - [2.使用](#2使用-1)
+    - [VXLAN](#vxlan)
+      - [1.概述](#1概述-4)
+      - [2.详细查看：`Architecture/protocol/vxlan.md`](#2详细查看architectureprotocolvxlanmd)
+    - [TUN/TAP](#tuntap)
+      - [1.概述](#1概述-5)
+      - [2.使用](#2使用-2)
+        - [（1）创建TUN/TAP](#1创建tuntap)
+        - [（2）查看应用程序使用的是哪个tap](#2查看应用程序使用的是哪个tap)
+      - [3.TUN/TAP和veth的区别](#3tuntap和veth的区别)
+    - [MACVLAN](#macvlan)
+      - [1.概述](#1概述-6)
+      - [2.macvlan有五种模式](#2macvlan有五种模式)
+        - [（1）bridge](#1bridge)
+        - [（2）Private](#2private)
+        - [（3）VEPA（Virtual Ethernet Port Aggregator）](#3vepavirtual-ethernet-port-aggregator)
+        - [（4）passthru](#4passthru)
+        - [（5）source](#5source)
+    - [IPVLAN](#ipvlan)
+      - [1.概述](#1概述-7)
+      - [2.ipvlan有两种模式](#2ipvlan有两种模式)
+        - [（1）l2模式](#1l2模式)
+        - [（2）l3模式](#2l3模式)
+
+<!-- /code_chunk_output -->
 
 ### 准备知识
 

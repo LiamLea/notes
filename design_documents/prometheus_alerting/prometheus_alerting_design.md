@@ -1,7 +1,30 @@
-
 # prometheus告警设计
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [prometheus告警设计](#prometheus告警设计)
+    - [监控设置](#监控设置)
+      - [1.blackbox监控](#1blackbox监控)
+      - [2.node-exporter监控](#2node-exporter监控)
+      - [3.原子监控](#3原子监控)
+      - [4.snmp监控](#4snmp监控)
+    - [告警概述](#告警概述)
+      - [1.需要解决的问题](#1需要解决的问题)
+    - [告警处理流程](#告警处理流程)
+      - [1.告警规则的设置](#1告警规则的设置)
+        - [（1）告警规则格式](#1告警规则格式)
+        - [（2）alertmanager配置](#2alertmanager配置)
+        - [（3）告警范围重叠](#3告警范围重叠)
+      - [2.告警的产生](#2告警的产生)
+        - [（1）告警消息模板](#1告警消息模板)
+      - [3.告警转换](#3告警转换)
+      - [4.处理告警](#4处理告警)
+        - [（1）告警入库](#1告警入库)
+        - [（2）告警恢复](#2告警恢复)
+        - [（3）推送kafka](#3推送kafka)
+
+<!-- /code_chunk_output -->
 
 ### 监控设置
 

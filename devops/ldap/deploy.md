@@ -1,5 +1,26 @@
 # 部署
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [部署](#部署)
+    - [安装openldap](#安装openldap)
+      - [1.修改配置文件：slapd.ldif](#1修改配置文件slapdldif)
+        - [（1）修改所在的域](#1修改所在的域)
+        - [（2）修改数据库管理员并设置密码](#2修改数据库管理员并设置密码)
+        - [（3）加载相关schema](#3加载相关schema)
+      - [2.生成配置文件](#2生成配置文件)
+      - [3.启动服务：slapd](#3启动服务slapd)
+      - [4.初始化该目录数据库的条目](#4初始化该目录数据库的条目)
+    - [利用SASL进行验证](#利用sasl进行验证)
+      - [1.安装相应的包：](#1安装相应的包)
+      - [2.修改配置文件：`/etc/sysconfig/saslauthd`](#2修改配置文件etcsysconfigsaslauthd)
+      - [3.修改配置文件：`/etc/saslauthd.conf`](#3修改配置文件etcsaslauthdconf)
+      - [4.重启服务：saslauthd](#4重启服务saslauthd)
+      - [5.验证ldap账号](#5验证ldap账号)
+
+<!-- /code_chunk_output -->
+
 ### 安装openldap
 
 #### 1.修改配置文件：slapd.ldif

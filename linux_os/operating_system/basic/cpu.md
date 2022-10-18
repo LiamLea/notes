@@ -1,6 +1,14 @@
 # cpu
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [cpu](#cpu)
+    - [概述](#概述)
+      - [1.有四个特权级：](#1有四个特权级)
+      - [2.实现特权级切换的方式：中断](#2实现特权级切换的方式中断)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

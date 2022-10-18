@@ -1,6 +1,19 @@
 # MyBatis
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [MyBatis](#mybatis)
+    - [概述](#概述)
+      - [1.MyBatis](#1mybatis)
+    - [使用](#使用)
+      - [1.基本使用](#1基本使用)
+        - [（1）导入并配置mybatis](#1导入并配置mybatis)
+        - [（2）创建实体类（用于对应表）](#2创建实体类用于对应表)
+        - [（3）创建mapper](#3创建mapper)
+        - [（4）使用mapper的接口](#4使用mapper的接口)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

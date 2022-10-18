@@ -1,6 +1,34 @@
 # pipeline
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [pipeline](#pipeline)
+    - [概述](#概述)
+      - [1.pipeline](#1pipeline)
+        - [（1）两种语法：declarative 和 scripted](#1两种语法declarative-和-scripted)
+      - [2.常用的CD场景](#2常用的cd场景)
+      - [3.使用建议](#3使用建议)
+    - [语法](#语法)
+      - [1.单引号和双引号：](#1单引号和双引号)
+        - [（1）需要转义的符合（当使用双引号时）](#1需要转义的符合当使用双引号时)
+      - [2.基本格式](#2基本格式)
+        - [（1）指定具体的计算单元：agent](#1指定具体的计算单元agent)
+        - [（2）根据执行结果执行相应任务：post](#2根据执行结果执行相应任务post)
+        - [（3）指定基础配置: options](#3指定基础配置-options)
+        - [（4）设置环境变量](#4设置环境变量)
+        - [（5）常用内置变量](#5常用内置变量)
+        - [（6）设置参数](#6设置参数)
+      - [3.steps常用语句](#3steps常用语句)
+        - [（1）基础语句](#1基础语句)
+        - [（2）执行shell命令: `sh`](#2执行shell命令-sh)
+        - [（3）使用script语法](#3使用script语法)
+        - [（4）同一个pipeline、同一次run中 不同agent数据共享：stash](#4同一个pipeline-同一次run中-不同agent数据共享stash)
+        - [（5）不同pipeline、不同run共享文件: archiveArifacts和copyArtifacts](#5不同pipeline-不同run共享文件-archivearifacts和copyartifacts)
+        - [（6）git](#6git)
+        - [（7）在指定container中执行任务（当使用k8s agent时）](#7在指定container中执行任务当使用k8s-agent时)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

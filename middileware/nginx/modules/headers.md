@@ -1,6 +1,13 @@
 # ngx_http_headers_module
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ngx_http_headers_module](#ngx_http_headers_module)
+    - [配置](#配置)
+      - [1.`add_header`](#1add_header)
+
+<!-- /code_chunk_output -->
 
 ### 配置
 

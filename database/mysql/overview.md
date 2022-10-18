@@ -1,6 +1,22 @@
 # overview
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [overview](#overview)
+    - [概述](#概述)
+      - [1.架构](#1架构)
+        - [（1）应用层](#1应用层)
+        - [（2）mysql server层](#2mysql-server层)
+        - [（3）存储引擎层](#3存储引擎层)
+      - [2.并发控制（加锁）](#2并发控制加锁)
+        - [（1）读锁和写锁](#1读锁和写锁)
+        - [（2）锁的粒度](#2锁的粒度)
+      - [3.charset和collate](#3charset和collate)
+      - [4.内存](#4内存)
+        - [（1）InnoDB buffer pool](#1innodb-buffer-pool)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,6 +1,42 @@
 # nginx
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [nginx](#nginx)
+    - [概述](#概述)
+      - [1.内置变量](#1内置变量)
+        - [（1）`$http_<header_name>`](#1http_header_name)
+        - [（2）`$arg_<arg_name>`和`$args`](#2arg_arg_name和args)
+        - [（3）`$cookie_<cookie_name>`](#3cookie_cookie_name)
+        - [（4）其他常用变量](#4其他常用变量)
+      - [2.http request经过的11个phases](#2http-request经过的11个phases)
+        - [（1）read phase](#1read-phase)
+        - [（2）server rewrite phase](#2server-rewrite-phase)
+        - [（3）find config phase](#3find-config-phase)
+        - [（4）rewrite phase](#4rewrite-phase)
+        - [（5）post rewrite phase](#5post-rewrite-phase)
+        - [（6）preaccess phase](#6preaccess-phase)
+        - [（7）access phase](#7access-phase)
+        - [（8）post access phase](#8post-access-phase)
+        - [（9）precontent phase](#9precontent-phase)
+        - [（10）content phase](#10content-phase)
+        - [（11）log phase](#11log-phase)
+      - [3.添加模块的方式](#3添加模块的方式)
+        - [（1）编译时添加](#1编译时添加)
+        - [（2）将需要的模块编译成 动态模块](#2将需要的模块编译成-动态模块)
+    - [配置文件的结构](#配置文件的结构)
+      - [1.顶层context（上下文）](#1顶层context上下文)
+        - [（1）stream](#1stream)
+        - [（2）http](#2http)
+        - [（3）events](#3events)
+        - [（4）mail](#4mail)
+      - [2.继承](#2继承)
+      - [3.virtual servers](#3virtual-servers)
+        - [（1）stream上下文中的server](#1stream上下文中的server)
+        - [（2）http上下文中的server](#2http上下文中的server)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

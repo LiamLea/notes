@@ -1,6 +1,22 @@
 # TiDB
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [TiDB](#tidb)
+    - [概述](#概述)
+      - [1.架构](#1架构)
+        - [（1） TiDB server](#1-tidb-server)
+        - [（2）PD server（PD：placement driver）](#2pd-serverpdplacement-driver)
+        - [（3）存储节点](#3存储节点)
+      - [2.存储](#2存储)
+        - [（1）存储形式：key-value pairs（键值对）](#1存储形式key-value-pairs键值对)
+        - [（2）存储引擎：RocksDB](#2存储引擎rocksdb)
+        - [（3）一致性协议：Raft](#3一致性协议raft)
+        - [（4）最小单位：region](#4最小单位region)
+        - [（5）MVCC（multi-version concurrency control，多版本并发控制）](#5mvccmulti-version-concurrency-control多版本并发控制)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

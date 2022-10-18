@@ -1,6 +1,30 @@
 # routine
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [routine](#routine)
+    - [概述](#概述)
+      - [1.goroutine](#1goroutine)
+      - [2.协程调度：GMP调度模型](#2协程调度gmp调度模型)
+      - [3.context接口](#3context接口)
+    - [使用](#使用)
+      - [1.基本使用](#1基本使用)
+        - [（1）开启一个协程：`go`](#1开启一个协程go)
+        - [（2）退出一个协程](#2退出一个协程)
+      - [2.协程安全的计数器：`WaitGroup`](#2协程安全的计数器waitgroup)
+      - [3.协程间的通信：channel](#3协程间的通信channel)
+        - [（1）创建和关闭channel](#1创建和关闭channel)
+        - [（2）在channel中生产和消费](#2在channel中生产和消费)
+        - [（3）利用`range`读取channel数据](#3利用range读取channel数据)
+        - [（4）channel multiplexing（处理多个channel）：`select`](#4channel-multiplexing处理多个channelselect)
+      - [4.worker pool（goroutine池）](#4worker-poolgoroutine池)
+      - [5.context](#5context)
+        - [(1) introduction](#1-introduction)
+        - [（2）`Background()`和`TODO()`](#2background和todo)
+        - [（3）](#3)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

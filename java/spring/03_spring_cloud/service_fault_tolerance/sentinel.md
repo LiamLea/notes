@@ -1,6 +1,26 @@
 # sentinel
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [sentinel](#sentinel)
+    - [使用](#使用)
+      - [1.部署sentinel dashboard](#1部署sentinel-dashboard)
+      - [1.基本使用](#1基本使用)
+        - [（1）引入依赖](#1引入依赖)
+      - [（2）配置](#2配置)
+        - [（3）测试](#3测试)
+      - [3.设置流控规则](#3设置流控规则)
+      - [4.设置通用 BlockException处理函数 和 fallback函数](#4设置通用-blockexception处理函数-和-fallback函数)
+        - [（1）设置BlockException处理函数](#1设置blockexception处理函数)
+        - [（2）设置 fallback函数](#2设置-fallback函数)
+        - [（3）使用](#3使用)
+      - [5.将服务降级和业务逻辑解耦（主要在调用方实现，即feign）](#5将服务降级和业务逻辑解耦主要在调用方实现即feign)
+        - [（1）配置feign](#1配置feign)
+        - [（2）创建一个类实现feign接口（类中的覆盖方法就是fallback方法）](#2创建一个类实现feign接口类中的覆盖方法就是fallback方法)
+      - [6.规则持久化（nacos）](#6规则持久化nacos)
+
+<!-- /code_chunk_output -->
 
 ### 使用
 

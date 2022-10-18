@@ -1,5 +1,19 @@
 # ACL
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ACL](#acl)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+      - [2.格式](#2格式)
+      - [3.`<WHAT>`（目标，即访问该目标时进行权限控制）](#3what目标即访问该目标时进行权限控制)
+        - [（1）基本选取的方式](#1基本选取的方式)
+      - [4.`<WHO>`（指定被授权的用户，即该条目有相关权限）](#4who指定被授权的用户即该条目有相关权限)
+      - [5.`<ACCESS_LEVEL>`（具体的权限）](#5access_level具体的权限)
+      - [6.`<CONTROL>`（匹配后进行的动作）](#6control匹配后进行的动作)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 #### 1.特点

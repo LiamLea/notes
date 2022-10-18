@@ -1,3 +1,16 @@
+# deploy
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [deploy](#deploy)
+    - [部署](#部署)
+      - [1.修改密码](#1修改密码)
+      - [2.启动参数](#2启动参数)
+      - [2.Argo CD Image Updater](#2argo-cd-image-updater)
+
+<!-- /code_chunk_output -->
+
 ### 部署
 
 #### 1.修改密码

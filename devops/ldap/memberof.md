@@ -1,4 +1,20 @@
-[toc]
+# memberof
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [memberof](#memberof)
+    - [概述](#概述)
+      - [posixGroup vs groupOfNames](#posixgroup-vs-groupofnames)
+    - [配置memberof功能](#配置memberof功能)
+      - [1.启动memeberof](#1启动memeberof)
+        - [（1）加载模块](#1加载模块)
+        - [（2）配置数据库](#2配置数据库)
+      - [2.启动参照完整性](#2启动参照完整性)
+        - [（1)加载模块](#1加载模块-1)
+        - [（2）配置数据库](#2配置数据库-1)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 #### posixGroup vs groupOfNames

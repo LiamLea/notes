@@ -1,5 +1,13 @@
 # ESXi
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ESXi](#esxi)
+    - [查用命令](#查用命令)
+      - [1.虚拟机相关](#1虚拟机相关)
+
+<!-- /code_chunk_output -->
 
 ### 查用命令
 

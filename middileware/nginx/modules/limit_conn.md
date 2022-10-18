@@ -1,6 +1,19 @@
 # limit connections
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [limit connections](#limit-connections)
+    - [概述](#概述)
+      - [1.相关模块](#1相关模块)
+      - [2.作用](#2作用)
+      - [3.连接计数](#3连接计数)
+    - [配置](#配置)
+      - [1.基础配置](#1基础配置)
+      - [2.demo](#2demo)
+        - [（1）限制每个ip能够连接指定api的并发数](#1限制每个ip能够连接指定api的并发数)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

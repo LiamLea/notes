@@ -1,5 +1,16 @@
 # aix
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [aix](#aix)
+    - [常用命令](#常用命令)
+      - [1.基本命令](#1基本命令)
+      - [2.磁盘和文件系统](#2磁盘和文件系统)
+      - [3.查看硬件6](#3查看硬件6)
+
+<!-- /code_chunk_output -->
+
 ### 常用命令
 
 #### 1.基本命令

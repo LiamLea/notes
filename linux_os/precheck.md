@@ -1,3 +1,16 @@
+# precheck
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [precheck](#precheck)
+    - [检查磁盘](#检查磁盘)
+      - [1.吞吐量](#1吞吐量)
+      - [2.时延](#2时延)
+      - [3.掉速](#3掉速)
+
+<!-- /code_chunk_output -->
+
 ### 检查磁盘
 
 #### 1.吞吐量

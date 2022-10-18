@@ -1,6 +1,15 @@
 # debug
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [debug](#debug)
+      - [1.使用actuator](#1使用actuator)
+        - [（1）引入依赖](#1引入依赖)
+        - [（2） 配置（开启actuator所有的endpoints）: application.yml](#2-配置开启actuator所有的endpoints-applicationyml)
+        - [（3）查看所有的endpoints（包括配置、路由等）](#3查看所有的endpoints包括配置-路由等)
+
+<!-- /code_chunk_output -->
 
 #### 1.使用actuator
 

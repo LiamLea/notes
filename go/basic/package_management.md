@@ -1,6 +1,16 @@
 # package management
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [package management](#package-management)
+    - [概述](#概述)
+      - [1.定义包（就是一个go文件）](#1定义包就是一个go文件)
+      - [2.import处理流程](#2import处理流程)
+      - [3.import使用](#3import使用)
+      - [4.包中的标识符命名规则（必须遵循）](#4包中的标识符命名规则必须遵循)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

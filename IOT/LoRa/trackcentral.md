@@ -1,6 +1,18 @@
 # TrackCentral(network server)
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [TrackCentral(network server)](#trackcentralnetwork-server)
+    - [概述](#概述)
+      - [1.TrackCentral network server](#1trackcentral-network-server)
+      - [2.core components](#2core-components)
+        - [(1) station](#1-station)
+        - [(2) dispatch](#2-dispatch)
+        - [(3) IO](#3-io)
+        - [(4) terminal management console](#4-terminal-management-console)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

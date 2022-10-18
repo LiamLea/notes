@@ -1,6 +1,28 @@
 # stream
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [stream](#stream)
+    - [概述](#概述)
+      - [1.spring cloud stream](#1spring-cloud-stream)
+        - [（1）what](#1what)
+      - [2.基础概念](#2基础概念)
+        - [（1）Binder](#1binder)
+        - [（2）Channel](#2channel)
+        - [（3）Source 和 Sink](#3source-和-sink)
+    - [使用（以kafka为例）](#使用以kafka为例)
+      - [1.引入依赖](#1引入依赖)
+      - [2.生产者](#2生产者)
+        - [（1）配置stream](#1配置stream)
+        - [（2）创建service（用于发送消息）](#2创建service用于发送消息)
+        - [（3）使用](#3使用)
+      - [3.消费者](#3消费者)
+        - [（1）配置stream](#1配置stream-1)
+        - [（2）使用](#2使用)
+        - [（3）效果](#3效果)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 
