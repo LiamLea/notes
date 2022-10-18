@@ -1,6 +1,20 @@
 # keepalived
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [keepalived](#keepalived)
+    - [概述](#概述)
+      - [1.keepalived包含三个部分](#1keepalived包含三个部分)
+      - [2.priority值的范围：-245~245](#2priority值的范围-245~245)
+    - [配置](#配置)
+      - [1.全局配置](#1全局配置)
+      - [2.VRRP配置](#2vrrp配置)
+      - [3.demo](#3demo)
+        - [（1）脚本:`check.sh`](#1脚本checksh)
+        - [（2）`keepalived.conf`](#2keepalivedconf)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

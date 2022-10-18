@@ -1,6 +1,30 @@
 # VXLAN
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [VXLAN](#vxlan)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+      - [2.相关术语](#2相关术语)
+        - [（1）VNI（vxlan netwotk id）](#1vnivxlan-netwotk-id)
+        - [（2）VTEP（virtual tunnel endpoint）](#2vtepvirtual-tunnel-endpoint)
+      - [3.数据包格式](#3数据包格式)
+      - [4.发现其他VTEP的方式](#4发现其他vtep的方式)
+        - [（1）组播](#1组播)
+        - [（2）单播](#2单播)
+      - [5.通信过程（非常重要）](#5通信过程非常重要)
+    - [配置](#配置)
+      - [1.利用组播](#1利用组播)
+        - [（1）创建vxlan设备](#1创建vxlan设备)
+        - [（2）验证配置](#2验证配置)
+        - [（3）配置ip](#3配置ip)
+      - [2.利用单播](#2利用单播)
+        - [（1）创建vxlan设备](#1创建vxlan设备-1)
+        - [（2）添加vxlan的fdb条目](#2添加vxlan的fdb条目)
+        - [（3）其他设备，跟组播差不多，这里省略](#3其他设备跟组播差不多这里省略)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

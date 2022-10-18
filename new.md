@@ -1,4 +1,47 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+  - [1.REST架构：](#1rest架构)
+  - [3.执行脚本最好使用：bash](#3执行脚本最好使用bash)
+  - [4.脚本的内容都放在后台执行了，让脚本不放在后台，可以在最后加上：wait](#4脚本的内容都放在后台执行了让脚本不放在后台可以在最后加上wait)
+  - [14.当添加了新的动态库目录后，需要更新动态库缓存：ldconfig](#14当添加了新的动态库目录后需要更新动态库缓存ldconfig)
+  - [18.\r\n 和 \n 区别：](#18rn-和-n-区别)
+  - [22.printf](#22printf)
+  - [23.sysrq（system request）](#23sysrqsystem-request)
+  - [24.overcommit不会触发oom killer](#24overcommit不会触发oom-killer)
+  - [29."cannot allocate memory"，可能的原因：](#29cannot-allocate-memory可能的原因)
+  - [32./var/run和/var/lib](#32varrun和varlib)
+  - [33.WAL：write-ahead logging](#33walwrite-ahead-logging)
+  - [40.SIGs（sepecial interests groups）](#40sigssepecial-interests-groups)
+- [42.hash函数用来提取 定长的特征码](#42hash函数用来提取-定长的特征码)
+- [31.如何man一个命令的子命令](#31如何man一个命令的子命令)
+- [43."No manual entry for xx"的解决方法](#43no-manual-entry-for-xx的解决方法)
+- [45.并发访问的响应模型:](#45并发访问的响应模型)
+- [50.两个虚拟机之间的传输速度](#50两个虚拟机之间的传输速度)
+- [51.执行命令后，没有响应可能的原因：](#51执行命令后没有响应可能的原因)
+- [52.解释器](#52解释器)
+- [53.如果一个文件和另一个文件相同，但不是软连接，可能的情况：](#53如果一个文件和另一个文件相同但不是软连接可能的情况)
+- [55.在k8s上运行的镜像要求](#55在k8s上运行的镜像要求)
+- [56.upstream和downstream的区别](#56upstream和downstream的区别)
+- [57.处于不可中断(`D`)的后台进程不能被kill掉（前台的可以被kill）](#57处于不可中断d的后台进程不能被kill掉前台的可以被kill)
+- [50.Stream（流）](#50stream流)
+- [52.`kubectl edit cm xx`导致data中的数据变为一行](#52kubectl-edit-cm-xx导致data中的数据变为一行)
+- [53.查看网络设备的参数](#53查看网络设备的参数)
+- [54.ping 本地的任何ip，其实都是ping的`127.0.0.1`](#54ping-本地的任何ip其实都是ping的127001)
+- [55.`docker restart` 和 `docker restart`都不会清除docker中的临时数据](#55docker-restart-和-docker-restart都不会清除docker中的临时数据)
+- [56.buff和cache](#56buff和cache)
+- [57.helm仓库无法查找旧的chart问题](#57helm仓库无法查找旧的chart问题)
+- [58.out-of-band](#58out-of-band)
+  - [(1) out-of-band management](#1-out-of-band-management)
+  - [(2) out-of-band data](#2-out-of-band-data)
+- [56.在没有工具的请求下：查看容器中的某个端口](#56在没有工具的请求下查看容器中的某个端口)
+  - [（1）利用文件查找](#1利用文件查找)
+  - [（2）将该容器的网络命名空间挂载出来](#2将该容器的网络命名空间挂载出来)
+- [57.格式化磁盘: `wipefs`](#57格式化磁盘-wipefs)
+
+<!-- /code_chunk_output -->
+
 ##### 1.REST架构：
 representation state transfer，表现层状态转移
 本质：URL定义资源，用HTTP方法处理资源

@@ -1,6 +1,19 @@
 # VNC
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [VNC](#vnc)
+    - [部署](#部署)
+      - [1.安装](#1安装)
+      - [2.配置VNC认证信息](#2配置vnc认证信息)
+      - [3.启动vncserver](#3启动vncserver)
+        - [（1）通过systemd（永久）](#1通过systemd永久)
+        - [（2）通过命令行（临时）](#2通过命令行临时)
+        - [（3）相关文件放在：`<user_home>/.vnc/`](#3相关文件放在user_homevnc)
+      - [4.验证](#4验证)
+
+<!-- /code_chunk_output -->
 
 ### 部署
 

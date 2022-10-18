@@ -1,6 +1,24 @@
 # STP
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [STP](#stp)
+    - [概述](#概述)
+      - [1.STP](#1stp)
+      - [2.相关术语](#2相关术语)
+        - [（1）Root Bridge](#1root-bridge)
+        - [（2）Root Port](#2root-port)
+        - [（3）Designated Port](#3designated-port)
+        - [（4）Cost](#4cost)
+      - [3.端口的状态](#3端口的状态)
+      - [4.工作原理](#4工作原理)
+        - [（1）在广播域中选出一个Root Bridge](#1在广播域中选出一个root-bridge)
+        - [（2）找出Root Ports](#2找出root-ports)
+        - [（3）找出Designated Ports](#3找出designated-ports)
+        - [（4）阻塞环路](#4阻塞环路)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

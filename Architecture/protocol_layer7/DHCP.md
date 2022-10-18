@@ -1,5 +1,14 @@
 # DHCP
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [DHCP](#dhcp)
+    - [概述](#概述)
+      - [1.DHCP](#1dhcp)
+      - [2.原理](#2原理)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 #### 1.DHCP

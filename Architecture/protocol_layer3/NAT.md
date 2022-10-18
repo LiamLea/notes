@@ -1,6 +1,31 @@
 # NAT
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [NAT](#nat)
+    - [概述](#概述)
+      - [1.NAT Translation Table](#1nat-translation-table)
+        - [（1）现在的协议大部分都是有状态的协议](#1现在的协议大部分都是有状态的协议)
+        - [（2）映射记录](#2映射记录)
+      - [2.Internate address architecture](#2internate-address-architecture)
+      - [3.NAT造成的问题](#3nat造成的问题)
+      - [4.NAT traversal（NAT穿透）](#4nat-traversalnat穿透)
+        - [（1）relaying（中继转发）](#1relaying中继转发)
+        - [（2）connection reversal（连接反转）](#2connection-reversal连接反转)
+        - [（3）hole punching](#3hole-punching)
+      - [5.hairpin nat（NAT loopback）](#5hairpin-natnat-loopback)
+        - [（1）why need hairpin nat](#1why-need-hairpin-nat)
+        - [（2）工作原理](#2工作原理)
+    - [hole punching(punch-through)](#hole-punchingpunch-through)
+      - [1.hole punching](#1hole-punching)
+      - [2.hole punching需要满足的条件](#2hole-punching需要满足的条件)
+        - [（1）Consistent Endpoint Translation（一致的endpoint转换）](#1consistent-endpoint-translation一致的endpoint转换)
+      - [3.UDP hole punching工作原理](#3udp-hole-punching工作原理)
+        - [（1）存在三种场景（但基本原理是一样的）](#1存在三种场景但基本原理是一样的)
+        - [（2）工作原理](#2工作原理-1)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

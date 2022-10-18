@@ -1,6 +1,37 @@
 # HTTP
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [HTTP](#http)
+    - [概述](#概述)
+      - [1.HTTP协议特点](#1http协议特点)
+      - [2.HTTP/1.0 和 HTTP/1.1 比较](#2http10-和-http11-比较)
+      - [3.一次http请求的过程](#3一次http请求的过程)
+      - [4.请求报文格式](#4请求报文格式)
+      - [5.响应报文格式](#5响应报文格式)
+      - [6.常用请求方法](#6常用请求方法)
+      - [7.url分析](#7url分析)
+        - [（1）传递参数：`?<query_string>`](#1传递参数query_string)
+        - [（2）锚点：`#<anchor>`](#2锚点anchor)
+      - [8.模拟http请求](#8模拟http请求)
+      - [9.利用python模拟http服务端](#9利用python模拟http服务端)
+      - [10.超时时间](#10超时时间)
+    - [HTTP请求头](#http请求头)
+      - [1.注意事项](#1注意事项)
+        - [（1）header的名字不能包含下划线](#1header的名字不能包含下划线)
+        - [（2）不区分大小写](#2不区分大小写)
+      - [2.常用请求头](#2常用请求头)
+    - [补充知识](#补充知识)
+      - [1.重定向是客户端进行的](#1重定向是客户端进行的)
+    - [cookie](#cookie)
+      - [1.cookie特点](#1cookie特点)
+    - [session](#session)
+      - [1.session特点](#1session特点)
+      - [2.session能够存放的地方](#2session能够存放的地方)
+      - [3.demo(django)](#3demodjango)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

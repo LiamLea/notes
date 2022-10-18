@@ -1,12 +1,26 @@
 # websocket
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [websocket](#websocket)
+    - [概述](#概述)
+      - [1.websocket特点](#1websocket特点)
+      - [2.websocket原理](#2websocket原理)
+      - [3.建立websocket连接](#3建立websocket连接)
+      - [4.socket和HTTP](#4socket和http)
+      - [5.与http比较](#5与http比较)
+
+<!-- /code_chunk_output -->
+
 ### 概述
+
 #### 1.websocket特点
 * 基于TCP，是HTML5下的应用层协议，高效节能的**全双工**通信机制，保证数据的实时传输
 </br>
 * 通过**HTTP协议** **建立连接**，但是在建立连接之后，真正的数据传输阶段是不需要http协议参与的
 </br>
 * 服务端可以主动向客户端**推送数据**
-
 
 #### 2.websocket原理
 ```mermaid

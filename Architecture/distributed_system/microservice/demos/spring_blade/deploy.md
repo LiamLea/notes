@@ -1,6 +1,32 @@
 # spring blade
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [spring blade](#spring-blade)
+    - [概述](#概述)
+      - [1.服务说明](#1服务说明)
+    - [部署后端](#部署后端)
+      - [1.部署基础服务](#1部署基础服务)
+        - [（1）部署nacos](#1部署nacos)
+        - [（2）部署sentinel（不是必须）](#2部署sentinel不是必须)
+        - [（3）初始化数据库](#3初始化数据库)
+      - [2.其他服务的配置](#2其他服务的配置)
+        - [（1） 配置sentinel（在配置服务器上配置）](#1-配置sentinel在配置服务器上配置)
+      - [部署其他服务](#部署其他服务)
+        - [（1）构建](#1构建)
+        - [（2）启动其他服务](#2启动其他服务)
+      - [服务访问地址](#服务访问地址)
+    - [部署前端](#部署前端)
+      - [1.构建](#1构建-1)
+      - [2.部署（需要nginx）](#2部署需要nginx)
+        - [（1）修改配置](#1修改配置)
+        - [（2）部署](#2部署)
+    - [使用和配置](#使用和配置)
+      - [1.配置菜单](#1配置菜单)
+      - [2.使用代码生成](#2使用代码生成)
+
+<!-- /code_chunk_output -->
 
 [后端](https://github.com/chillzhuang/SpringBlade)
 [前端](https://gitee.com/smallc/Saber)

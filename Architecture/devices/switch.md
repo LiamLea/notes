@@ -1,6 +1,28 @@
 # switch
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [switch](#switch)
+    - [基础](#基础)
+      - [1.术语](#1术语)
+      - [2.port的命名](#2port的命名)
+      - [3.`PortIndex`、`IfIndex`和`IfName`](#3portindex-ifindex和ifname)
+      - [4.端口信息](#4端口信息)
+        - [（1）端口状态](#1端口状态)
+      - [5.分析直连设备](#5分析直连设备)
+      - [4..access](#4access)
+      - [5..trunk](#5trunk)
+      - [6.SPAN（switch port analyzer，交换机的端口镜像技术）](#6spanswitch-port-analyzer交换机的端口镜像技术)
+      - [7.如何获取交换机上其他端口的流量：](#7如何获取交换机上其他端口的流量)
+    - [常用命令](#常用命令)
+      - [1.接口相关](#1接口相关)
+        - [（1）查看接口概要信息](#1查看接口概要信息)
+        - [（2）查看所有ip](#2查看所有ip)
+      - [2.设置日志输出到syslog服务器](#2设置日志输出到syslog服务器)
+    - [常用oid](#常用oid)
+
+<!-- /code_chunk_output -->
 
 ### 基础
 

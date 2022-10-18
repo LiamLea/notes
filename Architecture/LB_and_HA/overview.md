@@ -1,7 +1,25 @@
 # Load_balance
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
 
+- [Load_balance](#load_balance)
+    - [概述](#概述)
+      - [1.常用调度算法](#1常用调度算法)
+        - [（1）rr（roundrobin）](#1rrroundrobin)
+        - [（2）wrr（weighted roundrobin）](#2wrrweighted-roundrobin)
+        - [（3）sh（source hashing）](#3shsource-hashing)
+        - [（4）lc（least connections）](#4lcleast-connections)
+        - [（5）wlc（weighted least connections）](#5wlcweighted-least-connections)
+    - [ip transparency](#ip-transparency)
+      - [1.layer 4：ip transparency](#1layer-4ip-transparency)
+        - [（1）DR模式](#1dr模式)
+        - [（2）NAT模式](#2nat模式)
+      - [2.layer 7: 在http头中添加源客户端的信息](#2layer-7-在http头中添加源客户端的信息)
+        - [(1)  X-Forwarded-For headers](#1-x-forwarded-for-headers)
+      - [3.通用方式：proxy protocol](#3通用方式proxy-protocol)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 
