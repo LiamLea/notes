@@ -1,4 +1,19 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [json模块](#json模块)
+      - [1.可实现的转换](#1可实现的转换)
+      - [2.使用](#2使用)
+      - [3.FAQ](#3faq)
+        - [（1）通过 sql语句 将json数据 插入到 mysql的json_filed类型字段](#1通过-sql语句-将json数据-插入到-mysql的json_filed类型字段)
+- [requests模块](#requests模块)
+      - [1.基本使用](#1基本使用)
+      - [2.处理返回](#2处理返回)
+- [requests+json的框架](#requestsjson的框架)
+
+<!-- /code_chunk_output -->
+
 # json模块
 JSON(javaScript Object Notation),是一种轻量级的数据交换格式
 可以通过网络传输各种类型的数据

@@ -1,5 +1,18 @@
 # pymysql模块
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [pymysql模块](#pymysql模块)
+    - [使用](#使用)
+      - [操作数据库的步骤](#操作数据库的步骤)
+      - [增加数据](#增加数据)
+      - [查询数据](#查询数据)
+      - [修改数据](#修改数据)
+      - [删除数据](#删除数据)
+
+<!-- /code_chunk_output -->
+
 ### 使用
 #### 操作数据库的步骤
 * 建立连接:

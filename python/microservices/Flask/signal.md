@@ -1,5 +1,17 @@
 # signal
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [signal](#signal)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+      - [2.使用](#2使用)
+        - [（1）定义signal](#1定义signal)
+        - [（2）在signal中注册函数](#2在signal中注册函数)
+        - [（3）触发信号](#3触发信号)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

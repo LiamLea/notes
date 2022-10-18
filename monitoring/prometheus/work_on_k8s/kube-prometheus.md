@@ -1,5 +1,29 @@
 # kube-prometheus
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [kube-prometheus](#kube-prometheus)
+    - [概述](#概述)
+    - [使用](#使用)
+      - [1.部署](#1部署)
+      - [2.添加job](#2添加job)
+        - [（1）创建service，代理相应的exporter的`<IP>:<PORT>`](#1创建service代理相应的exporter的ipport)
+        - [（2)创建serviceMonitor](#2创建servicemonitor)
+    - [自定义配置](#自定义配置)
+      - [1.安装相关工具，或者直接使用工具镜像](#1安装相关工具或者直接使用工具镜像)
+      - [2.创建目录并初始化](#2创建目录并初始化)
+      - [3.配置](#3配置)
+        - [（1）example配置](#1example配置)
+        - [（2）监控其他命名空间的配置](#2监控其他命名空间的配置)
+        - [（3）持久化存储配置](#3持久化存储配置)
+        - [（4）添加grafana模板](#4添加grafana模板)
+      - [4.下载`build.sh`到当前目录](#4下载buildsh到当前目录)
+      - [5.生成清单文件](#5生成清单文件)
+      - [5.利用生成的清单文件进行部署](#5利用生成的清单文件进行部署)
+
+<!-- /code_chunk_output -->
+
 ### 概述
 ### 使用
 #### 1.部署

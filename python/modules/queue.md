@@ -1,5 +1,16 @@
 # queue
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [queue](#queue)
+    - [使用](#使用)
+      - [1.队列](#1队列)
+      - [2.栈](#2栈)
+      - [3.优先级队列](#3优先级队列)
+
+<!-- /code_chunk_output -->
+
 ### 使用
 #### 1.队列
 ```python

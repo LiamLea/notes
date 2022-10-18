@@ -1,6 +1,15 @@
 # data center
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [data center](#data-center)
+    - [概述](#概述)
+      - [1.网络架构的演进](#1网络架构的演进)
+        - [(1) 3-tier architecture](#1-3-tier-architecture)
+        - [(2) spine-and-leaf architecture](#2-spine-and-leaf-architecture)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

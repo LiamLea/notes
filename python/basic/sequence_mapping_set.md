@@ -1,4 +1,16 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [序列](#序列)
+- [string](#string)
+- [list](#list)
+- [tuple](#tuple)
+- [dict](#dict)
+- [set](#set)
+
+<!-- /code_chunk_output -->
+
 # 序列
 **序列：list,tuple,string**
 **序列的实例是序列对象，都是可迭代对象**

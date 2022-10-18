@@ -1,5 +1,19 @@
 # pinpoint
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [pinpoint](#pinpoint)
+    - [概述](#概述)
+      - [1.架构](#1架构)
+        - [（1）HBase](#1hbase)
+        - [（2）collector](#2collector)
+        - [（3）web](#3web)
+        - [（4）agent](#4agent)
+        - [2.主要功能](#2主要功能)
+
+<!-- /code_chunk_output -->
+
 ### 概述
 
 #### 1.架构

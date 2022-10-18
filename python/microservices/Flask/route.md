@@ -1,5 +1,23 @@
 # route
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [route](#route)
+    - [基础](#基础)
+      - [1.路由系统](#1路由系统)
+      - [2.建议目录结构](#2建议目录结构)
+    - [使用](#使用)
+      - [1.函数详细说明](#1函数详细说明)
+        - [（1）`add_url_rule`函数参数](#1add_url_rule函数参数)
+      - [2.视图函数相关](#2视图函数相关)
+        - [（1）创建视图函数（view）](#1创建视图函数view)
+        - [（2）在视图函数中设置变量，变量的值来自url](#2在视图函数中设置变量变量的值来自url)
+        - [（3）根据endpoint获取对应的url：`url_for`函数](#3根据endpoint获取对应的urlurl_for函数)
+      - [2.全局变量](#2全局变量)
+
+<!-- /code_chunk_output -->
+
 ### 基础
 #### 1.路由系统
 路由匹配发生在`app.url_map`中

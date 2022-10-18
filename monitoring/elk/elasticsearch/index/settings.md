@@ -1,6 +1,16 @@
 # settings
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [settings](#settings)
+    - [概述](#概述)
+      - [1.有两类settigs](#1有两类settigs)
+      - [2.常用配置](#2常用配置)
+        - [（1）static settings](#1static-settings)
+        - [（2）dynamic settings](#2dynamic-settings)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

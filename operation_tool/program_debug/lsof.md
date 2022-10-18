@@ -1,3 +1,15 @@
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [lsof（list open files）](#lsoflist-open-files)
+  - [1.底层原理](#1底层原理)
+  - [2.列出所有当前打开的文件，输出的格式：](#2列出所有当前打开的文件输出的格式)
+  - [3.选项](#3选项)
+  - [4.应用场景](#4应用场景)
+
+<!-- /code_chunk_output -->
+
 ### lsof（list open files）
 #### 1.底层原理
 基于进程的以下几个文件

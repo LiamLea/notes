@@ -1,4 +1,25 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [插入操作（index some documents）](#插入操作index-some-documents)
+  - [1.插入一条记录](#1插入一条记录)
+  - [2.批量插入](#2批量插入)
+- [查询操作](#查询操作)
+  - [1.index相关](#1index相关)
+    - [（1）查询index的概述信息](#1查询index的概述信息)
+    - [（2）查询index的内容](#2查询index的内容)
+  - [2.高级查询](#2高级查询)
+    - [（1）基本语法](#1基本语法)
+    - [（2）`query`](#2query)
+    - [（3）查询nested类型数据](#3查询nested类型数据)
+  - [3.集群相关](#3集群相关)
+    - [(1) 查看集群状态](#1-查看集群状态)
+- [其他操作](#其他操作)
+  - [1.重新索引（把一个index的documents 拷贝到 另一个index）](#1重新索引把一个index的documents-拷贝到-另一个index)
+
+<!-- /code_chunk_output -->
+
 ### 插入操作（index some documents）
 
 #### 1.插入一条记录

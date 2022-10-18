@@ -1,4 +1,24 @@
-[toc]
+# filter
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [filter](#filter)
+      - [1.date](#1date)
+      - [2.drop](#2drop)
+      - [3.fingerprint](#3fingerprint)
+      - [4.mutate和prune](#4mutate和prune)
+      - [5.dns（解析域名）](#5dns解析域名)
+      - [6.geoip（添加地理信息）](#6geoip添加地理信息)
+      - [7.http（获取http接口数据进行解析）](#7http获取http接口数据进行解析)
+      - [8.jdbc_static和jdb_streaming（访问数据库）](#8jdbc_static和jdb_streaming访问数据库)
+      - [9.translate（实现字段映射）](#9translate实现字段映射)
+      - [10.grok](#10grok)
+        - [（1）基本使用](#1基本使用)
+        - [（2）常用内置pattern](#2常用内置pattern)
+        - [（3）自定义pattern](#3自定义pattern)
+
+<!-- /code_chunk_output -->
 
 #### 1.date
 从**给定字段**中，**完全匹配**出日期（即字段不能有其他内容），**作为**`@timestamp`字段

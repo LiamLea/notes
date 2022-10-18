@@ -1,6 +1,20 @@
 # context
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [context](#context)
+    - [概述](#概述)
+      - [1.上下文管理](#1上下文管理)
+      - [2.重要的三个类](#2重要的三个类)
+        - [3.有两类上下文](#3有两类上下文)
+      - [4.请求上下文 处理基本流程](#4请求上下文-处理基本流程)
+        - [（1）请求到来](#1请求到来)
+        - [（2）执行视图时](#2执行视图时)
+        - [（3）请求结束](#3请求结束)
+      - [5.flask中的Local对象为什么使用栈保存数据](#5flask中的local对象为什么使用栈保存数据)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

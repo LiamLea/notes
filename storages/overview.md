@@ -1,6 +1,25 @@
 # overview
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [overview](#overview)
+    - [概述](#概述)
+      - [1.常用的三种存储形式](#1常用的三种存储形式)
+        - [（1）block storage（块存储）](#1block-storage块存储)
+        - [（2）file storage（文件存储）](#2file-storage文件存储)
+        - [（3）object storage（对象存储）](#3object-storage对象存储)
+      - [2.data striping（数据条带化）](#2data-striping数据条带化)
+      - [3.why object storage：scalability](#3why-object-storagescalability)
+        - [（1）传统的基于block的文件系统](#1传统的基于block的文件系统)
+        - [（2）横向扩展（scale-out）的文件系统（比如：hdfs）](#2横向扩展scale-out的文件系统比如hdfs)
+        - [（3）object storage](#3object-storage)
+    - [object storage](#object-storage)
+      - [1.概述](#1概述)
+        - [（1）object](#1object)
+        - [（2）bucket](#2bucket)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

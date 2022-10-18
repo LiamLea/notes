@@ -1,6 +1,24 @@
 # wmic
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [wmic](#wmic)
+    - [概述](#概述)
+      - [1.wmic](#1wmic)
+      - [2.相关术语](#2相关术语)
+        - [（1）alias](#1alias)
+        - [（2）switches](#2switches)
+        - [（3）verbs](#3verbs)
+      - [3.使用的端口](#3使用的端口)
+    - [使用](#使用)
+      - [1.在linux上安装wmic](#1在linux上安装wmic)
+      - [2.在Linux上使用wmic](#2在linux上使用wmic)
+        - [（1）wmi的所有类](#1wmi的所有类)
+        - [（2）命令](#2命令)
+      - [3.在windoews上使用wmic](#3在windoews上使用wmic)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,4 +1,20 @@
-[toc]
+# tools
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [tools](#tools)
+    - [flask sqlalchemy](#flask-sqlalchemy)
+      - [1.创建sqlalchemy并注册到app中](#1创建sqlalchemy并注册到app中)
+      - [2.创建表的类](#2创建表的类)
+      - [3.操作](#3操作)
+    - [flask scripts](#flask-scripts)
+      - [1.用脚本命令管理该app](#1用脚本命令管理该app)
+      - [2.自定义命令](#2自定义命令)
+    - [flask migrate（需要flask_scripts）](#flask-migrate需要flask_scripts)
+
+<!-- /code_chunk_output -->
+
 ### flask sqlalchemy
 
 #### 1.创建sqlalchemy并注册到app中

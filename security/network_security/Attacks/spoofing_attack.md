@@ -1,6 +1,18 @@
 # spoofing attack
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [spoofing attack](#spoofing-attack)
+    - [概述](#概述)
+      - [1.ip/mac spoofing](#1ipmac-spoofing)
+        - [（1）mac spoofing](#1mac-spoofing)
+        - [（2）ip spoofing](#2ip-spoofing)
+        - [（3）prevent ip/mac spoofing](#3prevent-ipmac-spoofing)
+      - [2.arp spoofing（arp poisoning）](#2arp-spoofingarp-poisoning)
+      - [3.DNS spoofing](#3dns-spoofing)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

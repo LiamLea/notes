@@ -1,6 +1,23 @@
 # overview
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [overview](#overview)
+    - [概述](#概述)
+      - [1.配置文件查找顺序（匹配即停止）](#1配置文件查找顺序匹配即停止)
+      - [2.facts](#2facts)
+      - [3.变量（变量名不要使用：`-`符合）](#3变量变量名不要使用-符合)
+      - [（1）变量来源](#1变量来源)
+      - [（2）管理主机变量和组变量](#2管理主机变量和组变量)
+      - [（3）变量的优先级](#3变量的优先级)
+    - [使用](#使用)
+      - [1.自定义配置文件](#1自定义配置文件)
+      - [2.使用多个inventory](#2使用多个inventory)
+      - [3.配置inventory文件](#3配置inventory文件)
+      - [4.ansible命令](#4ansible命令)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

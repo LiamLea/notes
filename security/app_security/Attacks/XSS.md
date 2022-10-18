@@ -1,6 +1,33 @@
 # XSS
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [XSS](#xss)
+    - [概述](#概述)
+      - [1.XSS（cross-site scripting）](#1xsscross-site-scripting)
+      - [2.XSS类型](#2xss类型)
+        - [（1）stored XSS attacks（最常见）](#1stored-xss-attacks最常见)
+        - [（2）reflected XSS attacks](#2reflected-xss-attacks)
+        - [（3）DOM XSS attacks（少见）](#3dom-xss-attacks少见)
+      - [3.实现XSS攻击条件](#3实现xss攻击条件)
+      - [4.如何利用XSS攻击](#4如何利用xss攻击)
+    - [攻击](#攻击)
+      - [1.寻找可攻击的输入点](#1寻找可攻击的输入点)
+        - [（1）找到一个输入点](#1找到一个输入点)
+        - [（2）测试输入点](#2测试输入点)
+      - [2.简单的攻击测试](#2简单的攻击测试)
+        - [（1）基本测试](#1基本测试)
+        - [（2）闭合标签](#2闭合标签)
+        - [（3）多标签测试](#3多标签测试)
+    - [防护](#防护)
+      - [1.XSS Filter](#1xss-filter)
+      - [2.实体化编码](#2实体化编码)
+        - [（1）html编码](#1html编码)
+        - [（2）javascript编码](#2javascript编码)
+      - [3.HttpOnly](#3httponly)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

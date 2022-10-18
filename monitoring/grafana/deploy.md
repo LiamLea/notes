@@ -1,4 +1,12 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [deploy](#deploy)
+  - [1.安装设置数据源](#1安装设置数据源)
+  - [2.安装时导入dashboard](#2安装时导入dashboard)
+
+<!-- /code_chunk_output -->
 
 ### deploy
 * 参考grafana的chart

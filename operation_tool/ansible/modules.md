@@ -1,4 +1,47 @@
-[toc]
+# modules
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [modules](#modules)
+    - [概述](#概述)
+      - [1.collections（管理模块）](#1collections管理模块)
+        - [（1）介绍](#1介绍)
+        - [（2）利用ansible-galaxy管理collections](#2利用ansible-galaxy管理collections)
+        - [（3）collections搜索路径](#3collections搜索路径)
+      - [2.查看模块详情](#2查看模块详情)
+    - [工具模块](#工具模块)
+      - [1.meta（能够影响ansible内部执行和状态）](#1meta能够影响ansible内部执行和状态)
+      - [2.fail](#2fail)
+      - [3.set_fact（在任务运行时，设置变量）](#3set_fact在任务运行时设置变量)
+    - [调试模块](#调试模块)
+      - [1.ping](#1ping)
+      - [2.debug](#2debug)
+      - [3.setup](#3setup)
+    - [命令模块](#命令模块)
+      - [1.shell](#1shell)
+      - [2.script](#2script)
+      - [3.expect（能够响应 需要输入的语句）](#3expect能够响应-需要输入的语句)
+    - [系统模块](#系统模块)
+      - [1.service](#1service)
+      - [2.user](#2user)
+      - [3.reboot](#3reboot)
+      - [4.selinux](#4selinux)
+      - [5.sysctl](#5sysctl)
+    - [包管理模块](#包管理模块)
+      - [1.yum](#1yum)
+    - [文件模块](#文件模块)
+      - [1.copy](#1copy)
+      - [2.stat（获取文件的信息）](#2stat获取文件的信息)
+      - [3.file（对文件进行操作：创建，修改属性等等）](#3file对文件进行操作创建修改属性等等)
+      - [4.unarchive](#4unarchive)
+      - [5.template](#5template)
+      - [6.lineinfile](#6lineinfile)
+      - [7.blockinfile](#7blockinfile)
+    - [kubernetes相关模块](#kubernetes相关模块)
+      - [1.helm](#1helm)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

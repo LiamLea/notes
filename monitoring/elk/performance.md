@@ -1,6 +1,17 @@
 # performance
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [performance](#performance)
+    - [optimizing](#optimizing)
+      - [1.optimize es](#1optimize-es)
+        - [(1) jvm heap size](#1-jvm-heap-size)
+      - [2.optimize logstash](#2optimize-logstash)
+        - [(1) jvm heap size](#1-jvm-heap-size-1)
+        - [(2) pipeline batch size](#2-pipeline-batch-size)
+
+<!-- /code_chunk_output -->
 
 ### optimizing
 

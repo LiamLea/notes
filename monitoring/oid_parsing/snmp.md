@@ -1,5 +1,31 @@
 # snmp（simple network management protocol）
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [snmp（simple network management protocol）](#snmpsimple-network-management-protocol)
+    - [基础概念](#基础概念)
+      - [1.snmp网络管理框架由三部分组成：](#1snmp网络管理框架由三部分组成)
+      - [2.oid（object identity）](#2oidobject-identity)
+      - [3.community（共同体名）](#3community共同体名)
+      - [4.v3三种安全级别](#4v3三种安全级别)
+      - [5.v2c和v3的区别](#5v2c和v3的区别)
+      - [6.USM：user-based security model](#6usmuser-based-security-model)
+      - [7.Context](#7context)
+    - [配置](#配置)
+      - [1.修改配置文件](#1修改配置文件)
+      - [2.重启服务](#2重启服务)
+      - [3.验证](#3验证)
+      - [4.采集分区信息](#4采集分区信息)
+    - [扩展](#扩展)
+      - [1.自定义oid](#1自定义oid)
+        - [（1）创建脚本（最后必须输出，三行内容）](#1创建脚本最后必须输出三行内容)
+        - [（2）修改snmpd.conf](#2修改snmpdconf)
+      - [2.加载本地的mib库](#2加载本地的mib库)
+    - [常用指令](#常用指令)
+
+<!-- /code_chunk_output -->
+
 ### 基础概念
 
 #### 1.snmp网络管理框架由三部分组成：

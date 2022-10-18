@@ -1,6 +1,52 @@
 # overview
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [overview](#overview)
+    - [概述](#概述)
+      - [1.术语](#1术语)
+      - [2.架构](#2架构)
+        - [（1）RADOS](#1rados)
+        - [（2）RBD（RADOS block device）](#2rbdrados-block-device)
+        - [（3）file system](#3file-system)
+        - [（4）librados](#4librados)
+        - [（5）RADOSGW](#5radosgw)
+      - [3.RADOS组件](#3rados组件)
+        - [（1）ceph-osd（object storage device）](#1ceph-osdobject-storage-device)
+        - [（2）ceph-mon（monitor）](#2ceph-monmonitor)
+      - [4.其他基础组件](#4其他基础组件)
+        - [（1）ceph-mgr（manager）](#1ceph-mgrmanager)
+        - [（2）ceph-mds（metadata server）](#2ceph-mdsmetadata-server)
+        - [（3）RGW（rados gateway）](#3rgwrados-gateway)
+      - [4.目录规划](#4目录规划)
+    - [RADOS](#rados)
+      - [1.基础概念](#1基础概念)
+        - [（1）bluestore（一个osd是一个bluestore）](#1bluestore一个osd是一个bluestore)
+        - [（2）erasure code](#2erasure-code)
+        - [（3）CRUSH map](#3crush-map)
+      - [2.BlueStore](#2bluestore)
+        - [(1) filestore vs bluestore](#1-filestore-vs-bluestore)
+        - [(2) 存储结构（四个存储）](#2-存储结构四个存储)
+      - [3.pool](#3pool)
+        - [（1）两类pool](#1两类pool)
+        - [（2）pool的相关参数](#2pool的相关参数)
+        - [（3）pool需要与application关联](#3pool需要与application关联)
+      - [4.placement group](#4placement-group)
+        - [（1）原理](#1原理)
+        - [（2）为什么需要pg](#2为什么需要pg)
+        - [（3）pg数量的权衡](#3pg数量的权衡)
+        - [（4）基础概念](#4基础概念)
+        - [（5）acting set 和 up set：](#5acting-set-和-up-set)
+        - [（5）pg的状态](#5pg的状态)
+        - [（6）需要关注长时间处于down的pg](#6需要关注长时间处于down的pg)
+        - [（6）需要保证pg都处于up的状态，才能看出数据的真实状态（否则数据丢失，可能看不出来）](#6需要保证pg都处于up的状态才能看出数据的真实状态否则数据丢失可能看不出来)
+      - [5.OSD（提供存储服务）](#5osd提供存储服务)
+        - [（1）OSD状态](#1osd状态)
+        - [（2）OSD weight（决定了数据的分布）](#2osd-weight决定了数据的分布)
+        - [（3）OSD宕机](#3osd宕机)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

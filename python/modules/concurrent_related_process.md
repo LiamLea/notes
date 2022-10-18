@@ -1,5 +1,27 @@
 # Process
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [Process](#process)
+    - [预备知识](#预备知识)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+      - [2.守护进程](#2守护进程)
+      - [3.linux和windows多进程区别](#3linux和windows多进程区别)
+    - [使用](#使用)
+      - [1. `os.fork()`](#1-osfork)
+    - [multiprocssing模块](#multiprocssing模块)
+      - [1.基本用法](#1基本用法)
+      - [2.`join()`的用法](#2join的用法)
+      - [3.互斥锁](#3互斥锁)
+      - [4.进程间通信](#4进程间通信)
+        - [（1）队列（是进程安全的）](#1队列是进程安全的)
+      - [5.进程间共享状态](#5进程间共享状态)
+        - [（1）共享内存（速度较慢）](#1共享内存速度较慢)
+
+<!-- /code_chunk_output -->
+
 ### 预备知识
 * 同步与异步区别：**通知方式**
 请求发出后，是否需要等待结果，才能继续执行其他操作

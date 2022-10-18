@@ -1,6 +1,16 @@
 # performance
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [performance](#performance)
+    - [测试性能](#测试性能)
+      - [1.测试rados性能](#1测试rados性能)
+        - [（1）测试吞吐量](#1测试吞吐量)
+        - [（2）测试延迟（一次I/O大小为4M）](#2测试延迟一次io大小为4m)
+      - [2.查看osd的延迟](#2查看osd的延迟)
+
+<!-- /code_chunk_output -->
 
 ### 测试性能
 

@@ -1,6 +1,16 @@
 # 实践
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [实践](#实践)
+    - [概述](#概述)
+      - [1.flapping alerts（拍打告警）](#1flapping-alerts拍打告警)
+      - [2.解决flapping alerts](#2解决flapping-alerts)
+        - [3.对alerts进行分组的建议](#3对alerts进行分组的建议)
+    - [常用告警设置](#常用告警设置)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

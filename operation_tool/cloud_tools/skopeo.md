@@ -1,6 +1,17 @@
 # skopeo
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [skopeo](#skopeo)
+    - [概述](#概述)
+      - [1.用于操作镜像仓库](#1用于操作镜像仓库)
+    - [使用](#使用)
+      - [1.list某个镜像的tags](#1list某个镜像的tags)
+      - [2.copy某个镜像](#2copy某个镜像)
+      - [3.迁移某个镜像仓库](#3迁移某个镜像仓库)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

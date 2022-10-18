@@ -1,4 +1,16 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [WSGI](#wsgi)
+    - [概述](#概述)
+      - [1.WSGI](#1wsgi)
+      - [2.WSGI对application对象有如下三点要求](#2wsgi对application对象有如下三点要求)
+      - [3.web服务器（服务端）和web框架（应用端）区别](#3web服务器服务端和web框架应用端区别)
+      - [4.HTTP如何到达应用程序的](#4http如何到达应用程序的)
+
+<!-- /code_chunk_output -->
+
 # WSGI
 **本质**
 ```

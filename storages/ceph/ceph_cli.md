@@ -1,6 +1,34 @@
 # ceph command
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ceph command](#ceph-command)
+    - [orchestrator module：`ceph orch`](#orchestrator-moduleceph-orch)
+      - [1.获取整个集群状态](#1获取整个集群状态)
+      - [2.管理host：`ceph orch host`](#2管理hostceph-orch-host)
+        - [（1）特殊的host标签（最新版本）：](#1特殊的host标签最新版本)
+      - [3.管理service：`ceph orch <ACTION> <service_type>`](#3管理serviceceph-orch-action-service_type)
+        - [（1）查看服务状态](#1查看服务状态)
+        - [（2）配置daemon的placement并启动：`ceph orch apply <service_type>`](#2配置daemon的placement并启动ceph-orch-apply-service_type)
+      - [4.管理存储设备：`ceph orch device`](#4管理存储设备ceph-orch-device)
+      - [5.管理daemon：`ceph orch daemon`](#5管理daemonceph-orch-daemon)
+        - [（1）查看daemon状态](#1查看daemon状态)
+        - [（2）添加service](#2添加service)
+    - [配置相关：`ceph config`](#配置相关ceph-config)
+      - [1.查看配置](#1查看配置)
+      - [2.进行配置](#2进行配置)
+    - [mgr module相关: `ceph mgr`](#mgr-module相关-ceph-mgr)
+    - [OSD相关（osd需要特别关注）](#osd相关osd需要特别关注)
+      - [1.osd相关](#1osd相关)
+      - [2.pool相关](#2pool相关)
+      - [3.pg相关](#3pg相关)
+    - [权限相关](#权限相关)
+      - [1.列出所有账号、密码和权限](#1列出所有账号-密码和权限)
+    - [debug](#debug)
+      - [1.查看集群状态和原因](#1查看集群状态和原因)
+
+<!-- /code_chunk_output -->
 
 [不同版本的文档，需要去github上查看](https://github.com/ceph/ceph/tree/hammer/doc)
 

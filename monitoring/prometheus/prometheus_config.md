@@ -1,4 +1,42 @@
-[toc]
+# prometheus config
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [prometheus config](#prometheus-config)
+    - [概述](#概述)
+      - [1.有四个部分](#1有四个部分)
+        - [（1）全局配置：`global`](#1全局配置global)
+        - [（2） 加载rule文件：`rule_files`](#2-加载rule文件rule_files)
+        - [（3）采集配置：`scrape_configs`](#3采集配置scrape_configs)
+        - [（4）告警发往何处的配置：`alerting`](#4告警发往何处的配置alerting)
+      - [2.基本格式](#2基本格式)
+      - [3.重新加载配置](#3重新加载配置)
+    - [全局配置](#全局配置)
+    - [加载rule文件](#加载rule文件)
+    - [采集配置](#采集配置)
+      - [1.概述](#1概述)
+      - [2.k8s服务发现](#2k8s服务发现)
+        - [（1）概述](#1概述-1)
+        - [（2）通过Node发现targets](#2通过node发现targets)
+        - [（3）通过Service发现targets](#3通过service发现targets)
+        - [（4）通过Pod发现targets](#4通过pod发现targets)
+        - [（5）通过Endpoints发现targets](#5通过endpoints发现targets)
+        - [（6）通过Ingress发现targets](#6通过ingress发现targets)
+        - [（7）基本配置](#7基本配置)
+      - [3.relabel（重新标记，prometheus非常重要的功能）](#3relabel重新标记prometheus非常重要的功能)
+        - [（1）主要功能](#1主要功能)
+        - [（2）元标签对配置的影响（很重要）](#2元标签对配置的影响很重要)
+        - [（3）5种action](#35种action)
+        - [（4）基本格式](#4基本格式)
+    - [告警配置](#告警配置)
+      - [1.概述](#1概述-2)
+      - [2.配置告警发往的地址](#2配置告警发往的地址)
+        - [（1）基本配置](#1基本配置)
+        - [（2）静态地址](#2静态地址)
+        - [（3）动态地址（自动发现）](#3动态地址自动发现)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 
@@ -80,7 +118,7 @@ scape_configs:
   metrics_path: <URL_PATH>   #本质生成__metrics_path__元标签
                              #在这里配置优先级最低
                              #如果没有__metrics_path__元标签，默认为 /metrics
-                             
+
   #设置传递的参数，<__address__>/<__metrics_path__>?<key1>=<string_1>&<key1>=<string_2>&<key2>=<string_3>
   params:
     <key1>: [<string_1>, <string_2>]

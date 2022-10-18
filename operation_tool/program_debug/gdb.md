@@ -1,4 +1,15 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [gdb（GNU debugger）](#gdbgnu-debugger)
+  - [1.特点](#1特点)
+  - [2.基本使用](#2基本使用)
+  - [3.gdb终端命令](#3gdb终端命令)
+  - [4.利用gdb管理文件描述符](#4利用gdb管理文件描述符)
+
+<!-- /code_chunk_output -->
+
 ### gdb（GNU debugger）
 #### 1.特点
 * 可以进入正在执行的某个进程，进入后，进程就**暂停**在进入点

@@ -1,6 +1,16 @@
 # cluster
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [cluster](#cluster)
+    - [概述](#概述)
+      - [1.集群状态及解决](#1集群状态及解决)
+        - [（1）集群状态为red](#1集群状态为red)
+        - [（2）集群状态为yellow](#2集群状态为yellow)
+        - [（3）解决思路：](#3解决思路)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

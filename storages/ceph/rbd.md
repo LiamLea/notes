@@ -1,6 +1,32 @@
 # rbd
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [rbd](#rbd)
+    - [概述](#概述)
+      - [1.基础概念](#1基础概念)
+        - [（1）image](#1image)
+      - [2.使用注意事项](#2使用注意事项)
+    - [操作](#操作)
+      - [1.创建pool](#1创建pool)
+      - [2.创建image](#2创建image)
+      - [3.管理image](#3管理image)
+      - [4.利用内核使用rbd](#4利用内核使用rbd)
+        - [（1）提前准备](#1提前准备)
+        - [（2）加载image](#2加载image)
+        - [（3）查看加载的image（即块设备）](#3查看加载的image即块设备)
+        - [（4）卸载image（即块设备）](#4卸载image即块设备)
+      - [5.k8s使用rbd](#5k8s使用rbd)
+        - [（1）下载ceph-csi-rbd chart](#1下载ceph-csi-rbd-chart)
+        - [（2）根据实际情况修改api（这是一个bug）](#2根据实际情况修改api这是一个bug)
+        - [（3）修改values.yaml](#3修改valuesyaml)
+        - [（4）创建pool](#4创建pool)
+        - [（5）安装](#5安装)
+        - [（6）其他能力（提供了统一的接口，即k8s屏蔽后端存储的差异）](#6其他能力提供了统一的接口即k8s屏蔽后端存储的差异)
+        - [（7）static pv创建](#7static-pv创建)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

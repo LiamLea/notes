@@ -1,5 +1,36 @@
 # promethus operator
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [promethus operator](#promethus-operator)
+    - [概述](#概述)
+      - [1.架构图](#1架构图)
+      - [2.自定义的资源](#2自定义的资源)
+      - [3.监控的内容](#3监控的内容)
+    - [使用](#使用)
+      - [1.prometheus-operator资源清单](#1prometheus-operator资源清单)
+      - [2.Prometheus资源清单](#2prometheus资源清单)
+      - [3.grafana数据持久化](#3grafana数据持久化)
+        - [（1）插件等数据持久化](#1插件等数据持久化)
+        - [（2）dashboards持久化](#2dashboards持久化)
+    - [监控](#监控)
+      - [1.监控系统组件](#1监控系统组件)
+      - [2.监控k8s节点](#2监控k8s节点)
+      - [3.监控集群信息](#3监控集群信息)
+      - [4.监控其他软件](#4监控其他软件)
+        - [（1）修改clusterRole的权限](#1修改clusterrole的权限)
+        - [（2）查看某个软件暴露出的采集端口](#2查看某个软件暴露出的采集端口)
+        - [（3）使用ServiceMonitor添加target](#3使用servicemonitor添加target)
+    - [告警](#告警)
+      - [1.Alertmanager资源清单](#1alertmanager资源清单)
+      - [2.自定义alertmanager](#2自定义alertmanager)
+        - [（1）创建alertmanager.yaml文件](#1创建alertmanageryaml文件)
+        - [（2）生成secret](#2生成secret)
+        - [（3）部署Alertmanager](#3部署alertmanager)
+
+<!-- /code_chunk_output -->
+
 ### 概述
 #### 1.架构图
 ![](./imgs/prometheus-operator_01.png)

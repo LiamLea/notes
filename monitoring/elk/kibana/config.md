@@ -1,6 +1,13 @@
 # config
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [config](#config)
+    - [配置](#配置)
+      - [1.通过反向代理访问kibana](#1通过反向代理访问kibana)
+
+<!-- /code_chunk_output -->
 
 ### 配置
 

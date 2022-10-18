@@ -1,4 +1,14 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [使用](#使用)
+  - [1.下载exporter和配置文件](#1下载exporter和配置文件)
+  - [2.修改启动脚本](#2修改启动脚本)
+  - [3.重启tomcat](#3重启tomcat)
+  - [4.验证](#4验证)
+
+<!-- /code_chunk_output -->
 
 [参考](https://github.com/prometheus/jmx_exporter)
 

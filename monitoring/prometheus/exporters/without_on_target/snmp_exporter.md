@@ -1,4 +1,16 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [使用](#使用)
+  - [1.生成snmp.yml文件](#1生成snmpyml文件)
+    - [（1）下载mib库](#1下载mib库)
+    - [（2）配置generator](#2配置generator)
+    - [（3）生成snmp.yml文件](#3生成snmpyml文件)
+  - [2.启动snmp exporter](#2启动snmp-exporter)
+  - [3.配置promethwus](#3配置promethwus)
+
+<!-- /code_chunk_output -->
 
 [参考](https://github.com/prometheus/snmp_exporter)
 

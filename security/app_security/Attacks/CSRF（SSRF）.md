@@ -1,6 +1,22 @@
-#CSRF
+# CSRF
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [CSRF](#csrf)
+    - [概述](#概述)
+      - [1.CSRF（cross-site request forgery）](#1csrfcross-site-request-forgery)
+      - [2.SSRF（server-side request forgery）](#2ssrfserver-side-request-forgery)
+      - [2.实现CSRF攻击条件](#2实现csrf攻击条件)
+      - [3.CSRF影响](#3csrf影响)
+    - [防护](#防护)
+      - [1.添加中间环节](#1添加中间环节)
+        - [（1）添加确认过程](#1添加确认过程)
+        - [（2）添加验证码](#2添加验证码)
+      - [2.验证用户请求的合法性](#2验证用户请求的合法性)
+        - [（1）利用token（一般用于post等请求，不用于get请求 ）](#1利用token一般用于post等请求不用于get请求)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,4 +1,13 @@
-[toc]
+# input
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [input](#input)
+      - [1.kafka](#1kafka)
+      - [2.file](#2file)
+
+<!-- /code_chunk_output -->
 
 #### 1.kafka
 logstash从kafka消费数据，会commit offset到kafka，记录消费到哪个offset了

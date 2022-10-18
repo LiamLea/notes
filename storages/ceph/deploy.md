@@ -1,6 +1,39 @@
 # 部署ceph
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [部署ceph](#部署ceph)
+    - [概述](#概述)
+      - [1.最小资源](#1最小资源)
+      - [2.部署建议](#2部署建议)
+      - [3.orchestrator](#3orchestrator)
+      - [4.基础概念](#4基础概念)
+      - [5.orchestrator管理service](#5orchestrator管理service)
+    - [安装步骤](#安装步骤)
+      - [1.安装前准备](#1安装前准备)
+        - [（1）选择操作系统](#1选择操作系统)
+        - [（2）时间同步（非常重要，需要安装，不然后面会报错）](#2时间同步非常重要需要安装不然后面会报错)
+        - [（3）设置主机名（必须要设置好）](#3设置主机名必须要设置好)
+        - [（4）防火墙关闭](#4防火墙关闭)
+        - [（5）安装依赖软件](#5安装依赖软件)
+      - [2.修改docker配置](#2修改docker配置)
+      - [3.设置相关服务开启自启](#3设置相关服务开启自启)
+      - [4.初始化第一个节点](#4初始化第一个节点)
+        - [（1）下载cephadm](#1下载cephadm)
+        - [（2）安装客户端工具](#2安装客户端工具)
+        - [（3）提前准备好镜像](#3提前准备好镜像)
+        - [（4）初始化集群](#4初始化集群)
+      - [4.将其他节点orchestrator](#4将其他节点orchestrator)
+      - [5.添加osd](#5添加osd)
+        - [（1）通过yaml文件并实现data、WAL、DB分离](#1通过yaml文件并实现data-wal-db分离)
+      - [6.删除某个osd](#6删除某个osd)
+        - [(1) 通用方法](#1-通用方法)
+        - [(2) ceph orch方法](#2-ceph-orch方法)
+    - [开启ceph-exporter](#开启ceph-exporter)
+      - [1.enable prometheus mgr module](#1enable-prometheus-mgr-module)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

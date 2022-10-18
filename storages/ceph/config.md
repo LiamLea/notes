@@ -1,6 +1,16 @@
 # config
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [config](#config)
+    - [概述](#概述)
+      - [1.配置文件（优先级由高到低）](#1配置文件优先级由高到低)
+      - [2.配置文件格式](#2配置文件格式)
+      - [3.查看配置](#3查看配置)
+    - [老版本](#老版本)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 [参考](https://docs.ceph.com/en/latest/rados/configuration/ceph-conf/)

@@ -1,6 +1,20 @@
 # ingest node
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ingest node](#ingest-node)
+    - [概述](#概述)
+      - [1.ingest node（摄取节点）](#1ingest-node摄取节点)
+      - [2.与logstash区别](#2与logstash区别)
+      - [3.pipeline](#3pipeline)
+    - [操作](#操作)
+      - [1.创建pipeline](#1创建pipeline)
+      - [2.添加document时，使用指定pipeline](#2添加document时使用指定pipeline)
+      - [3.index配置默认的pipeline](#3index配置默认的pipeline)
+      - [4.设置最终pipeline（即最后一个执行的pipeline）](#4设置最终pipeline即最后一个执行的pipeline)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 
