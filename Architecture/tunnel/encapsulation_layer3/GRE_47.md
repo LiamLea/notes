@@ -1,6 +1,26 @@
 # GRE
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [GRE](#gre)
+    - [概述](#概述)
+      - [1.GRE](#1gre)
+      - [2.GRE header](#2gre-header)
+      - [3.GRE特点](#3gre特点)
+    - [使用](#使用)
+      - [1.设置GRE](#1设置gre)
+        - [（1）启动linux的GRE模块](#1启动linux的gre模块)
+        - [（2）创建隧道（tunnel）](#2创建隧道tunnel)
+        - [（3）启动隧道](#3启动隧道)
+        - [（4）配置VIP](#4配置vip)
+        - [（5）测试](#5测试)
+      - [2.使用GRE](#2使用gre)
+        - [（1）开启路由转发功能](#1开启路由转发功能)
+        - [（2）在机器一上设置路由](#2在机器一上设置路由)
+        - [（3）在机器二上设置SNAT](#3在机器二上设置snat)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

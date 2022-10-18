@@ -1,6 +1,16 @@
 # RDP
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [RDP](#rdp)
+    - [linux部署xDRP](#linux部署xdrp)
+      - [1.安装xRDP](#1安装xrdp)
+      - [2.配置认证信息](#2配置认证信息)
+      - [3.启动xrdp](#3启动xrdp)
+      - [4.验证](#4验证)
+
+<!-- /code_chunk_output -->
 
 ### linux部署xDRP
 

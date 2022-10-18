@@ -1,6 +1,18 @@
 # CAP
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [CAP](#cap)
+    - [概述](#概述)
+      - [1.CAP理论](#1cap理论)
+        - [（1）consistency（一致性）](#1consistency一致性)
+        - [（2）availability（可用性）](#2availability可用性)
+        - [（3）partition tolerance（分区容错）](#3partition-tolerance分区容错)
+      - [2.PACELC理论（对CAP的补充）](#2pacelc理论对cap的补充)
+      - [3.raft是一个CP系统（即使允许部分node宕机）](#3raft是一个cp系统即使允许部分node宕机)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

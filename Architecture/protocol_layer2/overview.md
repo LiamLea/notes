@@ -1,5 +1,22 @@
 # data link layer
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [data link layer](#data-link-layer)
+    - [概述](#概述)
+      - [1.有两种类型信道](#1有两种类型信道)
+        - [（1）点对点信道（PPP协议）](#1点对点信道ppp协议)
+        - [（2）广播信道（以太网，CSMA/CD协议）](#2广播信道以太网csmacd协议)
+      - [2.基本概念](#2基本概念)
+        - [（1）link（链路）](#1link链路)
+        - [（2）data link（数据链路）](#2data-link数据链路)
+      - [4.广播/多播 域](#4广播多播-域)
+      - [5.冲突域和广播域](#5冲突域和广播域)
+      - [6.BUM frame](#6bum-frame)
+      - [7.IXP(internet exchange points)](#7ixpinternet-exchange-points)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

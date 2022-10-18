@@ -1,6 +1,16 @@
 # ICMP（internet control message protocol）
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ICMP（internet control message protocol）](#icmpinternet-control-message-protocol)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+      - [2.ICMP报文分类](#2icmp报文分类)
+        - [（1）ICMP询问报文](#1icmp询问报文)
+        - [（2）差错报告报文](#2差错报告报文)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

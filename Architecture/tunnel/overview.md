@@ -1,6 +1,18 @@
 # tunnel
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [tunnel](#tunnel)
+    - [概述](#概述)
+      - [1.NAT对tunnel的影响](#1nat对tunnel的影响)
+        - [（1）改变ip和tcp headers](#1改变ip和tcp-headers)
+        - [（2）对于加密的tunnel，无法实现nat映射](#2对于加密的tunnel无法实现nat映射)
+      - [2.解决nat的问题](#2解决nat的问题)
+        - [（1）解决问题1：NAT traversal](#1解决问题1nat-traversal)
+        - [（2）解决问题2：passthrough](#2解决问题2passthrough)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

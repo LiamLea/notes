@@ -1,6 +1,22 @@
 # topology discovery
 
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [topology discovery](#topology-discovery)
+    - [流程](#流程)
+      - [1.设备发现](#1设备发现)
+      - [2.设备类型发现](#2设备类型发现)
+      - [3.连接发现（当设备有bridge mib时）](#3连接发现当设备有bridge-mib时)
+        - [（1）LLDP](#1lldp)
+        - [（2）STP](#2stp)
+        - [（3）mac地址表](#3mac地址表)
+      - [4.连接发现（当设备是router时，即没有bridge mib）](#4连接发现当设备是router时即没有bridge-mib)
+        - [（1）OSPF](#1ospf)
+        - [（2）路由表](#2路由表)
+
+<!-- /code_chunk_output -->
 
 ### 流程
 

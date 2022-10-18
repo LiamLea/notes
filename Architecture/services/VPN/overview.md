@@ -1,5 +1,23 @@
 # VPN
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [VPN](#vpn)
+    - [概述](#概述)
+      - [1.VPN（virtual private network）](#1vpnvirtual-private-network)
+      - [2.tunneling（隧道）](#2tunneling隧道)
+      - [2.特点](#2特点)
+      - [3.原理](#3原理)
+      - [4.VPN工作在两层](#4vpn工作在两层)
+      - [4.封装协议](#4封装协议)
+        - [（1）GRE（generic routing encapsulation）](#1gregeneric-routing-encapsulation)
+      - [2.常用VPN类型](#2常用vpn类型)
+        - [（2）PPTP（point to point tunneling protocol）](#2pptppoint-to-point-tunneling-protocol)
+        - [（3）L2TP（layer 2 tunneling protocol）](#3l2tplayer-2-tunneling-protocol)
+        - [（4）IPSec（internet protocol security）](#4ipsecinternet-protocol-security)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

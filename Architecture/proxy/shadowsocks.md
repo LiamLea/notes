@@ -1,6 +1,15 @@
 # shadowsocks
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [shadowsocks](#shadowsocks)
+    - [使用](#使用)
+      - [1.启动shadowsocks client（sock5 proxy）](#1启动shadowsocks-clientsock5-proxy)
+      - [2.启动polipo（http proxy -> sock5 proxy）](#2启动polipohttp-proxy-sock5-proxy)
+      - [3.验证](#3验证)
+
+<!-- /code_chunk_output -->
 
 ### 使用
 

@@ -1,6 +1,20 @@
 # CDN
 
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [CDN](#cdn)
+    - [概述](#概述)
+      - [1.CDN（content delivery network）](#1cdncontent-delivery-network)
+      - [2.GSLB（globa server load balancer）](#2gslbgloba-server-load-balancer)
+      - [3.两种技术实现CDN](#3两种技术实现cdn)
+        - [(1) DNS](#1-dns)
+        - [(2) anycast](#2-anycast)
+        - [(3) 比较](#3-比较)
+
+<!-- /code_chunk_output -->
+
 
 ### 概述
 

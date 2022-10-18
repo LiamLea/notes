@@ -1,6 +1,24 @@
 # NTP（Network Time Protocol）
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [NTP（Network Time Protocol）](#ntpnetwork-time-protocol)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+      - [2.常用ntp服务器地址](#2常用ntp服务器地址)
+    - [配置](#配置)
+      - [1.服务端：`/etc/ntp.conf`](#1服务端etcntpconf)
+      - [2.客户端: `/etc/ntp.conf`](#2客户端-etcntpconf)
+    - [查询ntp状态](#查询ntp状态)
+      - [1.ntpq命令格式](#1ntpq命令格式)
+      - [2.ntpq常用命令](#2ntpq常用命令)
+        - [（1）`ntpq -c peers`](#1ntpq-c-peers)
+        - [（2）查看ntp服务状态：`ntpq -c associations`](#2查看ntp服务状态ntpq-c-associations)
+        - [（3）`ntpq -c "rv <assid>"`](#3ntpq-c-rv-assid)
+      - [3.chronyc命令](#3chronyc命令)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 #### 1.特点

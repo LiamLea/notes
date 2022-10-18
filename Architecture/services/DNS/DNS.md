@@ -1,6 +1,22 @@
 # DNS
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [DNS](#dns)
+    - [概述](#概述)
+      - [1.域名结构](#1域名结构)
+      - [2.基础概念](#2基础概念)
+        - [（1）stub resolver（存根解析器）](#1stub-resolver存根解析器)
+        - [（2）recursive DNS server（cacheing DNS server，递归DNS）](#2recursive-dns-servercacheing-dns-server递归dns)
+        - [（3）authoritative DNS server（权威DNS）](#3authoritative-dns-server权威dns)
+        - [（4）forwarding DNS server（转发DNS）](#4forwarding-dns-server转发dns)
+      - [3.域名解析时的各项解析记录](#3域名解析时的各项解析记录)
+      - [4.DNS的search选项](#4dns的search选项)
+    - [使用](#使用)
+      - [1.`dig`](#1dig)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

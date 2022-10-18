@@ -1,5 +1,44 @@
 # TCP
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [TCP](#tcp)
+    - [概述](#概述)
+      - [1.TCP特点](#1tcp特点)
+      - [3.TCP的能力](#3tcp的能力)
+      - [4.发送窗口 =  Min[rwnd, cwnd]](#4发送窗口-minrwnd-cwnd)
+      - [5.TCP11中状态](#5tcp11中状态)
+      - [6.MTU and TCP MSS](#6mtu-and-tcp-mss)
+        - [（1）MTU（maximum transmission unit）](#1mtumaximum-transmission-unit)
+        - [（2）MSS（maximum segment size）](#2mssmaximum-segment-size)
+    - [TCP头部](#tcp头部)
+      - [1.序号（与 字节 有关）](#1序号与-字节-有关)
+      - [2.确认号](#2确认号)
+      - [3.数据偏移](#3数据偏移)
+      - [4.标记位](#4标记位)
+        - [（1）URG（urgent，紧急的）](#1urgurgent紧急的)
+        - [（2）PSH（push）](#2pshpush)
+        - [（3）ACK（acknowledgement）](#3ackacknowledgement)
+        - [（4）SYN（synchronize）](#4synsynchronize)
+        - [（5）FIN（finish）](#5finfinish)
+        - [（6）RST（reset）](#6rstreset)
+      - [5.窗口（接收窗口）](#5窗口接收窗口)
+    - [可靠连接原理](#可靠连接原理)
+      - [1.基本方式](#1基本方式)
+      - [2.改进：流水线传输](#2改进流水线传输)
+      - [3.改进：以字节为单位的滑动窗口（发送窗口）](#3改进以字节为单位的滑动窗口发送窗口)
+      - [4.改进：累计确认 和 选择重传(SACK)](#4改进累计确认-和-选择重传sack)
+    - [流量控制](#流量控制)
+      - [1.receive window（接收窗口，影响网络传输性能）](#1receive-window接收窗口影响网络传输性能)
+    - [拥塞控制](#拥塞控制)
+      - [1.基本原理：慢开始算法](#1基本原理慢开始算法)
+        - [（1）慢开始原理](#1慢开始原理)
+        - [（2）利用慢开始实现 拥塞控制](#2利用慢开始实现-拥塞控制)
+      - [2.改进：快重传和快恢复](#2改进快重传和快恢复)
+
+<!-- /code_chunk_output -->
+
 ### 概述
 
 #### 1.TCP特点

@@ -1,5 +1,27 @@
 # PPP（point-to-point protocol）
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [PPP（point-to-point protocol）](#ppppoint-to-point-protocol)
+    - [概述](#概述)
+      - [用途：在串口链路（只能连两台设备）上，进行账号访问控制](#用途在串口链路只能连两台设备上进行账号访问控制)
+      - [1.PPP](#1ppp)
+      - [2.主要功能](#2主要功能)
+      - [3.PPP有3个组成](#3ppp有3个组成)
+        - [（1）Encapsulation Component](#1encapsulation-component)
+        - [（2）LCP（link control protocol，链路控制协议）](#2lcplink-control-protocol链路控制协议)
+        - [（3）NCPs（network control protocol，网络控制协议）](#3ncpsnetwork-control-protocol网络控制协议)
+      - [4.支持的Authentication Protocols (AP)](#4支持的authentication-protocols-ap)
+      - [5.PPP帧格式（即HDLC帧格式）](#5ppp帧格式即hdlc帧格式)
+        - [（1）Flag](#1flag)
+        - [（2）Address](#2address)
+        - [（3）Control](#3control)
+        - [（4）Protocol](#4protocol)
+        - [（5）Payload](#5payload)
+      - [6.PPPOE（point-to-point over ethernet）](#6pppoepoint-to-point-over-ethernet)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,6 +1,23 @@
 # OSPF
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [OSPF](#ospf)
+    - [概述](#概述)
+      - [1.OSPF（open shortest path first，属于自治系统路由协议）](#1ospfopen-shortest-path-first属于自治系统路由协议)
+      - [2.特点](#2特点)
+      - [3.三个表](#3三个表)
+        - [（1）邻居表（通过hello包检测，从而更新邻居表）](#1邻居表通过hello包检测从而更新邻居表)
+        - [（2）链路状态表](#2链路状态表)
+        - [（3）路由表](#3路由表)
+    - [配置](#配置)
+      - [1.配置ospf](#1配置ospf)
+        - [（1）启动ospf进程](#1启动ospf进程)
+        - [（2）进入指定区域配置](#2进入指定区域配置)
+        - [（3）允许宣告的网段](#3允许宣告的网段)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 
