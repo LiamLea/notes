@@ -1,5 +1,42 @@
 # design patterns（隔离稳定和变化）
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [design patterns（隔离稳定和变化）](#design-patterns隔离稳定和变化)
+    - [预备知识](#预备知识)
+      - [1.依赖](#1依赖)
+    - [设计原则](#设计原则)
+      - [1.依赖倒置原则（DIP：dependency inversion principle）](#1依赖倒置原则dipdependency-inversion-principle)
+      - [2.开放封闭原则（OCP：open close principle）](#2开放封闭原则ocpopen-close-principle)
+      - [3.单一职责原则（SRP：single responsibility principle）](#3单一职责原则srpsingle-responsibility-principle)
+      - [4.liskov替换原则（LSP：liskov substitution principle）](#4liskov替换原则lspliskov-substitution-principle)
+      - [5.接口隔离原则（ISP：interface segregation principle）](#5接口隔离原则ispinterface-segregation-principle)
+      - [6.优先使用对象组合，而不是类继承](#6优先使用对象组合而不是类继承)
+      - [7.封装变化点](#7封装变化点)
+      - [8.针对接口编程，而不是针对实现编程](#8针对接口编程而不是针对实现编程)
+    - [单例模式](#单例模式)
+      - [1.概述](#1概述)
+      - [2.实现](#2实现)
+    - [Template Method（模板方法）](#template-method模板方法)
+      - [1.概述](#1概述-1)
+      - [2.实现](#2实现-1)
+    - [Stragtegy（策略模式）](#stragtegy策略模式)
+      - [1.概述](#1概述-2)
+    - [Observer/Event（观察者模式）](#observerevent观察者模式)
+      - [1.概述](#1概述-3)
+    - [Decorator（装饰器模式）](#decorator装饰器模式)
+      - [1.概述](#1概述-4)
+      - [2.实现](#2实现-2)
+    - [Bridge（桥模式）](#bridge桥模式)
+      - [1.概述](#1概述-5)
+    - [Factory Method（工厂方法）](#factory-method工厂方法)
+      - [1.概述](#1概述-6)
+    - [Abstract Factory（抽象工厂模式）](#abstract-factory抽象工厂模式)
+      - [1.概述](#1概述-7)
+
+<!-- /code_chunk_output -->
+
 ### 预备知识
 #### 1.依赖
 我们常常说的依赖是指编译时依赖，即编译时依赖具体的类，在c++中可以使用抽象类的指针，从而解除这种依赖，从而实现运行时依赖（即多态）

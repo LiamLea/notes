@@ -1,6 +1,14 @@
 # wmi_client_wrapper
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [wmi_client_wrapper](#wmi_client_wrapper)
+    - [使用](#使用)
+      - [1.安装模块](#1安装模块)
+      - [2.使用](#2使用)
+
+<!-- /code_chunk_output -->
 
 ### 使用
 

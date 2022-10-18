@@ -1,4 +1,4 @@
-#tarfile模块
+# tarfile模块
 * 压缩
 ```python
   tar=tarfile.open('/tmp/xx.tar.gz','w:gz')   

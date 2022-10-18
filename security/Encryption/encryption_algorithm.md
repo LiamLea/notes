@@ -1,4 +1,19 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [概述](#概述)
+  - [1.BASE 64编码](#1base-64编码)
+  - [2.HASH](#2hash)
+    - [（1）常用HASH加密算法](#1常用hash加密算法)
+    - [（2）特点](#2特点)
+    - [（3）应用场景：用户密码](#3应用场景用户密码)
+    - [（4）缺点](#4缺点)
+  - [3.散列碰撞](#3散列碰撞)
+  - [4.HMAC](#4hmac)
+    - [（1）特点](#1特点)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

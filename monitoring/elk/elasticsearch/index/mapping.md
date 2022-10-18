@@ -1,5 +1,26 @@
 # mapping
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [mapping](#mapping)
+    - [概述](#概述)
+      - [1.特点](#1特点)
+      - [2.mapping包括两部分](#2mapping包括两部分)
+        - [（1）meta-fields](#1meta-fields)
+        - [（2）properties](#2properties)
+      - [3.数据类型](#3数据类型)
+      - [4.设置参数（定义字段时）](#4设置参数定义字段时)
+        - [（1）fileds（设置子字段）](#1fileds设置子字段)
+      - [5.动态映射（dynamic mapping）](#5动态映射dynamic-mapping)
+        - [（1）动态字段映射（默认）](#1动态字段映射默认)
+        - [（2）动态映射模板（需要手动设置）](#2动态映射模板需要手动设置)
+    - [操作](#操作)
+      - [1.查询索引的mapping](#1查询索引的mapping)
+      - [2.明确指定mappings](#2明确指定mappings)
+
+<!-- /code_chunk_output -->
+
 ### 概述
 
 #### 1.特点

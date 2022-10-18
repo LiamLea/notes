@@ -1,6 +1,31 @@
 # ceph file system
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [ceph file system](#ceph-file-system)
+    - [概述](#概述)
+      - [1.cephfs（需要MDS服务）](#1cephfs需要mds服务)
+      - [2.使用注意事项](#2使用注意事项)
+      - [3.术语](#3术语)
+      - [4.file layout（布局）](#4file-layout布局)
+      - [5.volume和subvolume](#5volume和subvolume)
+    - [使用](#使用)
+      - [1.创建volume](#1创建volume)
+      - [2.管理文件系统](#2管理文件系统)
+      - [3.挂载cephfs](#3挂载cephfs)
+        - [（1）前提准备](#1前提准备)
+        - [（2）使用kernel client](#2使用kernel-client)
+      - [4.k8s使用ceph-fs](#4k8s使用ceph-fs)
+        - [（1）下载ceph-csi-cephfs chart](#1下载ceph-csi-cephfs-chart)
+        - [（2）根据实际情况修改api（这是一个bug）](#2根据实际情况修改api这是一个bug)
+        - [（3）修改values.yaml](#3修改valuesyaml)
+        - [（4）创建volume](#4创建volume)
+        - [（5）安装](#5安装)
+        - [（6）其他能力（提供了统一的接口，即k8s屏蔽后端存储的差异）](#6其他能力提供了统一的接口即k8s屏蔽后端存储的差异)
+        - [（7）static pv创建](#7static-pv创建)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

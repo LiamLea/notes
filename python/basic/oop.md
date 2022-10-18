@@ -1,6 +1,39 @@
 # OOP(object oriented program)
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [OOP(object oriented program)](#oopobject-oriented-program)
+    - [概述](#概述)
+      - [1.能够定义在类中的对象](#1能够定义在类中的对象)
+      - [2.访问私有变量的方法：`obj._<CLASS_NAME>__<PRIVATE_VARIABLE`](#2访问私有变量的方法obj_class_name__private_variable)
+    - [类和对象的命名空间](#类和对象的命名空间)
+      - [1.模型](#1模型)
+      - [2.利用静态变量计算有多少实例](#2利用静态变量计算有多少实例)
+      - [3.在子类中调用父类的同名方法](#3在子类中调用父类的同名方法)
+    - [基础](#基础)
+      - [1.定义一个类的基本格式](#1定义一个类的基本格式)
+      - [2.组合](#2组合)
+      - [3.继承](#3继承)
+      - [4.类的内置方法](#4类的内置方法)
+        - [（1）`__init__()`](#1__init__)
+        - [（2）`__new__()`](#2__new__)
+        - [（3）`__del__()`](#3__del__)
+        - [（4）`__str__()`](#4__str__)
+        - [（5）`__call__()`](#5__call__)
+        - [（6）`__setattr__(self, key, value)` 和 `__getattr__`（等价于`__getattribute__()`）](#6__setattr__self-key-value-和-__getattr__等价于__getattribute__)
+        - [（7）`__enter__`和`__exit__`](#7__enter__和__exit__)
+        - [（8）`__getitem__`和`__setitem__`](#8__getitem__和__setitem__)
+      - [5.类的特殊属性和函数](#5类的特殊属性和函数)
+      - [6.重载（overload）和重写（override，覆盖）](#6重载overload和重写override覆盖)
+    - [多继承](#多继承)
+    - [抽象类](#抽象类)
+      - [1.实现抽象类](#1实现抽象类)
+      - [2.接口和抽象类](#2接口和抽象类)
+    - [补充](#补充)
+      - [1.property装饰器](#1property装饰器)
+
+<!-- /code_chunk_output -->
 
 **在python中一切皆对象**
 

@@ -1,4 +1,18 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [1.去除列表中的空行(包括'','    '之类的元素)](#1去除列表中的空行包括-之类的元素)
+- [2.使用列表时，避免IndexError错误](#2使用列表时避免indexerror错误)
+  - [（1）利用if进行判断](#1利用if进行判断)
+  - [（2）捕获异常进行处理](#2捕获异常进行处理)
+  - [（3）继承list类，创建一个新的list类](#3继承list类创建一个新的list类)
+- [3.多个文件共享同一个全局变量](#3多个文件共享同一个全局变量)
+- [4.python项目的组织形式](#4python项目的组织形式)
+- [5.import包、函数等注意事项](#5import包-函数等注意事项)
+
+<!-- /code_chunk_output -->
+
 #### 1.去除列表中的空行(包括'','    '之类的元素)
 ```python
 [ i for i in my_list if i.strip() != '' ]

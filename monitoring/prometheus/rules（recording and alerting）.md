@@ -1,6 +1,21 @@
 # rules
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [rules](#rules)
+    - [概述](#概述)
+      - [1.两类rules](#1两类rules)
+        - [（1）recording rules](#1recording-rules)
+        - [（2）alerting rules](#2alerting-rules)
+      - [2.基本格式](#2基本格式)
+      - [2.rules评估的时间间隔](#2rules评估的时间间隔)
+    - [recoding rule](#recoding-rule)
+      - [1.recording rule的格式](#1recording-rule的格式)
+    - [alerting rule（告警规则）](#alerting-rule告警规则)
+      - [1.alerting rule的格式](#1alerting-rule的格式)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

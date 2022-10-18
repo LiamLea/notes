@@ -1,5 +1,14 @@
 # DBUtils
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [DBUtils](#dbutils)
+    - [使用](#使用)
+      - [1.创建连接池](#1创建连接池)
+      - [2.使用连接池](#2使用连接池)
+
+<!-- /code_chunk_output -->
 
 ### 使用
 

@@ -1,4 +1,4 @@
-#urllib模块
+# urllib模块
 * **包含4个子模块**
 >request     
 >>用于发送request和获取request的结果

@@ -1,6 +1,17 @@
 # function
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [function](#function)
+    - [常用函数](#常用函数)
+        - [1.使用python函数](#1使用python函数)
+        - [2.合并两个列表](#2合并两个列表)
+        - [3.合并两个dict](#3合并两个dict)
+        - [4.创建列表](#4创建列表)
+        - [5.使用原生字符串：`{% raw %} ... {% endraw %}`](#5使用原生字符串-raw-endraw)
+
+<!-- /code_chunk_output -->
 
 ### 常用函数
 

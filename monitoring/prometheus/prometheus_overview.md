@@ -1,6 +1,34 @@
 #overview
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [overview](#overview)
+    - [预备知识](#预备知识)
+      - [1.时间序列](#1时间序列)
+    - [基础知识](#基础知识)
+      - [1.prometheus特点](#1prometheus特点)
+      - [2.架构图](#2架构图)
+      - [3.组件](#3组件)
+        - [（1） exporter](#1-exporter)
+        - [（2）pushgateway](#2pushgateway)
+        - [（3）alermanager](#3alermanager)
+        - [（4）kube-state-metrics](#4kube-state-metrics)
+      - [4.相关名词](#4相关名词)
+        - [（1）metric](#1metric)
+        - [（2）label](#2label)
+        - [（3）sample](#3sample)
+        - [（4）time series（也称为vector）](#4time-series也称为vector)
+        - [（5）instance（target）](#5instancetarget)
+        - [（6）job](#6job)
+      - [5.标签（label）](#5标签label)
+        - [（1）元标签（meta label）](#1元标签meta-label)
+        - [（2）抓取时自动生成的标签（通过配置文件或者元标签生成）](#2抓取时自动生成的标签通过配置文件或者元标签生成)
+      - [6.metrics的主要类型](#6metrics的主要类型)
+    - [基本使用](#基本使用)
+      - [1.通过url获取exporter数据](#1通过url获取exporter数据)
+
+<!-- /code_chunk_output -->
 
 ### 预备知识
 

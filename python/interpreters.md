@@ -1,5 +1,19 @@
 # 解释器
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [解释器](#解释器)
+    - [pypy解释器](#pypy解释器)
+      - [概述](#概述)
+        - [1.特点](#1特点)
+      - [2.为什么pypy比cpython快](#2为什么pypy比cpython快)
+      - [安装](#安装)
+    - [jython解释器](#jython解释器)
+      - [概述](#概述-1)
+        - [1.特点](#1特点-1)
+
+<!-- /code_chunk_output -->
 
 ### pypy解释器
 

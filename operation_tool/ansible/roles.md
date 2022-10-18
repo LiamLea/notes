@@ -1,5 +1,22 @@
 # roles
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [roles](#roles)
+    - [概述](#概述)
+      - [1.基本概念](#1基本概念)
+      - [2.角色的目录结构（下面的目录不是必须的）](#2角色的目录结构下面的目录不是必须的)
+      - [3.roles的搜索路径在`ansible.cfg`中定义：](#3roles的搜索路径在ansiblecfg中定义)
+    - [使用](#使用)
+      - [1.playbook调用角色的三种方法](#1playbook调用角色的三种方法)
+        - [（1）直接调用：](#1直接调用)
+        - [（2）传递变量给role：](#2传递变量给role)
+        - [（3）基于条件实现role调用：](#3基于条件实现role调用)
+      - [ansible-glaxy命令（提供别人写好的role的网站）](#ansible-glaxy命令提供别人写好的role的网站)
+
+<!-- /code_chunk_output -->
+
 ### 概述
 #### 1.基本概念
 一个角色，有自己的tasks,handlers等

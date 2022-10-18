@@ -1,6 +1,18 @@
 # session
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [session](#session)
+    - [概述](#概述)
+      - [1.flask中的session](#1flask中的session)
+      - [2.session 在 cookie中对应的key](#2session-在-cookie中对应的key)
+      - [3.处理流程（默认是将 session数据 加密 存储到 客户端）](#3处理流程默认是将-session数据-加密-存储到-客户端)
+      - [4.flask_session组件能够实现将session数据存储在其他地方](#4flask_session组件能够实现将session数据存储在其他地方)
+    - [使用](#使用)
+      - [1.flask_session组件的使用](#1flask_session组件的使用)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

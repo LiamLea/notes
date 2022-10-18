@@ -1,6 +1,18 @@
 # 索引模板
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [索引模板](#索引模板)
+    - [概述](#概述)
+      - [1.index template](#1index-template)
+      - [2.两种template](#2两种template)
+        - [（1）component template（7.8版本之后才有）](#1component-template78版本之后才有)
+        - [（2）index template](#2index-template)
+    - [操作](#操作)
+      - [1.查看index template](#1查看index-template)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

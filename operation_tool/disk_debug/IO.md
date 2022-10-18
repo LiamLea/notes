@@ -1,6 +1,24 @@
 # IO
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [IO](#io)
+    - [fio](#fio)
+    - [dd](#dd)
+      - [1.特点](#1特点)
+      - [2.命令](#2命令)
+      - [3.应用](#3应用)
+        - [(1) backup the entire disk or partition](#1-backup-the-entire-disk-or-partition)
+        - [(2) format(clean) disk](#2-formatclean-disk)
+        - [(3) convert data](#3-convert-data)
+        - [(4) test disk performance](#4-test-disk-performance)
+    - [io相关](#io相关)
+        - [`iostat -dx 10`](#iostat-dx-10)
+        - [`iotop`](#iotop)
+        - [`ioping`（测试延迟）](#ioping测试延迟)
+
+<!-- /code_chunk_output -->
 
 ### fio
 

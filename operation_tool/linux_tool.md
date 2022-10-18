@@ -1,4 +1,18 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [locate](#locate)
+  - [1.由四部分组成](#1由四部分组成)
+  - [2.配置文件：/etc/updatedb.conf](#2配置文件etcupdatedbconf)
+  - [3.locate命令](#3locate命令)
+- [traceroute](#traceroute)
+  - [1.原理](#1原理)
+- [一些查看的小命令](#一些查看的小命令)
+    - [`xxd -b <FILE>`](#xxd-b-file)
+    - [`strings <FILE>`](#strings-file)
+
+<!-- /code_chunk_output -->
 
 ### locate
 

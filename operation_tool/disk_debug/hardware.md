@@ -1,6 +1,12 @@
 # hardware
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [hardware](#hardware)
+    - [查看硬盘信息: `smartctl`](#查看硬盘信息-smartctl)
+
+<!-- /code_chunk_output -->
 
 ### 查看硬盘信息: `smartctl`
 * 需要安装: smartmontools

@@ -1,6 +1,21 @@
 # paramiko
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [paramiko](#paramiko)
+    - [使用（注意必须要明确关闭ssh连接）](#使用注意必须要明确关闭ssh连接)
+      - [1.建立ssh连接](#1建立ssh连接)
+      - [2.执行命令](#2执行命令)
+        - [（1）`get_pty = True`（**尽量不要使用这个选项**）](#1get_pty-true尽量不要使用这个选项)
+      - [3.执行命令时输入](#3执行命令时输入)
+      - [4.获取执行结果](#4获取执行结果)
+      - [5.关闭ssh连接](#5关闭ssh连接)
+      - [6.使用时关闭paramiko自身的日志](#6使用时关闭paramiko自身的日志)
+    - [FAQ](#faq)
+      - [1.解决阻塞在read](#1解决阻塞在read)
+
+<!-- /code_chunk_output -->
 
 ### 使用（注意必须要明确关闭ssh连接）
 

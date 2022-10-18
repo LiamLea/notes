@@ -1,6 +1,28 @@
 # distributed tracing
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [distributed tracing](#distributed-tracing)
+    - [概述](#概述)
+      - [1.distributed tracing](#1distributed-tracing)
+      - [2.tracing相关概念](#2tracing相关概念)
+        - [（1）span相关属性（以Jaeger为例子）](#1span相关属性以jaeger为例子)
+        - [（2）示例](#2示例)
+        - [（3）时间分析](#3时间分析)
+      - [3.tracing fields](#3tracing-fields)
+      - [4.opentelemetry（标准化）](#4opentelemetry标准化)
+        - [（1）术语](#1术语)
+        - [（2）signals（监控数据）](#2signals监控数据)
+        - [（3）sample数据](#3sample数据)
+      - [5.前提](#5前提)
+      - [6.两种装配模式](#6两种装配模式)
+        - [（1）automatic instrumentation](#1automatic-instrumentation)
+        - [（2）manual instrumentation](#2manual-instrumentation)
+      - [7.采集策略](#7采集策略)
+      - [8.常用语言的装配](#8常用语言的装配)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,4 +1,38 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [基础](#基础)
+  - [1.第三方机构（Certificate Authority）](#1第三方机构certificate-authority)
+    - [（1）认证（即进行数字签名）](#1认证即进行数字签名)
+    - [（2）数字证书](#2数字证书)
+    - [（3）ca证书（格式为x509）](#3ca证书格式为x509)
+    - [（4）维护CRL（certificate revocation list，证书吊销列表）](#4维护crlcertificate-revocation-list证书吊销列表)
+    - [（5）CSR请求（certificate signature request）](#5csr请求certificate-signature-request)
+  - [2.SSL和TLS区别：](#2ssl和tls区别)
+  - [3.命名规范](#3命名规范)
+  - [5.x509 v3证书可以支持多个域名](#5x509-v3证书可以支持多个域名)
+- [openssl](#openssl)
+  - [1.openssl实现私有ca](#1openssl实现私有ca)
+  - [2.openssl利用已有ca，生成数字证书（即对其他公钥进行签名）](#2openssl利用已有ca生成数字证书即对其他公钥进行签名)
+  - [3.查看证书内容](#3查看证书内容)
+  - [4.创建x509 v3证书（支持多个域名）](#4创建x509-v3证书支持多个域名)
+- [jks（java keystore）](#jksjava-keystore)
+  - [1.有两个密钥库](#1有两个密钥库)
+  - [2.创建jks](#2创建jks)
+  - [3.查看jks中的证书](#3查看jks中的证书)
+  - [4.生成jks的脚本](#4生成jks的脚本)
+  - [5.从jks中提取pem格式证书的脚本](#5从jks中提取pem格式证书的脚本)
+- [pkcs12](#pkcs12)
+  - [1.概述](#1概述)
+  - [2.使用](#2使用)
+  - [3.查看pkcs12证书信息](#3查看pkcs12证书信息)
+- [应用](#应用)
+  - [1.https建立连接的过程](#1https建立连接的过程)
+  - [2.ssh建立连接过程](#2ssh建立连接过程)
+
+<!-- /code_chunk_output -->
+
 ### 基础
 #### 1.第三方机构（Certificate Authority）
 是为了非对称加密设置的，确保所有人能够获得彼此正确的公钥

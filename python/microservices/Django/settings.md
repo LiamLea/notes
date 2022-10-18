@@ -1,4 +1,18 @@
-[toc]
+#settings
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [settings](#settings)
+    - [Django的配置](#django的配置)
+      - [1.模板路径的配置](#1模板路径的配置)
+      - [2.静态文件路径的配置](#2静态文件路径的配置)
+      - [3.配置数据库](#3配置数据库)
+      - [4.注册app](#4注册app)
+      - [5.session配置](#5session配置)
+
+<!-- /code_chunk_output -->
+
 ### Django的配置
 #### 1.模板路径的配置
 ```python

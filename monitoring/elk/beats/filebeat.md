@@ -1,5 +1,38 @@
 # filebeat
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [filebeat](#filebeat)
+    - [基础概念](#基础概念)
+      - [1.input](#1input)
+      - [2.index template](#2index-template)
+      - [3.filebeat处理流程](#3filebeat处理流程)
+      - [4.注册表：`/var/lib/registry`](#4注册表varlibregistry)
+    - [配置](#配置)
+      - [1.基本配置](#1基本配置)
+        - [（1）设置input](#1设置input)
+        - [（2）processor](#2processor)
+        - [（3）导入kibana dashboard](#3导入kibana-dashboard)
+        - [（4）output](#4output)
+      - [2.更多配置](#2更多配置)
+        - [（1）input](#1input-1)
+        - [（2）使用multiline](#2使用multiline)
+        - [（3）general](#3general)
+        - [（4）加载外部配置文件（input配置）](#4加载外部配置文件input配置)
+        - [（5）output](#5output)
+        - [（6）扩展index template](#6扩展index-template)
+        - [（7）index lifecycle management](#7index-lifecycle-management)
+        - [（8）日志设置](#8日志设置)
+    - [modules](#modules)
+      - [1.基本使用](#1基本使用)
+        - [（1）开启指定模块](#1开启指定模块)
+        - [（2）配置模块](#2配置模块)
+        - [（3）配置kibbana dashboard和output](#3配置kibbana-dashboard和output)
+        - [（4）启动模块](#4启动模块)
+
+<!-- /code_chunk_output -->
+
 ### 基础概念
 #### 1.input
 * 用于采集日志，包括从文件读取、从端口读取等

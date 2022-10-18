@@ -1,6 +1,19 @@
 # alerting
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [alerting](#alerting)
+    - [概述](#概述)
+      - [1.告警架构](#1告警架构)
+      - [2.相关特性](#2相关特性)
+        - [（1）分组（group）](#1分组group)
+        - [（2）抑制（inhibit）](#2抑制inhibit)
+        - [（3）静默（silence）](#3静默silence)
+        - [（4）路由（route）](#4路由route)
+      - [3.告警规则的状态](#3告警规则的状态)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

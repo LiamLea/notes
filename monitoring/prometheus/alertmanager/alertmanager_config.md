@@ -1,4 +1,32 @@
-[toc]
+# alertmanager config
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [alertmanager config](#alertmanager-config)
+    - [概述](#概述)
+      - [1.有以下部分](#1有以下部分)
+      - [2.group](#2group)
+    - [配置](#配置)
+      - [1.配置格式](#1配置格式)
+      - [2.全局配置（`<global>`）](#2全局配置global)
+      - [3.receiver配置（`<receiver>`）](#3receiver配置receiver)
+        - [（1）基础配置](#1基础配置)
+        - [（2）webhook配置](#2webhook配置)
+        - [（3）发送的告警格式](#3发送的告警格式)
+      - [4.route和group配置（`<route>`）](#4route和group配置route)
+        - [（1）路由树](#1路由树)
+        - [（2）group](#2group-1)
+      - [5.inhibit配置（`<inhibit_rule>`）](#5inhibit配置inhibit_rule)
+    - [与第三方应用结合](#与第三方应用结合)
+      - [1.发送告警到钉钉](#1发送告警到钉钉)
+        - [（1）创建配置文件](#1创建配置文件)
+        - [（2）启动](#2启动)
+        - [（3）获取webhook的地址](#3获取webhook的地址)
+        - [（4）测试](#4测试)
+        - [在k8s上部署](#在k8s上部署)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

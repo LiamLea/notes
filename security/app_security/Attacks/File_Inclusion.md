@@ -1,6 +1,17 @@
 # File Inclusion
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [File Inclusion](#file-inclusion)
+    - [概述](#概述)
+      - [1.File Inclusion](#1file-inclusion)
+      - [2.实现文件包含攻击的条件](#2实现文件包含攻击的条件)
+    - [防护](#防护)
+      - [1.文件名验证](#1文件名验证)
+      - [2.路径限制](#2路径限制)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

@@ -1,6 +1,16 @@
 # elasticsearch
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [elasticsearch](#elasticsearch)
+    - [Introduction](#introduction)
+      - [1.compatibility](#1compatibility)
+      - [2.features](#2features)
+    - [Usage](#usage)
+      - [1.basic](#1basic)
+
+<!-- /code_chunk_output -->
 
 ### Introduction
 

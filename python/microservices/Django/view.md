@@ -1,3 +1,18 @@
+# view
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [view](#view)
+    - [1.视图函数](#1视图函数)
+      - [（1）接收一个参数，传入的是请求的所有内容](#1接收一个参数传入的是请求的所有内容)
+      - [（2）构造HTTP响应](#2构造http响应)
+      - [（3）设置返回的cookie](#3设置返回的cookie)
+      - [（4）返回HTTP响应](#4返回http响应)
+    - [2.视图类](#2视图类)
+
+<!-- /code_chunk_output -->
+
 ### 1.视图函数
 #### （1）接收一个参数，传入的是请求的所有内容
 ```python
@@ -50,7 +65,7 @@ def func(request):
 ```python
 from django.views import View
 class Login(View):
-  
+
     #当使用Get方法时，会执行类中的get函数
     def get(self, request):
         pass

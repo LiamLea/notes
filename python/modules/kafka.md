@@ -1,5 +1,20 @@
 # kafka
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [kafka](#kafka)
+    - [概述](#概述)
+      - [1.KafkaProducer是线程安全的，KafkaConsumer不是线程安全的](#1kafkaproducer是线程安全的kafkaconsumer不是线程安全的)
+      - [2.多个进程 之间不能 共享KafkaProducer](#2多个进程-之间不能-共享kafkaproducer)
+    - [使用](#使用)
+      - [1.安装kafka模块](#1安装kafka模块)
+      - [2.设置生产者](#2设置生产者)
+      - [3.设置消费者](#3设置消费者)
+      - [4.创建AdminClient](#4创建adminclient)
+        - [（1）管理consumer group](#1管理consumer-group)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

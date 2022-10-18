@@ -1,4 +1,15 @@
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [`ps`和`top`](#ps和top)
+  - [1.查看线程信息](#1查看线程信息)
+  - [2.相关指标](#2相关指标)
+    - [（1）`STAT`](#1stat)
+    - [（2）`%CPU`](#2cpu)
+
+<!-- /code_chunk_output -->
+
 ### `ps`和`top`
 
 #### 1.查看线程信息

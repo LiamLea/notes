@@ -1,6 +1,25 @@
 # 时间相关模块
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [时间相关模块](#时间相关模块)
+    - [概述](#概述)
+      - [1.相关概念](#1相关概念)
+        - [（1）时间戳](#1时间戳)
+        - [（2）UTC/GMT](#2utcgmt)
+        - [（3）struct time（9元组）](#3struct-time9元组)
+    - [time模块](#time模块)
+      - [1.基本函数](#1基本函数)
+      - [2.struct_time 与 string 之间相关转换](#2struct_time-与-string-之间相关转换)
+        - [（1）struct_time -> string](#1struct_time-string)
+        - [（2） string -> struct_time](#2-string-struct_time)
+      - [3.`time.sleep(0)`](#3timesleep0)
+    - [datetime模块](#datetime模块)
+    - [dateutil模块](#dateutil模块)
+      - [1.解析时间戳](#1解析时间戳)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

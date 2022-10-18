@@ -1,6 +1,24 @@
 # DDoS
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [DDoS](#ddos)
+    - [Introduction](#introduction)
+      - [1.what is DDoS attack](#1what-is-ddos-attack)
+      - [2.principle](#2principle)
+      - [3. 3 typpes of DDoS attacks](#3-3-typpes-of-ddos-attacks)
+        - [(1) application layer attacks](#1-application-layer-attacks)
+        - [(2) protocol attacks](#2-protocol-attacks)
+        - [(3) volumetric attacks](#3-volumetric-attacks)
+      - [4.如何识别DDoS攻击](#4如何识别ddos攻击)
+      - [5.mitigate DDoS attack](#5mitigate-ddos-attack)
+        - [(1) blackhole routing](#1-blackhole-routing)
+        - [(2) rate limiting](#2-rate-limiting)
+        - [(3) web application firewall](#3-web-application-firewall)
+        - [(4) anycast network diffusion](#4-anycast-network-diffusion)
+
+<!-- /code_chunk_output -->
 
 ### Introduction
 

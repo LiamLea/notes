@@ -1,4 +1,16 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [stree-ng](#stree-ng)
+  - [1.模拟高负载](#1模拟高负载)
+  - [2.注意：旧版的stress-ng不会触发OOM](#2注意旧版的stress-ng不会触发oom)
+  - [3.增加虚拟内存（通过`mmap()`系统调用）](#3增加虚拟内存通过mmap系统调用)
+  - [4.模拟高内存（OOM且系统卡死）](#4模拟高内存oom且系统卡死)
+  - [5.模拟高I/O（测试文件系统）](#5模拟高io测试文件系统)
+  - [6.模拟大量进程](#6模拟大量进程)
+
+<!-- /code_chunk_output -->
 
 ### stree-ng
 

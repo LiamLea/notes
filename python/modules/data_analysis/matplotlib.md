@@ -1,6 +1,15 @@
 # matplotlib
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [matplotlib](#matplotlib)
+    - [概述](#概述)
+      - [1.matplotlib](#1matplotlib)
+    - [使用](#使用)
+      - [1.使用pyplot](#1使用pyplot)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

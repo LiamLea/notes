@@ -1,6 +1,31 @@
 # kibana
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [kibana](#kibana)
+    - [基础概念](#基础概念)
+      - [1.index patterns](#1index-patterns)
+      - [2.discovery](#2discovery)
+      - [3.filter](#3filter)
+      - [4.aggregation（在visualize中配置）相关概念](#4aggregation在visualize中配置相关概念)
+        - [（1）buckets](#1buckets)
+        - [（2）metrics](#2metrics)
+        - [（3）split series](#3split-series)
+        - [（4）split chart](#4split-chart)
+      - [5.常用metric aggregation](#5常用metric-aggregation)
+      - [6.常用bucket aggregation](#6常用bucket-aggregation)
+        - [（1）bucket aggregation的排序（order）问题](#1bucket-aggregation的排序order问题)
+      - [7.dashboard](#7dashboard)
+      - [8.kibana的数据存储](#8kibana的数据存储)
+    - [基本操作](#基本操作)
+      - [1.创建index patterns](#1创建index-patterns)
+      - [2.修改某个字段的显示格式](#2修改某个字段的显示格式)
+      - [3.设置filter](#3设置filter)
+        - [（1）设置单个条件](#1设置单个条件)
+        - [（2）多个条件结合：](#2多个条件结合)
+
+<!-- /code_chunk_output -->
 
 ### 基础概念
 

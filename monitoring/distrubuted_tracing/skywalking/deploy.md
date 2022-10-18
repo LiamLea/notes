@@ -1,6 +1,15 @@
 # deploy
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [deploy](#deploy)
+    - [部署步骤](#部署步骤)
+      - [1.安装](#1安装)
+        - [（1）下载chart](#1下载chart)
+        - [（2）配置](#2配置)
+
+<!-- /code_chunk_output -->
 
 ### 部署步骤
 

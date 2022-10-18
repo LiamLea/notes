@@ -1,5 +1,15 @@
 # pyyaml
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [pyyaml](#pyyaml)
+    - [使用](#使用)
+      - [（1）将 yaml格式内容 转换成 python对象](#1将-yaml格式内容-转换成-python对象)
+      - [（2）将 python对象 转换成 yaml格式内容](#2将-python对象-转换成-yaml格式内容)
+
+<!-- /code_chunk_output -->
+
 ### 使用
 
 #### （1）将 yaml格式内容 转换成 python对象

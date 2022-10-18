@@ -1,6 +1,27 @@
 # perfermance
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [perfermance](#perfermance)
+    - [TSDB（内存 + 存储）](#tsdb内存-存储)
+      - [1.专业术语](#1专业术语)
+        - [（1）chunk](#1chunk)
+        - [（2）block](#2block)
+        - [（2）head](#2head)
+        - [（3）WAL](#3wal)
+        - [（4）memory-map（2.19版本之后）](#4memory-map219版本之后)
+      - [2.sample的存储过程](#2sample的存储过程)
+      - [3.需要的资源](#3需要的资源)
+        - [（1）所需存储计算方式](#1所需存储计算方式)
+        - [（2）所需要的内存](#2所需要的内存)
+    - [压测](#压测)
+      - [1.avalanche工具](#1avalanche工具)
+        - [（1）拉取镜像](#1拉取镜像)
+        - [（2）查看命令参数](#2查看命令参数)
+        - [（3）使用参数](#3使用参数)
+
+<!-- /code_chunk_output -->
 
 ### TSDB（内存 + 存储）
 

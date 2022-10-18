@@ -1,6 +1,21 @@
 # dashboard
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [dashboard](#dashboard)
+    - [virtualizations组件](#virtualizations组件)
+      - [1.table](#1table)
+    - [常用dashboard](#常用dashboard)
+      - [1.监控Node（基础信息）：8919](#1监控node基础信息8919)
+      - [2.监控Node（全量信息）: 1860](#2监控node全量信息-1860)
+      - [3.监控prometheus：3681](#3监控prometheus3681)
+      - [4.监控blackbox: 7587](#4监控blackbox-7587)
+      - [5.监控k8s：15520、11454](#5监控k8s15520-11454)
+      - [6.监控etcd: 9733](#6监控etcd-9733)
+      - [7.监控ceph: 2842](#7监控ceph-2842)
+
+<!-- /code_chunk_output -->
 
 ### virtualizations组件
 

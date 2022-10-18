@@ -1,4 +1,11 @@
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [strace](#strace)
+  - [1.选项](#1选项)
+
+<!-- /code_chunk_output -->
 
 ### strace
 * strace用于跟踪进程运行时的系统调用等，输出的结果：  

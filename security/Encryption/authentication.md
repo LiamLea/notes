@@ -1,5 +1,15 @@
 # 认证
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [认证](#认证)
+    - [概述](#概述)
+      - [1.NTLM认证（new technology lan manager，winodws操作系统用户登录）](#1ntlm认证new-technology-lan-managerwinodws操作系统用户登录)
+      - [2.域认证体系——kerbroes](#2域认证体系kerbroes)
+
+<!-- /code_chunk_output -->
+
 ### 概述
 
 #### 1.NTLM认证（new technology lan manager，winodws操作系统用户登录）

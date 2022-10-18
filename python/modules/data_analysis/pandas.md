@@ -1,6 +1,17 @@
 # pandas
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [pandas](#pandas)
+    - [概述](#概述)
+      - [1.pandas](#1pandas)
+      - [2.支持从多种格式中读取数据](#2支持从多种格式中读取数据)
+    - [使用](#使用)
+      - [1.读取数据](#1读取数据)
+      - [3.使用数据](#3使用数据)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

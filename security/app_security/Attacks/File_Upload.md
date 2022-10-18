@@ -1,6 +1,21 @@
 # File Upload
 
-[toc]
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [File Upload](#file-upload)
+    - [概述](#概述)
+      - [1.文件上传攻击](#1文件上传攻击)
+      - [2.实现条件](#2实现条件)
+    - [防护](#防护)
+      - [1.客户端防护措施（效果不好）](#1客户端防护措施效果不好)
+        - [（1）javascript检测](#1javascript检测)
+        - [（2）MIME检测](#2mime检测)
+      - [2.服务端防护措施](#2服务端防护措施)
+        - [（1）文件扩展名检测](#1文件扩展名检测)
+        - [（2）文件内容检测](#2文件内容检测)
+
+<!-- /code_chunk_output -->
 
 ### 概述
 

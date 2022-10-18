@@ -1,4 +1,25 @@
-[toc]
+# pipeline
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [pipeline](#pipeline)
+    - [pipeline内容配置（`xx.conf`）](#pipeline内容配置xxconf)
+      - [1.配置文件语法](#1配置文件语法)
+        - [（1）字符串](#1字符串)
+        - [（2）数组（常用列表）](#2数组常用列表)
+        - [（3）列表](#3列表)
+        - [（4）bool类型](#4bool类型)
+        - [（5）hash（也就是字典）](#5hash也就是字典)
+        - [（6）数字](#6数字)
+      - [2.高级语法](#2高级语法)
+        - [（1）字段的引用：`[]`](#1字段的引用)
+        - [（2）格式化：`%{}`](#2格式化)
+        - [（3）条件判断](#3条件判断)
+      - [3.特殊字段：`@metadata`](#3特殊字段metadata)
+      - [4.使用系统的环境变量：`${}`](#4使用系统的环境变量)
+
+<!-- /code_chunk_output -->
 
 ### pipeline内容配置（`xx.conf`）
 

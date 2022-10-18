@@ -1,5 +1,17 @@
 # blueprinnt
-[toc]
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [blueprinnt](#blueprinnt)
+    - [概述](#概述)
+      - [1.Blueprint（蓝图）](#1blueprint蓝图)
+      - [2.特点](#2特点)
+    - [使用](#使用)
+      - [1.基本使用](#1基本使用)
+
+<!-- /code_chunk_output -->
+
 ### 概述
 
 #### 1.Blueprint（蓝图）
