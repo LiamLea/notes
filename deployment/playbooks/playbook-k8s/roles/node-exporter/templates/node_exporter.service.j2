@@ -9,7 +9,8 @@ Type=simple
 User=root
 Group=root
 ExecStart={{ monitor.node_exporter.install_path.rstrip("/") }}/node_exporter \
-    --web.listen-address=:{{ monitor.node_exporter.port }}
+    --web.listen-address=:{{ monitor.node_exporter.port }} \
+    --collector.processes
 
 SyslogIdentifier=node_exporter
 Restart=always

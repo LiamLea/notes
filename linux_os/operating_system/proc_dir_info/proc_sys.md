@@ -23,11 +23,11 @@
     - [`/proc/sys/fs` —— 文件系统参数](#procsysfs-文件系统参数)
       - [1.`/proc/sys/fs/file-max`](#1procsysfsfile-max)
       - [2.`/proc/sys/fs/file-nr`](#2procsysfsfile-nr)
-      - [3.`ulimit -Hn`](#3ulimit-hn)
+      - [3.`ulimit -Hn`（不要用root用户查看）](#3ulimit-hn不要用root用户查看)
     - [进程和线程相关参数](#进程和线程相关参数)
       - [1.`/proc/sys/kernel/pid_max`](#1procsyskernelpid_max)
       - [2.`/proc/sys/kernel/threads-max`](#2procsyskernelthreads-max)
-      - [3.`ulimit -u`](#3ulimit-u)
+      - [3.`ulimit -u`（不要用root用户查看）](#3ulimit-u不要用root用户查看)
       - [4.进程的运行参数](#4进程的运行参数)
     - [`/proc/sys/net` —— 网络参数](#procsysnet-网络参数)
       - [1.socket buffer](#1socket-buffer)
@@ -140,7 +140,7 @@ dmesg -c        #可以查看到读写的日志
 #### 2.`/proc/sys/fs/file-nr`
   当前已经分配的文件描述符数量	当前已经分配但未被使用的文件描述符数量	整个系统能最多能打开的文件描述符数量
 
-#### 3.`ulimit -Hn`
+#### 3.`ulimit -Hn`（不要用root用户查看）
 一个 **进程** 最多能打开的文件描述符数量
 
 
@@ -149,13 +149,13 @@ dmesg -c        #可以查看到读写的日志
 ### 进程和线程相关参数
 
 #### 1.`/proc/sys/kernel/pid_max`
-  整个系统，最多能同时打开的进程数
+整个系统，最多能同时打开的进程数
 
 #### 2.`/proc/sys/kernel/threads-max`
-  一个进程最多能够使用的线程数
+整个系统，最多能同时打开的线程数
 
-#### 3.`ulimit -u`
-  一个用户最多能同时打开的进程数（对root无效）
+#### 3.`ulimit -u`（不要用root用户查看）
+一个用户最多能同时打开的进程数（对root无效）
 
 #### 4.进程的运行参数
 * `/proc/<PID>/cmdline`
