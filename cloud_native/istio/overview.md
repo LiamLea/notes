@@ -11,6 +11,7 @@
       - [1.Architecture](#1architecture)
         - [（1）envoy](#1envoy)
         - [（2）istiod](#2istiod)
+        - [（3）监控体系架构说明](#3监控体系架构说明)
       - [2.istio中的基本概念](#2istio中的基本概念)
       - [3.integrations](#3integrations)
         - [（1）jaeger（zipkin）](#1jaegerzipkin)
@@ -64,6 +65,16 @@
 * certificate management（citadel）
   * Istiod acts as a Certificate Authority (CA) and generates certificates to allow secure mTLS communication in the data plane.
 
+##### （3）监控体系架构说明
+* istiod本身不存储任何数据
+* 配置provider后，数据会推送到相应的provider
+  * metrics（包括服务间的调用关系） 存储在prometheus中，由于不是主动推送的，而是prometheus主动拉取的，所以prometheus provider不需要配置
+  * tracing 通过zipkin等接口进行存储，需要配置tracing provider，将数据推送到此接口
+  * log 默认provider为envoy，即打印到/dev/stdout
+* 监控展示(kiali)
+  * 需要配置相应的provider地址，才能展示数据
+  * metric 需要配置prometheus地址，才能获取metric数据进行展示
+  * tracing 需要配置tracing provider地址，才能获取tracing数据进行展示
 
 #### 2.istio中的基本概念
 

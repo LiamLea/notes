@@ -6,6 +6,16 @@
   include_tasks: "redhat.yaml"
   when: ansible_distribution_file_variety == "RedHat"
 
+- name: set sysctl
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+  with_items:
+  - name: "fs.inotify.max_user_instances"
+    value: 1024
+  - name: "fs.inotify.max_user_watches"
+    value: "1048576"
+
 - name: Add or modify nofile soft limit for all
   community.general.pam_limits:
     domain: 'root'

@@ -40,6 +40,8 @@
           repository: "{{ monitor.repository }}quay.io/prometheus/node-exporter"
         tolerations:
         - operator: "Exists"
+        extraArgs:
+          collector.processes: ""
       server:
         image:
           repository: "{{ monitor.repository }}quay.io/prometheus/prometheus"

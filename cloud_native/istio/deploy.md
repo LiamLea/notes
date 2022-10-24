@@ -24,10 +24,14 @@
       - [2.创建istio ingress GateWay](#2创建istio-ingress-gateway)
       - [3.访问该应用，获取对外暴露的端口号](#3访问该应用获取对外暴露的端口号)
     - [配置（本质就是配置envoy，主要就是filters）](#配置本质就是配置envoy主要就是filters)
-      - [1.IstioOperator](#1istiooperator)
-      - [2.Telemetry（本质就是配置filters）](#2telemetry本质就是配置filters)
-        - [（1）使用telemetry进行配置](#1使用telemetry进行配置)
-      - [3.查看配置是否生效的方法（查看envoy的filters等信息）](#3查看配置是否生效的方法查看envoy的filters等信息)
+      - [1.关键概念](#1关键概念)
+        - [（1）provider（重要）](#1provider重要)
+        - [（2）metrics](#2metrics)
+      - [2.IstioOperator](#2istiooperator)
+      - [3.Telemetry（本质就是配置filters）](#3telemetry本质就是配置filters)
+        - [（1）配置生效的范围（优先级由低到高）](#1配置生效的范围优先级由低到高)
+        - [（2）使用telemetry进行配置](#2使用telemetry进行配置)
+      - [4.查看配置是否生效的方法（查看envoy的filters等信息）](#4查看配置是否生效的方法查看envoy的filters等信息)
 
 <!-- /code_chunk_output -->
 
@@ -48,6 +52,9 @@ istioctl profile dump <profile>
 ```shell
 #修改配置
 vim istio-1.13.4/manifests/profiles/default.yaml
+
+#列出镜像
+istioctl manifest generate -f <path> | grep images:
 
 #安装
 istioctl install -f istio-1.13.4/manifests/profiles/default.yaml
@@ -166,10 +173,61 @@ kubectl get svc -n istio-system
 
 ### 配置（本质就是配置envoy，主要就是filters）
 
-基础配置建议通过IstioOperator API配置
-监控相关的配置建议通过Telemetry API配置
+* **基础配置** 建议通过IstioOperator API配置
+* **监控相关的配置** 建议通过Telemetry API配置
 
-#### 1.IstioOperator
+#### 1.关键概念
+
+##### （1）provider（重要）
+* 提供 存取不同类型的telemetry数据 能力的组件
+* 默认提供三个provider
+```json
+"extensionProviders": [
+  {
+    "name": "prometheus",
+    "prometheus": {}
+  },
+  {
+    "name": "stackdriver",
+    "stackdriver": {}
+  },
+  {
+    "name": "envoy",
+    "envoyFileAccessLog": {
+      "path": "/dev/stdout"
+    }
+  }
+]
+```
+
+* 自定义provider
+  * prometheus provider无法定义，因为prometheus主动采集的
+```yaml
+meshConfig:
+  extensionProviders:
+
+  #自定义zipkin类型的provider
+  - name: zipkin
+    zipkin:
+      service: zipkin.istio-system.svc.cluster.local  #必须写完整
+      port: 9411
+      maxTagLength: 256
+```
+
+##### （2）metrics
+
+* proxy agent自身的指标
+
+* Standard Metrics
+  * disable telemetry，这些指标就会关闭
+  * 本质是通过envoy filter采集的
+[参考](https://istio.io/latest/docs/reference/config/metrics/)
+
+* envoy stats（默认没有开启）
+  * 需要明确指定，才会采集相关指标
+[参考](https://istio.io/latest/docs/ops/configuration/telemetry/envoy-stats/)
+
+#### 2.IstioOperator
 * profile的配置是内置的，没办法修改，只能从外部覆盖
   * 可以通过`istioctl install -f <path>`指定覆盖后的配置文件
   * 让配置生效：`istioctl install ...`
@@ -214,15 +272,15 @@ spec:
     #合并应用和envoy的metrics
     enablePrometheusMerge: <bool | default=true>
 
-    #provider会在telemetry配置中用到
-    #配置外部的providers
+    #配置providers
     extensionProviders:
     - name: zipkin
       zipkin:
         service: zipkin.istio-system.svc.cluster.local  #必须写完整
         port: 9411
         maxTagLength: 256
-    #设置默认使用的providers
+
+    #设置 不同类型的telemetry 默认使用的providers（即在telemetry配置中没有指定的时，使用默认的provider）
     defaultProviders:
       accessLogging:
       - envoy
@@ -238,42 +296,17 @@ spec:
   values: {}
 ```
 
-#### 2.Telemetry（本质就是配置filters）
-* 配置生效的范围（优先级由低到高）：
-  * 全局
-    * `将Telemetry资源部署在istio-system这个命名空间下`
-  * 某个namespace
-    * `将Telemetry资源部署在某个namespace下`
-  * 某个workload
-    * `将Telemetry资源部署在某个namespace下 并 通过selector选择相应的workload`
-* 配置内容：
-  * metric
-  * tracing
-  * access log
-* provider提供某一类功能的配置
-  * 必须指定provider（如果不指定则使用defaultProvider，但是defaultProvider必须在meshConfig中指定，如果没设置defaultProvider并且也没指定provider，则配置不会生效)
+#### 3.Telemetry（本质就是配置filters）
 
-* 默认提供三个provider（如果需要其他的，需要自己定义）
-```json
-"extensionProviders": [
-  {
-    "name": "prometheus",
-    "prometheus": {}
-  },
-  {
-    "name": "stackdriver",
-    "stackdriver": {}
-  },
-  {
-    "name": "envoy",
-    "envoyFileAccessLog": {
-      "path": "/dev/stdout"
-    }
-  }
-]
-```
+##### （1）配置生效的范围（优先级由低到高）
+* 全局
+  * `将Telemetry资源部署在istio-system这个命名空间下`
+* 某个namespace
+  * `将Telemetry资源部署在某个namespace下`
+* 某个workload
+  * `将Telemetry资源部署在某个namespace下 并 通过selector选择相应的workload`
 
-##### （1）使用telemetry进行配置
+##### （2）使用telemetry进行配置
 ```yaml
 apiVersion: telemetry.istio.io/v1alpha1
 kind: Telemetry
@@ -293,16 +326,30 @@ spec:
   #tracing配置
   tracing:
   - randomSamplingPercentage: 100
+    disableSpanReporting: false
     customTags: {}
 
   #metrics配置
-  metrics: {}
+  # 生成新的metrics，对旧的metrics没有任何影响
+  # disabled选项也是对新的metrics
+  # metrics:
+  # - providers:
+  #   - name: prometheus
+  #   overrides:
+  #   - match:
+  #       metric: ALL_METRICS
+  #       mode: CLIENT_AND_SERVER
+  #     disabled: true  
+  #     tagOverrides:
+  #       response_code:
+  #         operation: REMOVE
+  metrics: []
 ```
 
 * kubectl apply使配置生效
 
 
-#### 3.查看配置是否生效的方法（查看envoy的filters等信息）
+#### 4.查看配置是否生效的方法（查看envoy的filters等信息）
 * 查看access log配置
   * 查看envoy的tcp_proxy或http_connection_manager filter（当没有配置access_log时，表示没有开启）
 

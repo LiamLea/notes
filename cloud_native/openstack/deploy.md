@@ -216,6 +216,8 @@ keystone_admin_password: cangoal
 
 #### 7.配置：`/etc/kolla/globals.yml`
 
+[配置参考](https://docs.openstack.org/train/configuration/)
+
 * 注意：当不同主机的变量不一样时（比如网卡名不一样），需要 **注释** `globals.yaml`中的配置，然后在inventory配置相应的变量
   * 比如：
   ```shell
@@ -266,17 +268,30 @@ cluster_interface: "{{ network_interface }}"
 #  该网卡需要up
 neutron_external_interface: "eth1"
 
-
-
+#ceph配置
 enable_ceph: "yes"
 enable_ceph_mds: "yes"
-enable_cinder: "yes"
+enable_ceph_dashboard: "no" #待测试（应该是disable ceph的dashboard模块)
 
+#cinder配置
+enable_cinder: "yes"
+# 提供备份volume的能力
+enable_cinder_backup: "yes"
+
+#nova配置
+# 使用ceph存储虚拟机信息（可以方便迁移）
+nova_backend_ceph: "{{ enable_ceph }}"
 #  设置hypervisor类型（默认为：kvm）
 #  当openstack安装在虚拟机上时，这里用qemu，用kvm会有问题
 nova_compute_virt_type: "kvm"
 
-#glance配置，enable ceph后默认使用rbd作为后端存储
+#glance配置（使用ceph存储）
+glance_backend_ceph: "yes"
+glance_backend_file: "no"
+
+#监控相关
+enable_prometheus_ceph_mgr_exporter: "yes"  #待测试（应该是enable ceph的prometheus模块）
+enable_prometheus_openstack_exporter: "yes" #待测试
 ```
 
 #### 8.使用ceph

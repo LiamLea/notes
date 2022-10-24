@@ -480,3 +480,21 @@ service:
       kafka_clusters:
       - name: kafka-k8s
         bootstrapServers: kafka.public:9092
+
+service_mesh:
+  providers:
+    prometheus:
+      service: "prometheus-server.{{monitor.namespace}}.svc.cluster.local"
+      port: 80
+      path: "/prometheus"
+    tracing:
+      service: zipkin.istio-system.svc.cluster.local
+      port: 9411
+      path: ""
+  telemetry:
+    metrics: {}
+    tracing:
+      randomSamplingPercentage: 100
+      disableSpanReporting: false
+    accessLogging:
+      disabled: true

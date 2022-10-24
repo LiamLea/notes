@@ -28,10 +28,10 @@ istioctl proxy-status
 #RDS: route discovery service
 ```
 
-* 查看某个envoy proxy的配置
+* 查看某个envoy proxy的配置（包括filter chain等）
 所有的envoy配置应该都是一样的
 ```shell
-istioctl proxy-config all <proxy-name>
+istioctl proxy-config all <proxy-name> -o json
 #all包括：listener、cluster等
 ```
 
