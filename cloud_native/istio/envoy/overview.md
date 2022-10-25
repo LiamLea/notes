@@ -8,7 +8,7 @@
       - [1.listener](#1listener)
         - [（1）listener](#1listener-1)
         - [（2）network filters](#2network-filters)
-        - [（3）RDS（route discovery service）](#3rdsroute-discovery-service)
+        - [（3）route类型: RDS（route discovery service）](#3route类型-rdsroute-discovery-service)
       - [2.cluster](#2cluster)
         - [（1）cluster](#1cluster)
         - [（2）常用service discovery类型（cluster类型）](#2常用service-discovery类型cluster类型)
@@ -101,7 +101,7 @@
   * RDS（route discovery service）
     * `<filter>.typedConfig.rds.routeConfigName`
 
-##### （3）RDS（route discovery service）
+##### （3）route类型: RDS（route discovery service）
 * route基本格式
 ```json
 {
@@ -168,7 +168,7 @@
 * 根据该listener配置的filters进行处理
   * listener filter
   * network filter chain
-    * 根据 路由规则（针对http协议） 或 直接（针对tcp协议） 路由到指定的cluster
+    * 根据 **路由规则**（针对http协议） 或 直接（针对tcp协议） 路由到指定的cluster
 * cluster根据 负载策略 转发到upstream endpoints
 
 ##### （3）具体的request flow

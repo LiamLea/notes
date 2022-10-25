@@ -4,11 +4,6 @@
 <!-- code_chunk_output -->
 
 - [traffic management](#traffic-management)
-    - [概述](#概述)
-      - [1.service registry](#1service-registry)
-        - [（1）生成service registry](#1生成service-registry)
-        - [（2）利用service registry配置envoy](#2利用service-registry配置envoy)
-      - [2.数据处理流程](#2数据处理流程)
     - [使用](#使用)
       - [1. VirtualService（本质就是配置envoy的filter）](#1-virtualservice本质就是配置envoy的filter)
         - [（1）清单文件格式](#1清单文件格式)
@@ -22,7 +17,6 @@
     - [ServiceEntry](#serviceentry)
       - [1.特点](#1特点-2)
       - [2.清单格式](#2清单格式)
-    - [unknown 和 passthroughcluster 和 BlackHole](#unknown-和-passthroughcluster-和-blackhole)
     - [更多流量治理（无需修改代码）](#更多流量治理无需修改代码)
       - [1.timeout](#1timeout)
       - [2.retries](#2retries)
@@ -32,37 +26,6 @@
     - [总结](#总结)
 
 <!-- /code_chunk_output -->
-
-### 概述
-
-![](./imgs/traffic_management_01.png)
-
-#### 1.service registry
-
-##### （1）生成service registry
-* 自动发现
-  * 通过调用k8s接口，发现如下内容：
-    * service 即k8s的service
-    * endpoint 即k8s中的endpoints中的endpoint
-      * 并且会根据endpoint对应的**pod的labels**，**作为这个endpoint的labels**
-
-* 静态添加
-  * 通过ServiceEntry在service registry中添加
-
-##### （2）利用service registry配置envoy
-
-|通过service registry生成的envoy的配置项||
-|-|-|
-|envoy的cluster的命名|`<DIRECTION>|<PORT>|<SUBSET>|<SERVICE_FQDN>`|
-
-#### 2.数据处理流程
-VirtualService需要通过hosts这个配置关联k8s的services（本质通过配置的hosts去查找该名字的virtualhosts，如果找到了，则修改，找不到则在80路由规则中添加）
-VirtualService用于将流量路由到指定DestinationRule
-* 如果没有匹配到VirtualService的流量，则正常处理（即发送到指定service进行负载）
-DestinationRule用于对service进行分组
-gateways to control ingress and egress traffic.
-
-***
 
 ### 使用
 
@@ -263,11 +226,7 @@ spec:
   - address: 3.3.3.3
 ```
 
-### unknown 和 passthroughcluster 和 BlackHole
-* 当不知道的外部流量进来时，则标识来源为**unknown**
-* 当流量发往外部不知道的服务时，则标记为目的为**passthroughcluster** 或者 **blackholw**
-当允许流量外出时，为**passthroughcluster**
-当不允许流量外出时，为**blackhole**
+
 
 
 ### 更多流量治理（无需修改代码）

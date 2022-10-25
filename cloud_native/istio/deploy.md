@@ -216,7 +216,8 @@ meshConfig:
 
 ##### （2）metrics
 
-* proxy agent自身的指标
+* proxy agent自身的指标（无法关闭）
+[参考](https://istio.io/latest/docs/concepts/observability/#control-plane-metrics)
 
 * Standard Metrics
   * disable telemetry，这些指标就会关闭
