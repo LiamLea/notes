@@ -41,7 +41,7 @@
 * 注意在istio中：
   * 启动envoy之前，都会先设置**iptables**
   * 将所有 **进入流量** 转到envoy的 **15006** 端口
-    * 会利用 元数据（原始的目标地址、协议等信息），来匹配最佳的filter chain，进行处理
+    * 会利用 **元数据**（原始的目标地址、协议等信息），来匹配最佳的filter chain，进行处理
   * 将所有 **外出流量** 转到envoy的 **15001** 端口
     * 设置了`"use_original_dst": true`
       * 会根据原始的目标地址，将该流量转到与之匹配的listener上
@@ -56,7 +56,7 @@
   "name": "...",
   "address": {},
   "listener_filters": [],     //增加一些额外的处理（比如检查tls、限制访问速率等）
-  "filter_chains": [],
+  "filter_chains": [],        //只匹配其中最佳的chain（最佳匹配参考：https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener_components.proto#config-listener-v3-filterchainmatch）
   "default_filter_chain": {},  //当流量在filter_chains中没有匹配的filter_chain，则使用default_filter_chain
   "traffic_direction": "<INBOUND | OUTBOUND>"   //流量的方向，是进入还是外出
 }
@@ -78,7 +78,18 @@
   },
 
   //network filters
-  "filters": []
+  "filters": [
+    //...
+    {
+     "name": "envoy.filters.network.http_connection_manager",
+     "typedConfig": {
+         "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager",
+         //...
+         //http filters
+         "httpFilters": []
+      }
+    }
+  ]
 }
 ```
 

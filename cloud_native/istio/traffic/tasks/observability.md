@@ -23,7 +23,7 @@
 * proxy agent自身的指标（无法关闭）
 [参考](https://istio.io/latest/docs/concepts/observability/#control-plane-metrics)
 
-* Standard Metrics
+* Standard Metrics（通过envoyfilter实现的）
   * disable telemetry，这些指标就会关闭
   * 本质是通过envoy filter采集的
 [参考](https://istio.io/latest/docs/reference/config/metrics/)
