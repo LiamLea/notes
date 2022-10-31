@@ -294,7 +294,15 @@ spec:
     defaultConfig:  {}
 
   #组件的内部配置（用于补充meshConfig，会被逐步弃用）
-  values: {}
+  #但有些配置目前只能在这里配
+  #参考: https://istio.io/v1.5/docs/reference/config/installation-options/
+  values:
+    pilot:
+      #关闭自动识别协议（默认是开启的）
+      enableProtocolSniffingForOutbound: false
+      #默认是关闭的
+      enableProtocolSniffingForInbound: false
+
 ```
 
 #### 3.Telemetry（本质就是配置filters）
