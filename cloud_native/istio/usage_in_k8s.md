@@ -10,6 +10,9 @@
     - [概述](#概述)
       - [1.istio的基本概念（与k8s的关联）](#1istio的基本概念与k8s的关联)
       - [2.工作原理](#2工作原理)
+        - [（1）工作原理](#1工作原理)
+        - [（2）两个特殊的listener](#2两个特殊的listener)
+        - [（3）配置原理](#3配置原理)
       - [3.支持转发的流量](#3支持转发的流量)
         - [（1）自动识别协议（当没有指定协议时，默认自动识别）（不建议开启）](#1自动识别协议当没有指定协议时默认自动识别不建议开启)
         - [（2）明确指定协议（server first protocol需要明确指定）](#2明确指定协议server-first-protocol需要明确指定)
@@ -58,6 +61,9 @@
 |endpoint|访问点|是endpoints中的一个个endpoint，每个endpoint还会关联pod的相关信息（比如：labels等，所以可以理解为一个endpoint就是一个pod）|
 
 #### 2.工作原理
+
+##### （1）工作原理
+
 * 启动envoy之前，都会先设置**iptables**
 * 将所有 **进入流量** 转到envoy的 **15006** 端口
   * 会利用 **元数据**（原始的目标地址、协议等信息），来匹配最佳的filter chain，进行处理
@@ -68,6 +74,17 @@
       * 如果存在"1.1.1.1:9080"这个listener，则会匹配这个listener，不存在的话继续，
       * 如果存在"0.0.0.0:9080"这个listener（0.0.0.0表示匹配所有），则会匹配这个listener
     * 如果没有匹配的，则将流量发送到15001这个listener指定的cluster上（即PassthroughCluster）
+
+##### （2）两个特殊的listener
+
+* virtualInbound
+  * 所以 **进入**流量都要经过这个listener
+* virtualOutBound
+  * 所有 **外出**流量且**未匹配**到listener的 都要经过这个listener，即PassthroughCluster
+
+##### （3）配置原理
+* 所有关于Inbound的配置，是在VirtualInbound这个listener上配的
+* 所有关于Outbound的配置，是在所有listener上配的（不包括两个特殊的listener）
 
 #### 3.支持转发的流量
 
@@ -82,12 +99,13 @@
     * 关闭后，默认都是tcp协议
 * istio能够自动识别的协议：http 和 http2
 * 如果无法识别协议，则认为是纯TCP流量
-
+* 底层原理：通过设置http_inspector（listener filter）
 
 ##### （2）明确指定协议（server first protocol需要明确指定）
 * 两种方式
   * 通过端口的名称：`svc.spec.ports.name: <protocol>[-<suffix>]`
   * 通过字段明确指定：`svc.spec.ports.appProtocol: <protocol>`
+* 底层原理：直接设置相关协议的filter（network filter），比如明确指定是http协议，就设置http_manager等filter
 
 ***
 
