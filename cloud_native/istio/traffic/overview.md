@@ -15,7 +15,7 @@
 
 ### 概述
 
-![](./imgs/traffic_management_01.png)
+![](./imgs/traffic_01.png)
 
 #### 1.service registry
 

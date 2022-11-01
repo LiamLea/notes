@@ -25,7 +25,10 @@
         - [（1）前提](#1前提)
         - [（2）原理](#2原理)
     - [常用filter](#常用filter)
-      - [1.network filters](#1network-filters)
+      - [1.listener filters](#1listener-filters)
+        - [（1）http_inspector（检测http协议）](#1http_inspector检测http协议)
+        - [（2）tls_inspector（检测TLS协议）](#2tls_inspector检测tls协议)
+      - [2.network filters](#2network-filters-1)
         - [（1）tcp_proxy](#1tcp_proxy)
         - [（2）http_connection_manager](#2http_connection_manager)
 
@@ -222,7 +225,56 @@
 
 [参考](https://www.envoyproxy.io/docs/envoy/v1.22.0/api-v3/config/filter/filter)
 
-#### 1.network filters
+#### 1.listener filters
+
+##### （1）http_inspector（检测http协议）
+```json
+{
+    "name": "envoy.filters.listener.http_inspector",
+    "typedConfig": {
+        "@type": "type.googleapis.com/envoy.extensions.filters.listener.http_inspector.v3.HttpInspector"
+    },
+    //这里关闭指定端口的检测
+    "filterDisabled": {
+        "orMatch": {
+            "rules": [
+                {
+                    "destinationPortRange": {
+                        "start": 9080,
+                        "end": 9081
+                    }
+                },
+                {
+                    "destinationPortRange": {
+                        "start": 15006,
+                        "end": 15007
+                    }
+                }
+            ]
+        }
+    }
+}
+```
+
+##### （2）tls_inspector（检测TLS协议）
+```json
+{
+    "name": "envoy.filters.listener.tls_inspector",
+    "typedConfig": {
+        "@type": "type.googleapis.com/envoy.extensions.filters.listener.tls_inspector.v3.TlsInspector"
+    },
+    
+    //关闭指定端口的检测
+    "filterDisabled": {
+        "destinationPortRange": {
+            "start": 15006,
+            "end": 15007
+        }
+    }
+}
+```
+
+#### 2.network filters
 
 ##### （1）tcp_proxy
 ```json
