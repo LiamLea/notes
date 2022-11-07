@@ -73,14 +73,10 @@
           cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
         className: "{{ ingress.class_name }}"
         pathtype: Prefix
-        hosts:
-        - host: "{{ ingress.hosts['kibana'].host }}"
-          paths:
-          - path: "{{ ingress.hosts['kibana'].path }}"
+        hosts: "{{ __kibana_ingress_hosts }}"
         tls:
-        - secretName: "{{ ingress.hosts['kibana'].host }}"
-          hosts:
-          - "{{ ingress.hosts['kibana'].host }}"
+        - secretName: "kibana-ingress-secret"
+          hosts: "{{ __kibana_hosts }}"
 
 - name: init elastic
   include_tasks: init.yaml

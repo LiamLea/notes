@@ -25,6 +25,9 @@
   set_fact:
     __node_exporter: []
     __etcd: []
+    __prometheus_hosts: []
+    __alertmanager_hosts: []
+    __grafana_hosts: []
 
 - name: set __node_exporter fact
   set_fact:
@@ -36,6 +39,21 @@
   set_fact:
     __etcd: "{{ __etcd | default([]) + [hostvars[item]['ansible_host'] + ':2381'] }}"
   with_items: "{{ groups['master'] }}"
+
+- name: set __prometheus_hosts fact
+  set_fact:
+    __prometheus_hosts: "{{ __prometheus_hosts + [(ingress.hosts['prometheus']['host'] + '.' + item).strip('.')] }}"
+  with_items: "{{ ingress.hosts['prometheus']['domains'] }}"
+
+- name: set __alertmanager_hosts fact
+  set_fact:
+    __alertmanager_hosts: "{{ __alertmanager_hosts + [(ingress.hosts['alertmanager']['host'] + '.' + item).strip('.')] }}"
+  with_items: "{{ ingress.hosts['alertmanager']['domains'] }}"
+
+- name: set __grafana_hosts fact
+  set_fact:
+    __grafana_hosts: "{{ __grafana_hosts + [(ingress.hosts['grafana']['host'] + '.' + item).strip('.')] }}"
+  with_items: "{{ ingress.hosts['grafana']['domains'] }}"
 
 - name: setup prometheus
   include_tasks: setup_prometheus.yaml

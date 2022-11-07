@@ -7,7 +7,7 @@
     - [常用注解](#常用注解)
       - [1.容器相关](#1容器相关)
         - [（1）`@Compnent`相关](#1compnent相关)
-      - [（2）`@Configuration`相关](#2configuration相关)
+        - [（2）`@Configuration`相关](#2configuration相关)
     - [使用](#使用)
       - [1.包结构](#1包结构)
     - [配置](#配置)
@@ -48,7 +48,7 @@
 |`@ResponseBody`|返回的内容为响应体，如果不加这个，则会寻找相应的文件|
 |`@Request*`|将请求相关信息和形参进行绑定|
 
-#### （2）`@Configuration`相关
+##### （2）`@Configuration`相关
 
 |注解|说明|
 |-|-|
