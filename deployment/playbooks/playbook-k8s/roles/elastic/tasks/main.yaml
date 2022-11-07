@@ -10,7 +10,7 @@
       HTTPS_PROXY: "{{ chart.http_proxy.server }}"
       NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
   when: chart.http_proxy.enabled == True
-  
+
 - block:
   - name: copy charts
     copy:
@@ -30,6 +30,21 @@
     include_role:
       name: kafka
   when: log.kafka.enabled
+
+- name: set fact
+  set_fact:
+    __kibana_hosts: []
+    __kibana_ingress_hosts: []
+
+- name: set __kibana_hosts fact
+  set_fact:
+    __kibana_hosts: "{{ __kibana_hosts + [(ingress.hosts['kibana']['host'] + '.' + item).strip('.')] }}"
+  with_items: "{{ ingress.hosts['kibana']['domains'] }}"
+
+- name: set __kibana_ingress_hosts fact
+  set_fact:
+    __kibana_ingress_hosts: "{{ __kibana_ingress_hosts + [{'host': item,'paths': [{'path': ingress.hosts['kibana']['path']}] }] }}"
+  with_items: "{{ __kibana_hosts }}"
 
 - name: setup elastic
   include_tasks: setup_elastic.yaml

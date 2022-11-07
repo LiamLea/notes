@@ -153,32 +153,41 @@ basic:
       https_port: 30443
 
 #speficy domain
-domain: home.bongli.local
+domains:
+- "home.liamlea.local"
+- "home.bongli.local"
 ingress:
   enabled: true
   cluster_issuer: ca-issuer
   class_name: "{{ basic.ingress_nginx.config.ingress_class }}"
   hosts:
     prometheus:
-      host: "{{ domain }}"
+      host: ""
+      domains: "{{ domains }}"
       path: "/prometheus"
     alertmanager:
-      host: "{{ domain }}"
+      host: ""
+      domains: "{{ domains }}"
       path: "/alertmanager"
     grafana:
-      host: "{{ domain }}"
+      host: ""
+      domains: "{{ domains }}"
       path: "/grafana"
     kibana:
-      host: "{{ domain }}"
+      host: ""
+      domains: "{{ domains }}"
       path: "/kibana"
     adminer:
-      host: "adminer.{{ domain }}"
+      host: "adminer"
+      domains: "{{ domains }}"
       path: "/"
     redis-commander:
-      host: "redis-commander.{{ domain }}"
+      host: "redis-commander"
+      domains: "{{ domains }}"
       path: "/"
     kafka-ui:
-      host: "kafka-ui.{{ domain }}"
+      host: "kafka-ui"
+      domains: "{{ domains }}"
       path: "/"
 
 monitor:
@@ -205,7 +214,7 @@ monitor:
       #this url will send with alerting msg which user can click to access prometheus to get alerting details
       #  e.g. https://k8s.my.local:30443/prometheus
       #set /prometheus if you don't know the exact external_url or you can't access prometheus
-      external_url: "https://{{ domain }}:{{ basic.ingress_nginx.config.https_port }}/prometheus"
+      external_url: "https://{{ domains[0] }}:{{ basic.ingress_nginx.config.https_port }}/prometheus"
       # e.g. {send_resolved: true, url: "<url|no empty>", max_alerts: 10}
       webhook_configs: []
       scrape_interval: "30s"

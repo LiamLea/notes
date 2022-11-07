@@ -19,15 +19,10 @@
           nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
           nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
         className: "{{ ingress.class_name }}"
-        hosts:
-        - host: "{{ ingress.hosts['adminer'].host }}"
-          paths:
-            - path: "{{ ingress.hosts['adminer'].path }}"
-              pathType: ImplementationSpecific
+        hosts: "{{ __adminer_ingress_hosts }}"
         tls:
-        - secretName: "{{ ingress.hosts['adminer'].host }}"
-          hosts:
-          - "{{ ingress.hosts['adminer'].host }}"
+        - secretName: "adminer-ingress-secret"
+          hosts: "{{ __adminer_hosts }}"
 
 - name: install redis-commander
   environment: "{{ __proxy_env | default(omit) }}"
@@ -49,14 +44,10 @@
         annotations:
           cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
         ingressClassName: "{{ ingress.class_name }}"
-        hosts:
-        - host: "{{ ingress.hosts['redis-commander'].host }}"
-          paths:
-          - "{{ ingress.hosts['redis-commander'].path }}"
+        hosts: "{{ __redis_ui_ingress_hosts }}"
         tls:
-        - secretName: "{{ ingress.hosts['redis-commander'].host }}"
-          hosts:
-          - "{{ ingress.hosts['redis-commander'].host }}"
+        - secretName: "redis-commander-ingress-secret"
+          hosts: "{{ __redis_ui_hosts }}"
 
 - name: install kafka-ui
   environment: "{{ __proxy_env | default(omit) }}"
@@ -91,7 +82,7 @@
           cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
         ingressClassName: "{{ ingress.class_name }}"
         path: "{{ ingress.hosts['kafka-ui'].path }}"
-        host: "{{ ingress.hosts['kafka-ui'].host }}"
+        host: "{{ __kafka_ui_hosts[0] }}"
         tls:
           enable: true
-          secretName: "{{ ingress.hosts['kafka-ui'].host }}"
+          secretName: "kafka-ui-ingress-secret"

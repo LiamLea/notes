@@ -13,7 +13,7 @@
         - [（3）初始化数据库](#3初始化数据库)
       - [2.其他服务的配置](#2其他服务的配置)
         - [（1） 配置sentinel（在配置服务器上配置）](#1-配置sentinel在配置服务器上配置)
-      - [部署其他服务](#部署其他服务)
+      - [3.部署其他服务](#3部署其他服务)
         - [（1）构建](#1构建)
         - [（2）启动其他服务](#2启动其他服务)
       - [服务访问地址](#服务访问地址)
@@ -77,7 +77,7 @@ docker run --name nacos-standalone -e MODE=standalone -d -p 8848:8848 -p 9848:98
     spring:
       cloud:
         sentinel:
-          eager: true   #是否开启
+          enabled: false #是否开启sentinel
           transport:
             dashboard: <sentinel_endpoint>
     ```
@@ -107,7 +107,9 @@ spring:
         dashboard: localhost:8880
 ```
 
-#### 部署其他服务
+#### 3.部署其他服务
+
+存在一个nacos的bug: [参考](https://gitee.com/smallc/SpringBlade/issues/I4S54L)
 
 ##### （1）构建
 ```shell

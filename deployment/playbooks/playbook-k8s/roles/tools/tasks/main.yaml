@@ -21,5 +21,38 @@
       __path: "/tmp/"
   when: chart.local_dir.strip() != ""
 
+- name: set fact
+  set_fact:
+    __adminer_hosts: []
+    __adminer_ingress_hosts: []
+    __redis_ui_hosts: []
+    __redis_ui_ingress_hosts: []
+    __kafka_ui_hosts: []
+
+- name: set __adminer_hosts fact
+  set_fact:
+    __adminer_hosts: "{{ __adminer_hosts + [(ingress.hosts['adminer']['host'] + '.' + item).strip('.')] }}"
+  with_items: "{{ ingress.hosts['adminer']['domains'] }}"
+
+- name: set __adminer_ingress_hosts fact
+  set_fact:
+    __adminer_ingress_hosts: "{{ __adminer_ingress_hosts + [{'host': item,'paths': [{'path': ingress.hosts['adminer']['path'], 'pathType': 'ImplementationSpecific'}]}] }}"
+  with_items: "{{ __adminer_hosts }}"
+
+- name: set __redis_ui_hosts fact
+  set_fact:
+    __redis_ui_hosts: "{{ __redis_ui_hosts + [(ingress.hosts['redis-commander']['host'] + '.' + item).strip('.')] }}"
+  with_items: "{{ ingress.hosts['redis-commander']['domains'] }}"
+
+- name: set __redis_ui_ingress_hosts fact
+  set_fact:
+    __redis_ui_ingress_hosts: "{{ __redis_ui_ingress_hosts + [{'host': item,'paths': [ingress.hosts['redis-commander']['path']]}] }}"
+  with_items: "{{ __redis_ui_hosts }}"
+
+- name: set __kafka_ui_hosts fact
+  set_fact:
+    __kafka_ui_hosts: "{{ __kafka_ui_hosts + [(ingress.hosts['kafka-ui']['host'] + '.' + item).strip('.')] }}"
+  with_items: "{{ ingress.hosts['kafka-ui']['domains'] }}"
+
 - name: setup tools
   include_tasks: setup_tools.yaml

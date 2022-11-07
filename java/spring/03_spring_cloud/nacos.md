@@ -7,7 +7,12 @@
     - [概述](#概述)
       - [1.nacos](#1nacos)
         - [（1）what](#1what)
+      - [2.端口（2.0有变化）](#2端口20有变化)
     - [部署](#部署)
+      - [1.安装](#1安装)
+        - [（1）单机模式](#1单机模式)
+        - [（2）使用mysql（以单机模式为例）](#2使用mysql以单机模式为例)
+        - [（3）集群模式（至少三个节点）](#3集群模式至少三个节点)
     - [客户端使用](#客户端使用)
       - [1.注册中心](#1注册中心)
         - [（1）引入依赖](#1引入依赖)
@@ -34,12 +39,55 @@ nacos = eureka + config + bus
 * 配置中心
 * 消息总线
 
+#### 2.端口（2.0有变化）
+
+|端口|说明|
+|-|-|
+|8848|1.0：客户端注册到服务端的这个端口|
+|9848|2.0：客户端注册到服务端的这个端口（grpc）|
+|9849|2.0：服务端互相通信的端，即集群（grpc）
+
+* 注意客户端使用时，不能直接指定grpc的端口，grpc的端口在server-addr端口上默认加1000
+  * 比如：grpc端口为19848
+  ```shell
+  #只能指定server-addr，然后加1000
+  --spring.cloud.nacos.discovery.server-addr=10.10.10.250:18848
+  ```
+
 ***
 
 ### 部署
 
+#### 1.安装
+
+##### （1）单机模式
+
 ```shell
-docker run --name nacos-quick -e MODE=standalone -p 8848:8848 -d nacos/nacos-server:2.0.2
+docker run --name nacos-quick \
+  -e MODE=standalone \
+  -p 8848:8848 -p 9848:9848 -p 9849:9849 \
+  -d nacos/nacos-server:2.0.2
+```
+
+#####（2）使用mysql（以单机模式为例）
+```shell
+docker run --name nacos-quick \
+  -e MODE=standalone \
+  -p 8848:8848 -p 9848:9848 -p 9849:9849 \
+  -e SPRING_DATASOURCE_PLATFORM=mysql \
+  -e MYSQL_SERVICE_HOST=10.10.10.163 -e MYSQL_SERVICE_PORT=32809 \
+  -e MYSQL_SERVICE_DB_NAME=nacos -e MYSQL_SERVICE_USER=root \
+  -e MYSQL_SERVICE_PASSWORD=cangoal \
+  -d nacos/nacos-server:2.0.2
+```
+
+##### （3）集群模式（至少三个节点）
+存在bug: 如果一个节点，即使注册上了服务列表也为空
+```shell
+docker run --name nacos-quick \
+  -e MODE=cluster -e NACOS_SERVERS="10.10.10.250:8848 10.10.10.251:8848 10.10.10.252:8848" \
+  -p 8848:8848 -p 9848:9848 -p 9849:9849 \
+  -d nacos/nacos-server:2.0.2
 ```
 
 ***

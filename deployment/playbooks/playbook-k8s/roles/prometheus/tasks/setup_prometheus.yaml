@@ -21,13 +21,11 @@
           annotations:
             cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
           ingressClassName: "{{ ingress.class_name }}"
-          hosts:
-          - "{{ ingress.hosts['alertmanager'].host }}"
+          hosts: "{{ __alertmanager_hosts }}"
           path: "{{ ingress.hosts['alertmanager'].path }}"
           tls:
-          - secretName: "{{ ingress.hosts['alertmanager'].host }}"
-            hosts:
-            - "{{ ingress.hosts['alertmanager'].host }}"
+          - secretName: "alertmanager-ingress-secret"
+            hosts: "{{ __alertmanager_hosts }}"
       configmapReload:
         prometheus:
           image:
@@ -62,13 +60,12 @@
           annotations:
             cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
           ingressClassName: "{{ ingress.class_name }}"
-          hosts:
-          - "{{ ingress.hosts['prometheus'].host }}"
+          hosts: "{{ __prometheus_hosts }}"
           path: "{{ ingress.hosts['prometheus'].path }}"
           tls:
-          - secretName: "{{ ingress.hosts['prometheus'].host }}"
-            hosts:
-            - "{{ ingress.hosts['prometheus'].host }}"
+          - secretName: "prometheus-ingress-secret"
+            hosts: "{{ __prometheus_hosts }}"
+
       pushgateway:
         image:
           repository: "{{ monitor.repository }}prom/pushgateway"
@@ -187,10 +184,8 @@
         annotations:
           cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
         ingressClassName: "{{ ingress.class_name }}"
-        hosts:
-        - "{{ ingress.hosts['grafana'].host }}"
+        hosts: "{{ __grafana_hosts }}"
         path: "{{ ingress.hosts['grafana'].path }}"
         tls:
-        - secretName: "{{ ingress.hosts['grafana'].host }}"
-          hosts:
-          - "{{ ingress.hosts['grafana'].host }}"
+        - secretName: "grafana-ingress-secret"
+          hosts: "{{ __grafana_hosts }}"

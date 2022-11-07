@@ -107,7 +107,6 @@ spec:
     name: http
     protocol: HTTP
   location: MESH_INTERNAL
-  resolution: STATIC
 
   #必须关联正确，否则访问不通（访问ip时，关联到了这个serviceentry，但是后端却没有关联）
   workloadSelector:
