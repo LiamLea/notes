@@ -39,6 +39,7 @@
   - [（1）利用文件查找](#1利用文件查找)
   - [（2）将该容器的网络命名空间挂载出来](#2将该容器的网络命名空间挂载出来)
 - [57.格式化磁盘: `wipefs`](#57格式化磁盘-wipefs)
+- [58.`ip route`有多个路由表](#58ip-route有多个路由表)
 
 <!-- /code_chunk_output -->
 
@@ -277,4 +278,21 @@ INODE=8036871;find /proc -lname "socket:\[$INODE\]" 2> /dev/null | head -n 1 | a
 #### 57.格式化磁盘: `wipefs`
 ```shell
 wipefs -a /dev/sda
+```
+
+#### 58.`ip route`有多个路由表
+* 查看路由表
+```shell
+cat /etc/iproute2/rt_tables
+
+255	local
+254	main    #平常使用的是这个表（真正路由也只有这个表有效）
+253	default
+0	unspec
+```
+
+* 列出所有路由
+```shell
+ip route show table <table_id>
+#e.g. ip route show table all
 ```

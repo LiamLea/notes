@@ -36,6 +36,8 @@
 
 ### 概述
 
+![](./imgs/overview_02.png)
+
 #### 1.listener
 [参考](https://www.envoyproxy.io/docs/envoy/latest/api-v3/listeners/listeners)
 
@@ -44,14 +46,18 @@
 * 注意在istio中：
   * 启动envoy之前，都会先设置**iptables**
   * 将所有 **进入流量** 转到envoy的 **15006** 端口
-    * 会利用 **元数据**（原始的目标地址、协议等信息），来匹配最佳的filter chain，进行处理
+      * 流量到达了15006这个listener上
+        * 会根据 元数据（目标地址、端口、协议等）匹配一个最佳的 **filter chain**
+        * 如果没有匹配到，则发送到 InboundPassthroughClusterIpv4 这个cluster上
   * 将所有 **外出流量** 转到envoy的 **15001** 端口
-    * 设置了`"use_original_dst": true`
-      * 会根据原始的目标地址，将该流量转到与之匹配的listener上
-        * 发往："1.1.1.1:9080"，
-        * 如果存在"1.1.1.1:9080"这个listener，则会匹配这个listener，不存在的话继续，
-        * 如果存在"0.0.0.0:9080"这个listener（0.0.0.0表示匹配所有），则会匹配这个listener
-      * 如果没有匹配的，则将流量发送到15001这个listener指定的cluster上（即PassthroughCluster）
+    * 流量到达了15001这个listener上（设置了`"use_original_dst": true`）
+      * 该listner根据 **元数据**（原始的目标地址即`ip+port`、协议等信息） 匹配最佳的 **listener** 去处理
+        * 发往："1.1.1.1:9080"，经过iptables转发到15001这个端口上（则15001这个listener进行处理）
+        * 如果存在"1.1.1.1:9080"这个listener，则会转交给这个listener，不存在的话继续
+        * 如果存在"0.0.0.0:9080"这个listener（0.0.0.0表示匹配所有），则会转交给这个listener
+      * 如果未匹配到则自己处理（即15001这个listener自己处理）
+        * 会将外出的流量发送到 PassthroughCluster 这个cluster上
+        * 其他流量则发送到 BlackHoleCluster 这个cluster上
 
 * 基本格式
 ```json
@@ -60,6 +66,7 @@
   "address": {},
   "listener_filters": [],     //增加一些额外的处理（比如检查tls、限制访问速率等）
   "filter_chains": [],        //只匹配其中最佳的chain（最佳匹配参考：https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener_components.proto#config-listener-v3-filterchainmatch）
+  "use_original_dst": true,   //当用iptables转发流量后，该listner根据 原始目标地址 匹配合适的listener去处理，如果未匹配到则自己处理
   "default_filter_chain": {},  //当流量在filter_chains中没有匹配的filter_chain，则使用default_filter_chain
   "traffic_direction": "<INBOUND | OUTBOUND>"   //流量的方向，是进入还是外出
 }
@@ -152,12 +159,23 @@
 
 #### 2.cluster
 
+[参考](https://www.envoyproxy.io/docs/envoy/v1.22.0/api-v3/config/cluster/v3/cluster.proto#envoy-v3-api-file-envoy-config-cluster-v3-cluster-proto)
+
+```json
+"cluster": {
+ "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+ "name": "",
+ "type": "ORIGINAL_DST",
+ "upstream_bind_config": {}   //指定用什么地址连接upstream servers（如果未指定，则系统默认）
+}
+```
 ##### （1）cluster
 * 一个cluster就是一组upstream hosts
   * 通过service discovery发现这个cluster中的members（即upstream hosts，即endpoints），发现后会进行监控检查
   * 流量发送到该cluster，会根据 负载策略 发送到其members上
 
 ##### （2）常用service discovery类型（cluster类型）
+[参考](https://www.envoyproxy.io/docs/envoy/v1.22.0/intro/arch_overview/upstream/service_discovery#arch-overview-service-discovery-types)
   * static
     * 静态设置memeber的endpoint（`loadAssignment.endpoints`）
   * original destination
@@ -263,7 +281,7 @@
     "typedConfig": {
         "@type": "type.googleapis.com/envoy.extensions.filters.listener.tls_inspector.v3.TlsInspector"
     },
-    
+
     //关闭指定端口的检测
     "filterDisabled": {
         "destinationPortRange": {
