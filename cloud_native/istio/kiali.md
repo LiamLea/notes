@@ -8,6 +8,7 @@
     - [概述](#概述)
       - [1.图的基本元素](#1图的基本元素)
       - [2.图示说明](#2图示说明)
+      - [3.日志功能使用](#3日志功能使用)
 
 <!-- /code_chunk_output -->
 
@@ -44,3 +45,10 @@
 |Service Nodes|展示service|
 |Rank|结合find和hide使用，rank对node进行排序（有两个指标：inbound edges和outbound edges，比如按照inbound edges进行排序，有最多inbound edges的node的rank=1，然后结合find和hide设置rank条件，从而过滤相应的node）|
 |Traffic Animation|开启流量的动态效果|
+
+#### 3.日志功能使用
+
+![](./imgs/kiali_log_01.png)
+![](./imgs/kiali_log_02.png)
+* 日志详情
+![](./imgs/kiali_log_03.png)

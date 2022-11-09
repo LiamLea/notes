@@ -114,6 +114,7 @@ target也可以是某条chain
 |MASQUERADE|源地址转换（转换成外出网卡的地址，不需要手动指定），同时也可以转换源端口|--to-ports|
 |REDIRECT|端口重定向|--to-ports|
 |LOG|用于记录日志，可以在DROP之前，进行LOG，进行查看DROP掉了哪些|
+|RETURN|立即返回，不再匹配chain|
 
 #### 7.数据包流程图
 ![](./imgs/iptables_01_new.png)

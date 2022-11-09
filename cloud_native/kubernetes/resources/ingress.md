@@ -273,6 +273,13 @@ spec:
            name: kangpaas-gate
            port:
              number: 8093
+     - path: /(ureport(/.*)?$)
+       pathType: Prefix
+       backend:
+         service:
+           name: blade-report
+           port:
+             number: 8108
   ...
 ```
 

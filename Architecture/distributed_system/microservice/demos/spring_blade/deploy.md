@@ -22,6 +22,8 @@
       - [2.部署（需要nginx）](#2部署需要nginx)
         - [（1）修改配置](#1修改配置)
         - [（2）部署](#2部署)
+    - [服务修改](#服务修改)
+      - [1.swagger](#1swagger)
     - [使用和配置](#使用和配置)
       - [1.配置菜单](#1配置菜单)
       - [2.使用代码生成](#2使用代码生成)
@@ -102,7 +104,7 @@ docker run --name sentinel -d -p 8858:8858 -d bladex/sentinel-dashboard
 spring:
   cloud:
     sentinel:
-      eager: true
+      enabled: false
       transport:
         dashboard: localhost:8880
 ```
@@ -181,6 +183,25 @@ upstream gateway {
 cp docker/nginx.k8s.conf /etc/nginx/nginx.conf
 cp -r dist /usr/share/nginx/html
 systemctl restart nginx
+```
+
+***
+
+### 服务修改
+
+#### 1.swagger
+需要修改配置
+```yaml
+routes:
+  - name: 授权模块
+    uri: blade-gateway  #指定gateway的地址（这里用的是域名）
+    location: /blade-auth/v2/api-docs
+  - name: 工作台模块
+    uri: blade-gateway
+    location: /blade-desk/v2/api-docs
+  - name: 系统模块
+    uri: blade-gateway
+    location: /blade-system/v2/api-docs
 ```
 
 ***

@@ -11,8 +11,8 @@
       - [1.istio的基本概念（与k8s的关联）](#1istio的基本概念与k8s的关联)
       - [2.工作原理](#2工作原理)
         - [（1）工作原理](#1工作原理)
-        - [（2）两个特殊的listener](#2两个特殊的listener)
-        - [（3）配置原理](#3配置原理)
+        - [（2）两个特殊的listener 和 配置原理](#2两个特殊的listener-和-配置原理)
+        - [（3）magical  number: 6](#3magical-number-6)
       - [3.支持转发的流量](#3支持转发的流量)
         - [（1）自动识别协议（当没有指定协议时，默认自动识别）（不建议开启）](#1自动识别协议当没有指定协议时默认自动识别不建议开启)
         - [（2）明确指定协议（server first protocol需要明确指定）](#2明确指定协议server-first-protocol需要明确指定)
@@ -63,31 +63,44 @@
 #### 2.工作原理
 
 ##### （1）工作原理
+![](./envoy/imgs/overview_02.png)
+* 这个listener不代表实际监听的port，而是用来匹配数据包的目的地址
+* 注意在istio中：
+  * 启动envoy之前，都会先设置**iptables**
+  * 将所有 **进入流量** 转到envoy的 **15006** 端口
+      * 流量到达了15006这个listener上
+        * 会根据 元数据（目标地址、端口、协议等）匹配一个最佳的 **filter chain**
+        * 如果没有匹配到，则发送到 InboundPassthroughClusterIpv4 这个cluster上
+  * 将所有 **外出流量** 转到envoy的 **15001** 端口
+    * 流量到达了15001这个listener上（设置了`"use_original_dst": true`）
+      * 该listner根据 **元数据**（原始的目标地址即`ip+port`、协议等信息） 匹配最佳的 **listener** 去处理
+        * 发往："1.1.1.1:9080"，经过iptables转发到15001这个端口上（则15001这个listener进行处理）
+        * 如果存在"1.1.1.1:9080"这个listener，则会转交给这个listener，不存在的话继续
+        * 如果存在"0.0.0.0:9080"这个listener（0.0.0.0表示匹配所有），则会转交给这个listener
+      * 如果未匹配到则自己处理（即15001这个listener自己处理）
+        * 会将外出的流量发送到 PassthroughCluster 这个cluster上
+        * 其他流量则发送到 BlackHoleCluster 这个cluster上
 
-* 启动envoy之前，都会先设置**iptables**
-* 将所有 **进入流量** 转到envoy的 **15006** 端口
-  * 会利用 **元数据**（原始的目标地址、协议等信息），来匹配最佳的filter chain，进行处理
-* 将所有 **外出流量** 转到envoy的 **15001** 端口
-  * 设置了`"use_original_dst": true`
-    * 会根据原始的目标地址，将该流量转到与之匹配的listener上
-      * 发往："1.1.1.1:9080"，
-      * 如果存在"1.1.1.1:9080"这个listener，则会匹配这个listener，不存在的话继续，
-      * 如果存在"0.0.0.0:9080"这个listener（0.0.0.0表示匹配所有），则会匹配这个listener
-    * 如果没有匹配的，则将流量发送到15001这个listener指定的cluster上（即PassthroughCluster）
-
-##### （2）两个特殊的listener
+##### （2）两个特殊的listener 和 配置原理
 
 * virtualInbound
   * 所以 **进入**流量都要经过这个listener
 * virtualOutBound
-  * 所有 **外出**流量且**未匹配**到listener的 都要经过这个listener，即PassthroughCluster
+  * 所有 **外出**流量都要经过这个listener
 
-##### （3）配置原理
 * 所有关于Inbound的配置，是在VirtualInbound这个listener上配的
 * 所有关于Outbound的配置，是在所有listener上配的（不包括两个特殊的listener）
 
-#### 3.支持转发的流量
+##### （3）magical  number: 6
 
+* 15006
+  * 所有流量入口
+* `127.0.0.6` 和 `::6`（[参考](https://github.com/istio/istio/issues/29603)）
+  * 用于标记入站流量，且永远不会命中出站流量的iptables规则
+  * istio proxy用于和upstream（即后端代理的服务）建立连接的地址
+
+#### 3.支持转发的流量
+[参考](https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/)
 * 支持转发所有TCP的流量
 * 不支持转发非TCP的流量（比如UDP），即istio proxy不会拦截该流量（即该流量不经过istio proxy）
 
@@ -96,7 +109,7 @@
   * server first protocol与此种方式不兼容，所以必须明确指定协议（比如：TCP、Mysql等）
   * 不建议开启
     * 原因：可能会把http协议检测成http2，导致流量不通
-    * 关闭后，默认都是tcp协议
+    * 关闭后，没有指定的默认都是tcp协议
 * istio能够自动识别的协议：http 和 http2
 * 如果无法识别协议，则认为是纯TCP流量
 * 底层原理：通过设置http_inspector（listener filter）
@@ -189,6 +202,7 @@ spec:
 * grpc
 * grpc-web
 * http
+  * 不支持1.0，nginx（proxy时，默认使用的是1.0，所以需要明确指定为1.1）
 * http2
 * https
 * mongo
