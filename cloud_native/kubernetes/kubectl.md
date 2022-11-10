@@ -15,12 +15,13 @@ apiserver的客户端程序，是k8s集群的管理入口
       - [5.查看已创建的某种资源实例](#5查看已创建的某种资源实例)
       - [6.查看某个实例的详细信息](#6查看某个实例的详细信息)
       - [7.查询node节点的状态](#7查询node节点的状态)
-    - [管理pods](#管理pods)
+    - [管理pods和controllers](#管理pods和controllers)
       - [1.创建pods](#1创建pods)
       - [2.动态扩容和缩容pods](#2动态扩容和缩容pods)
       - [3.升级镜像](#3升级镜像)
       - [4.在容器内执行指令](#4在容器内执行指令)
       - [5.查看日志](#5查看日志)
+      - [6.暂停和恢复 daemonset](#6暂停和恢复-daemonset)
     - [管理标签和污点](#管理标签和污点)
       - [1.给资源打标签](#1给资源打标签)
       - [2.删除资源的某个标签](#2删除资源的某个标签)
@@ -166,7 +167,8 @@ kubectl describe nodes xx
 
 ***
 
-### 管理pods
+### 管理pods和controllers
+
 #### 1.创建pods
 ```shell
 kubectl run NAME \          #NAME为pod控制器的名字
@@ -198,6 +200,18 @@ kubectl logs POD_NAME
             -f            #follow
             -p            #previous，查看该容器的上一个实例（常用于查询终止的容器的日志）
                           #当容器重新启动，kubelet会保留该容器上一个终止的实例
+```
+
+#### 6.暂停和恢复 daemonset
+
+* 暂停daemonset
+```shell
+kubectl -n <namespace> patch daemonset <daemonset> -p '{"spec": {"template": {"spec": {"nodeSelector": {"non-existing": "true"}}}}}'
+```
+
+* 恢复daemonset
+```shell
+kubectl -n <namespace> patch daemonset <daemonset> --type json -p='[{"op": "remove", "path": "/spec/template/spec/nodeSelector/non-existing"}]'
 ```
 
 ***

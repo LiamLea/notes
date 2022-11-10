@@ -330,7 +330,7 @@ spec:
 
   #访问日志配置
   accessLogging:
-  - disabled: true
+  - disabled: false
 
   #tracing配置
   tracing:

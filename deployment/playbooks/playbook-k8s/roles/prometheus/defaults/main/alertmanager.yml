@@ -2,6 +2,7 @@ __config_alertmanager:
   receivers:
   - name: default-receiver
     webhook_configs: "{{ monitor.prometheus.config.webhook_configs }}"
+    email_configs: "{{ monitor.prometheus.config.email_configs }}"
 
   route:
     receiver: default-receiver
