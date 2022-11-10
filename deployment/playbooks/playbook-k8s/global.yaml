@@ -217,6 +217,8 @@ monitor:
       external_url: "https://{{ domains[0] }}:{{ basic.ingress_nginx.config.https_port }}/prometheus"
       # e.g. {send_resolved: true, url: "<url|no empty>", max_alerts: 10}
       webhook_configs: []
+      # e.g. {send_resolved: true, smarthost: smtp.qq.com:587 ,from: 1059202624@qq.com, to: 1059202624@qq.com, auth_username: 1059202624@qq.com, auth_password: 'xx'}
+      email_configs: []
       scrape_interval: "30s"
       #e.g. "10.10.10.1"
       icmp_probe: []

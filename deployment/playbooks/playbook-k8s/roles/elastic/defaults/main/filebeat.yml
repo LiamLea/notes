@@ -15,6 +15,9 @@ __config_filebeat: |
             - not:
                 regexp:
                   kubernetes.pod.name: "iot-.*-backend"
+            - not:
+                equals:
+                  kubernetes.container.name: "istio-proxy"
           config:
           - type: container
             paths:
