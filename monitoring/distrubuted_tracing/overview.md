@@ -11,16 +11,12 @@
         - [（2）示例](#2示例)
         - [（3）时间分析](#3时间分析)
       - [3.tracing fields](#3tracing-fields)
-      - [4.opentelemetry（标准化）](#4opentelemetry标准化)
-        - [（1）术语](#1术语)
-        - [（2）signals（监控数据）](#2signals监控数据)
-        - [（3）sample数据](#3sample数据)
-      - [5.前提](#5前提)
-      - [6.两种装配模式](#6两种装配模式)
+      - [4.前提](#4前提)
+      - [5.两种装配模式](#5两种装配模式)
         - [（1）automatic instrumentation](#1automatic-instrumentation)
         - [（2）manual instrumentation](#2manual-instrumentation)
-      - [7.采集策略](#7采集策略)
-      - [8.常用语言的装配](#8常用语言的装配)
+      - [6.采集策略](#6采集策略)
+      - [7.常用语言的装配](#7常用语言的装配)
 
 <!-- /code_chunk_output -->
 
@@ -29,7 +25,7 @@
 ![](./imgs/overview_04.png)
 * 服务发送请求，会生成一个新的span（比如图中的span B是service 1生成的）
   * 展示的时候，这个span会跟发起的服务关联（比如图中的B是service 1关联）
-* 服务收到请求后，会生成一个新的span（比如图中的span A 和 C）
+* 服务收到请求后，会生成一个新的span（比如图中的span A 、span C等）
 
 #### 1.distributed tracing
 * 现有的分布式Trace基本都是采用了google 的Dapper设计
@@ -79,71 +75,13 @@
 |traceid|唯一标识一条调用链|
 |traceflags|元数据（可以自定义）|
 
-#### 4.opentelemetry（标准化）
-
-将OpenTracing和OpenCensus合并
-* 提供 监控数据 存入 后端存储 的API标准
-* 提供 各种语言的SDK（遵循API标准）
-  * 用于装配在服务上，采集服务的signals（包括：traces、metrics、logs、baggage）
-
-##### （1）术语
-
-|term|description|
-|-|-|
-|OTel|opentelemetry|
-|OTLP|opentelemetry protocol|
-
-##### （2）signals（监控数据）
-
-|signal|description|
-|-|-|
-|traces|链路数据|
-|metrics|指标数据（如：读写的总字节数、进程资源的使用的等）|
-|logs|访问日志等（还不成熟）|
-|baggage|用户在context中定义的元数据|
-
-##### （3）sample数据
-
-* span数据格式
-
-```json
-{
-  //基本信息
-  "trace_id": "7bba9f33312b3dbb8b2c2c62bb7abe2d",
-  "name": "/v1/sys/health",
-  "parent_id": "",
-  "span_id": "086e83747d0e381e",
-
-  //开始和结束时间
-  "start_time": "2021-10-22 16:04:01.209458162 +0000 UTC",
-  "end_time": "2021-10-22 16:04:01.209514132 +0000 UTC",
-
-  //状态（当发生异常，且处理了则为ERROR，未处理UNSET）
-  "status_code": "STATUS_CODE_OK",
-  "status_message": "",
-
-  //元数据
-  "attributes": {
-    "net.transport": "IP.TCP",
-    "net.peer.ip": "172.17.0.1"
-  },
-
-  //日志数据
-  "events": {
-    "name": "",
-    "message": "OK",
-    "timestamp": "2021-10-22 16:04:01.209512872 +0000 UTC"
-  }
-}
-```
-
-#### 5.前提
+#### 4.前提
 * 应用需要传递相应的http header
   * 所以需要对应用进行更改
     * 有两种装配模式
     * java更容易，因为可以通过字节码进行注入，不需要更改任何代码）
 
-#### 6.两种装配模式
+#### 5.两种装配模式
 
 ##### （1）automatic instrumentation
 使用指定的框架和库，这样能够自动生产span
@@ -151,12 +89,12 @@
 ##### （2）manual instrumentation
 需要在代码中调用相应的SDK，开始和结束一个span
 
-#### 7.采集策略
+#### 6.采集策略
 
 * Sample everything
   * 适合测试环境，不适合生产环境，成本比较大
 
-#### 8.常用语言的装配
+#### 7.常用语言的装配
 
 下面以opentelemtry为例子，[参考](https://opentelemetry.io/docs/instrumentation/)
 
