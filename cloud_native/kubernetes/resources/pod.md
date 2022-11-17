@@ -21,6 +21,7 @@
       - [8.priority和preemption](#8priority和preemption)
         - [（1）priority](#1priority)
         - [（2）preemption policy](#2preemption-policy)
+      - [9.restart 和 recreate](#9restart-和-recreate)
     - [资源清单](#资源清单)
       - [1.基本格式](#1基本格式)
       - [2.环境变量设置](#2环境变量设置)
@@ -146,6 +147,11 @@ PodInitializing</br>Running|所有初始化容器都执行成功
   * 不影响已经调度的pods
 * PreemptLowerPriority（默认）
   * 影响已经调度的pods
+
+#### 9.restart 和 recreate
+
+* restart（重启pod，一般当容器运行错误时）
+* recreate（重新创建pod，当重新调度pod时）
 
 ***
 
