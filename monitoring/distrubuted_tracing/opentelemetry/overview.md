@@ -11,7 +11,12 @@
         - [（1）数据处理: collector（与jaeger的collector不同）](#1数据处理-collector与jaeger的collector不同)
         - [（2）存储存储: TSDB、Trace DB等](#2存储存储-tsdb-trace-db等)
       - [3.signals（监控数据）](#3signals监控数据)
-      - [4.sample数据](#4sample数据)
+      - [4. context propagation（通过Propagators）](#4-context-propagation通过propagators)
+        - [（1）tracecontext（默认开启）](#1tracecontext默认开启)
+        - [（2）baggage（默认开启）](#2baggage默认开启)
+        - [（3）b3（即b3 single，即只有一个http header）](#3b3即b3-single即只有一个http-header)
+        - [（4）b3multi（有多个http header）](#4b3multi有多个http-header)
+      - [5.sample数据](#5sample数据)
       - [5.demo](#5demo)
 
 <!-- /code_chunk_output -->
@@ -41,7 +46,7 @@
 * 用于 处理 数据
   * 支持多种数据源（即receivers）和backend（exporters）
 * 哪些场景需要：
-  * 比如: 需要把metrics存入prometheus，这时需要collector来采集metrics，然后prometheus到collector采集metrics
+  * 比如: 可以把多个服务的metrics发往一个collector，然后prometheus到collector采集metrics
 
 ##### （2）存储存储: TSDB、Trace DB等
 
@@ -54,7 +59,43 @@
 |logs|访问日志等（还不成熟）|
 |baggage|用户在context中定义的元数据|
 
-#### 4.sample数据
+#### 4. context propagation（通过Propagators）
+
+不同的propagators就是添加不同的http header，来传递上下文
+常用propagators（[参考](https://github.com/open-telemetry/opentelemetry-java/tree/main/sdk-extensions/autoconfigure#propagator)）:
+
+##### （1）tracecontext（默认开启）
+* http header
+```yaml
+traceparent: <version>-<trace_id>-<parent_id>-<trace_flags>
+```
+
+##### （2）baggage（默认开启）
+* 用于传递用户定义的信息（貌似只能在代码中实现添加baggage）
+* http header
+```yaml
+baggage: key1=value1;property1;property2, key2 = value2, key3=value3; propertyKey=propertyValue
+```
+
+##### （3）b3（即b3 single，即只有一个http header）
+* http header
+```yaml
+#最后两个字段可选的
+#注意这里的SpanID就相当于traceparent中的<parent_id>
+b3: {TraceId}-{SpanId}-{SamplingState}-{ParentSpanId}
+```
+
+##### （4）b3multi（有多个http header）
+* http header
+```yaml
+x-b3-traceid: 33b048580e8e53788bc12faadc74e914
+x-b3-spanid: 47164b7954a4b30c
+#下面两个不是必须的
+x-b3-sampled: 1
+x-b3-parentspanid: 0694bd1dd428ffd2
+```
+
+#### 5.sample数据
 
 * span数据格式
 

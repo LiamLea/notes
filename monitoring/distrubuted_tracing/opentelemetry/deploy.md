@@ -65,6 +65,10 @@ otel.exporter.otlp.endpoint=<otlp_endpoint> #默认tracing、metrics、logging�
 
 # otel.metrics.exporter=none，不发送metrics
 otel.exporter.otlp.metrics.endpoint=<collector_endpoint>    #指定metrics发往的地址（会覆盖上面的配置）
+#直接暴露metrics，不发往collector（与上面配置二选一即可）
+otel.metrics.exporter=prometheus
+otel.exporter.prometheus.port=9464
+otel.exporter.prometheus.host=0.0.0.0
 
 #默认就是none，表示不发送日志数据
 otel.logs.exporter=none

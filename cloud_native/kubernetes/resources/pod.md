@@ -151,7 +151,9 @@ PodInitializing</br>Running|所有初始化容器都执行成功
 #### 9.restart 和 recreate
 
 * restart（重启pod，一般当容器运行错误时）
+  * 查询restart记录: `kubectl describe pods xxx`
 * recreate（重新创建pod，当重新调度pod时）
+  * 查询recreate记录: `kubectl get rs`
 
 ***
 
@@ -174,6 +176,10 @@ spec:
     - containerPort: <port>
       protocol: TCP   #TCP、UDP或者SCTP
 
+
+    #使用root用户
+    securityContext:
+      runAsUser: 0
 
     #挂在逻辑卷
     volumeMounts:

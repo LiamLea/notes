@@ -48,6 +48,12 @@ kubernetes:
       service_subnet: 10.96.0.0/12
       pod_subnet: 10.244.0.0/16
     nodeport_range: 10000-65535
+  backup:
+    image: "{{ registry_prefix }}bitnami/etcd:3.5.6"
+    schedule: "0 0 * * *"
+    dir: /tmp/
+    #how many days will these files keep
+    reservation: 7
 
 calico:
   repository: "{{ registry_prefix }}"

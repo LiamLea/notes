@@ -10,6 +10,8 @@
       - [1.kiali中几种log的集中展示](#1kiali中几种log的集中展示)
     - [tracing（目前只支持http协议）](#tracing目前只支持http协议)
       - [1.前提](#1前提)
+      - [2.context propagator](#2context-propagator)
+        - [（1）http header](#1http-header)
 
 <!-- /code_chunk_output -->
 
@@ -52,10 +54,24 @@
 * 应用需要传递相应的http header，因为envoy不能将进入流量和外出流量进行关联，所以需要应用传递相应的http头
 
 * 必须传递的http header: `x-request-id`
-* 其他需要传递的http header（根据使用的trace banend决定），参考下方表格
+  * 用于关联 日志 和 tracing
+* 其他需要传递的http header（根据使用的trace backend决定），参考下方表格
 
 |使用的trace backend|应用需要支持的http header|
 |-|-|
 |Zipkin, Jaeger, Stackdriver等|`x-b3-*`|
 |Datadog|`x-datadog-*`|
 |Lightstep|`x-ot-span-context`|
+
+#### 2.context propagator
+
+##### （1）http header
+```yaml
+x-request-id: c688b06e-8d93-9c6a-952b-01ac20e1a3e9
+
+#使用的是b3multi propagator
+x-b3-traceid: 33b048580e8e53788bc12faadc74e914
+x-b3-spanid: 47164b7954a4b30c
+x-b3-parentspanid: 0694bd1dd428ffd2
+x-b3-sampled: 1
+```

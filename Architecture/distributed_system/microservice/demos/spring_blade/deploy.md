@@ -43,7 +43,7 @@ SpringBlade
 ├── blade-common -- 常用工具封装包（无需启动）
 ├── blade-gateway -- Spring Cloud 网关
 ├── blade-ops -- 运维中心
-├    ├── blade-admin -- spring-cloud后台管理
+├    ├── blade-admin -- spring-cloud后台管理（不需要）
 ├    ├── blade-develop -- 代码生成
 ├    ├── blade-resource -- 资源管理
 ├    ├── blade-seata-order -- seata分布式事务demo
@@ -53,7 +53,7 @@ SpringBlade
 ├    ├── blade-log -- 日志模块
 ├    ├── blade-system -- 系统模块
 ├    └── blade-user -- 用户模块
-├── blade-service-api -- 业务模块api封装
+├── blade-service-api -- 业务模块api封装（无需启动）
 ├    ├── blade-desk-api -- 工作台api
 ├    ├── blade-dict-api -- 字典api
 ├    ├── blade-system-api -- 系统api
@@ -146,13 +146,13 @@ for i in `jps | awk '{print $1}'`;do kill $i;done
 #服务治理(sentinel)
 http://<ip>:8858/
 
-#spring boot后台管理:
+#spring boot后台管理（blade-admin）:
 http://<ip>:7002
 
-#接口服务：
+#接口服务（blade-swagger）：
 http://<ip>:18000/doc.html
 
-#报表服务:
+#报表服务（blade-report）:
 http://<ip>:8108/ureport/designer
 ```
 
