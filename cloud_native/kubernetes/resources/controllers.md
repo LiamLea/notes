@@ -288,6 +288,51 @@ spec:
 #### 6.Cronjob
 周期性运行
 
+* 注意job 和 pod不一样
+```shell
+kubectl get cronjob
+kubectl get job
+kubectl get pod
+```
+
+* 存在bug: [参考]()
+  * 当pod restartPolicy设为
+    * OnFailure时，job失败了，pod不会保留
+    * Never时，job失败了，pod会保留（并且还是会创建新的pod，相当于重启）
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: <job-name>
+spec:
+
+  #代表每分钟执行一次
+  schedule: "* * * * *"       
+
+  #允许同时执行（比如上次job还没执行完，如果周期到了，继续执行新的job）
+  concurrencyPolicy: default  
+
+  #只保留一个失败的job（注意不是pod）
+  failedJobsHistoryLimit: 1
+
+  #只保留一个成功的job
+  successfulJobsHistoryLimit: 1
+
+  #当错过的job, 错过的时间超过这里的时间，则不会再执行了，直接认为是失败的job
+  startingDeadlineSeconds: <int>
+
+  #设为true的，表示暂停这个job（即停止执行cronjob）
+  suspend: false
+
+  jobTemplate:
+    spec:
+      #设置job的active deadline（即当job允许的时间超过了这个时间，就标记为失败，即删除指定的pod）
+      activeDeadlineSeconds: <int>
+      template:
+        spec: <pod_spec>    #注意：restartPolicy设为Never（是个bug）
+```
+
 ***
 
 ### 运维

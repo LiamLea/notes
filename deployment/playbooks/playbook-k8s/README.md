@@ -371,6 +371,8 @@ make install_harbor
 vim push_images.yaml
 ```
 ```yaml
+#if noe set exception_pattern , it will add registry prefix in front of all images
+#if set exception_pattern, it will replace the address(i.e. xx in xx/yy/zz) with the target_registry
 vars:
   target_registry: "10.10.10.250"
   username: "admin"

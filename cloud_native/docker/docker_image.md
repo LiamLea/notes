@@ -5,7 +5,11 @@
 
 - [docker镜像](#docker镜像)
     - [概述](#概述)
-      - [1.image](#1image)
+      - [1.image: a JSON manifest(包含files的信息) + files(config、layer)](#1image-a-json-manifest包含files的信息-filesconfig-layer)
+        - [（1）index（在registry中存储会有index）](#1index在registry中存储会有index)
+        - [（2）image content: a JSON manifest(包含files的信息) + files(config、layer)](#2image-content-a-json-manifest包含files的信息-filesconfig-layer)
+        - [（3）snapshot（对于containerd）](#3snapshot对于containerd)
+        - [（4）利用ctr查看镜像的content](#4利用ctr查看镜像的content)
       - [2.container](#2container)
       - [3.镜像采用分层构建机制](#3镜像采用分层构建机制)
         - [3.1 概述](#31-概述)
@@ -22,9 +26,85 @@
 
 ### 概述
 
-#### 1.image
-是一个只读模板
-**组成：a JSON manifest（用于描述该镜像的信息） + individual layer files**
+#### 1.image: a JSON manifest(包含files的信息) + files(config、layer)
+是一个只读模板，[参考](https://github.com/containerd/containerd/blob/main/docs/content-flow.md)
+
+##### （1）index（在registry中存储会有index）
+* 一个镜像有多个manifest（因为每个平台对应一个manifest，比如linux-adm64平台需要使用相应的manifest）
+* index为manifest的哈希
+```shell
+#aiops/data-cleaning:zdgt这个镜像只有一个manifest（即e7c...）
+$ ls /data/registry/docker/registry/v2/repositories/aiops/data-cleaning/_manifests/tags/zdgt/index/sha256/
+
+e7cb24b1b1d23063777027fa448821b89e334e36e2505bf36d0047a74723f20b
+```
+
+
+##### （2）image content: a JSON manifest(包含files的信息) + files(config、layer)
+
+* a JSON manifest（用于描述该镜像的信息）
+```json
+{
+   "schemaVersion": 2,
+   "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+
+   //config文件（根据digest去查找config），即镜像的启动命令等等
+   "config": {
+      "mediaType": "application/vnd.docker.container.image.v1+json",
+      "size": 3834,
+      "digest": "sha256:4c5c325303915ea5cad48921922fae6f7d877aa7b1bafde068225dc36e5e3468"
+   },
+
+   //layers文件（根据digest去查找layer）
+   "layers": [
+      {
+         "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+         "size": 18093,
+         "digest": "sha256:637e7e7d198ccf674d454ac31556613afc10283292bc05325cc8a185f7aeca3e"
+      }
+
+      //...
+   ]
+}
+```
+
+* `docker inspect <image>`的id说明
+```json
+{
+
+  //这个id是该镜像config file的哈希
+  "id": "sha256:4c5c325303915ea5cad48921922fae6f7d877aa7b1bafde068225dc36e5e3468",
+
+  //这个镜像后的id是manifest的哈希
+  "repoDigests": [
+    "10.10.10.250/library/calico/cni@sha256:7aa6c97fc5f6a6959f8b06bacc12e6f593c68e6e0839e1f454ba0b9523255a79"
+  ]
+}
+```
+
+##### （3）snapshot（对于containerd）
+[参考](https://blog.mobyproject.org/where-are-containerds-graph-drivers-145fc9b7255)
+* 容器的只读层和可写层
+  * 因为content是压缩过的镜像内容，且不允许修改，所以需要snapshot来管理只读层和可写层
+  * 内部整合之后，挂载到`/run/containerd/io.containerd.runtime.v2.task/k8s.io/<container_id>/rootfs`目录下，文件系统类型为overlay
+
+##### （4）利用ctr查看镜像的content
+```shell
+$ ctr -n k8s.io content ls | grep kube-controller
+
+DIGEST									SIZE	AGE		LABELS
+#这个label中有containerd.io/uncompressed，表示这个layer 没有压缩时的哈希
+#  find / -iname '31faef45b5465d0e4a613ea5d7398a431f1964dadb129aa214d2ba6b4955c8b2'
+sha256:31faef45b5465d0e4a613ea5d7398a431f1964dadb129aa214d2ba6b4955c8b2	28.08MB	7 months	containerd.io/uncompressed=sha256:e762f80a5ad3e5009de92a6cb3418de4e0266e7451276e742bb793df9225f4bb,containerd.io/distribution.source.10.10.10.250=library/k8s.gcr.io/kube-controller-manager
+
+#这个label中有containerd.io/gc.ref.content，表示这个是manifest的哈希
+# find / -iname '4383e498ee2eb0cbbf56a415b382ede538acff8aec6366a589d0e9bb12723922'
+sha256:4383e498ee2eb0cbbf56a415b382ede538acff8aec6366a589d0e9bb12723922	949B	7 months	containerd.io/gc.ref.content.l.2=sha256:31faef45b5465d0e4a613ea5d7398a431f1964dadb129aa214d2ba6b4955c8b2,containerd.io/gc.ref.content.l.1=sha256:15663828260b844f6fd9637195bf716ca809a9020b913a032f03ff06c31cf985,containerd.io/gc.ref.content.l.0=sha256:ab2f6dae3b543cfb15c6bbc4ce6368bb84fd76fcb08efb54fb9345240e9f4e34,containerd.io/gc.ref.content.config=sha256:790d6af1dbdc34750316956467c9713468594ee9ec35d7e5b25bdd71841dac1b,containerd.io/distribution.source.10.10.10.250=library/k8s.gcr.io/kube-controller-manager
+
+#这个label中有containerd.io/gc.ref，表示这个可能是config file的哈希（通过下面方式查看里面内容可以确认）
+# find / -iname '790d6af1dbdc34750316956467c9713468594ee9ec35d7e5b25bdd71841dac1b'
+sha256:790d6af1dbdc34750316956467c9713468594ee9ec35d7e5b25bdd71841dac1b	1.618kB	7 months	containerd.io/gc.ref.snapshot.overlayfs=sha256:dfdeb512861694ed17c8df616fd704108c065901346778688f7b4d3db4c9ceb8,containerd.io/distribution.source.10.10.10.250=library/k8s.gcr.io/kube-controller-manager
+```
 
 #### 2.container
 容器是镜像的可运行实例

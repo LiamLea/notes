@@ -1,1 +1,18 @@
-#e.g. taint some nodes
+#e.g. do some init jobs in k8s
+
+
+# - name: get ectd image
+#   shell: "kubectl get pods -n kube-system -l component=etcd -o jsonpath='{$.items[0].spec.containers[0].image}'"
+#   register: get_etcd_image
+#
+# - name: set fact
+#   set_fact:
+#     __etcd_backup_image: "{{ get_etcd_image.stdout }}"
+
+- name: copy etcd back CronJob
+  template:
+    src: etcd_backup.yaml.j2
+    dest: /etc/kubernetes/etcd_backup.yaml
+
+- name: apply etcd back CronJob
+  shell: "kubectl apply -f /etc/kubernetes/etcd_backup.yaml -n kube-system"
