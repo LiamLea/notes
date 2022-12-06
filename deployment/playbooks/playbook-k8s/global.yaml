@@ -93,6 +93,7 @@ chart:
 
   #if the charts are local, set local directory
   #or will use the remote repo
+  #local_dir: "/root/ansible/charts" ,this is path in container, so you should put charts in the current directory/charts
   local_dir: ""
 
 storage_class:
@@ -515,3 +516,23 @@ service_mesh:
       disableSpanReporting: false
     accessLogging:
       disabled: true
+
+download_packages:
+  context: "centos-7"
+  download_dir: "/tmp/download/"
+  packages_list:
+  - name: docker-ce
+    version: 20.10.5
+  - name: kubeadm
+    version: 1.22.10
+  - name: kubelet
+    version: 1.22.10
+  - name: kubectl
+    version: 1.22.10
+  contexts:
+    centos-7:
+      image: "centos:7"
+      package_manager: "yum"
+    ubuntu-18.04:
+      image: "ubuntu:18.04"
+      package_manager: "apt"

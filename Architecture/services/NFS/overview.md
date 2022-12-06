@@ -10,6 +10,7 @@
       - [1.关闭nfsv2和nfsv3](#1关闭nfsv2和nfsv3)
       - [2.配置exports](#2配置exports)
         - [（1）选项](#1选项)
+      - [3.expoers常用配置](#3expoers常用配置)
 
 <!-- /code_chunk_output -->
 
@@ -81,3 +82,9 @@ clnt_create: RPC: Program not registered
 secure的话，需要请求的端口小于1024
 * `no_auth_nlm`
 不需要对加锁请求进行认证
+
+#### 3.expoers常用配置
+* `/etc/exports`
+```
+/data/nfs *(rw,async,no_root_squash)
+```

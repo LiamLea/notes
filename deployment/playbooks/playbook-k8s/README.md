@@ -4,21 +4,23 @@
 <!-- code_chunk_output -->
 
 - [k8s deployment](#k8s-deployment)
-    - [quick start](#quick-start)
+    - [Quick Start](#quick-start)
       - [1.set inventory](#1set-inventory)
       - [2.set global variables](#2set-global-variables)
-      - [3.init localhost](#3init-localhost)
-      - [4.check all hosts](#4check-all-hosts)
-      - [5.prepare images and charts](#5prepare-images-and-charts)
-      - [6.run the playbook](#6run-the-playbook)
-    - [initialize k8s](#initialize-k8s)
+      - [3.other configs](#3other-configs)
+        - [（1）config  packages repo](#1config-packages-repo)
+      - [4.init localhost](#4init-localhost)
+      - [5.check all hosts](#5check-all-hosts)
+      - [6.prepare images and charts](#6prepare-images-and-charts)
+      - [7.run the playbook](#7run-the-playbook)
+    - [Initialize K8S](#initialize-k8s)
       - [1.install ceph storageclass](#1install-ceph-storageclass)
         - [（1）set global variables](#1set-global-variables)
         - [（2）run storageclass task](#2run-storageclass-task)
       - [2.install basic service](#2install-basic-service)
         - [（2）set global variables](#2set-global-variables-1)
         - [（2）run storageclass task](#2run-storageclass-task-1)
-    - [other basic tasks](#other-basic-tasks)
+    - [Other Basic Tasks](#other-basic-tasks)
       - [1.run test tasks](#1run-test-tasks)
         - [（1）define test tasks](#1define-test-tasks)
         - [（2）run test tasks](#2run-test-tasks)
@@ -29,22 +31,27 @@
       - [3.push images to private registry](#3push-images-to-private-registry)
         - [（1） set variables](#1-set-variables)
         - [（2） run push_images task](#2-run-push_images-task)
-    - [monitor task](#monitor-task)
+      - [4.download packages](#4download-packages)
+        - [（1） set variables](#1-set-variables-1)
+        - [（2） run push_images task](#2-run-push_images-task-1)
+    - [Monitor Task](#monitor-task)
       - [1.deploy monitor](#1deploy-monitor)
         - [（1）set global variables](#1set-global-variables-1)
         - [（2）run monitor task](#2run-monitor-task)
-    - [log task](#log-task)
+    - [Log Task](#log-task)
       - [1.deploy log](#1deploy-log)
         - [（1）set global variables](#1set-global-variables-2)
         - [（2）run log task](#2run-log-task)
-    - [service task](#service-task)
+    - [Service Task](#service-task)
       - [1.deploy service](#1deploy-service)
         - [（1）set global variables](#1set-global-variables-3)
         - [（2）run service task](#2run-service-task)
+    - [Author](#author)
+    - [📝 License](#license)
 
 <!-- /code_chunk_output -->
 
-### quick start
+### Quick Start
 
 #### 1.set inventory
 
@@ -167,7 +174,25 @@ chart:
   local_dir: ""
 ```
 
-#### 3.init localhost
+#### 3.other configs
+
+##### （1）config  packages repo
+* yum
+```shell
+ls roles/init/files/repo/centos-7/yum.repos.d/
+```
+* debian
+```shell
+cat roles/init/tasks/debian.yaml
+```
+
+#### 4.init localhost
+
+* install docker-ce
+```shell
+make install_docker
+```
+
 * specify ansible image
 ```shell
 $ vim Makefile
@@ -177,16 +202,17 @@ ansible_image = bongli/ansible:debian-2.10
 
 * run init_localhost
 ```shell
+#run multiple times until this task is successful
 make init_localhost
 ```
 
-#### 4.check all hosts
+#### 5.check all hosts
 
 ```shell
 make check
 ```
 
-#### 5.prepare images and charts
+#### 6.prepare images and charts
 * list all images
 ```shell
 make list_images
@@ -198,11 +224,11 @@ make list_images
 make download_charts
 ```
 
-#### 6.run the playbook
+#### 7.run the playbook
 
 * enable roles
 ```shell
-vim main.yaml
+vim playbooks/main.yaml
 ```
 ```yaml
 - hosts: all
@@ -234,7 +260,7 @@ make stop
 
 ***
 
-### initialize k8s
+### Initialize K8S
 
 #### 1.install ceph storageclass
 
@@ -328,7 +354,7 @@ make basic
 
 ***
 
-### other basic tasks
+### Other Basic Tasks
 
 #### 1.run test tasks
 
@@ -371,13 +397,22 @@ make install_harbor
 vim push_images.yaml
 ```
 ```yaml
-#if noe set exception_pattern , it will add registry prefix in front of all images
-#if set exception_pattern, it will replace the address(i.e. xx in xx/yy/zz) with the target_registry
 vars:
   target_registry: "10.10.10.250"
   username: "admin"
   password: "Harbor12345"
-  exception_pattern: ""
+
+  #匹配的镜像，会用${registry_prefix} 替换 其地址
+  #没有匹配这里的镜像，都会在镜像前面加上${registry_prefix}
+  #use | to match multiple registries
+  prefix_replace_pattern: ""
+
+  #匹配的镜像，会用${my_registry} 替换 其地址
+  #没有匹配这里的镜像，都会在镜像前面加上${registry_prefix}
+  #use | to match multiple registries
+  address_replace_pattern: ""
+
+  #其余镜像都会在前面加上 ${registry_prefix}
 ```
 
 ##### （2） run push_images task
@@ -385,9 +420,42 @@ vars:
 make push_images
 ```
 
+#### 4.download packages
+
+##### （1） set variables
+```shell
+vim global.yaml
+```
+```yaml
+download_packages:
+  context: "centos-7"
+  download_dir: "/tmp/download/"
+  packages_list:
+  - name: docker-ce
+    version: 20.10.5
+  - name: kubeadm
+    version: 1.22.10
+  - name: kubelet
+    version: 1.22.10
+  - name: kubectl
+    version: 1.22.10
+  contexts:
+    centos-7:
+      image: "centos:7"
+      package_manager: "yum"
+    ubuntu-18.04:
+      image: "ubuntu:18.04"
+      package_manager: "apt"
+```
+
+##### （2） run push_images task
+```shell
+make download_packages
+```
+
 ***
 
-### monitor task
+### Monitor Task
 
 #### 1.deploy monitor
 ##### （1）set global variables
@@ -499,7 +567,7 @@ make monitor
 
 ***
 
-### log task
+### Log Task
 
 #### 1.deploy log
 ##### （1）set global variables
@@ -577,7 +645,7 @@ make log
 
 ***
 
-### service task
+### Service Task
 
 #### 1.deploy service
 ##### （1）set global variables
@@ -719,3 +787,12 @@ make log
 ```shell
 make service
 ```
+
+### Author
+ 👤 **Li Liang**
+* Email: liweixiliang@gmail.com
+* Github: https://github.com/LiamLea/cloud
+
+### 📝 License
+Copyright © 2022 [Li Liang](https://github.com/LiamLea/cloud).
+This project is [Apache 2.0](https://github.com/LiamLea/cloud/blob/master/deployment/playbooks/LICENSE) licensed.

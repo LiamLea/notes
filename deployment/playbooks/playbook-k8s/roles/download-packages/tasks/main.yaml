@@ -1,0 +1,18 @@
+- name: set fact
+  set_fact:
+    __packages: "{% for c_v in download_packages['packages_list'] %} {{ c_v['name'] }}-{{ c_v['version'] }}  {% endfor %}"
+  when: download_packages.contexts[download_packages["context"]]["package_manager"] == "yum"
+
+- name: set fact
+  set_fact:
+    __packages: "{% for c_v in download_packages['packages_list'] %} {{ c_v['name'] }}:{{ c_v['version'] }}  {% endfor %}"
+  when: download_packages.contexts[download_packages["context"]]["package_manager"] == "apt"
+
+- name: template download script
+  template:
+    src: "{{ download_packages.contexts[download_packages['context']]['package_manager'] }}_download.sh.j2"
+    dest: /tmp/__download.sh
+    mode: 0777
+
+- name: run container
+  shell: "docker run --rm -v /tmp/__download.sh:/tmp/__download.sh -v {{ download_packages.download_dir }}:/tmp/download -it {{ download_packages.contexts[download_packages['context']]['image'] }} /tmp/__download.sh"
