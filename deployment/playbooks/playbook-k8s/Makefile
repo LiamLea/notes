@@ -70,3 +70,7 @@ install_harbor: docker
 .PHONY := push_images
 push_images: docker
 	docker run --rm --network host --name ansible-lil-push -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/push_images.yaml"
+
+.PHONY := download_packages
+download_packages: docker
+	docker run --rm --network host --name ansible-lil-download_packages -v ${ansible_dir}:/root/ansible -itd ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/download_packages.yaml -e @global.yaml &> run.log"

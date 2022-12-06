@@ -5,7 +5,8 @@
     target_registry: "10.10.10.250"
     username: "admin"
     password: "Harbor12345"
-    exception_pattern: ""
+    prefix_replace_pattern: ""
+    address_replace_pattern: ""
   tasks:
   - name: login registry
     shell: docker login {{ target_registry }} -u {{ username }} -p {{ password }}

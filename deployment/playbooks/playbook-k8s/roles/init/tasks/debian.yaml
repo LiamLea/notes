@@ -22,7 +22,8 @@
     export DEBIAN_FRONTEND=noninteractive
     sed -i "s@http://.*archive.ubuntu.com@http://repo.huaweicloud.com@g" /etc/apt/sources.list
     sed -i "s@http://.*security.ubuntu.com@http://repo.huaweicloud.com@g" /etc/apt/sources.list
-    apt-get -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+    apt update
+    apt-get -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common sudo
     curl -fsSL https://repo.huaweicloud.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
     add-apt-repository "deb [arch=amd64] https://repo.huaweicloud.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
     curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
