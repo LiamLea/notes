@@ -1,13 +1,14 @@
-# gitlab
+# deploy
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 <!-- code_chunk_output -->
 
-- [gitlab](#gitlab)
+- [deploy](#deploy)
     - [概述](#概述)
       - [1.组件](#1组件)
       - [2.能够数据](#2能够数据)
-    - [安装](#安装)
+    - [在docker上安装](#在docker上安装)
+    - [在k8s上安装](#在k8s上安装)
       - [1.配置](#1配置)
 
 <!-- /code_chunk_output -->
@@ -41,7 +42,31 @@
 
 ***
 
-### 安装
+### 在docker上安装
+[参考](https://docs.gitlab.com/ee/install/docker.html)
+```shell
+mkdir /var/gitlab
+export GITLAB_HOME=/var/gitlab
+
+docker run --detach \
+ --hostname gitlab.example.com \
+ --env GITLAB_OMNIBUS_CONFIG="external_url 'https://10.10.10.249/';" \
+ --publish 443:443 --publish 80:80 --publish 22:22 \
+ --name gitlab \
+ --restart always \
+ --volume $GITLAB_HOME/config:/etc/gitlab \
+ --volume $GITLAB_HOME/logs:/var/log/gitlab \
+ --volume $GITLAB_HOME/data:/var/opt/gitlab \
+ --shm-size 256m \
+ gitlab/gitlab-ee:latest
+
+#获取root初始化密码
+cat $GITLAB_HOME/config/initial_root_password
+```
+
+***
+
+### 在k8s上安装
 
 #### 1.配置
 ```shell

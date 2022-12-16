@@ -17,7 +17,7 @@ hosts:
 
 http_proxy:
   server: http://10.10.10.250:8123
-  no_proxy: ""
+  no_proxy: "10.0.0.0/8"  #service and pod cidr
 
 #if registry is changed,you should pay attention to registry_prefix
 registry: "10.10.10.250"
@@ -84,7 +84,8 @@ chart:
     prometheus-community: https://prometheus-community.github.io/helm-charts
     grafana: https://grafana.github.io/helm-charts
     elastic: https://helm.elastic.co
-    bitnami: https://charts.bitnami.com/bitnami
+    #bitnami: https://charts.bitnami.com/bitnami
+    bitnami: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
     cert-manager: https://charts.jetstack.io
     ingress-nginx: https://kubernetes.github.io/ingress-nginx
     paradeum-team: https://paradeum-team.github.io/helm-charts/
@@ -101,8 +102,10 @@ storage_class:
   ceph:
     enabled: true
     cluster:
+      #id and mons(get from /etc/ceph/ceph.conf)
       id: ""
       mons: []
+      #id and key of and user(get from /etc/ceph/*.ketring, e.g. id: admin,  key: 1111)
       admin:
         id: ""
         key: ""
@@ -116,6 +119,7 @@ storage_class:
       config:
         default: true
         class_name: "csi-cephfs-sc"
+        #volume must exist
         fs_name: "ceph-fs"
         volume_name_prefix: "dev-k8s-vol-"
         #host network mode, so this port must be available
@@ -156,8 +160,8 @@ basic:
       version: "4.0.18"
     config:
       ingress_class: nginx
-      http_port: 30080
-      https_port: 30443
+      http_port: 80
+      https_port: 443
 
 #speficy domain
 domains:
@@ -236,7 +240,7 @@ monitor:
       #e.g. "10.10.10.1:9092"
       node_exporter: []
       jobs:
-        #e.g. {"targets": [], "labels": {}}
+        #e.g. {"targets": ["10.10.10.10:9283"], "labels": {cluster: "openstack"}}
         ceph_exporter: []
     blackbox:
       name: "blackbox-exporter"
@@ -263,7 +267,7 @@ monitor:
             revision: 24
             datasource: Prometheus
           node-full:
-            gnetID: 1860
+            gnetId: 1860
             revision: 27
             datasource: Prometheus
           blackbox-exporter:
@@ -280,21 +284,22 @@ monitor:
             revision: 14
             datasource: Prometheus
           apiserver:
-            gnetID: 12006
+            gnetId: 12006
             revision: 1
             datasource: Prometheus
           etcd:
-            gnetID: 9733
+            gnetId: 9733
             revision: 1
             datasource: Prometheus
           ceph:
-            gnetID: 2842
+            gnetId: 2842
             revision: 14
             datasource: Prometheus
 
   node_exporter:
     version: 1.3.0
-    #will download node-exporter when local_dir is empty
+    #will download node-exporter binary when local_dir is empty
+    # this is binary file
     local_dir: "/root/ansible/files/node_exporter"
     install_path: /usr/local/bin/
     port: 9100

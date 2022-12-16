@@ -31,7 +31,8 @@ dns:
 etcd:
   local:
     dataDir: /var/lib/etcd
-    listen-metrics-urls: "http://0.0.0.0:2381"
+    extraArgs:
+      listen-metrics-urls: "http://0.0.0.0:2381"
 imageRepository: {{ kubernetes.repository }}
 kind: ClusterConfiguration
 controlPlaneEndpoint: "{{ kubernetes.apiserver.control_plane.ip }}:{{ kubernetes.apiserver.control_plane.port }}"
