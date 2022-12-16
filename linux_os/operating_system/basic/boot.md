@@ -25,8 +25,9 @@
         - [（3）复制bash所需要的动态库](#3复制bash所需要的动态库)
         - [（4）用chroot验证](#4用chroot验证)
       - [5.利用安装盘进行系统修复:](#5利用安装盘进行系统修复)
-      - [6..生成initramfs](#6生成initramfs)
+      - [6.生成initramfs](#6生成initramfs)
       - [7.在一块磁盘上安装双操作系统](#7在一块磁盘上安装双操作系统)
+      - [8.进入initramfs后的操作](#8进入initramfs后的操作)
 
 <!-- /code_chunk_output -->
 
@@ -181,8 +182,10 @@ chroot /mnt/sysroot
 2.进入troubleshooting
 3.选择rescue system
 
-#### 6..生成initramfs
+#### 6.生成initramfs
+```shell
 dracut /boot/initramfs-`uname -r`.img `uname -r`
+```
 
 #### 7.在一块磁盘上安装双操作系统
   1.先安装windows,且留有充足空间
@@ -191,3 +194,17 @@ dracut /boot/initramfs-`uname -r`.img `uname -r`
   4.安装后,只能启动centos
   5.下载ntfs-3G软件,编译安装,能够识别windows操作系统
   6.修改grub.cfg文件:grub2-mkconfig -o /boot/grub2/grub.cfg
+
+#### 8.进入initramfs后的操作
+
+[参考](https://unix.stackexchange.com/questions/672137/lvm-volume-group-not-found)
+```shell
+sudo vgchange -ay
+sudo mount /dev/mapper/vg0-root /mnt # mount root partition
+sudo mount /dev/sda2 /mnt/boot # mount boot partition
+sudo mount -t proc proc /mnt/proc
+sudo mount -t sysfs sys /sys
+sudo mount -o bind /run /mnt/run # to get resolv.conf for internet access
+sudo mount -o bind /dev /mnt/dev
+sudo chroot /mnt
+```

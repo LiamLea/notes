@@ -19,7 +19,7 @@
         - [（2）run storageclass task](#2run-storageclass-task)
       - [2.install basic service](#2install-basic-service)
         - [（2）set global variables](#2set-global-variables-1)
-        - [（2）run storageclass task](#2run-storageclass-task-1)
+        - [（2）run basic task](#2run-basic-task)
     - [Other Basic Tasks](#other-basic-tasks)
       - [1.run test tasks](#1run-test-tasks)
         - [（1）define test tasks](#1define-test-tasks)
@@ -273,8 +273,10 @@ make stop
     ceph:
       enabled: true
       cluster:
+        #id and mons(get from /etc/ceph/ceph.conf)
         id: ""
         mons: []
+        #id and key of and user(get from /etc/ceph/*.ketring, e.g. id: admin,  key: 1111)
         admin:
           id: ""
           key: ""
@@ -288,6 +290,7 @@ make stop
         config:
           default: true
           class_name: "csi-cephfs-sc"
+          #volume must exist
           fs_name: "ceph-fs"
           volume_name_prefix: "dev-k8s-vol-"
           #host network mode, so this port must be available
@@ -347,7 +350,7 @@ make storageclass
         https_port: 30443
   ```
 
-##### （2）run storageclass task
+##### （2）run basic task
 ```shell
 make basic
 ```
@@ -372,7 +375,7 @@ make test
 
 ##### （1）set inventory
 ```shell
-$ vim inventory/harbor_hosts
+$ vim inventory/hosts
 
 [harbor]
 harbor ansible_host=10.172.1.250 ansible_user=root ansible_password=cangoal
@@ -490,9 +493,11 @@ make download_packages
         #this url will send with alerting msg which user can click to access prometheus to get alerting details
         #  e.g. https://k8s.my.local:30443/prometheus
         #set /prometheus if you don't know the exact external_url or you can't access prometheus
-        external_url: "https://{{ domain }}:{{ basic.ingress_nginx.config.https_port }}/prometheus"
+        external_url: "https://{{ domains[0] }}:{{ basic.ingress_nginx.config.https_port }}/prometheus"
         # e.g. {send_resolved: true, url: "<url|no empty>", max_alerts: 10}
         webhook_configs: []
+        # e.g. {send_resolved: true, smarthost: smtp.qq.com:587 ,from: 1059202624@qq.com, to: 1059202624@qq.com, auth_username: 1059202624@qq.com, auth_password: 'xx'}
+        email_configs: []
         scrape_interval: "30s"
         #e.g. "10.10.10.1"
         icmp_probe: []
@@ -503,7 +508,7 @@ make download_packages
         #e.g. "10.10.10.1:9092"
         node_exporter: []
         jobs:
-          #e.g. {"targets": [], "labels": {}}
+          #e.g. {"targets": ["10.10.10.10:9283"], "labels": {cluster: "openstack"}}
           ceph_exporter: []
       blackbox:
         name: "blackbox-exporter"
@@ -558,6 +563,14 @@ make download_packages
               gnetID: 2842
               revision: 14
               datasource: Prometheus
+
+    node_exporter:
+      version: 1.3.0
+      #will download node-exporter when local_dir is empty
+      # local_dir: "/root/ansible/files/node_exporter"
+      local_dir: ""
+      install_path: /usr/local/bin/
+      port: 9100
   ```
 
 ##### （2）run monitor task

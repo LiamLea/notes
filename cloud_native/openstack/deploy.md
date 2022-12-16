@@ -117,6 +117,13 @@ reboot
 
 ##### （2）加载kvm模块
 所有机器上加载kvm_intel（或者kvm_amd）模块
+```shell
+$ vim /etc/modprobe.d/kvm.conf
+
+#kvm开启了netsted（即虚拟机可以进行kvm虚拟）
+# kvm_intel 或者 kvm_amd
+options kvm_intel nested=1
+```
 
 ##### （3）高可用：奇数台controller
 奇数台controller: 因为rabbitmq、ceph-mon等需要奇数个
@@ -197,7 +204,8 @@ localhost       ansible_connection=local become=true
 # use localhost and sudo
 ```
 ```shell
-ansible -i ./multinode all -m ping
+#-b: become
+ansible -i ./multinode all -b -m ping
 ```
 
 #### 6.生成和修改密码
@@ -271,7 +279,7 @@ neutron_external_interface: "eth1"
 #ceph配置
 enable_ceph: "yes"
 enable_ceph_mds: "yes"
-enable_ceph_dashboard: "no" #待测试（应该是disable ceph的dashboard模块)
+enable_ceph_dashboard: "no" #disable ceph mgr的dashboard模块
 
 #cinder配置
 enable_cinder: "yes"
@@ -290,8 +298,8 @@ glance_backend_ceph: "yes"
 glance_backend_file: "no"
 
 #监控相关
-enable_prometheus_ceph_mgr_exporter: "yes"  #待测试（应该是enable ceph的prometheus模块）
-enable_prometheus_openstack_exporter: "yes" #待测试
+enable_prometheus_ceph_mgr_exporter: "yes"  #待测试（enable ceph mgr的prometheus模块）
+enable_prometheus_openstack_exporter: "yes" #待测试（需要enable_prometheus，这样其他exporter也会安装，可以设置其他不安装）
 ```
 
 #### 8.使用ceph

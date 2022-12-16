@@ -9,6 +9,7 @@
     - [使用](#使用)
       - [1.列出所有可加载的模块](#1列出所有可加载的模块)
       - [2.永久加载指定模块](#2永久加载指定模块)
+      - [3.查看加载的module的参数](#3查看加载的module的参数)
 
 <!-- /code_chunk_output -->
 
@@ -45,4 +46,9 @@ man modules-load.d
 * 永久加载ip_gre模块
 ```shell
 echo ip_gre >> /etc/modules-load.d/my.conf
+```
+
+#### 3.查看加载的module的参数
+```shell
+cat /sys/module/<module>/parameters/<parameter>
 ```

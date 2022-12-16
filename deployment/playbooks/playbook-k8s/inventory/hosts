@@ -15,6 +15,7 @@ node-3 ansible_host=3.1.4.127 ansible_user=lil ansible_password=cangoal ansible_
 #harbor ansible_host=3.1.4.250 ansible_user=root ansible_password=cangoal
 
 [monitor]
+#host-1 ansible_host=10.10.10.1 ansible_user=lil ansible_password='liamlea@7558' ansible_become=true ansible_become_user=root ansible_become_password='liamlea@7558' ansible_ssh_private_key_file=./pki/ssh_key
 
 [monitor_exception]
 

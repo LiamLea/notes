@@ -9,6 +9,7 @@
     create_namespace: yes
     atomic: yes
     release_values:
+      installCRDs: true
       image:
         repository: "{{ basic.repository }}quay.io/jetstack/cert-manager-controller"
       cainjector:

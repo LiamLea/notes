@@ -34,6 +34,7 @@
         - [（1）project管理](#1project管理-1)
         - [（2）限额（quota）管理](#2限额quota管理)
       - [2.server管理](#2server管理)
+    - [Demo](#demo)
 
 <!-- /code_chunk_output -->
 
@@ -42,6 +43,7 @@
 #### 1.镜像相关
 
 最好使用官方制作好的cloud镜像，在此基础上改：[下载](https://docs.openstack.org/image-guide/obtain-images.html)
+  * 注意上传格式是qcow2
 
 windows镜像参考：[virtio-win](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.215-2/),[参考1](https://techglimpse.com/create-windows-10-qcow2-image-openstack/),[参考2](https://linuxhint.com/install_virtio_drivers_kvm_qemu_windows_vm/)
 
@@ -51,6 +53,7 @@ windows镜像参考：[virtio-win](https://fedorapeople.org/groups/virt/virtio-w
 
 ##### （1）在cloud镜像基础上制作镜像
 * 启动一个实例
+  * 注意：必须以`#cloud-config`开头（或者其他的格式）
 ```yaml
 #cloud-config
 
@@ -77,9 +80,6 @@ ssh_pwauth: true
 ```shell
 cloud-init clean
 ```
-
-* 上传volume作为镜像（qcow2）
-  * 修改镜像的metadata，删除signature_verified、owner_specified.openstack.sha256和owner_specified.openstack.md5
 
 ##### （2）制作镜像
 
@@ -119,6 +119,9 @@ yum -y install vim lrzsz unzip zip
 ```shell
 openstack image create --progress --disk-format <image_format> --public --file <path>  <image_name>
 ```
+
+* 上传volume作为镜像（qcow2）
+  * 修改镜像的metadata，删除signature_verified、owner_specified.openstack.sha256和owner_specified.openstack.md5
 
 #### 2.flavor相关
 flavor定义了一个instance的规格模板（RAM、Disk、CPU等）
@@ -186,13 +189,13 @@ openstack volume create --size <size> <volume_name>
   * 创建volume，然后加到这个虚拟机上
 
 ```shell
-openstack server create /
-  --image <image> /
-  --flavor <flavor> /
-  --nic net-id=<network>,v4-fixed-ip=<ip> / #重复使用可以添加多个port（可以代替的选项：--network <network> 或者 --port <port>）
-  --boot-from-volume <volume_size> /
-  --security-group <security-group | default=default> /  #重复使用可以添加多个securiy group（取并集）
-  --availability-zone <zone-name | default=nova> /
+openstack server create \
+  --image <image> \
+  --flavor <flavor> \
+  --nic net-id=<network>,v4-fixed-ip=<ip> \ #重复使用可以添加多个port（可以代替的选项：--network <network> 或者 --port <port>）
+  --boot-from-volume <volume_size> \  #单位为GB
+  --security-group <security-group | default=default> \  #重复使用可以添加多个securiy group（取并集）
+  --availability-zone <zone-name | default=nova> \
   <instance_name>
 
 #注意：
@@ -310,13 +313,10 @@ openstack loadbalancer create --name <name> \
 openstack port create --network <network> --fixed-ip ip-address=<vip> <port_name>
 ```
 
-* 创建floating ip
-
-* 将floating ip与某个port绑定
+* 创建floating ip（并与某个port绑定）
 ```shell
-neutron floatingip-associate <floatingip_id> <port_id>
+openstack floating ip create --subnet <subnet> --port <port> --floating-ip-address <floating_ip> <public_network>
 ```
-
 * 此时该vip其实还没有分配，只不过是与floating ip进行了绑定
  * 然后多个虚拟机允许该vip通过，然后通过keepalived将这个vip配置在这些虚拟机间，这样访问floating ip就能实现高可用
 
@@ -348,4 +348,75 @@ openstack quota set --cores 60 --ram 122880 --instances 100 --volumes 150 --snap
 #### 2.server管理
 ```shell
 openstack server list --all-projects
+```
+
+
+### Demo
+
+```shell
+openstack quota set --cores 96 --ram 196608 --instances 100 --volumes 150 --snapshots 150 admin
+
+openstack server create \
+  --image centos-7-cloud-template \
+  --flavor 8c/16g \
+  --nic net-id=10.172.1.0,v4-fixed-ip=10.172.1.250 \
+  --boot-from-volume 100 \
+  --security-group 51c2913a-5a5c-46c7-9d47-fe044a862e73 \
+  --security-group public \
+  service-250
+
+openstack server create \
+  --image centos-7-cloud-template \
+  --flavor 8c/16g \
+  --nic net-id=10.172.1.0,v4-fixed-ip=10.172.1.249 \
+  --boot-from-volume 50 \
+  --security-group 51c2913a-5a5c-46c7-9d47-fe044a862e73 \
+  --security-group public \
+  gitlab-249
+
+openstack port create --network 10.172.1.0 --fixed-ip ip-address=10.172.1.11 \
+  --allowed-address ip-address=10.172.1.10 \
+  --security-group 51c2913a-5a5c-46c7-9d47-fe044a862e73 \
+  --security-group public \
+  port-1.11
+openstack port create --network 10.172.1.0 --fixed-ip ip-address=10.172.1.12 \
+  --allowed-address ip-address=10.172.1.10 \
+  --security-group 51c2913a-5a5c-46c7-9d47-fe044a862e73 \
+  --security-group public \
+  port-1.12
+openstack port create --network 10.172.1.0 --fixed-ip ip-address=10.172.1.13 \
+  --allowed-address ip-address=10.172.1.10 \
+  --security-group 51c2913a-5a5c-46c7-9d47-fe044a862e73 \
+  --security-group public \
+  port-1.13
+
+openstack server create \
+  --image centos-7-cloud-template \
+  --flavor 4c/8g \
+  --port port-1.11 \
+  --boot-from-volume 50 \
+  --security-group 51c2913a-5a5c-46c7-9d47-fe044a862e73 \
+  --security-group public \
+  host-1.11
+
+openstack server create \
+  --image centos-7-cloud-template \
+  --flavor 4c/8g \
+  --port port-1.12 \
+  --boot-from-volume 50 \
+  --security-group 51c2913a-5a5c-46c7-9d47-fe044a862e73 \
+  --security-group public \
+  host-1.12
+
+openstack server create \
+  --image centos-7-cloud-template \
+  --flavor 4c/8g \
+  --port port-1.13 \
+  --boot-from-volume 50 \
+  --security-group 51c2913a-5a5c-46c7-9d47-fe044a862e73 \
+  --security-group public \
+  host-1.13
+
+openstack port create --network 10.172.1.0 --fixed-ip ip-address=10.172.1.10 port-10
+openstack floating ip create --subnet public1-subnet --port port-10 --floating-ip-address 10.10.10.150 public1
 ```

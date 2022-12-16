@@ -68,7 +68,7 @@
           cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
         ingressClassName: "{{ ingress.class_name }}"
         path: "{{ ingress.hosts['kafka-ui'].path }}"
-        host: "{{ __kafka_ui_hosts[0] }}"
+        host: ""
         tls:
           enable: true
           secretName: "kafka-ui-ingress-secret"

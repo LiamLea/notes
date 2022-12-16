@@ -1,9 +1,9 @@
-# VNC
+# VNC（Virtual Network Computing）
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 <!-- code_chunk_output -->
 
-- [VNC](#vnc)
+- [VNC（Virtual Network Computing）](#vncvirtual-network-computing)
     - [部署](#部署)
       - [1.安装](#1安装)
       - [2.配置VNC认证信息](#2配置vnc认证信息)

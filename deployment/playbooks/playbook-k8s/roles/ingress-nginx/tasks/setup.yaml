@@ -33,7 +33,9 @@
             image:
               registry: "{{ basic.repository }}k8s.gcr.io"
               digest: ""
+        hostNetwork: true
         service:
+          enabled: false
           externalTrafficPolicy: Local
           type: NodePort
           nodePorts:
