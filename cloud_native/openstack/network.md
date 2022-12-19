@@ -22,6 +22,7 @@
     - [配置](#配置)
       - [1.重要配置文件：`/etc/kolla/neutron-openvswitch-agent/ml2_conf.ini`](#1重要配置文件etckollaneutron-openvswitch-agentml2_confini)
     - [debug](#debug)
+      - [1.查看虚拟的网络设备（OVN，参考OVN章节）](#1查看虚拟的网络设备ovn参考ovn章节)
 
 <!-- /code_chunk_output -->
 
@@ -172,4 +173,9 @@ local_ip = 10.10.10.1
 ```shell
 #查看所有的网络名称空间（比如 路由 的网络名称空间）
 ip netns ls
+```
+
+#### 1.查看虚拟的网络设备（OVN，参考OVN章节）
+```shell
+docker exec -it --privileged openvswitch_db /bin/bash
 ```

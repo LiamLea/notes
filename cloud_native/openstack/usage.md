@@ -354,7 +354,7 @@ openstack server list --all-projects
 ### Demo
 
 ```shell
-openstack quota set --cores 96 --ram 196608 --instances 100 --volumes 150 --snapshots 150 admin
+openstack quota set --cores 146 --ram 299008 --instances 100 --volumes 150 --snapshots 150 admin
 
 openstack server create \
   --image centos-7-cloud-template \

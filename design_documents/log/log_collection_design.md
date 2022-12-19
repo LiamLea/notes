@@ -136,6 +136,20 @@ filebeat.autodiscover:
   - type: kubernetes
     templates:
 
+      - config:
+        - type: log
+          paths:
+          - "/var/log/messages"
+          - "/var/log/syslog"
+          fields:
+            labels:
+              app_name: "syslog"
+              addition: ""
+              source: "host"
+              timezone: Asia/Shanghai
+              host: "${data.kubernetes.node.name}"
+          fields_under_root: true
+
       #需要特殊处理的日志
       - condition:
           regexp:
@@ -200,7 +214,11 @@ processors:
     fail_on_error: false
     ignore_missing: true
     when:
-      has_fields: ['kubernetes']
+      and:
+      - has_fields: ['kubernetes']
+      - not:
+          equals:
+            labels.source: "host"
 
 #输出到kafka
 output.kafka:
@@ -568,6 +586,18 @@ PUT _template/common-template
 * grok
 ```shell
 "%{TIMESTAMP_ISO8601:logtime}\s+\[(?<module>\S+)\]\s+%{LOGLEVEL:level}\s+(?<message>.*)"
+```
+
+##### （4）解析规则四（syslog）
+* 样例数据
+```shell
+Dec 15 16:27:14 node-3 systemd[1]: run-containerd-runc-k8s.io-188cc0ee1d5f11b655111f67585b286252de1fd392042c95f836fbeff284a9d3-runc.zpMveV.mount: Succeeded.
+Dec 15 16:27:21 node-3 kernel: [135192.570277] audit: type=1400 audit(1671121641.943:2574): apparmor="DENIED" operation="ptrace" profile="cri-containerd.apparmor.d" pid=456698 comm="node_exporter" requested_mask="read" denied_mask="read" peer="unconfined"
+```
+
+* grok
+```shell
+%{SYSLOGTIMESTAMP:logtime} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:[labels][host]} %{SYSLOGPROG:module}:(?<message>.*)
 ```
 
 ***

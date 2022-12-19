@@ -24,7 +24,8 @@ __config_logstash_conf: |
           "%{IP:[request][remote_addr]}.*?\[%{HTTPDATE:logtime}\]\s+\"%{WORD:[request][request_method]}\s+%{URIPATH:[request][request_path]}(?:\?*(?<[request][params]>\S+))?\s+HTTP/%{NUMBER:[request][http_version]}\"\s+%{INT:[request][status]}\s+%{NOTSPACE:[request][bytes_sent]}(?:\s+\"(?<[request][http_referer]>.*?)\")?(?:\s+\"(?<[request][user_agent]>.*?)\")?(?:\s*%{NUMBER:[request][request_time]})?",
           "\[%{TIMESTAMP_ISO8601:logtime}\].*?\[(?<trace_id>.*?)\].*?\[%{LOGLEVEL:level}\s*\].*?\[(?<module>\S+)\]\s*--\s*(?<message>.*)",
           "%{DATESTAMP:logtime}\s+\[%{LOGLEVEL:level}\]\s%{POSINT:pid}#%{NUMBER:tid}:\s(?<message>.*)",
-          "%{TIMESTAMP_ISO8601:logtime}\s+\[(?<module>\S+)\]\s+%{LOGLEVEL:level}\s+(?<message>.*)"
+          "%{TIMESTAMP_ISO8601:logtime}\s+\[(?<module>\S+)\]\s+%{LOGLEVEL:level}\s+(?<message>.*)",
+          "%{SYSLOGTIMESTAMP:logtime} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST} %{SYSLOGPROG:module}:(?<message>.*)"
         ]
       }
       overwrite => ["message"]
@@ -76,7 +77,7 @@ __config_logstash_conf: |
 
     #清洗时间（如果清洗失败，使用默认时间）
     date {
-       match => ["logtime", "dd/MMM/yyyy:HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss,SSS"]
+       match => ["logtime", "dd/MMM/yyyy:HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss,SSS", "MMM dd HH:mm:ss"]
        target => "@timestamp"
        timezone => "%{[labels][timezone]}"
     }
