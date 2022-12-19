@@ -6,6 +6,20 @@ __config_filebeat: |
     - type: kubernetes
       templates:
 
+      - config:
+        - type: log
+          paths:
+          - "/var/log/messages"
+          - "/var/log/syslog"
+          fields:
+            labels:
+              app_name: "syslog"
+              addition: "host"
+              source: "host"
+              timezone: Asia/Shanghai
+              host: "${data.kubernetes.node.name}"
+          fields_under_root: true
+
         #收集k8s中所有容器的日志（需要排除上面特殊处理的日志）
         - condition:
             and:
@@ -52,7 +66,11 @@ __config_filebeat: |
       fail_on_error: false
       ignore_missing: true
       when:
-        has_fields: ['kubernetes']
+        and:
+        - has_fields: ['kubernetes']
+        - not:
+            equals:
+              labels.source: "host"
 
   #输出到kafka
   output.kafka:

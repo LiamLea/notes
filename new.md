@@ -40,6 +40,7 @@
   - [（2）将该容器的网络命名空间挂载出来](#2将该容器的网络命名空间挂载出来)
 - [57.格式化磁盘: `wipefs`](#57格式化磁盘-wipefs)
 - [58.`ip route`有多个路由表](#58ip-route有多个路由表)
+- [59.认证失败的原因：证书过期 或者 时间不同步](#59认证失败的原因证书过期-或者-时间不同步)
 
 <!-- /code_chunk_output -->
 
@@ -296,3 +297,5 @@ cat /etc/iproute2/rt_tables
 ip route show table <table_id>
 #e.g. ip route show table all
 ```
+
+#### 59.认证失败的原因：证书过期 或者 时间不同步

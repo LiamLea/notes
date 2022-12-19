@@ -23,6 +23,7 @@
       - [5.配置清单文件（@ansible）](#5配置清单文件ansible)
       - [6.生成和修改密码](#6生成和修改密码)
       - [7.配置：`/etc/kolla/globals.yml`](#7配置etckollaglobalsyml)
+        - [（1）网络配置（建议生产环境使用）](#1网络配置建议生产环境使用)
       - [8.使用ceph](#8使用ceph)
         - [（1）修改配置](#1修改配置)
         - [（2）标记磁盘（@storage-nodes）](#2标记磁盘storage-nodes)
@@ -54,6 +55,8 @@
     - [trouble shooting](#trouble-shooting)
       - [1.检查时，python sdk报错](#1检查时python-sdk报错)
       - [2.创建instance时，Sending discover failed（通过dhcp获取ip失败）](#2创建instance时sending-discover-failed通过dhcp获取ip失败)
+      - [3.vm创建启动都没问题，在启动操作系统时等好久（一般是DHCP的问题，即网络的问题）](#3vm创建启动都没问题在启动操作系统时等好久一般是dhcp的问题即网络的问题)
+      - [4.网络不通，但是通过抓包能够获取ARP的包（证明二层是同的，一般是三层设置了什么策略，比如iptables）](#4网络不通但是通过抓包能够获取arp的包证明二层是同的一般是三层设置了什么策略比如iptables)
 
 <!-- /code_chunk_output -->
 
@@ -236,6 +239,10 @@ keystone_admin_password: cangoal
   host-1 ... network_interface=enp5s0
   ```
 ```yaml
+#docker配置(关闭docker的iptables，不然会影响到openstack的网络导致网路不通)
+#需要注意docker对网络的影响，比如docker的bridge也会有影响，必要时可以关掉（新版的kolla提供了关闭选项，旧版的需要手动修改docker配置进行关闭）
+docker_disable_default_iptables_rules: "yes"
+
 #  设置镜像，下面的这些配置决定了镜像的名称：kolla/ubuntu-source-xx:train
 kolla_base_distro: "ubuntu"
 kolla_install_type: "source"
@@ -300,6 +307,28 @@ glance_backend_file: "no"
 #监控相关
 enable_prometheus_ceph_mgr_exporter: "yes"  #待测试（enable ceph mgr的prometheus模块）
 enable_prometheus_openstack_exporter: "yes" #待测试（需要enable_prometheus，这样其他exporter也会安装，可以设置其他不安装）
+```
+
+* 配置网卡up和混杂模式
+```shell
+$ vim /etc/rc.local
+
+#!/bin/bash
+ip link set eth1 up
+ip link set eth1 promisc on
+
+$ chmod +x /etc/rc.local
+```
+
+##### （1）网络配置（建议生产环境使用）
+[参考](https://docs.openstack.org/kolla-ansible/latest/reference/networking/neutron.html)
+
+* DVR模式（Neutron Distributed Virtual Routing）（通过控制路由实现的）
+  * 每个compute node上配一个external interface
+  * external流量 和 floating ip流量 从该external interface出去
+  * 跨节点的fixed ip流量（即内部流量）还是需要经过network node进行路由
+```shell
+enable_neutron_dvr: "yes"
 ```
 
 #### 8.使用ceph
@@ -605,6 +634,7 @@ kolla-ansible -i ./multinode deploy
 ```shell
 kolla-ansible -i ./multinode bootstrap-servers --limit <new_host>
 kolla-ansible -i ./multinode pull --limit <new_host>
+kolla-ansible -i ./multinode prechecks
 kolla-ansible -i ./multinode deploy
 ```
 
@@ -643,3 +673,7 @@ kolla-ansible -i ./multinode prechecks
 
 #### 2.创建instance时，Sending discover failed（通过dhcp获取ip失败）
 需要具体查看日志：`/var/log/kolla/neutron/neutron-dhcp-agent.log`和`/var/log/kolla/neutron/dnsmasq.log`
+
+#### 3.vm创建启动都没问题，在启动操作系统时等好久（一般是DHCP的问题，即网络的问题）
+
+#### 4.网络不通，但是通过抓包能够获取ARP的包（证明二层是同的，一般是三层设置了什么策略，比如iptables）
