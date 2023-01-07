@@ -43,7 +43,26 @@ virt-host-validate qemu
 export RELEASE=$(curl https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt)
 wget https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-operator.yaml
 wget https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-cr.yaml
+```
+* `vim kubevirt-operator.yaml`
+```yaml
+#修改镜像地址
+#搜索: quay.io，然后进行修改
+```
 
+* `vim kubevirt-cr.yaml`
+```yaml
+spec:
+  #设置仓库地址
+  imageRegistry: 10.10.10.250/library/quay.io/kubevirt
+  #enable VMExport
+  configuration:
+    developerConfiguration:
+      featureGates:
+      - VMExport
+```
+
+```shell
 kubectl apply -f kubevirt-operator.yaml
 kubectl apply -f kubevirt-cr.yaml
 kubectl -n kubevirt wait kv kubevirt --for condition=Available
@@ -92,8 +111,15 @@ kubectl get pods -n <ns>
 [参考](https://kubevirt.io/user-guide/operations/containerized_data_importer/)
 ```shell
 export VERSION=$(curl -s https://api.github.com/repos/kubevirt/containerized-data-importer/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-operator.yaml
-kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-cr.yaml
+wget https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-operator.yaml
+wget https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-cr.yaml
+
+#修改镜像地址
+vim cdi-operator.yaml
+#搜索: quay.io，然后进行修改
+
+kubectl apply -f cdi-operator.yaml
+kubectl apply -f cdi-cr.yaml
 ```
 
 * 暴露cdi-uploadproxy

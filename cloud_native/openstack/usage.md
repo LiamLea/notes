@@ -9,6 +9,7 @@
         - [（1）在cloud镜像基础上制作镜像](#1在cloud镜像基础上制作镜像)
         - [（2）制作镜像](#2制作镜像)
         - [（3）上传镜像](#3上传镜像)
+        - [（4）下载镜像](#4下载镜像)
       - [2.flavor相关](#2flavor相关)
       - [3.port（网卡）相关](#3port网卡相关)
       - [4.volume（磁盘）相关](#4volume磁盘相关)
@@ -122,6 +123,12 @@ openstack image create --progress --disk-format <image_format> --public --file <
 
 * 上传volume作为镜像（qcow2）
   * 修改镜像的metadata，删除signature_verified、owner_specified.openstack.sha256和owner_specified.openstack.md5
+
+##### （4）下载镜像
+```shell
+openstack image list
+openstack image save --file /tmp/centos-7-cloud-template centos-7-cloud-template
+```
 
 #### 2.flavor相关
 flavor定义了一个instance的规格模板（RAM、Disk、CPU等）
