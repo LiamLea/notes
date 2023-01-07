@@ -288,7 +288,7 @@ make stop
           path: "ceph-csi-cephfs"
           version: "3.4.0"
         config:
-          default: true
+          default: false
           class_name: "csi-cephfs-sc"
           #volume must exist
           fs_name: "ceph-fs"
@@ -304,7 +304,7 @@ make stop
           path: "ceph-csi-rbd"
           version: "3.4.0"
         config:
-          default: false
+          default: true
           class_name: "csi-rbd-sc"
           pool: "rbd-replicated-pool"
           volume_name_prefix: "dev-k8s-vol-"

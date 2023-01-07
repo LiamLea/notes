@@ -22,6 +22,7 @@
         - [（1）priority](#1priority)
         - [（2）preemption policy](#2preemption-policy)
       - [9.restart 和 recreate](#9restart-和-recreate)
+      - [10.security](#10security)
     - [资源清单](#资源清单)
       - [1.基本格式](#1基本格式)
       - [2.环境变量设置](#2环境变量设置)
@@ -154,6 +155,31 @@ PodInitializing</br>Running|所有初始化容器都执行成功
   * 查询restart记录: `kubectl describe pods xxx`
 * recreate（重新创建pod，当重新调度pod时）
   * 查询recreate记录: `kubectl get rs`
+
+#### 10.security
+* fsgroup
+  * 容器运行和storageclass ，需要开启对fsgroup的支持: [参考](https://kubernetes.io/blog/2021/11/09/non-root-containers-and-devices/)
+  * ceph-csi-cephfs不支持fsgroup，ceph-csi-rbd支持fsgroup
+  
+```yaml
+securityContext:
+
+  #指定user和group
+  runAsUser: <uid>    #以指定的用户 运行容器
+  runAsGroup: <gid>   #设置runAsUser的gid，然后运行容器
+  supplementalGroups: []  #设置runAsUser的groups，然后运行容器
+
+  #检查是否以root身份运行
+  runAsNonRoot: true  #会验证是否以root身份运行的容器，如果是，则会启动失败
+
+  fsGroup: <gid>   #挂载时，会将volume的 所属主 更改，创建的新文件也会属于这个组
+                   #有些volume不支持，比如: hostpath
+
+  #设置内核参数
+  sysctls:
+  - name: net.ipv4.ip_forward
+    value: "1"
+```
 
 ***
 
