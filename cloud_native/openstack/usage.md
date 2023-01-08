@@ -7,9 +7,11 @@
     - [基本使用](#基本使用)
       - [1.镜像相关](#1镜像相关)
         - [（1）在cloud镜像基础上制作镜像](#1在cloud镜像基础上制作镜像)
-        - [（2）制作镜像](#2制作镜像)
-        - [（3）上传镜像](#3上传镜像)
-        - [（4）下载镜像](#4下载镜像)
+        - [（2）从iso安装镜像（一开不能挂载磁盘）](#2从iso安装镜像一开不能挂载磁盘)
+        - [（3）制作镜像](#3制作镜像)
+        - [（4）制作windows镜像](#4制作windows镜像)
+        - [（5）上传镜像](#5上传镜像)
+        - [（6）下载镜像](#6下载镜像)
       - [2.flavor相关](#2flavor相关)
       - [3.port（网卡）相关](#3port网卡相关)
       - [4.volume（磁盘）相关](#4volume磁盘相关)
@@ -46,8 +48,6 @@
 最好使用官方制作好的cloud镜像，在此基础上改：[下载](https://docs.openstack.org/image-guide/obtain-images.html)
   * 注意上传格式是qcow2
 
-windows镜像参考：[virtio-win](https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.215-2/),[参考1](https://techglimpse.com/create-windows-10-qcow2-image-openstack/),[参考2](https://linuxhint.com/install_virtio_drivers_kvm_qemu_windows_vm/)
-
 注意：
 * cloud-init很多配置是创建镜像时生效，不是每次重启都生效，比如配置ssh
 * 不仅要修改cloud.cfg而且要本身的配置也修改过来（比如：sshd的配置），因为cloud-init其实实现的不够完美，有时候不生效
@@ -82,7 +82,13 @@ ssh_pwauth: true
 cloud-init clean
 ```
 
-##### （2）制作镜像
+##### （2）从iso安装镜像（一开不能挂载磁盘）
+
+* 从镜像启动不要挂载其他volume（否则不能检测到iso）
+* 启动后，挂载volume，即要安装操作系统的磁盘
+* 进行安装
+
+##### （3）制作镜像
 
 * 只有有一个分区且不能是LVM
   * 这样才能自动扩容根文件系统
@@ -115,7 +121,53 @@ $ grub2-mkconfig -o /etc/grub2.cfg
 yum -y install vim lrzsz unzip zip
 ```
 
-##### （3）上传镜像
+##### （4）制作windows镜像
+
+windows镜像参考：[参考1](https://bugzilla.redhat.com/show_bug.cgi?id=1982606),[参考2](https://linuxhint.com/install_virtio_drivers_kvm_qemu_windows_vm/)
+
+* 下载相关iso并上传为镜像
+  * windows iso
+  * [virtio-win](https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/)
+
+* 创建volume
+```shell
+#创建系统盘
+openstack volume create --size 50 --bootable win10-disk
+#创建windows iso的cdrom
+openstack volume create --image Windows-10.iso --size 10 win10-iso-disk
+#创建virtio-win iso的cdrom
+openstack volume create --image virtio-win-0.1.225.iso --size 1 virtio-iso-disk
+```
+
+* 创建虚拟机
+```shell
+openstack server create \
+  --flavor 4c/8g --nic net-id=10.172.1.0 --security-group 51c2913a-5a5c-46c7-9d47-fe044a862e73 \
+  #指定系统盘（通过--image或--voulme的boot_index=0，启动优先级最高）
+  --volume win10-disk \
+  #添加windows iso的cdrom（uuid就是上面win10-iso-disk的id），并且设置boot_index=1在系统盘后
+  --block-device uuid=f40b77a0-ce1d-47c6-969f-c1a35888745b,source_type=volume,destination_type=volume,device_type=cdrom,boot_index=1 \
+  #添加virtio-win iso的cdrom（uuid就是就是上面virtio-iso-disk的id）
+  --block-device uuid=4666b838-5f82-443c-abf7-008da20eb09e,source_type=volume,destination_type=volume,device_type=cdrom  \
+  win10
+```
+
+* 安装
+  * 选择自动扫描驱动
+
+![](./imgs/usage_07.png)
+
+* 安装成功后，需要安装网卡驱动
+
+![](./imgs/usage_02.png)
+![](./imgs/usage_03.png)
+![](./imgs/usage_04.png)
+![](./imgs/usage_05.png)
+![](./imgs/usage_06.png)
+
+* 把 其他（即未识别的设备）下面 的设备都更新一下驱动
+
+##### （5）上传镜像
 
 ```shell
 openstack image create --progress --disk-format <image_format> --public --file <path>  <image_name>
@@ -124,7 +176,7 @@ openstack image create --progress --disk-format <image_format> --public --file <
 * 上传volume作为镜像（qcow2）
   * 修改镜像的metadata，删除signature_verified、owner_specified.openstack.sha256和owner_specified.openstack.md5
 
-##### （4）下载镜像
+##### （6）下载镜像
 ```shell
 openstack image list
 openstack image save --file /tmp/centos-7-cloud-template centos-7-cloud-template
