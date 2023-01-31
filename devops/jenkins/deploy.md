@@ -20,6 +20,7 @@
         - [（2）添加maven容器](#2添加maven容器)
         - [（3）添加nodejs容器](#3添加nodejs容器)
         - [（4）在pipeline中使用k8s agent](#4在pipeline中使用k8s-agent)
+        - [（5）pod template yaml](#5pod-template-yaml)
       - [6.debug动态agent](#6debug动态agent)
 
 <!-- /code_chunk_output -->
@@ -283,6 +284,163 @@ steps {
     ''')
   }
 }
+```
+
+##### （5）pod template yaml
+```yaml
+apiVersion: "v1"
+kind: "Pod"
+metadata:
+  labels:
+    jenkins/jenkins-jenkins-agent: "true"
+    jenkins/label-digest: "3d6d160fd0a1df9cbbb676fe328305ef80807d1e"
+    jenkins/label: "k8s"
+  name: "default-c4qgh"
+  namespace: "devops"
+spec:
+  containers:
+  - args:
+    - "9999999"
+    command:
+    - "sleep"
+    env:
+    - name: "GIT_SSL_NO_VERIFY"
+      value: "1"
+    image: "10.10.10.250/library/maven:3.8.5-openjdk-8"
+    imagePullPolicy: "IfNotPresent"
+    name: "maven"
+    resources: {}
+    tty: true
+    volumeMounts:
+    - mountPath: "/root/.npm"
+      name: "volume-4"
+      readOnly: false
+    - mountPath: "/usr/share/maven/conf/settings.xml"
+      name: "volume-2"
+      readOnly: false
+      subPath: "settings.xml"
+    - mountPath: "/bin/docker"
+      name: "volume-0"
+      readOnly: false
+    - mountPath: "/root/.m2"
+      name: "volume-3"
+      readOnly: false
+    - mountPath: "/var/run/docker.sock"
+      name: "volume-1"
+      readOnly: false
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+    workingDir: "/home/jenkins/agent"
+  - env:
+    - name: "JENKINS_SECRET"
+      value: "********"
+    - name: "JENKINS_TUNNEL"
+      value: "jenkins-agent.devops.svc.cluster.local:50000"
+    - name: "GIT_SSL_NO_VERIFY"
+      value: "1"
+    - name: "JENKINS_AGENT_NAME"
+      value: "default-c4qgh"
+    - name: "JENKINS_NAME"
+      value: "default-c4qgh"
+    - name: "JENKINS_AGENT_WORKDIR"
+      value: "/home/jenkins/agent"
+    - name: "JENKINS_URL"
+      value: "http://jenkins.devops.svc.cluster.local:8080/jenkins"
+    image: "10.10.10.250/library/jenkins/inbound-agent:4.11.2-4"
+    imagePullPolicy: "IfNotPresent"
+    name: "jnlp"
+    resources:
+      limits:
+        memory: "512Mi"
+        cpu: "512m"
+      requests:
+        memory: "512Mi"
+        cpu: "512m"
+    tty: true
+    volumeMounts:
+    - mountPath: "/root/.npm"
+      name: "volume-4"
+      readOnly: false
+    - mountPath: "/usr/share/maven/conf/settings.xml"
+      name: "volume-2"
+      readOnly: false
+      subPath: "settings.xml"
+    - mountPath: "/bin/docker"
+      name: "volume-0"
+      readOnly: false
+    - mountPath: "/root/.m2"
+      name: "volume-3"
+      readOnly: false
+    - mountPath: "/var/run/docker.sock"
+      name: "volume-1"
+      readOnly: false
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+    workingDir: "/home/jenkins/agent"
+  - args:
+    - "9999999"
+    command:
+    - "sleep"
+    env:
+    - name: "GIT_SSL_NO_VERIFY"
+      value: "1"
+    image: "10.10.10.250/library/node:8.17.0-stretch-slim"
+    imagePullPolicy: "IfNotPresent"
+    name: "nodejs"
+    resources: {}
+    tty: true
+    volumeMounts:
+    - mountPath: "/root/.npm"
+      name: "volume-4"
+      readOnly: false
+    - mountPath: "/usr/share/maven/conf/settings.xml"
+      name: "volume-2"
+      readOnly: false
+      subPath: "settings.xml"
+    - mountPath: "/bin/docker"
+      name: "volume-0"
+      readOnly: false
+    - mountPath: "/root/.m2"
+      name: "volume-3"
+      readOnly: false
+    - mountPath: "/var/run/docker.sock"
+      name: "volume-1"
+      readOnly: false
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+    workingDir: "/home/jenkins/agent"
+  hostNetwork: false
+  nodeSelector:
+    kubernetes.io/os: "linux"
+  restartPolicy: "Never"
+  securityContext:
+    runAsUser: 0
+  serviceAccountName: "default"
+  volumes:
+  - hostPath:
+      path: "/bin/docker"
+    name: "volume-0"
+  - configMap:
+      name: "maven-config"
+      optional: false
+    name: "volume-2"
+  - hostPath:
+      path: "/var/run/docker.sock"
+    name: "volume-1"
+  - emptyDir:
+      medium: ""
+    name: "workspace-volume"
+  - name: "volume-4"
+    persistentVolumeClaim:
+      claimName: "npm-pvc"
+      readOnly: false
+  - name: "volume-3"
+    persistentVolumeClaim:
+      claimName: "maven-pvc"
+      readOnly: false
 ```
 
 #### 6.debug动态agent

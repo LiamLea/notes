@@ -1,0 +1,41 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- name: set fact
+  set_fact:
+    __path: "{{ chart.local_dir.rstrip('/') }}/"
+  when: chart.local_dir.strip() != ""
+
+- name: set proxy fact
+  set_fact:
+    __proxy_env:
+      HTTP_PROXY: "{{ chart.http_proxy.server }}"
+      HTTPS_PROXY: "{{ chart.http_proxy.server }}"
+      NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
+  when: chart.http_proxy.enabled == True
+
+- name: install jenkins
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ devops.jenkins.chart.path }}"
+    chart_repo_url: "{{ devops.jenkins.chart.repo }}"
+    chart_version: "{{ devops.jenkins.chart.version }}"
+    release_values:
+      controller:
+        image: "{{ devops.repository }}jenkins/jenkins"
+        tagLabel: jdk11
+        imagePullPolicy: "IfNotPresent"
+        adminPassword: "{{ devops.jenkins.admin_password }}"
+        resources:
+          requests: "{{ devops.jenkins.resources.requests }}"
+          limits: "{{ devops.jenkins.resources.limits }}"
+  register: jenkins_template_result
+
+  - name: set facts
+    set_fact:
+      jenkins_template_stdout: "{{ jenkins_template_result.stdout_lines }}"
+
+  - name: get images
+    set_fact:
+      jenkins_images: "{{ jenkins_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"

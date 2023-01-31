@@ -20,22 +20,22 @@ __config_filebeat: |
               host: "${data.kubernetes.node.name}"
           fields_under_root: true
 
-        #收集k8s中所有容器的日志（需要排除上面特殊处理的日志）
-        - condition:
-            and:
-            - not:
-                regexp:
-                  kubernetes.pod.name: "filebeat|logstash"
-            - not:
-                regexp:
-                  kubernetes.pod.name: "iot-.*-backend"
-            - not:
-                equals:
-                  kubernetes.container.name: "istio-proxy"
-          config:
-          - type: container
-            paths:
-            - "/var/log/containers/*${data.kubernetes.container.id}.log"
+      #收集k8s中所有容器的日志（需要排除上面特殊处理的日志）
+      - condition:
+          and:
+          - not:
+              regexp:
+                kubernetes.pod.name: "filebeat|logstash"
+          - not:
+              regexp:
+                kubernetes.pod.name: "iot-.*-backend"
+          - not:
+              equals:
+                kubernetes.container.name: "istio-proxy"
+        config:
+        - type: container
+          paths:
+          - "/var/log/containers/*${data.kubernetes.container.id}.log"
 
   #给容器日志添加相应标签
   processors:
@@ -62,6 +62,8 @@ __config_filebeat: |
       - from: kubernetes.namespace
         to: labels.addition
       - from: kubernetes.pod.name
+        to: labels.pod
+      - from: kubernetes.node.name
         to: labels.host
       fail_on_error: false
       ignore_missing: true

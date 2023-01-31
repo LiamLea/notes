@@ -1,0 +1,27 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: maven-pvc
+spec:
+  storageClassName: {%- if devops.jenkins.agent.storage_class %} {{ devops.jenkins.agent.storage_class }} {% else %} "" {% endif %}
+
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: npm-pvc
+spec:
+  storageClassName: {%- if devops.jenkins.agent.storage_class %} {{ devops.jenkins.agent.storage_class }} {% else %} "" {% endif %}
+
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi

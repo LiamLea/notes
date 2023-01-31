@@ -1,0 +1,57 @@
+__agent_config:
+  enabled: true
+  namespace: "{{ devops.namespace }}"
+  command: ""
+  args: ""
+  customJenkinsLabels:
+  - "k8s"
+  image: "{{ devops.jenkins.agent.image }}"
+  tag: "{{ devops.jenkins.agent.tag }}"
+  envVars:
+  - name: GIT_SSL_NO_VERIFY
+    value: "1"
+  runAsUser: 0
+  runAsGroup: 0
+  TTYEnabled: true
+  additionalContainers:
+  - sideContainerName: maven
+    image: "{{ devops.jenkins.agent.maven.image }}"
+    tag: "{{ devops.jenkins.agent.maven.tag }}"
+    command: "sleep"
+    args: "9999999"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 500m
+        memory: 500Mi
+  - sideContainerName: nodejs
+    image: "{{ devops.jenkins.agent.nodejs.image }}"
+    tag: "{{ devops.jenkins.agent.nodejs.tag }}"
+    command: "sleep"
+    args: "9999999"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 500m
+        memory: 500Mi
+  volumes:
+  - type: HostPath
+    hostPath: /bin/docker
+    mountPath: /bin/docker
+  - type: HostPath
+    hostPath: /var/run/docker.sock
+    mountPath: /var/run/docker.sock
+  - type: ConfigMap
+    configMapName: maven-config
+    subPath: settings.xml
+    mountPath: /usr/share/maven/conf/settings.xml
+  - type: PVC
+    claimName: maven-pvc
+    mountPath: /root/.m2
+  - type: PVC
+    claimName: npm-pvc
+    mountPath: /root/.npm
