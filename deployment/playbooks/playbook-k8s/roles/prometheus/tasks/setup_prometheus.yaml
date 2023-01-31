@@ -96,12 +96,8 @@
         repository: "{{ monitor.repository }}prom/blackbox-exporter"
       service:
         port: 80
-      config:
-        modules:
-          http_2xx:
-            http:
-              tls_config:
-                insecure_skip_verify: true
+      allowIcmp: true
+      config: "{{ __config_blackbox }}"
 
 - name: install prometheus-adapter
   environment: "{{ __proxy_env | default(omit) }}"

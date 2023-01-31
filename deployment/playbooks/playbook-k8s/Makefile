@@ -47,6 +47,10 @@ log: docker
 service: docker
 	docker run --rm --network host --name ansible-lil-service -e ANSIBLE_JINJA2_NATIVE=1 -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_service.yaml -e @global.yaml"
 
+.PHONY := devops
+devops: docker
+	docker run --rm --network host --name ansible-lil-devops -e ANSIBLE_JINJA2_NATIVE=1 -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/deploy_devops.yaml -e @global.yaml"
+
 .PHONY := stop
 stop:
 	docker stop ansible-lil

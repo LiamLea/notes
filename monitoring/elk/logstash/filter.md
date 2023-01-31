@@ -192,7 +192,7 @@ TZ          #用于匹配时区
 ##### （3）自定义pattern
 * 方式一：直接写正则
 ```shell
-(?<filed_name>pattern)    #这是正则的写法，将匹配的内容存放在一个组内，并命名这个组为filed_name
+(?<<filed_name>>pattern)    #这是正则的写法，将匹配的内容存放在一个组内，并命名这个组为filed_name
                           #所以这里，匹配pattern的内容，会放在field_name中保存
 ```
 

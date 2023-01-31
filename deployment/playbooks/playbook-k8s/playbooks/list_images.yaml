@@ -50,6 +50,9 @@
   - name: include template tools
     include_tasks: ../roles/tools/tasks/template_tools.yaml
 
+  - name: include template jenkins
+    include_tasks: ../roles/jenkins/tasks/template.yaml
+
   - name: set images
     set_fact:
       my_dict:
@@ -69,6 +72,7 @@
         pgsql: "{{ pgsql_images | unique }}"
         redis: "{{ redis_images | unique }}"
         tools: "{{ tools_images | unique }}"
+        jenkins: "{{ jenkins_images | unique }}"
 
   - name: list_images
     debug:

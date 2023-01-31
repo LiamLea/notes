@@ -1,0 +1,46 @@
+apiVersion: v1
+data:
+  settings.xml: |
+    <!-- 添加下面的配置 -->
+
+    <!-- 设置私库的账号密码 -->
+    <servers>
+      <server>
+        <id>maven-public</id>
+        <username>admin</username>
+        <password>cangoal</password>
+      </server>
+      <server>
+        <id>kangpaas-release</id>
+        <username>admin</username>
+        <password>cangoal</password>
+      </server>
+      <server>
+        <id>kangpaas-snapshot</id>
+        <username>admin</username>
+        <password>cangoal</password>
+      </server>
+    </servers>
+
+    <!-- 设置中央仓库的地址 -->
+    <mirrors>
+      <mirror>
+         <id>central</id>
+         <mirrorOf>central</mirrorOf>
+         <name>central</name>
+         <url>{{ devops.jenkins.agent.maven.mirrors.central }}</url>
+      </mirror>
+    </mirrors>
+
+    <!-- 注释下面内容，否则不能使用http协议连接私库 -->
+    <!--<mirror>
+      <id>maven-default-http-blocker</id>
+      <mirrorOf>external:http:*</mirrorOf>
+      <name>Pseudo repository to mirror external repositories initially using HTTP.</name>
+      <url>http://0.0.0.0/</url>
+      <blocked>true</blocked>
+    </mirror>-->
+
+kind: ConfigMap
+metadata:
+  name: maven-config

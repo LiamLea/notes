@@ -91,6 +91,7 @@ chart:
     paradeum-team: https://paradeum-team.github.io/helm-charts/
     kfirfer: https://kfirfer.github.io/helm/
     kafka-ui: https://provectus.github.io/kafka-ui
+    jenkins: https://charts.jenkins.io/
 
   #if the charts are local, set local directory
   #or will use the remote repo
@@ -200,6 +201,10 @@ ingress:
       host: "kafka-ui"
       domains: "{{ domains }}"
       path: "/"
+    jenkins:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/jenkins"
 
 monitor:
   namespace: monitor
@@ -226,7 +231,7 @@ monitor:
       #  e.g. https://k8s.my.local:30443/prometheus
       #set /prometheus if you don't know the exact external_url or you can't access prometheus
       external_url: "https://{{ domains[0] }}:{{ basic.ingress_nginx.config.https_port }}/prometheus"
-      # e.g. {send_resolved: true, url: "<url|no empty>", max_alerts: 10}
+      # e.g. {send_resolved: true, url: "<url|no empty>", max_alerts: 5}
       webhook_configs: []
       # e.g. {send_resolved: true, smarthost: smtp.qq.com:587 ,from: 1059202624@qq.com, to: 1059202624@qq.com, auth_username: 1059202624@qq.com, auth_password: 'xx'}
       email_configs: []
@@ -503,6 +508,43 @@ service:
       kafka_clusters:
       - name: kafka-k8s
         bootstrapServers: kafka.public:9092
+
+devops:
+  namespace: devops
+  repository: "{{ registry_prefix }}"
+  #use default sc when set null
+  storage_class: null
+  jenkins:
+    enabled: true
+    name: jenkins
+    chart:
+      repo: "{{ chart.repo['jenkins'] }}"
+      path: "jenkins"
+      version: "4.3.0"
+    admin_password: cangoal
+    resources:
+      requests:
+        cpu: "1000m"
+        memory: "2Gi"
+      limits:
+        cpu: "2000m"
+        memory: "4Gi"
+      storage: 10Gi
+    agent:
+      #must support RWX mode
+      storage_class: null
+      image: "{{ registry_prefix }}jenkins/inbound-agent"
+      tag: "4.11.2-4"
+      maven:
+        image: "{{ registry_prefix }}maven"
+        tag: "3.8.5-openjdk-8"
+        mirrors:
+          central: "http://maven.aliyun.com/nexus/content/groups/public"
+      nodejs:
+        image: "{{ registry_prefix }}node"
+        tag: "8.17.0-stretch-slim"
+  nexus:
+    enabled: true
 
 service_mesh:
   providers:
