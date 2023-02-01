@@ -5,8 +5,7 @@ metadata:
 spec:
   storageClassName: {%- if devops.jenkins.agent.storage_class %} {{ devops.jenkins.agent.storage_class }} {% else %} "" {% endif %}
 
-  accessModes:
-  - ReadWriteMany
+  accessModes: {{ devops.jenkins.agent.pvc_access_mode }}
   resources:
     requests:
       storage: 10Gi
@@ -20,8 +19,7 @@ metadata:
 spec:
   storageClassName: {%- if devops.jenkins.agent.storage_class %} {{ devops.jenkins.agent.storage_class }} {% else %} "" {% endif %}
 
-  accessModes:
-  - ReadWriteMany
+  accessModes: {{ devops.jenkins.agent.pvc_access_mode }}
   resources:
     requests:
       storage: 10Gi

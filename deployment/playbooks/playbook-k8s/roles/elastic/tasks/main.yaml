@@ -46,5 +46,15 @@
     __kibana_ingress_hosts: "{{ __kibana_ingress_hosts + [{'host': item,'paths': [{'path': ingress.hosts['kibana']['path']}] }] }}"
   with_items: "{{ __kibana_hosts }}"
 
+- name: set volumes fact
+  set_fact:
+    __volumes: []
+    __volumeMounts: []
+- name: set volumes fact
+  set_fact:
+    __volumes: "{{ __volumes | default([]) +  [{'name': item['name'],'hostPath': { 'path': item['hostPath']}}] }}"
+    __volumeMounts: "{{ __volumeMounts | default([]) +  [{'name': item['name'],'mountPath': item['mountPath']}] }}"
+  with_items: "{{ log.elastic.filebeat.volumes }}"
+
 - name: setup elastic
   include_tasks: setup_elastic.yaml

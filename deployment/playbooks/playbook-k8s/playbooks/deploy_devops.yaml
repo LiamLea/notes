@@ -3,3 +3,4 @@
   become: True
   roles:
   - { role: jenkins , when: "devops.jenkins.enabled" }
+  - { role: argocd , when: "devops.argocd.enabled" }

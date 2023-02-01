@@ -4,22 +4,17 @@ data:
     <!-- 添加下面的配置 -->
 
     <!-- 设置私库的账号密码 -->
+
     <servers>
+      {%- for server in devops.jenkins.agent.maven.servers %}
+
       <server>
-        <id>maven-public</id>
-        <username>admin</username>
-        <password>cangoal</password>
+        <id>{{ server.id }}</id>
+        <username>{{ server.username }}</username>
+        <password>{{ server.password }}</password>
       </server>
-      <server>
-        <id>kangpaas-release</id>
-        <username>admin</username>
-        <password>cangoal</password>
-      </server>
-      <server>
-        <id>kangpaas-snapshot</id>
-        <username>admin</username>
-        <password>cangoal</password>
-      </server>
+      {%- endfor %}
+
     </servers>
 
     <!-- 设置中央仓库的地址 -->

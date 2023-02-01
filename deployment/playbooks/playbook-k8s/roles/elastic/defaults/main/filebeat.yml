@@ -6,19 +6,21 @@ __config_filebeat: |
     - type: kubernetes
       templates:
 
+
       - config:
+        {% for li in log.elastic.filebeat.log -%}
         - type: log
-          paths:
-          - "/var/log/messages"
-          - "/var/log/syslog"
+          paths: {{ li.paths }}
           fields:
             labels:
-              app_name: "syslog"
+              app_name: "{{ li.app_name }}"
               addition: "host"
               source: "host"
-              timezone: Asia/Shanghai
+              timezone: "{{ li.timezone }}"
               host: "${data.kubernetes.node.name}"
           fields_under_root: true
+
+        {% endfor -%}
 
       #收集k8s中所有容器的日志（需要排除上面特殊处理的日志）
       - condition:
@@ -41,7 +43,7 @@ __config_filebeat: |
   processors:
   - add_labels:
       labels:
-        app_env: test
+        app_env: {{ log.elastic.filebeat.env }}
   - add_labels:
       labels:
         timezone: UTC

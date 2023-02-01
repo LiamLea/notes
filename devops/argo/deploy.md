@@ -7,6 +7,7 @@
     - [部署](#部署)
       - [1.修改密码](#1修改密码)
       - [2.启动参数](#2启动参数)
+      - [3.ingress](#3ingress)
       - [2.Argo CD Image Updater](#2argo-cd-image-updater)
 
 <!-- /code_chunk_output -->
@@ -30,5 +31,8 @@ argocd-server
   --basehref <PATH>   #返回资源的地址，比如：/argocd
   --rootpath <PATh>   #真正的资源的地址，比如：/argocd
 ```
+
+#### 3.ingress
+Argo CD API server runs both a gRPC server (used by the CLI), as well as a HTTP/HTTPS server (used by the UI).
 
 #### 2.Argo CD Image Updater

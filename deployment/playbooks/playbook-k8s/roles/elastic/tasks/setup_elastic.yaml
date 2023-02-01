@@ -129,3 +129,5 @@
           limits:
             cpu: "1000m"
             memory: "500Mi"
+        extraVolumes: "{{ __volumes }}"
+        extraVolumeMounts: "{{ __volumeMounts }}"
