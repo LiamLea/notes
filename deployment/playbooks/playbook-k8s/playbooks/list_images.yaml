@@ -53,6 +53,9 @@
   - name: include template jenkins
     include_tasks: ../roles/jenkins/tasks/template.yaml
 
+  - name: include template argocd
+    include_tasks: ../roles/argocd/tasks/template.yaml
+
   - name: set images
     set_fact:
       my_dict:
@@ -73,6 +76,7 @@
         redis: "{{ redis_images | unique }}"
         tools: "{{ tools_images | unique }}"
         jenkins: "{{ jenkins_images | unique }}"
+        argocd: "{{ argocd_images | unique }}"
 
   - name: list_images
     debug:

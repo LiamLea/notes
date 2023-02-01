@@ -28,7 +28,6 @@
     release_values:
       controller:
         image: "{{ devops.repository }}jenkins/jenkins"
-        tagLabel: jdk11
         imagePullPolicy: "IfNotPresent"
         adminPassword: "{{ devops.jenkins.admin_password }}"
         resources:
@@ -51,6 +50,10 @@
           tls:
           - secretName: "jenkins-ingress-secret"
             hosts: "{{ __jenkins_hosts }}"
+        testEnabled: false
+        sidecars:
+          configAutoReload:
+            image: "{{ devops.repository }}kiwigrid/k8s-sidecar:1.15.0"
       agent: "{{ __agent_config }}"
       persistence:
         enabled: true

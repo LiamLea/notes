@@ -92,6 +92,7 @@ chart:
     kfirfer: https://kfirfer.github.io/helm/
     kafka-ui: https://provectus.github.io/kafka-ui
     jenkins: https://charts.jenkins.io/
+    argo: https://argoproj.github.io/argo-helm
 
   #if the charts are local, set local directory
   #or will use the remote repo
@@ -205,6 +206,10 @@ ingress:
       host: ""
       domains: "{{ domains }}"
       path: "/jenkins"
+    argocd:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/argocd"
 
 monitor:
   namespace: monitor
@@ -377,11 +382,40 @@ log:
       config:
         batch_size: 1000
         group_id: logstash_log_k8s
+      #groks:
+      #- '%{IP:[request][remote_addr]}\"%{WORD:[request][request_method]}\s+%{URIPATH:[request][request_path]}(?:\?*(?<[request][params]>\S+))?\s+HTTP/%{NUMBER:[request][http_version]}\"\s+%{INT:[request][status]}\s+%{NOTSPACE:[request][bytes_sent]}(?:\s+\"(?<[request][http_referer]>.*?)\")?(?:\s+\"(?<[request][user_agent]>.*?)\")?(?:\s*%{NUMBER:[request][request_time]})?'
     filebeat:
       name: filebeat
       chart:
         repo: "{{ chart.repo['elastic'] }}"
         path: "filebeat"
+
+      #description env info(e.g. test、dev、prodution)
+      env: test
+
+      #mount hostPath into container
+      #/var/log don't need to mount
+      #cannot mout on /var/log/ because /var/log has been mounted in readonly mode
+      volumes: []
+      # - name: vol-1
+      #   hostPath: /tmp/a.txt
+      #   mountPath: /tmp/a.txt
+      # - name: vol-2
+      #   hostPath: /tmp/log
+      #   mountPath: /tmp/mylog
+
+      #collect the logs belowed additionly
+      log:
+      - paths:
+        - "/var/log/messages"
+        - "/var/log/syslog"
+        app_name: "syslog"
+        timezone: Asia/Shanghai
+      # - paths:
+      #   - "/tmp/a.txt"
+      #   - "/tmp/mylog/*.txt"
+      #   app_name: "mylog"
+      #   timezone: Asia/Shanghai
 
 service:
   namespace: public
@@ -531,20 +565,40 @@ devops:
         memory: "4Gi"
       storage: 10Gi
     agent:
-      #must support RWX mode
       storage_class: null
+      #if not enable RWX mode, you can only run one agent
+      pvc_access_mode: ["ReadWriteMany"]
       image: "{{ registry_prefix }}jenkins/inbound-agent"
       tag: "4.11.2-4"
       maven:
         image: "{{ registry_prefix }}maven"
         tag: "3.8.5-openjdk-8"
+        servers:
+        - id: kangpaas-release
+          username: admin
+          password: cangoal
         mirrors:
           central: "http://maven.aliyun.com/nexus/content/groups/public"
       nodejs:
         image: "{{ registry_prefix }}node"
         tag: "8.17.0-stretch-slim"
-  nexus:
+  argocd:
     enabled: true
+    name: argocd
+    chart:
+      repo: "{{ chart.repo['argo'] }}"
+      path: "argo-cd"
+      version: "5.19.12"
+    #htpasswd -nbBC 10 "" <password> | tr -d ':\n' | sed 's/$2y/$2a/'
+    admin_password: '$2a$10$JzzAmxScWsiWq5Ap6NUwYOwnLZvUEEPuH6A0ol0JCd3Tk2yuK90LC'
+    resources:
+      requests:
+        cpu: "1000m"
+        memory: "2Gi"
+      limits:
+        cpu: "2000m"
+        memory: "4Gi"
+      storage: 10Gi
 
 service_mesh:
   providers:

@@ -1,0 +1,55 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- name: set proxy fact
+  set_fact:
+    __proxy_env:
+      HTTP_PROXY: "{{ chart.http_proxy.server }}"
+      HTTPS_PROXY: "{{ chart.http_proxy.server }}"
+      NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
+  when: chart.http_proxy.enabled == True
+
+- block:
+  - name: copy charts
+    copy:
+      src: "{{ chart.local_dir.rstrip('/') }}/"
+      dest: "/tmp/"
+      force: true
+  - name: set fact
+    set_fact:
+      __path: "/tmp/"
+  when: chart.local_dir.strip() != ""
+
+- name: template argocd
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ devops.argocd.chart.path }}"
+    chart_repo_url: "{{ devops.argocd.chart.repo }}"
+    chart_version: "{{ devops.argocd.chart.version }}"
+    release_values:
+      global:
+        image:
+          repository: "{{ devops.repository }}quay.io/argoproj/argocd"
+      configs:
+        params:
+          server.insecure: true
+          server.basehref: /argocd
+          server.rootpath: /argocd
+        secret:
+          argocdServerAdminPassword: "{{ devops.argocd.admin_password }}"
+      dex:
+        image:
+          repository: "{{ devops.repository }}ghcr.io/dexidp/dex"
+      redis:
+        image:
+          repository: "{{ devops.repository }}public.ecr.aws/docker/library/redis"
+  register: argocd_template_result
+
+- name: set facts
+  set_fact:
+    argocd_template_stdout: "{{ argocd_template_result.stdout_lines }}"
+
+- name: get images
+  set_fact:
+    argocd_images: "{{ argocd_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"

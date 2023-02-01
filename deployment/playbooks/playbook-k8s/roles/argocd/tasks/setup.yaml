@@ -1,0 +1,45 @@
+- name: install argocd
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm:
+    chart_ref: "{{ __path }}{{ devops.argocd.chart.path }}"
+    chart_repo_url: "{{ devops.argocd.chart.repo }}"
+    chart_version: "{{ devops.argocd.chart.version }}"
+    release_name: "{{ devops.argocd.name }}"
+    release_namespace: "{{ devops.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      global:
+        image:
+          repository: "{{ devops.repository }}quay.io/argoproj/argocd"
+      configs:
+        params:
+          server.insecure: true
+          server.basehref: /argocd
+          server.rootpath: /argocd
+        secret:
+          argocdServerAdminPassword: "{{ devops.argocd.admin_password }}"
+      server:
+        ingress:
+          enabled: true
+          annotations:
+            cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
+            nginx.ingress.kubernetes.io/configuration-snippet: |
+              if ($request_uri ~ "^/argocd.*") {
+                rewrite ^ $request_uri;
+                rewrite "(?i)/(argocd.*)" /$1 break;
+                proxy_pass http://upstream_balancer$uri;
+                break;
+              }
+          ingressClassName: "{{ ingress.class_name }}"
+          hosts: "{{ __argocd_hosts }}"
+          paths: ["{{ ingress.hosts['argocd'].path }}"]
+          tls:
+          - secretName: "argocd-ingress-secret"
+            hosts: "{{ __argocd_hosts }}"
+      dex:
+        image:
+          repository: "{{ devops.repository }}ghcr.io/dexidp/dex"
+      redis:
+        image:
+          repository: "{{ devops.repository }}public.ecr.aws/docker/library/redis"
