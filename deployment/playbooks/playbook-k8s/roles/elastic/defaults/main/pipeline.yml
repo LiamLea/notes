@@ -20,13 +20,7 @@ __config_logstash_conf: |
     #进行grok清洗（匹配即停止）
     grok{
       match => {
-        "message" => [
-          "%{IP:[request][remote_addr]}.*?\[%{HTTPDATE:logtime}\]\s+\"%{WORD:[request][request_method]}\s+%{URIPATH:[request][request_path]}(?:\?*(?<[request][params]>\S+))?\s+HTTP/%{NUMBER:[request][http_version]}\"\s+%{INT:[request][status]}\s+%{NOTSPACE:[request][bytes_sent]}(?:\s+\"(?<[request][http_referer]>.*?)\")?(?:\s+\"(?<[request][user_agent]>.*?)\")?(?:\s*%{NUMBER:[request][request_time]})?",
-          "\[%{TIMESTAMP_ISO8601:logtime}\].*?\[(?<trace_id>.*?)\].*?\[%{LOGLEVEL:level}\s*\].*?\[(?<module>\S+)\]\s*--\s*(?<message>.*)",
-          "%{DATESTAMP:logtime}\s+\[%{LOGLEVEL:level}\]\s%{POSINT:pid}#%{NUMBER:tid}:\s(?<message>.*)",
-          "%{TIMESTAMP_ISO8601:logtime}\s+\[(?<module>\S+)\]\s+%{LOGLEVEL:level}\s+(?<message>.*)",
-          "%{SYSLOGTIMESTAMP:logtime} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST} %{SYSLOGPROG:module}:(?<message>.*)"
-        ]
+        "message" => {{ log.elastic.logstash.pipeline.groks }}
       }
       overwrite => ["message"]
     }
@@ -89,7 +83,7 @@ __config_logstash_conf: |
 
     #统一清洗
     prune {
-      whitelist_names => ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$","^geoip$","^data_stream$"]
+      whitelist_names => {{ log.elastic.logstash.pipeline.whitelist_names }}
       add_field => {
         "[labels][app_id]" => "%{[labels][app_name]}.%{[labels][addition]}.%{[labels][log_type]}-%{[labels][app_env]}"
         "[data_stream][type]" => "logs"
