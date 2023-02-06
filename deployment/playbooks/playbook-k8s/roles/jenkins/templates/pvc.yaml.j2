@@ -23,3 +23,17 @@ spec:
   resources:
     requests:
       storage: 10Gi
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: cache-pvc
+spec:
+  storageClassName: {%- if devops.jenkins.agent.storage_class %} {{ devops.jenkins.agent.storage_class }} {% else %} "" {% endif %}
+
+  accessModes: {{ devops.jenkins.agent.pvc_access_mode }}
+  resources:
+    requests:
+      storage: 10Gi

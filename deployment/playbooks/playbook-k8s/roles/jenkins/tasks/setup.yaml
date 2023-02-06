@@ -18,6 +18,8 @@
 - name: install jenkins
   environment: "{{ __proxy_env | default(omit) }}"
   kubernetes.core.helm:
+    wait: yes
+    wait_timeout: 10m0s
     chart_ref: "{{ __path }}{{ devops.jenkins.chart.path }}"
     chart_repo_url: "{{ devops.jenkins.chart.repo }}"
     chart_version: "{{ devops.jenkins.chart.version }}"
@@ -30,16 +32,27 @@
         image: "{{ devops.repository }}jenkins/jenkins"
         imagePullPolicy: "IfNotPresent"
         adminPassword: "{{ devops.jenkins.admin_password }}"
+        containerEnv:
+        - name: GIT_SSL_NO_VERIFY
+          value: "1"
         resources:
           requests: "{{ devops.jenkins.resources.requests }}"
           limits: "{{ devops.jenkins.resources.limits }}"
         jenkinsUriPrefix: "{{ ingress.hosts['jenkins'].path }}"
         #install the latest plugins(you can speify the version, e.g. kubernetes:3734.v562b_b_a_627ea_c)
-        installPlugins:
-        - kubernetes
-        - workflow-aggregator
-        - git
-        - configuration-as-code
+        additionalPlugins:
+        - "blue ocean"
+        - skip-certificate-check
+        - timestamper
+        initializeOnce: true
+        JCasC:
+          security:
+            gitHostKeyVerificationConfiguration:
+              sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
+          updateCenter:
+            sites:
+            - id: "default"
+              url: "https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json"
         ingress:
           enabled: true
           annotations:
