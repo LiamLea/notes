@@ -52,6 +52,7 @@
 #### 5.监控k8s：15520、11454
 
 * 系统状态: 15520
+  * 需要添加一个变量: `DS_PROMETHEUS`，值为`Prometheus`
 ![](./imgs/dashboard_k8s_01.png)
 ![](./imgs/dashboard_k8s_02.png)
 

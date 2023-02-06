@@ -392,7 +392,7 @@ log:
             "%{SYSLOGTIMESTAMP:logtime} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST} %{SYSLOGPROG:module}:(?<message>.*)"
           ]
         whitelist_names: ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$","^geoip$","^data_stream$"]
-    
+
     filebeat:
       name: filebeat
       chart:
@@ -563,7 +563,7 @@ devops:
     chart:
       repo: "{{ chart.repo['jenkins'] }}"
       path: "jenkins"
-      version: "4.3.0"
+      version: "4.1.9"
     admin_password: cangoal
     resources:
       requests:
@@ -579,6 +579,8 @@ devops:
       pvc_access_mode: ["ReadWriteMany"]
       image: "{{ registry_prefix }}jenkins/inbound-agent"
       tag: "4.11.2-4"
+      #if false , use additionalContainers config , or use podTemplates config(choose depending on jenkins chart version)
+      disableDefaultAgent: true
       maven:
         image: "{{ registry_prefix }}maven"
         tag: "3.8.5-openjdk-8"
@@ -590,7 +592,7 @@ devops:
           central: "http://maven.aliyun.com/nexus/content/groups/public"
       nodejs:
         image: "{{ registry_prefix }}node"
-        tag: "8.17.0-stretch-slim"
+        tag: "14"
   argocd:
     enabled: true
     name: argocd
