@@ -11,8 +11,10 @@
     - [部署](#部署)
       - [1.安装](#1安装)
         - [（1）单机模式](#1单机模式)
-        - [（2）使用mysql（以单机模式为例）](#2使用mysql以单机模式为例)
-        - [（3）集群模式（至少三个节点）](#3集群模式至少三个节点)
+      - [2.使用mysql](#2使用mysql)
+        - [（1）使用mysql（以单机模式为例）](#1使用mysql以单机模式为例)
+        - [（2）集群模式（至少三个节点）](#2集群模式至少三个节点)
+      - [3.在k8s上安装](#3在k8s上安装)
     - [客户端使用](#客户端使用)
       - [1.注册中心](#1注册中心)
         - [（1）引入依赖](#1引入依赖)
@@ -70,7 +72,14 @@ docker run --name nacos-quick \
   -d nacos/nacos-server:2.0.2
 ```
 
-#####（2）使用mysql（以单机模式为例）
+#### 2.使用mysql
+
+* 需要使用nacos提高的mysql（即会自动刷入相关sql）
+  * 如果要使用自己的mysql需要自动导入数据等，比较复杂
+  [参考](https://github.com/nacos-group/nacos-docker)
+
+#####（1）使用mysql（以单机模式为例）
+
 ```shell
 docker run --name nacos-quick \
   -e MODE=standalone \
@@ -82,13 +91,51 @@ docker run --name nacos-quick \
   -d nacos/nacos-server:2.0.2
 ```
 
-##### （3）集群模式（至少三个节点）
+##### （2）集群模式（至少三个节点）
 存在bug: 如果一个节点，即使注册上了服务列表也为空
 ```shell
 docker run --name nacos-quick \
   -e MODE=cluster -e NACOS_SERVERS="10.10.10.250:8848 10.10.10.251:8848 10.10.10.252:8848" \
   -p 8848:8848 -p 9848:9848 -p 9849:9849 \
   -d nacos/nacos-server:2.0.2
+```
+
+#### 3.在k8s上安装
+[官方](https://github.com/nacos-group/nacos-k8s)提供的方式，不好，不建议使用
+建议使用这个[chart](https://artifacthub.io/packages/helm/ygqygq2/nacos):
+* 需要修改的参数
+```yaml
+parameters:
+  - name: image.repository
+    value: nacos/nacos-server
+  - name: ingress.hostname
+    value: home.liamlea.local
+  - name: mysql.enabled
+    value: 'false'
+  - name: mysql.external.mysqlMasterHost
+    value: mysql-primary
+  - name: mysql.external.mysqlMasterUser
+    value: root
+  - name: mysql.external.mysqlMasterPassword
+    value: cangoal
+  - name: mysql.external.mysqlSlaveHost
+    value: mysql-secondary
+  - name: image.registry
+    value: 10.10.10.250/library
+  - name: ingress.annotations.cert-manager\.io/cluster-issuer
+    value: ca-issuer
+  - name: ingress.tls
+    value: 'true'
+  - name: ingress.ingressClassName
+    value: nginx
+  - name: service.ports.grpc-1.port
+    value: '9848'
+  - name: service.ports.grpc-1.protocol
+    value: TCP
+  - name: service.ports.grpc-2.port
+    value: '9849'
+  - name: service.ports.grpc-2.protocol
+    value: TCP
 ```
 
 ***

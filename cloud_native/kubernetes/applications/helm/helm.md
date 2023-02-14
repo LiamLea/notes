@@ -25,7 +25,8 @@
       - [3.判断语句](#3判断语句)
       - [4.with语句（修改作用域）](#4with语句修改作用域)
       - [5.range语句（遍历）](#5range语句遍历)
-      - [6.常见例子](#6常见例子)
+      - [6.语句嵌套:`()`](#6语句嵌套)
+      - [7.常见例子](#7常见例子)
     - [自定义chart](#自定义chart)
 
 <!-- /code_chunk_output -->
@@ -166,6 +167,7 @@ helm get all <releae_name> --revision <revision>
 #如果在shell中，语法：
   ${<VAIRABLE_NAME>}
 ```
+
 #### 2.helm内置对象和内置变量
 ```shell
   Release           #release相关属性
@@ -239,7 +241,25 @@ name:
 #- lier
 #- lisan
 ```
-#### 6.常见例子
+
+#### 6.语句嵌套:`()`
+* 比如需求如下:
+```shell
+#需要获取.Values.resources."blade-auth"的值，并且渲染成yaml格式
+# 因为不能使用-，所以需要index方法
+{{ index .Values.resources "blade-auth" }}
+
+#渲染成yaml格式
+# 下面这种写法不对：因为不能使用-，所以需要index方法
+{{- toYaml .Values.resources."blade-auth" | nindent 12 }}
+```
+
+* 两种语句进行嵌套
+```shell
+{{- toYaml (index .Values.resources "blade-auth") | nindent 12 }}
+```
+
+#### 7.常见例子
 （1）demo1
 >values.yml
 ```yaml
