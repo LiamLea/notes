@@ -629,8 +629,9 @@ __config_alerting_rules:
         description: "A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.\n  VALUE = {{  '{{ $value }}\n  LABELS = {{ $labels }}' }}"
 
     - alert: KubernetesApiServerLatency
-      expr: histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{verb!~"CONNECT|WATCH"}[5m])) by (le, instance)) > 1
-      for: 2m
+      #origin: >1 for 2m
+      expr: histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{verb!~"CONNECT|WATCH"}[5m])) by (le, instance)) > 3
+      for: 5m
       labels:
         severity: warning
       annotations:
@@ -638,8 +639,9 @@ __config_alerting_rules:
         description: "Kubernetes API server has a 99th percentile latency of {{  '{{ $value }} seconds for {{ $labels.instance }}.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
 
     - alert: KubernetesApiServerRequestEtcdLatency
-      expr: histogram_quantile(0.99, sum(rate(etcd_request_duration_seconds_bucket[5m])) by (le, instance)) > 1
-      for: 2m
+      #origin: >1 for 2m
+      expr: histogram_quantile(0.99, sum(rate(etcd_request_duration_seconds_bucket[5m])) by (le, instance)) > 3
+      for: 5m
       labels:
         severity: warning
       annotations:
@@ -739,7 +741,8 @@ __config_alerting_rules:
         description: "Etcd member communication slowing down, 99th percentile is over 0.15s\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
 
     - alert: EtcdHighNumberOfFailedProposals
-      expr: increase(etcd_server_proposals_failed_total[1h]) > 5
+      #origin: >5 in 1h for 2m
+      expr: increase(etcd_server_proposals_failed_total[10m]) > 5
       for: 2m
       labels:
         severity: warning
@@ -757,8 +760,9 @@ __config_alerting_rules:
         description: "Etcd WAL fsync duration increasing, 99th percentile is over 0.5s\n  {{ 'VALUE = {{ $value }}\n  LABELS = {{ $labels }}' }}"
 
     - alert: EtcdHighCommitDurations
-      expr: histogram_quantile(0.99, rate(etcd_disk_backend_commit_duration_seconds_bucket[1m])) > 0.25
-      for: 2m
+      #origin: >0.25 for 2m
+      expr: histogram_quantile(0.99, rate(etcd_disk_backend_commit_duration_seconds_bucket[1m])) > 0.5
+      for: 5m
       labels:
         severity: warning
       annotations:

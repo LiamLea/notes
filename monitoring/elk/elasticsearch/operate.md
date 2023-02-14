@@ -9,9 +9,10 @@
   - [1.index相关](#1index相关)
     - [（1）查询index的概述信息](#1查询index的概述信息)
     - [（2）查询index的内容](#2查询index的内容)
-  - [2.高级查询](#2高级查询)
-    - [（1）基本语法](#1基本语法)
-    - [（2）`query`](#2query)
+    - [（3）curl格式](#3curl格式)
+  - [2.查询语法](#2查询语法)
+    - [（1）基本格式](#1基本格式)
+    - [（2）query中的语法](#2query中的语法)
     - [（3）查询nested类型数据](#3查询nested类型数据)
   - [3.集群相关](#3集群相关)
     - [(1) 查看集群状态](#1-查看集群状态)
@@ -95,9 +96,7 @@ curl <IP>:<PORT>/<INDEX>/_search?pretty&size=<NUMBER>
 }
 ```
 
-#### 2.高级查询
-
-##### （1）基本语法
+##### （3）curl格式
 ```shell
 curl -H "Content-Type: application/json" \
 -XGET <IP>:<PORT>/<INDEX>/_search -d \
@@ -109,48 +108,122 @@ curl -H "Content-Type: application/json" \
   "from": 10,
   "size": 10
 }'
-
-#sort对结果进行排序
-#from、size就是从第10个结果开始向后的10个结果
 ```
 
-##### （2）`query`
-* 所有documents
+#### 2.查询语法
+```shell
+GET /<index>/_search
+```
+##### （1）基本格式
+
 ```json
 {
-  "query": {"match_all": {}}
+	"size": 10,
+	"query": {}
 }
+
+//常用字段:
+//  size: 获取多少个数据
+//  sort: 对结果进行排序
+//  from: 从第几个document开始查
 ```
 
-* `<KEY>`的value等于`<VALUE>`的documents
-```json
-{
-  "query": { "match": { "<KEY>": "<VALUE>"}}
-}
-```
+##### （2）query中的语法
+[参考](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl.html)
 
-* `<KEY>`的value包含`<VALUE>`的documents
-```json
-{
-  "query": {"match_phrase": {"<KEY>": "<VALUE>"}}
-}
-```
+* `match_all`
+  * 所有documents
+    ```json
+    {
+      "query": {"match_all": {}}
+    }
+    ```
 
-* 复合查询
-```json
-{
-  "query": {
-    "bool": {
-      "must": [
-        {"match": {"<KEY>": "<VALUE>"}},
-      ],
-      "must_not": [
-        {"match": {"<KEY>": "<VALUE>"}}
-      ]
+* 查询关键词（无顺序）: `match`
+  * 查询 `字段<key>的值 包含 <v1>或者<v2>`
+    ```json
+    {
+        "query": {
+            "match": {
+                "<key>": "<v1> <v2>",
+                "operator": "or"
+            }
+        }
+    }
+    ```
+
+* 查询关键词（有顺序）: `match_phrase`
+  * 查询 `字段<key>的值 包含 "<v1> <v2>"这种格式的词组`
+    ```json
+    {
+        "query": {
+            "match_phrase": {
+                "<key>": "<v1> <v2>",
+            }
+        }
+    }
+    ```
+
+* 查询某个字段的范围（比如时间戳）: `range`
+  * 查询近30min的结果
+    ```json
+    {
+        "query": {
+            "range": {
+                "@timestamp": {
+                    "gte": "now-30m"
+                }
+            }
+        }
+    }
+    ```
+
+  * 使用正则表达式: `regexp`
+  ```json
+  {
+    "query": {
+      "regexp": {
+        "user.id": {
+          "value": "k.*y",
+          "flags": "ALL",
+          "case_insensitive": true,
+          "max_determinized_states": 10000,
+          "rewrite": "constant_score"
+        }
+      }
     }
   }
-}
-```
+  ```
+
+* 复合查询（有多个查询语句）: `bool`
+  * must (==and)
+  * should (==or)
+  * 查询近30min内, message字段的值 包含 "similar"和"error"这两个内容
+  ```json
+  {
+      "query": {
+          "bool": {
+              "must": [
+                  {
+                      "match": {
+                          "message": {
+                              "query": "similar error",
+                              "operator": "and"
+                          }
+                      }
+                  },
+                  {
+                      "range": {
+                          "@timestamp": {
+                              "gte": "now-30m"
+                          }
+                      }
+                  }
+              ]
+          }
+      }
+  }
+  ```
 
 ##### （3）查询nested类型数据
 ```json
