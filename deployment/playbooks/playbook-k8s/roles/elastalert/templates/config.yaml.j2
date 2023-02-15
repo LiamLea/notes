@@ -1,0 +1,79 @@
+apiVersion: v1
+data:
+  global.config: |
+    #----------告警配置---------------
+    # 将多个match合并在一个alert中发过去
+    #   比如设置2h：在12:00产生了一个match，会在14:00的时候发送一个alert，不管这中间发生了多少match
+    # aggregation时，会打印如下日志（表示已经触发了告警，只是还没发送）:
+    #   INFO:elastalert:New aggregation for test_rule, aggregation_key: None. next alert at 2023-02-10 08:15:29.789938+00:00.
+    aggregation:
+      minutes: 1
+
+    # 在一段时间内，忽略query_key都相同的match
+    # 忽略时会打印如下日志:
+    #   INFO:elastalert:Ignoring match for silenced rule test_rule.node-4, None, syslog.host.app-test
+    realert:
+      minutes: 1
+    query_key:
+    - labels.host
+    - labels.pod
+    - labels.app_id
+
+    #----------设置告警内容: subject和text---------------
+    # 将多个matches合并为一个alert
+    # {0} 表示引用alert_subject_args[0]参数
+    alert_subject: "{0}"
+    #可以使用的参数: rule中字段 或者 elastic中的字段
+    alert_subject_args:
+    - "name"
+
+    alert_text_type: alert_text_jinja
+    {% raw %}
+    alert_text: |
+      Alert triggered! *({{num_hits}} Matches!)*
+      {{origin_message}}
+    {% endraw %}
+
+    #会在alert_text最前面加上，一个表，表的列就是下面这些字段（用于分类统计）
+    summary_table_fields:
+    - labels.host
+    - labels.pod
+    - labels.app_id
+    summary_table_type: markdown
+
+    # 定义告警方式
+    alert:
+    #- debug    #可以用于告警调试
+    - alertmanager
+
+    #----------alertmanager告警配置---------------
+    alertmanager_hosts:
+    - "{{ log.elastalert.alertmanager.url }}"
+
+    #alertmanager_alertname: "<default=rule_name>"
+
+    # 将alert_subject用于annotation中的哪个字段（默认为summary字段）
+    # 所以这里不改变，alertmanager_annotations.summary不会生效
+    #alertmanager_alert_subject_labelname: "subject"
+    # 将alert_text用于annotation中的哪个字段（默认为description字段）
+    # 所以这里不改变，alertmanager_annotations.description不会生效
+    #alertmanager_alert_text_labelname: "text"
+
+    #设置告警的annotations
+    #alertmanager_annotations: {}
+
+    #设置告警的labels
+    alertmanager_labels:
+      severity: critical
+      source: "elastalert"
+
+    # 通过 已存在的字段 设置lables
+    # 比如: msg: "message"，会设置msg这个label，值为message对应的字段的值
+    alertmanager_fields:
+      #<label_name>: "<some_elastic_fieldname>"
+      #加一个时间戳，因为alertmanager告警的fintprint是通过label产生的
+      timestamp: "@timestamp"
+
+kind: ConfigMap
+metadata:
+  name: elastalert-rules-global-config

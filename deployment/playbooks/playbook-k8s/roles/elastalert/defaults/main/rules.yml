@@ -1,0 +1,69 @@
+__rules:
+  oom_rules: |
+    #----------基本信息---------------
+    name: out_of_memory
+    is_enabled: true
+    # 指定index
+    index: {{ log.elastalert.index_map.syslog }}
+
+    #----------设置告警触发条件---------------
+    # 不通的rule type有不同的设置参数
+    type: any
+
+    #定义filter（多个filter，即and）
+    # filter为空表示，匹配该index中所有document
+    filter:
+    - query:
+        query_string:
+          query: "message: \"out of memory\""
+
+    #导入文件（放在rules/目录下，不能以.yml或.yaml结尾）
+    #将通用配置放在里面
+    import:
+    - ../global.config
+
+  tooOpenFiles_rules: |
+    #----------基本信息---------------
+    name: too_open_files
+    is_enabled: true
+    # 指定index
+    index: {{ log.elastalert.index_map.syslog }}
+
+    #----------设置告警触发条件---------------
+    # 不通的rule type有不同的设置参数
+    type: any
+
+    #定义filter（多个filter，即and）
+    # filter为空表示，匹配该index中所有document
+    filter:
+    - query:
+        query_string:
+          query: "message: \"too many open files\""
+
+    #导入文件（放在rules/目录下，不能以.yml或.yaml结尾）
+    #将通用配置放在里面
+    import:
+    - ../global.config
+
+  memoryError_rules: |
+    #----------基本信息---------------
+    name: memory_error
+    is_enabled: true
+    # 指定index
+    index: {{ log.elastalert.index_map.syslog }}
+
+    #----------设置告警触发条件---------------
+    # 不通的rule type有不同的设置参数
+    type: any
+
+    #定义filter（多个filter，即and）
+    # filter为空表示，匹配该index中所有document
+    filter:
+    - query:
+        query_string:
+          query: "message: EDAC *dimm* AND message: error"
+
+    #导入文件（放在rules/目录下，不能以.yml或.yaml结尾）
+    #将通用配置放在里面
+    import:
+    - ../global.config

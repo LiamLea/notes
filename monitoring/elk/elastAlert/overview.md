@@ -12,7 +12,7 @@
       - [5.alerts](#5alerts)
       - [7.避免报警风暴](#7避免报警风暴)
     - [基本使用](#基本使用)
-      - [1.elastAlert创建index](#1elastalert创建index)
+      - [1.elastAlert创建index（不是必须，运行时会自动创建）](#1elastalert创建index不是必须运行时会自动创建)
       - [3.测试rule](#3测试rule)
       - [4.运行elastAlert](#4运行elastalert)
 
@@ -81,7 +81,7 @@ end
 
 ### 基本使用
 
-#### 1.elastAlert创建index
+#### 1.elastAlert创建index（不是必须，运行时会自动创建）
 
 ```shell
 docker run -it --name elastalert --rm \

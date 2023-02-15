@@ -93,6 +93,7 @@ chart:
     kafka-ui: https://provectus.github.io/kafka-ui
     jenkins: https://charts.jenkins.io/
     argo: https://argoproj.github.io/argo-helm
+    elastalert2: https://jertel.github.io/elastalert2/
 
   #if the charts are local, set local directory
   #or will use the remote repo
@@ -425,6 +426,29 @@ log:
       #   - "/tmp/mylog/*.txt"
       #   app_name: "mylog"
       #   timezone: Asia/Shanghai
+  elastalert:
+    name: elastalert
+    chart:
+      repo: "{{ chart.repo['elastalert2'] }}"
+      path: "elastalert2"
+      version: "2.9.0"
+    resources:
+      requests:
+        cpu: "1000m"
+        memory: "2Gi"
+      limits:
+        cpu: "1000m"
+        memory: "2Gi"
+    writebackIndex: elastalert
+    elasticsearch:
+      host: elasticsearch-master
+      port: 9200
+      username: "elastic"
+      password: "elastic"
+    alertmanager:
+      url: "http://{{ monitor.prometheus.name }}-alertmanager.{{ monitor.namespace }}/alertmanager"
+    index_map:
+      syslog: "logs-syslog*"
 
 service:
   namespace: public

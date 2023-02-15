@@ -1,0 +1,45 @@
+- name: set fact
+  set_fact:
+    __path: ""
+
+- name: set fact
+  set_fact:
+    __path: "{{ chart.local_dir.rstrip('/') }}/"
+  when: chart.local_dir.strip() != ""
+
+- name: set proxy fact
+  set_fact:
+    __proxy_env:
+      HTTP_PROXY: "{{ chart.http_proxy.server }}"
+      HTTPS_PROXY: "{{ chart.http_proxy.server }}"
+      NO_PROXY: "{{ chart.http_proxy.no_proxy }}"
+  when: chart.http_proxy.enabled == True
+
+- name: template elastAlert
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm_template:
+    chart_ref: "{{ __path }}{{ log.elastalert.chart.path }}"
+    chart_repo_url: "{{ log.elastalert.chart.repo }}"
+    chart_version: "{{ log.elastalert.chart.version }}"
+    release_values:
+      image:
+        repository: "{{ log.repository }}jertel/elastalert2"
+      elasticsearch:
+        host: "{{ log.elastalert.elasticsearch.host }}"
+        port: "{{ log.elastalert.elasticsearch.port }}"
+        username: "{{ log.elastalert.elasticsearch.username }}"
+        password: "{{ log.elastalert.elasticsearch.password }}"
+        verifyCerts: "False"
+      resources: "{{ log.elastalert.resources }}"
+      writebackIndex: "{{ log.elastalert.writebackIndex }}"
+      runIntervalMins: 1
+      bufferTimeMins: 15
+  register: elastalert_template_result
+
+- name: set facts
+  set_fact:
+    elastalert_template_stdout: "{{ elastalert_template_result.stdout_lines }}"
+
+- name: get images
+  set_fact:
+    elastalert_images: "{{ elastalert_template_stdout | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}"
