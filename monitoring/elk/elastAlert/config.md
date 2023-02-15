@@ -20,7 +20,7 @@
         - [（7）flatline](#7flatline)
         - [（8）new_term](#8new_term)
         - [（9）cardinality](#9cardinality)
-      - [3.常用filter（待验证）](#3常用filter待验证)
+      - [3.常用filter](#3常用filter)
         - [（1）query_string（通用，能够替代term、wildcard等）](#1query_string通用能够替代term-wildcard等)
         - [（2）term](#2term)
         - [（3）wildcard（通配符）](#3wildcard通配符)
@@ -44,7 +44,7 @@ es_port: <port>
 es_username: <user>
 es_password: <password>
 use_ssl: False
-#指定index（用于保存elastalert的状态，必须要先创建好）
+#指定index（用于保存elastalert的状态）
 writeback_index: <index_name>
 
 #rules配置
@@ -115,6 +115,14 @@ type: <rule_type>
 # filter为空表示，匹配该index中所有document
 filter: []
 
+#导入文件（放在rules/目录下，不能以.yml或.yaml结尾）
+#将通用配置放在里面
+import:
+- global.config
+```
+
+* `rules/global.config`
+```yaml
 #----------告警配置---------------
 # 将多个match合并在一个alert中发过去
 #   比如设置2h：在12:00产生了一个match，会在14:00的时候发送一个alert，不管这中间发生了多少match
@@ -157,6 +165,8 @@ summary_table_type: markdown
 alert:
 #- debug    #可以用于告警调试
 - alertmanager
+
+#----------alertmanager配置---------------
 ```
 
 #### 2.常用rule type
@@ -271,13 +281,15 @@ cardinality_field: level
 max_cardinality: 2
 ```
 
-#### 3.常用filter（待验证）
+#### 3.常用filter
 
 [参考](https://elastalert2.readthedocs.io/en/stable/recipes/writing_filters.html)
 
-**注意**：空格在这里比较特殊，有空格的内容基本上不能被匹配
-  * 因为elastic会在存储doc之前，会对doc进行analyzed
-    * 默认是把doc按照空格进行切割
+**注意**: 需要判断搜索的字段类型
+  * 如果是 **text类型** 的字段，则在index之前 会进行analyzed（所以空格匹配不到）
+    * 比如message字段，就是text类型，因为日志的index template默认会将message这个字段设置text类型，便于检索
+  * 如果是 **keyword类型** 的字段，不会进行analyzed（空格也能够被匹配）
+  * 默认搜索使用的analyzer和index使用的analyzer是一样的
 
 #####（1）query_string（通用，能够替代term、wildcard等）
 [参考](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html)
@@ -289,17 +301,19 @@ filter:
     query_string:
       query: "message: haha xixi" #匹配haha或者xixi
 
-#通配符（不能匹配空格，因为字段值有空格的话，会部analyzed）
+#通配符
 - query:
     query_string:
-      query: "message: hah*h" #使用通配符匹配，比如：hahaaah（不能包含空格）
+      query: "message: hah*h" #使用通配符匹配，比如：hahaaah
 
-#regex（不能匹配空格，因为字段值有空格的话，会部analyzed）
+#regex（需要完全匹配）
+# 对于text类型的字段，regex只能匹配其中一个词
+# 对于keyword字段，regex能匹配完整的内容
 - query:
     query_string:
-      query: "message: /hah.*h/" #使用正则匹配，比如：hahaaah（不能包含空格）
+      query: "message: /hah.*h/" #使用正则匹配，比如：hahaaah
 
-#匹配phrase
+#对于text类型的字段匹配phrase
 - query:
     query_string:
       query: "message: \"haha xixi\"" #匹配（包括空格）: haha xixi     
@@ -384,7 +398,9 @@ alertmanager_labels:
 
 # 通过 已存在的字段 设置lables
 # 比如: msg: "message"，会设置msg这个label，值为message对应的字段的值
-#alertmanager_fields:
-#  <label_name>: "<some_elastic_fieldname>"
+alertmanager_fields:
+  #<label_name>: "<some_elastic_fieldname>"
+  #加一个时间戳，因为alertmanager告警的fintprint是通过label产生的
+  timestamp: "@timestamp"
 
 ```

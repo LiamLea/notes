@@ -58,7 +58,9 @@ mapping定义了document如何被索引和存储的
 #### 3.数据类型
 每个**字段**都有一个**数据类型**，下面是常用的一些数据类型
 
-* text
+* text（在被index之前会进行analyzed）
+* keyword（不会进行analyzed）
+  * 用于排序和聚合（能够根据这个字段，就是对搜索的结果，进行排序和聚合）
 * numeric
   * long
   * float
@@ -103,9 +105,7 @@ mapping定义了document如何被索引和存储的
     }
   }
   ```
-* keyword
-用于排序和聚合（能够根据这个字段，就是对搜索的结果，进行排序和聚合）
-</br>
+
 * date
 * boolean
 * ip

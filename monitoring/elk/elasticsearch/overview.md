@@ -10,6 +10,19 @@
       - [3.角色](#3角色)
       - [4.命名格式](#4命名格式)
       - [5.ES中的时区是UTC（无法修改）](#5es中的时区是utc无法修改)
+    - [文本分析（使用的是analyzer）](#文本分析使用的是analyzer)
+      - [1.文件分析步骤](#1文件分析步骤)
+        - [（1）tokenization（词语切分）](#1tokenization词语切分)
+        - [（2）normalization（标准化）](#2normalization标准化)
+      - [2.analyzer组成](#2analyzer组成)
+        - [（1）character filters](#1character-filters)
+        - [（2）tokenizer](#2tokenizer)
+        - [（3）token filters](#3token-filters)
+      - [3.文件分析的时机](#3文件分析的时机)
+        - [（1）index时](#1index时)
+        - [（2）search时](#2search时)
+      - [4.测试index使用的analyzer](#4测试index使用的analyzer)
+      - [5.对keyword类型的数据不会进行文本分析](#5对keyword类型的数据不会进行文本分析)
     - [Aggregations（聚合）](#aggregations聚合)
       - [1.有4类聚合](#1有4类聚合)
         - [（1）bucketing](#1bucketing)
@@ -65,6 +78,60 @@ ES集群给每个节点分配不同角色，每种角色干的活都不一样
   * 元字段用下划线开头
 
 #### 5.ES中的时区是UTC（无法修改）
+
+***
+
+### 文本分析（使用的是analyzer）
+
+[参考](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis.html)
+
+* 默认的analyzer: [standard analyzer](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-standard-analyzer.html)
+
+#### 1.文件分析步骤
+
+##### （1）tokenization（词语切分）
+词语切分，将一个text，切分成多个chunk（一个单词或者词组），一个chunk叫做token
+* 并且记录chunk间的顺序
+
+##### （2）normalization（标准化）
+将token转换成标准格式，比如:
+* Quick -> quick
+* foxes -> fox
+* jump或者leap -> jump
+
+这样能够实现同义匹配，而不是精准匹配
+
+#### 2.analyzer组成
+
+##### （1）character filters
+用于对文件内容进行转换，比如：添加、删除或者改变字符
+
+##### （2）tokenizer
+进行tokenization（词语切分）
+
+##### （3）token filters
+进行normalization（标准化）
+
+#### 3.文件分析的时机
+
+##### （1）index时
+当doc被index时，text类型的字段会进行 文件分析
+
+##### （2）search时
+进行full-text搜索时，会对 搜索文本（比如：query_string） 进行 文本分析 后，再进行搜索
+* 所以 search时使用的analyzer 应该和 index时使用的analyzer 一样
+
+#### 4.测试index使用的analyzer
+```shell
+#必须用完整的index名称，不能使用模糊匹配，因为会匹配多个index
+POST /.ds-logs-syslog.host.app-test-2022.12.16-000001/_analyze
+{
+  "field": "my_text",
+  "text": "The old brown cow"
+}
+```
+
+#### 5.对keyword类型的数据不会进行文本分析
 
 ***
 

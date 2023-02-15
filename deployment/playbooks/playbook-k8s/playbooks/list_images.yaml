@@ -56,6 +56,9 @@
   - name: include template argocd
     include_tasks: ../roles/argocd/tasks/template.yaml
 
+  - name: include template elastalert
+    include_tasks: ../roles/elastalert/tasks/template.yaml
+
   - name: set images
     set_fact:
       my_dict:
@@ -77,6 +80,7 @@
         tools: "{{ tools_images | unique }}"
         jenkins: "{{ jenkins_images | unique }}"
         argocd: "{{ argocd_images | unique }}"
+        elastalert: "{{ elastalert_images | unique }}"
 
   - name: list_images
     debug:
