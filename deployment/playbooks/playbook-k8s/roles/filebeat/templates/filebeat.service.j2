@@ -1,18 +1,19 @@
 {{ ansible_managed | comment }}
 
 [Unit]
-Description=Prometheus Node Exporter {{ monitor.node_exporter.version }}
+Description=elastic filebeat {{ log.elastic.version }}
 After=network-online.target
 
 [Service]
 Type=simple
 User=root
 Group=root
-ExecStart={{ monitor.node_exporter.install_path.rstrip("/") }}/node_exporter \
-    --web.listen-address=:{{ monitor.node_exporter.port }} \
-    --collector.processes
+ExecStart={{ log.elastic.filebeat.install_path.rstrip("/") }}/filebeat \
+    -e -c /etc/filebeat/filebeat.yml \
+    -E http.enabled=true -E http.host=0.0.0.0 -E http.port={{ log.elastic.filebeat.http_port }} \
+    --path.data /var/lib/filebeat
 
-SyslogIdentifier=node_exporter
+SyslogIdentifier=filebeat
 Restart=always
 RestartSec=1
 StartLimitInterval=0
@@ -24,7 +25,7 @@ ProtectHome=yes
 {% endfor %}
 NoNewPrivileges=yes
 
-{% if node_exporter_systemd_version | int >= 232 %}
+{% if filebeat_systemd_version | int >= 232 %}
 #ProtectSystem=strict
 #ProtectControlGroups=true
 #ProtectKernelModules=true

@@ -4,3 +4,9 @@
   roles:
   - { role: elastic, when: "inventory_hostname in groups['work_master']" }
   - { role: elastalert, when: "inventory_hostname in groups['work_master']" }
+
+- hosts: all:!monitor_exceptions
+  gather_facts: True
+  become: True
+  roles:
+  - filebeat

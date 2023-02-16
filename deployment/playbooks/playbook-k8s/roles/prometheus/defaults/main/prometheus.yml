@@ -256,7 +256,7 @@ __config_prometheus:
     params:
       module: [http_2xx]
     static_configs:
-      - targets: "{{ monitor.prometheus.config.http_probe }}"
+      - targets: "{{ __http_probe }}"
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target

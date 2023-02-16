@@ -9,6 +9,7 @@
       src: /tmp/node_exporter-{{ monitor.node_exporter.version }}.linux-{{ go_arch }}/node_exporter
       dest: "{{ monitor.node_exporter.install_path }}"
       mode: 0755
+      remote_src: yes
   when: monitor.node_exporter.local_dir.strip() == ""
 
 - name: copy node exporter binaries
