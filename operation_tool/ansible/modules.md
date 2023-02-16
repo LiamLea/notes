@@ -261,7 +261,7 @@ register: <VARIABLE_NAME>
 ```yaml
 file:
   path: <PATH>      #指明文件
-  state: <STATE>    #dirctory（创建目录），touch（创建文件），absent（删除文件）
+  state: <STATE>    #directory（创建目录），touch（创建文件），absent（删除文件）
                     #如果文件已存在，则不会覆盖
   owner: <USER>
   group: <GROUP>

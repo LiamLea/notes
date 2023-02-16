@@ -314,6 +314,7 @@ monitor:
     local_dir: "/root/ansible/files/node_exporter"
     install_path: /usr/local/bin/
     port: 9100
+    install_check: true
 
   exporters:
     openstack_exporter:
@@ -426,6 +427,17 @@ log:
       #   - "/tmp/mylog/*.txt"
       #   app_name: "mylog"
       #   timezone: Asia/Shanghai
+
+      #install filebeat on nodes not in k8s
+      # will download node-exporter binary when local_dir is empty
+      # this is binary file
+      local_dir: "/root/ansible/files/filebeat"
+      install_path: /usr/local/bin/
+      kafka: "10.10.10.163:19092"
+      http_probe: true
+      http_port: 5066
+      install_check: true
+
   elastalert:
     name: elastalert
     chart:

@@ -23,7 +23,8 @@
 
 - name: set fact
   set_fact:
-    __node_exporter: []
+    __node_exporter: "{{ monitor.prometheus.config.node_exporter }}"
+    __http_probe: "{{ monitor.prometheus.config.http_probe }}"
     __etcd: []
     __prometheus_hosts: []
     __alertmanager_hosts: []
@@ -31,8 +32,14 @@
 
 - name: set __node_exporter fact
   set_fact:
-    __node_exporter: "{{ __node_exporter | default([]) + [hostvars[item]['ansible_host'] + ':' + (monitor['node_exporter']['port']|string)] + monitor.prometheus.config.node_exporter }}"
+    __node_exporter: "{{ __node_exporter | default([]) + [hostvars[item]['ansible_host'] + ':' + (monitor['node_exporter']['port']|string)] }}"
   when: item not in groups['monitor_exceptions']
+  with_items: "{{ groups['all'] }}"
+
+- name: set __http_probe fact
+  set_fact:
+    __http_probe: "{{ __http_probe | default([]) + [hostvars[item]['ansible_host'] + ':' + (log['elastic']['filebeat']['http_port']|string)] }}"
+  when: item not in groups['monitor_exceptions'] and log.elastic.filebeat.http_probe
   with_items: "{{ groups['all'] }}"
 
 - name: set __etcd fact
