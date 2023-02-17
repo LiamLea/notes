@@ -5,13 +5,16 @@
 
 - [deploy](#deploy)
     - [部署](#部署)
-      - [1.部署jaeger](#1部署jaeger)
+      - [1.docker部署jaeger](#1docker部署jaeger)
+      - [2.k8s部署jaeger](#2k8s部署jaeger)
+        - [（1）安装operator](#1安装operator)
+        - [（2）安装](#2安装)
 
 <!-- /code_chunk_output -->
 
 ### 部署
 
-#### 1.部署jaeger
+#### 1.docker部署jaeger
 
 * All-in-one
   * agent
@@ -34,4 +37,51 @@ docker run -d --name jaeger \
   -p 14269:14269 \
   -p 9411:9411 \
   jaegertracing/all-in-one:1.39
+```
+
+#### 2.k8s部署jaeger
+[参考](https://www.jaegertracing.io/docs/1.42/operator/)
+
+##### （1）安装operator
+```shell
+kubectl create ns observability
+kubectl create -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.42.0/jaeger-operator.yaml -n observability
+```
+
+##### （2）安装
+* `vim install.yaml`
+```yaml
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: jaeger-prod
+spec:
+  strategy: production
+  collector:
+    maxReplicas: 5
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+  storage:
+    type: elasticsearch
+    options:
+      es:
+        server-urls: http://elasticsearch-master.log:9200
+        index-prefix: test-jaeger
+        username: elastic
+        password: elastic
+  query:
+    options:
+      query:
+        base-path: /jaeger
+  ingress:
+    hosts:
+    - "home.liamlea.local"
+    ingressClassName: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: ca-issuer
+```
+```shell
+kubectl apply -f install.yaml -n <ns>
 ```

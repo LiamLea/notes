@@ -10,14 +10,14 @@
       dest: "{{ monitor.node_exporter.install_path }}"
       mode: 0755
       remote_src: yes
-  when: monitor.node_exporter.local_dir.strip() == ""
+  when: monitor.node_exporter.local_path.strip() == ""
 
 - name: copy node exporter binaries
   copy:
-    src: "{{ monitor.node_exporter.local_dir }}"
+    src: "{{ monitor.node_exporter.local_path }}"
     dest: "{{ monitor.node_exporter.install_path }}"
     mode: 0755
-  when: monitor.node_exporter.local_dir.strip() != ""
+  when: monitor.node_exporter.local_path.strip() != ""
 
 - name: Get systemd version
   command: systemctl --version

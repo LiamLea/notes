@@ -211,6 +211,10 @@ ingress:
       host: ""
       domains: "{{ domains }}"
       path: "/argocd"
+    jaeger:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/jaeger"
 
 monitor:
   namespace: monitor
@@ -271,6 +275,7 @@ monitor:
         repo: "{{ chart.repo['grafana'] }}"
         path: "grafana"
         version: "6.28.0"
+      admin_password: "{{ password.grafana_admin }}"
       dashboards:
         default:
           node-exporter:
@@ -311,7 +316,7 @@ monitor:
     version: 1.3.0
     #will download node-exporter binary when local_dir is empty
     # this is binary file
-    local_dir: "/root/ansible/files/node_exporter"
+    local_path: "/root/ansible/files/node_exporter"
     install_path: /usr/local/bin/
     port: 9100
     install_check: true
@@ -345,7 +350,7 @@ log:
   elastic:
     version: "7.17.3"
     security:
-      password: "elastic"
+      password: "{{ password.elastic_elastic }}"
     elasticsearch:
       name: elasticsearch
       chart:
@@ -429,9 +434,9 @@ log:
       #   timezone: Asia/Shanghai
 
       #install filebeat on nodes not in k8s
-      # will download node-exporter binary when local_dir is empty
+      # will download node-exporter binary when local_path is empty
       # this is binary file
-      local_dir: "/root/ansible/files/filebeat"
+      local_path: "/root/ansible/files/filebeat"
       install_path: /usr/local/bin/
       kafka: "10.10.10.163:19092"
       http_probe: true
@@ -456,7 +461,7 @@ log:
       host: elasticsearch-master
       port: 9200
       username: "elastic"
-      password: "elastic"
+      password: "{{ password.elastic_elastic }}"
     alertmanager:
       url: "http://{{ monitor.prometheus.name }}-alertmanager.{{ monitor.namespace }}/alertmanager"
     index_map:
@@ -502,8 +507,8 @@ service:
       repo: "{{ chart.repo['bitnami'] }}"
       path: "mysql"
       version: "8.5.7"
-    root_password: cangoal
-    replication_password: cangoal
+    root_password: "{{ password.mysql_root }}"
+    replication_password: "{{ password.mysql_replication }}"
     #standalone or replication
     architecture: replication
     resources:
@@ -522,8 +527,8 @@ service:
       repo: "{{ chart.repo['bitnami'] }}"
       path: "postgresql"
       version: "11.7.3"
-    postgres_password: cangoal
-    replication_password: cangoal
+    postgres_password: "{{ password.pgsql_postgres }}"
+    replication_password: "{{ password.pgsql_replication }}"
     #standalone or replication
     architecture: replication
     resources:
@@ -542,7 +547,7 @@ service:
       repo: "{{ chart.repo['bitnami'] }}"
       path: "redis"
       version: "17.0.8"
-    password: cangoal
+    password: "{{ password.redis }}"
     resources:
       requests:
         cpu: "2000m"
@@ -582,7 +587,7 @@ service:
         version: "0.4.1"
       auth:
         user: admin
-        password: cangoal
+        password: "{{ password.kafka_ui_admin }}"
       #add kafka clusters
       kafka_clusters:
       - name: kafka-k8s
@@ -600,7 +605,7 @@ devops:
       repo: "{{ chart.repo['jenkins'] }}"
       path: "jenkins"
       version: "4.1.9"
-    admin_password: cangoal
+    admin_password: "{{ password.jenkins_admin }}"
     resources:
       requests:
         cpu: "1000m"
@@ -636,8 +641,7 @@ devops:
       repo: "{{ chart.repo['argo'] }}"
       path: "argo-cd"
       version: "5.19.12"
-    #htpasswd -nbBC 10 "" <password> | tr -d ':\n' | sed 's/$2y/$2a/'
-    admin_password: '$2a$10$JzzAmxScWsiWq5Ap6NUwYOwnLZvUEEPuH6A0ol0JCd3Tk2yuK90LC'
+    admin_password: "{{ password.argocd_admin }}"
     resources:
       requests:
         cpu: "1000m"
@@ -648,22 +652,44 @@ devops:
       storage: 10Gi
 
 service_mesh:
-  providers:
-    prometheus:
-      service: "prometheus-server.{{monitor.namespace}}.svc.cluster.local"
-      port: 80
-      path: "/prometheus"
-    tracing:
-      service: zipkin.istio-system.svc.cluster.local
-      port: 9411
-      path: ""
-  telemetry:
-    metrics: {}
-    tracing:
-      randomSamplingPercentage: 100
-      disableSpanReporting: false
-    accessLogging:
-      disabled: true
+  namespace: service-mesh
+  repository: "{{ registry_prefix }}"
+  jaeger:
+    enabled: true
+    version: "1.42.0"
+    #operator yaml file
+    local_path: "/root/ansible/files/jaeger-operator.yaml"
+    collector:
+      max_replicas: 5
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 4Gi
+        requests:
+          cpu: 2000m
+          memory: 4Gi
+    elasticsearch:
+      url: "http://elasticsearch-master.{{ log.namespace }}:9200"
+      index_prefix: jarger-prod
+      username: "elastic"
+      password: "{{ log.elastic.security.password }}"
+  istio:
+    providers:
+      prometheus:
+        service: "prometheus-server.{{monitor.namespace}}.svc.cluster.local"
+        port: 80
+        path: "/prometheus"
+      tracing:
+        service: zipkin.istio-system.svc.cluster.local
+        port: 9411
+        path: ""
+    telemetry:
+      metrics: {}
+      tracing:
+        randomSamplingPercentage: 100
+        disableSpanReporting: false
+      accessLogging:
+        disabled: true
 
 download_packages:
   context: "centos-7"
