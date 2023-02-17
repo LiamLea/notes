@@ -23,6 +23,8 @@
   * 并且可以调整client的采样频率
 * agent（不是必须的）
   * 是装在本地，用于收集所在机器的tracing数据，然后统一发到collector
+* query
+  * 就是用于查询collector获取数据，展现在UI上
 
 #### 2.常用端口
 

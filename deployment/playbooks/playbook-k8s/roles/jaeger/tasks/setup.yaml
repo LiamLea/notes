@@ -1,0 +1,35 @@
+- name: download operator yaml
+  get_url:
+    url: "https://github.com/jaegertracing/jaeger-operator/releases/download/v{{ service_mesh.jaeger.version }}/jaeger-operator.yaml"
+    dest: /tmp/jaeger-operator.yaml
+    environment: "{{ __proxy_env | default(omit) }}"
+  when: service_mesh.jaeger.local_path.strip() == ""
+
+- name: copy jaeger operator yaml
+  copy:
+    src: "{{ service_mesh.jaeger.local_path }}"
+    dest: /tmp/jaeger-operator.yaml
+  when: service_mesh.jaeger.local_path.strip() != ""
+
+- name: set image registry
+  #must escape \ in ansible
+  shell: |
+    sed -i -E  's@image: (\S*)@image: {{ service_mesh.repository }}\1@g' /tmp/jaeger-operator.yaml
+
+- name: create namespace
+  shell: "kubectl create ns {{ item }} "
+  ignore_errors: true
+  with_items:
+  - "observability"
+  - "{{ service_mesh.namespace }}"
+
+- name: install operator
+  shell: "kubectl apply -f /tmp/jaeger-operator.yaml -n observability"
+
+- name: copy install.yaml
+  template:
+    src: install.yaml.j2
+    dest: /tmp/jaeger_install.yaml
+
+- name: instal jaeger
+  shell: "kubectl apply -f /tmp/jaeger_install.yaml -n {{ service_mesh.namespace }}"

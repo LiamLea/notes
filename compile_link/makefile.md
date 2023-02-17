@@ -12,6 +12,8 @@
       - [2.makefile格式](#2makefile格式)
       - [3.语法](#3语法)
         - [（1）转义](#1转义)
+      - [4.demo](#4demo)
+        - [（1）通过变量获取target的名称](#1通过变量获取target的名称)
 
 <!-- /code_chunk_output -->
 
@@ -58,7 +60,7 @@ make [options] [targets]
 #将shell命令的执行结果作为变量
 <VARIABLE> = $(shell <COMMAND>)
 
-#定义target
+#定义target（可以写多个< TARGET用空格格式，$@获取target的名称）
 <TARGET>: <DEPENDECE1> <DEPENDECE2> ...   #依赖的文件名（注意target就是 文件名），当依赖的文件存在时，才会执行该<TARGET>
     <SHELL_COMMAND>   #前面必须是tab键隔开的空格
                       #@<SHELL_COMMAND> 在前面加个@表示，不会打印出命令，只会打印结果
@@ -76,3 +78,23 @@ make [options] [targets]
 |-|-|
 |`$`|`$$`|
 |`#`|`\#`|
+
+#### 4.demo
+
+##### （1）通过变量获取target的名称
+```Makefile
+.DEFAULT_GOAL := run
+
+TASKS = check test release
+
+.PHONY := ${TASKS}
+${TASKS}:
+        echo "$@ $@"
+```
+
+|输入|输出|
+|-|-|
+|`make test`|`test test`|
+|`make check`|`check check`|
+|`make release`|`release release`|
+|`make aa`|`make: *** No rule to make target 'aa'.  Stop.`|

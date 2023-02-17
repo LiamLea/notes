@@ -1,0 +1,5 @@
+- hosts: work_master
+  gather_facts: True
+  become: True
+  roles:
+  - { role: jaeger , when: "service_mesh.jaeger.enabled" }
