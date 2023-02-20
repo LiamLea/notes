@@ -1,0 +1,32 @@
+- name: install opentelemetry operator
+  environment: "{{ __proxy_env | default(omit) }}"
+  kubernetes.core.helm:
+    wait: yes
+    wait_timeout: 10m0s
+    chart_ref: "{{ __path }}{{ service_mesh.opentelemetry.chart.path }}"
+    chart_repo_url: "{{ service_mesh.opentelemetry.chart.repo }}"
+    chart_version: "{{ service_mesh.opentelemetry.chart.version }}"
+    release_name: "{{ service_mesh.opentelemetry.name }}"
+    release_namespace: "{{ service_mesh.namespace }}"
+    create_namespace: yes
+    atomic: yes
+    release_values:
+      manager:
+        image:
+          repository: "{{ service_mesh.repository }}ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator"
+        collectorImage:
+          repository: "{{ service_mesh.repository }}otel/opentelemetry-collector-contrib"
+      testFramework:
+        image:
+          repository: "{{ service_mesh.repository }}busybox"
+      kubeRBACProxy:
+        image:
+          repository: "{{ service_mesh.repository }}gcr.io/kubebuilder/kube-rbac-proxy"
+
+- name: copy install.yaml
+  template:
+    src: install.yaml.j2
+    dest: /tmp/opentelemetry_install.yaml
+
+- name: install opentelemetry
+  shell: "kubectl apply -f /tmp/opentelemetry_install.yaml -n {{ service_mesh.namespace }}"

@@ -3,3 +3,4 @@
   become: True
   roles:
   - { role: jaeger , when: "service_mesh.jaeger.enabled" }
+  - { role: opentelemetry , when: "service_mesh.opentelemetry.enabled" }
