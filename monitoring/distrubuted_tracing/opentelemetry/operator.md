@@ -61,13 +61,14 @@
 
 #### 1.创建Instrumentation资源
 * 在需要需要自动装配的namespace下创建
-
+  * 配置的含义参考deploy文档
 ```yaml
 apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: my-instrumentation
 spec:
+  #默认tracing、metrics、logging都会发往这个地址
   exporter:
     endpoint: http://otel-collector:4317
   propagators:
@@ -88,7 +89,12 @@ spec:
 ```
 
 * 自动装配：在pod上添加指定的annotation
-  * java: `instrumentation.opentelemetry.io/inject-java: "true"`
-  * python: `instrumentation.opentelemetry.io/inject-python: "true"`
-  * NodeJs: `instrumentation.opentelemetry.io/inject-nodejs: "true"`
-  * DotNet: `instrumentation.opentelemetry.io/inject-dotnet: "true"`
+  * java:
+    * `instrumentation.opentelemetry.io/inject-java: "true"`
+    * 指定特定的容器: `instrumentation.opentelemetry.io/container-names: "myapp,myapp2"`
+  * python:
+    * `instrumentation.opentelemetry.io/inject-python: "true"`
+  * NodeJs:
+    * `instrumentation.opentelemetry.io/inject-nodejs: "true"`
+  * DotNet:
+    * `instrumentation.opentelemetry.io/inject-dotnet: "true"`

@@ -94,6 +94,7 @@ chart:
     jenkins: https://charts.jenkins.io/
     argo: https://argoproj.github.io/argo-helm
     elastalert2: https://jertel.github.io/elastalert2/
+    opentelemetry: https://open-telemetry.github.io/opentelemetry-helm-charts
 
   #if the charts are local, set local directory
   #or will use the remote repo
@@ -673,6 +674,21 @@ service_mesh:
       index_prefix: jarger-prod
       username: "elastic"
       password: "{{ log.elastic.security.password }}"
+  opentelemetry:
+    enabled: true
+    name: opentelemetry-operator
+    chart:
+      repo: "{{ chart.repo['opentelemetry'] }}"
+      path: "opentelemetry-operator"
+      version: "0.23.0"
+    exporter:
+      endpoint: http://jaeger-prod-collector:4317
+    sampler:
+      type: parentbased_traceidratio
+      argument: "1"
+    instrument:
+      java:
+        image: "{{ registry_prefix }}ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.22.1"
   istio:
     providers:
       prometheus:

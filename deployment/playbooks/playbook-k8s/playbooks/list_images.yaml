@@ -59,6 +59,9 @@
   - name: include template elastalert
     include_tasks: ../roles/elastalert/tasks/template.yaml
 
+  - name: include template jaeger
+    include_tasks: ../roles/jaeger/tasks/template.yaml
+
   - name: set images
     set_fact:
       my_dict:
@@ -81,6 +84,7 @@
         jenkins: "{{ jenkins_images | unique }}"
         argocd: "{{ argocd_images | unique }}"
         elastalert: "{{ elastalert_images | unique }}"
+        jaeger: "{{ jaeger_images | unique }}"
 
   - name: list_images
     debug:
