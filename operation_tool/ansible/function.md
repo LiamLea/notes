@@ -7,6 +7,7 @@
     - [常用函数](#常用函数)
       - [1.使用python函数](#1使用python函数)
       - [2.合并两个列表](#2合并两个列表)
+      - [2.1合并在不同地方获取的列表（即将string转化为list，再合并）](#21合并在不同地方获取的列表即将string转化为list再合并)
       - [3.合并两个dict](#3合并两个dict)
       - [4.创建列表](#4创建列表)
         - [（1）方式一](#1方式一)
@@ -43,6 +44,19 @@
 ```yaml
 set_fact:
   list_new: "{{ list1 + list2 }}"
+```
+
+#### 2.1合并在不同地方获取的列表（即将string转化为list，再合并）
+* 先join再split
+```yaml
+- name: set facts
+  set_fact:
+    opentelemetry_other_2: "{{ opentelemetry_template_stdout | select('match', '.*image=.*') | join('\n') | regex_replace(' *- --collector-image=', '') }}"
+
+- name: get images
+  set_fact:
+    opentelemetry_images: "{{ (((opentelemetry_template_stdout +  opentelemetry_other_1_stdout) | select('match', '.*image:.*') | list) + opentelemetry_other_2.split('\n')) | regex_replace(' *image: *', '') | replace('\"', '') }}"
+
 ```
 
 #### 3.合并两个dict
