@@ -37,5 +37,6 @@
 |9411|HTTP|zipkin|
 |14250|HTTP|jaeger over gRPC|
 |14268|HTTP|jaeger over HTTP|
+|14269|HTTP|jaeger admin port（获取metrics）|
 |16685|HTTP|query over gRPC|
 |16686|HTTP|query over HTTP|

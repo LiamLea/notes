@@ -653,13 +653,14 @@ devops:
       storage: 10Gi
 
 service_mesh:
-  namespace: service-mesh
+  namespace: &sm_ns "service-mesh"
   repository: "{{ registry_prefix }}"
   jaeger:
     enabled: true
     version: "1.42.0"
     #operator yaml file
     local_path: "/root/ansible/files/jaeger-operator.yaml"
+    prometheus: "http://{{ monitor.prometheus.name }}-server.{{ monitor.namespace}}/prometheus"
     collector:
       max_replicas: 5
       resources:
@@ -682,7 +683,8 @@ service_mesh:
       path: "opentelemetry-operator"
       version: "0.23.0"
     exporter:
-      endpoint: http://jaeger-prod-collector:4317
+      collector: "http://otlc-collector.{{ ref.sm_ns }}:4317"
+      jaeger: "http://jaeger-prod-collector.{{ ref.sm_ns }}:4317"
     sampler:
       type: parentbased_traceidratio
       argument: "1"
@@ -726,3 +728,6 @@ download_packages:
     ubuntu-18.04:
       image: "ubuntu:18.04"
       package_manager: "apt"
+
+ref:
+  sm_ns: *sm_ns

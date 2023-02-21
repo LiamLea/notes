@@ -20,6 +20,10 @@ spec:
     options:
       query:
         base-path: /jaeger
+      prometheus:
+        server-url: "{{ service_mesh.jaeger.prometheus }}"
+    metricsStorage:
+      type: prometheus
     image:
       {{ service_mesh.repository }}jaegertracing/jaeger-query:{{ service_mesh.jaeger.version }}
   agent:

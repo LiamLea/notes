@@ -8,7 +8,8 @@
       - [1.operator功能](#1operator功能)
       - [2.自动装配agent原理](#2自动装配agent原理)
     - [使用](#使用)
-      - [1.创建Instrumentation资源](#1创建instrumentation资源)
+      - [1.创建opentelemetry collector资源](#1创建opentelemetry-collector资源)
+      - [2.创建Instrumentation资源](#2创建instrumentation资源)
 
 <!-- /code_chunk_output -->
 
@@ -59,9 +60,57 @@
 
 [清单文件参考](https://github.com/open-telemetry/opentelemetry-operator/blob/main/docs/api.md)
 
-#### 1.创建Instrumentation资源
+#### 1.创建opentelemetry collector资源
+配置参考[deploy](./deploy.md)
+```yaml
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otlc
+spec:
+  mode: Deployment  #DaemonSet、Sidecar、Deployment (default)
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+
+    exporters:
+      otlp:
+        endpoint: "<backend_otlp>"  #比如发送到jaeger的collector
+        tls:
+          insecure: true
+      prometheus:
+        endpoint: "0.0.0.0:9464"    #prometheus需要配置：<ip>:9464/metrics
+
+    processors:
+      batch:
+      spanmetrics:
+        metrics_exporter: prometheus
+        latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]
+        dimensions:
+          - name: http.method
+            default: GET
+          - name: http.status_code
+        dimensions_cache_size: 1000
+        aggregation_temporality: "AGGREGATION_TEMPORALITY_CUMULATIVE"
+        
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [spanmetrics, batch]
+          exporters: [otlp]
+        metrics:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [prometheus]
+```
+
+#### 2.创建Instrumentation资源
 * 在需要需要自动装配的namespace下创建
-  * 配置的含义参考deploy文档
+  * 配置的含义参考[deploy](./deploy.md)
 ```yaml
 apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
@@ -88,9 +137,10 @@ spec:
     value: none
 ```
 
-* 自动装配：在pod上添加指定的annotation
+* 自动装配：在pod上添加指定的annotation（也可以添加在namespace上，需要关闭namespace中的某个pod时，就设为false）
   * java:
     * `instrumentation.opentelemetry.io/inject-java: "true"`
+      * 如果使用其他namespace中的instrumentation: `<namespace>/<my-instrumentation>`
     * 指定特定的容器: `instrumentation.opentelemetry.io/container-names: "myapp,myapp2"`
   * python:
     * `instrumentation.opentelemetry.io/inject-python: "true"`

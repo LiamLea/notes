@@ -75,12 +75,25 @@ spec:
     options:
       query:
         base-path: /jaeger
+      prometheus:
+        server-url: "http://prometheus:9090"
+    metricsStorage:
+      type: prometheus
   ingress:
     hosts:
     - "home.liamlea.local"
     ingressClassName: "nginx"
     annotations:
       cert-manager.io/cluster-issuer: ca-issuer
+
+  # ui:
+  #   options:
+  #     #可以添加外部url
+  #     menu:
+  #     - label: "About Jaeger"
+  #       items:
+  #         - label: "Documentation"
+  #           url: "https://www.jaegertracing.io/docs/latest"
 ```
 ```shell
 kubectl apply -f install.yaml -n <ns>
