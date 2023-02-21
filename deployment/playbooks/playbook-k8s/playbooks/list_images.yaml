@@ -62,6 +62,9 @@
   - name: include template jaeger
     include_tasks: ../roles/jaeger/tasks/template.yaml
 
+  - name: include template opentelemetry
+    include_tasks: ../roles/opentelemetry/tasks/template.yaml
+
   - name: set images
     set_fact:
       my_dict:
@@ -85,6 +88,7 @@
         argocd: "{{ argocd_images | unique }}"
         elastalert: "{{ elastalert_images | unique }}"
         jaeger: "{{ jaeger_images | unique }}"
+        opentelemetry: "{{ opentelemetry_images | unique }}"
 
   - name: list_images
     debug:
