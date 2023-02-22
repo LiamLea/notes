@@ -95,6 +95,7 @@ chart:
     argo: https://argoproj.github.io/argo-helm
     elastalert2: https://jertel.github.io/elastalert2/
     opentelemetry: https://open-telemetry.github.io/opentelemetry-helm-charts
+    kiali: https://kiali.org/helm-charts
 
   #if the charts are local, set local directory
   #or will use the remote repo
@@ -216,6 +217,10 @@ ingress:
       host: ""
       domains: "{{ domains }}"
       path: "/jaeger"
+    kiali:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/kiali"
 
 monitor:
   namespace: monitor
@@ -241,7 +246,7 @@ monitor:
       #this url will send with alerting msg which user can click to access prometheus to get alerting details
       #  e.g. https://k8s.my.local:30443/prometheus
       #set /prometheus if you don't know the exact external_url or you can't access prometheus
-      external_url: "https://{{ domains[0] }}:{{ basic.ingress_nginx.config.https_port }}/prometheus"
+      external_url: "https://{{ ingress.hosts.prometheus.host }}{% if ingress.hosts.prometheus.host != '' %}.{% endif %}{{ ingress.hosts.prometheus.domains[0] }}:{{ basic.ingress_nginx.config.https_port }}{{ ingress.hosts.prometheus.path }}"
       # e.g. {send_resolved: true, url: "<url|no empty>", max_alerts: 5}
       webhook_configs: []
       # e.g. {send_resolved: true, smarthost: smtp.qq.com:587 ,from: 1059202624@qq.com, to: 1059202624@qq.com, auth_username: 1059202624@qq.com, auth_password: 'xx'}
@@ -657,10 +662,12 @@ service_mesh:
   repository: "{{ registry_prefix }}"
   jaeger:
     enabled: true
+    name: &jg_nm "jaeger-prod"
     version: "1.42.0"
     #operator yaml file
-    local_path: "/root/ansible/files/jaeger-operator.yaml"
-    prometheus: "http://{{ monitor.prometheus.name }}-server.{{ monitor.namespace}}/prometheus"
+    #local_path: "/root/ansible/files/jaeger-operator.yaml"
+    local_path: ""
+    prometheus: "http://{{ monitor.prometheus.name }}-server.{{ monitor.namespace}}{{ ingress.hosts.prometheus.path }}"
     collector:
       max_replicas: 5
       resources:
@@ -672,7 +679,7 @@ service_mesh:
           memory: 4Gi
     elasticsearch:
       url: "http://elasticsearch-master.{{ log.namespace }}:9200"
-      index_prefix: jarger-prod
+      index_prefix: "{{ ref.jg_nm }}"
       username: "elastic"
       password: "{{ log.elastic.security.password }}"
   opentelemetry:
@@ -682,9 +689,11 @@ service_mesh:
       repo: "{{ chart.repo['opentelemetry'] }}"
       path: "opentelemetry-operator"
       version: "0.23.0"
+    collector:
+      name: &otlc_nm "otlc"
     exporter:
-      collector: "http://otlc-collector.{{ ref.sm_ns }}:4317"
-      jaeger: "http://jaeger-prod-collector.{{ ref.sm_ns }}:4317"
+      collector: "http://{{ ref.otlc_nm }}-collector.{{ ref.sm_ns }}:4317"
+      jaeger: "http://{{ ref.jg_nm }}-collector.{{ ref.sm_ns }}:4317"
     sampler:
       type: parentbased_traceidratio
       argument: "1"
@@ -692,22 +701,45 @@ service_mesh:
       java:
         image: "{{ registry_prefix }}ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.22.1"
   istio:
+    enabled: true
+    version: "1.17.0"
+    #local_path: "/root/ansible/files/istioctl"
+    local_path: ""
+    install_path: /usr/local/bin/
+    integrations:
+      prometheus: "http://{{ monitor.prometheus.name }}-server.{{monitor.namespace}}{{ ingress.hosts.prometheus.path }}"
+      jaeger:
+        in: "http://{{ ref.jg_nm }}-collector.{{ ref.sm_ns }}:16685/jaeger"
+        external: "https://{{ ingress.hosts.jaeger.host }}{% if ingress.hosts.jaeger.host != '' %}.{% endif %}{{ ingress.hosts.jaeger.domains[0] }}:{{ basic.ingress_nginx.config.https_port }}{{ ingress.hosts.jaeger.path }}"
+      grafana:
+        in: "http://{{ monitor.prometheus.grafana.name }}.{{ monitor.namespace }}{{ ingress.hosts.grafana.path }}"
+        external: "https://{{ ingress.hosts.grafana.host }}{% if ingress.hosts.grafana.host != '' %}.{% endif %}{{ ingress.hosts.grafana.domains[0] }}:{{ basic.ingress_nginx.config.https_port }}{{ ingress.hosts.grafana.path }}"
     providers:
-      prometheus:
-        service: "prometheus-server.{{monitor.namespace}}.svc.cluster.local"
-        port: 80
-        path: "/prometheus"
       tracing:
-        service: zipkin.istio-system.svc.cluster.local
+        service: "{{ ref.jg_nm }}-collector.{{ ref.sm_ns }}.svc.cluster.local"
         port: 9411
-        path: ""
+        maxTagLength: 256
     telemetry:
-      metrics: {}
-      tracing:
-        randomSamplingPercentage: 100
-        disableSpanReporting: false
       accessLogging:
-        disabled: true
+      - disabled: true
+      tracing:
+      - randomSamplingPercentage: 100
+        disableSpanReporting: true
+        customTags: {}
+      metrics: []
+    kiali:
+      name: kiali
+      chart:
+        repo: "{{ chart.repo['kiali'] }}"
+        path: "kiali-server"
+        version: "1.64.0"
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "2000m"
+          memory: "4Gi"
 
 download_packages:
   context: "centos-7"
@@ -731,3 +763,5 @@ download_packages:
 
 ref:
   sm_ns: *sm_ns
+  jg_nm: *jg_nm
+  otlc_nm: *otlc_nm
