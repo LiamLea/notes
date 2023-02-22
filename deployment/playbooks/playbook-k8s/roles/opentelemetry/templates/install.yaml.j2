@@ -1,7 +1,7 @@
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: otlc
+  name: {{ service_mesh.opentelemetry.collector.name }}
 spec:
   mode: deployment  #daemonSet、sidecar、deployment (default)、statefulset
   podAnnotations:
