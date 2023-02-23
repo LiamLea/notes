@@ -172,6 +172,7 @@ basic:
 domains:
 - "home.liamlea.local"
 - "home.bongli.local"
+#will use ingrss.hosts.<service>.path configure the service's url_root_path
 ingress:
   enabled: true
   cluster_issuer: ca-issuer

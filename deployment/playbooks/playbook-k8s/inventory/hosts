@@ -1,22 +1,28 @@
+# k8s master nodes
 [master]
 master-1 ansible_host=3.1.4.121 ansible_user=root ansible_password=cangoal
 master-2 ansible_host=3.1.4.122 ansible_user=root ansible_password=cangoal
 master-3 ansible_host=3.1.4.123 ansible_user=root ansible_password=cangoal
 
+# k8s work nodes
 [node]
 node-1 ansible_host=3.1.4.124 ansible_user=root ansible_password=cangoal
 node-2 ansible_host=3.1.4.125 ansible_user=root ansible_password=cangoal
 node-3 ansible_host=3.1.4.127 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
 
+# only run init and docker tasks
 [others]
 #test-1 ansible_host=3.1.4.126 ansible_user=root ansible_password=cangoal
 
+# only run init , docker and harbor task
 [harbor]
 #harbor ansible_host=3.1.4.250 ansible_user=root ansible_password=cangoal
 
+# only install monitor agents
 [monitor]
 #host-1 ansible_host=10.10.10.1 ansible_user=lil ansible_password='liamlea@7558' ansible_become=true ansible_become_user=root ansible_become_password='liamlea@7558' ansible_ssh_private_key_file=./pki/ssh_key
 
+# don't install monitor agents
 [monitor_exception]
 
 [ansible]
@@ -45,6 +51,7 @@ nginx
 ntp_server
 others
 
+# don't install monitor agents 
 [monitor_exceptions:children]
 k8s
 monitor_exception

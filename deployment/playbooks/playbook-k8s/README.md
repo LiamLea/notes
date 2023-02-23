@@ -7,6 +7,8 @@
     - [Quick Start](#quick-start)
       - [1.set inventory](#1set-inventory)
       - [2.set global variables](#2set-global-variables)
+        - [（1）set global variables](#1set-global-variables)
+        - [（2）set password](#2set-password)
       - [3.other configs](#3other-configs)
         - [（1）config  packages repo](#1config-packages-repo)
       - [4.init localhost](#4init-localhost)
@@ -15,7 +17,7 @@
       - [7.run the playbook](#7run-the-playbook)
     - [Initialize K8S](#initialize-k8s)
       - [1.install ceph storageclass](#1install-ceph-storageclass)
-        - [（1）set global variables](#1set-global-variables)
+        - [（1）set global variables](#1set-global-variables-1)
         - [（2）run storageclass task](#2run-storageclass-task)
       - [2.install basic service](#2install-basic-service)
         - [（2）set global variables](#2set-global-variables-1)
@@ -27,7 +29,7 @@
       - [2.install harbor(if need)](#2install-harborif-need)
         - [（1）set inventory](#1set-inventory-1)
         - [（2）install harbor](#2install-harbor)
-        - [（3）create repos below](#3create-repos-below)
+        - [（3）create repos below in harbor](#3create-repos-below-in-harbor)
       - [3.push images to private registry](#3push-images-to-private-registry)
         - [（1） set variables](#1-set-variables)
         - [（2） run push_images task](#2-run-push_images-task)
@@ -36,16 +38,24 @@
         - [（2） run push_images task](#2-run-push_images-task-1)
     - [Monitor Task](#monitor-task)
       - [1.deploy monitor](#1deploy-monitor)
-        - [（1）set global variables](#1set-global-variables-1)
+        - [（1）set global variables](#1set-global-variables-2)
         - [（2）run monitor task](#2run-monitor-task)
     - [Log Task](#log-task)
       - [1.deploy log](#1deploy-log)
-        - [（1）set global variables](#1set-global-variables-2)
+        - [（1）set global variables](#1set-global-variables-3)
         - [（2）run log task](#2run-log-task)
     - [Service Task](#service-task)
       - [1.deploy service](#1deploy-service)
-        - [（1）set global variables](#1set-global-variables-3)
+        - [（1）set global variables](#1set-global-variables-4)
         - [（2）run service task](#2run-service-task)
+    - [DevOps Task](#devops-task)
+      - [1.deploy service](#1deploy-service-1)
+        - [（1）set global variables](#1set-global-variables-5)
+        - [（2）run service task](#2run-service-task-1)
+    - [Service-Mesh Task](#service-mesh-task)
+      - [1.deploy service](#1deploy-service-2)
+        - [（1）set global variables](#1set-global-variables-6)
+        - [（2）run service task](#2run-service-task-2)
     - [Author](#author)
     - [📝 License](#license)
 
@@ -58,27 +68,70 @@
 ```shell
 $ vim inventory/hosts
 
+# k8s master nodes
 [master]
 master-1 ansible_host=3.1.4.121 ansible_user=root ansible_password=cangoal
 master-2 ansible_host=3.1.4.122 ansible_user=root ansible_password=cangoal
 master-3 ansible_host=3.1.4.123 ansible_user=root ansible_password=cangoal
 
+# k8s work nodes
 [node]
 node-1 ansible_host=3.1.4.124 ansible_user=root ansible_password=cangoal
 node-2 ansible_host=3.1.4.125 ansible_user=root ansible_password=cangoal
 node-3 ansible_host=3.1.4.127 ansible_user=lil ansible_password=cangoal ansible_become_user=root ansible_become_password=cangoal
 
+# only run init and docker tasks
 [others]
-#some hosts need to install docker
+#test-1 ansible_host=3.1.4.126 ansible_user=root ansible_password=cangoal
 
-#specify which host to run ansible
+# only run init , docker and harbor task
+[harbor]
+#harbor ansible_host=3.1.4.250 ansible_user=root ansible_password=cangoal
+
+# only install monitor agents
+[monitor]
+#host-1 ansible_host=10.10.10.1 ansible_user=lil ansible_password='liamlea@7558' ansible_become=true ansible_become_user=root ansible_become_password='liamlea@7558' ansible_ssh_private_key_file=./pki/ssh_key
+
+# don't install monitor agents
+[monitor_exception]
+
 [ansible]
 master-1
+
+[k8s:children]
+master
+node
+
+[work_master]
+master-1
+
+[nginx]
+master-1
+master-2
+
+[keepalived:children]
+nginx
+
+[ntp_server]
+master-1
+
+[cluster:children]
+k8s
+nginx
+ntp_server
+others
+
+# don't install monitor agents
+[monitor_exceptions:children]
+k8s
+monitor_exception
 ```
 
 #### 2.set global variables
+
+##### （1）set global variables
 ```shell
-vim global.yaml
+vim vars/global.yaml
 ```
 
 ```yaml
@@ -101,7 +154,7 @@ hosts:
 
 http_proxy:
   server: http://10.10.10.250:8123
-  no_proxy: ""
+  no_proxy: "10.0.0.0/8"  #service and pod cidr
 
 #if registry is changed,you should pay attention to registry_prefix
 registry: "10.10.10.250"
@@ -132,6 +185,12 @@ kubernetes:
       service_subnet: 10.96.0.0/12
       pod_subnet: 10.244.0.0/16
     nodeport_range: 10000-65535
+  backup:
+    image: "{{ registry_prefix }}bitnami/etcd:3.5.6"
+    schedule: "0 0 * * *"
+    dir: /tmp/
+    #how many days will these files keep
+    reservation: 7
 
 calico:
   repository: "{{ registry_prefix }}"
@@ -162,16 +221,97 @@ chart:
     prometheus-community: https://prometheus-community.github.io/helm-charts
     grafana: https://grafana.github.io/helm-charts
     elastic: https://helm.elastic.co
-    bitnami: https://charts.bitnami.com/bitnami
+    #bitnami: https://charts.bitnami.com/bitnami
+    bitnami: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
     cert-manager: https://charts.jetstack.io
     ingress-nginx: https://kubernetes.github.io/ingress-nginx
     paradeum-team: https://paradeum-team.github.io/helm-charts/
     kfirfer: https://kfirfer.github.io/helm/
     kafka-ui: https://provectus.github.io/kafka-ui
+    jenkins: https://charts.jenkins.io/
+    argo: https://argoproj.github.io/argo-helm
+    elastalert2: https://jertel.github.io/elastalert2/
+    opentelemetry: https://open-telemetry.github.io/opentelemetry-helm-charts
+    kiali: https://kiali.org/helm-charts
 
   #if the charts are local, set local directory
   #or will use the remote repo
+  #local_dir: "/root/ansible/charts" ,this is path in container, so you should put charts in the current directory/charts
   local_dir: ""
+
+#speficy domain
+domains:
+- "home.liamlea.local"
+- "home.bongli.local"
+#will use ingrss.hosts.<service>.path configure the service's url_root_path
+ingress:
+  enabled: true
+  cluster_issuer: ca-issuer
+  class_name: "{{ basic.ingress_nginx.config.ingress_class }}"
+  hosts:
+    prometheus:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/prometheus"
+    alertmanager:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/alertmanager"
+    grafana:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/grafana"
+    kibana:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/kibana"
+    adminer:
+      host: "adminer"
+      domains: "{{ domains }}"
+      path: "/"
+    redis-commander:
+      host: "redis-commander"
+      domains: "{{ domains }}"
+      path: "/"
+    kafka-ui:
+      host: "kafka-ui"
+      domains: "{{ domains }}"
+      path: "/"
+    jenkins:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/jenkins"
+    argocd:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/argocd"
+    jaeger:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/jaeger"
+    kiali:
+      host: ""
+      domains: "{{ domains }}"
+      path: "/kiali"
+```
+
+##### （2）set password
+```shell
+vim vars/password.yaml
+```
+```yaml
+password:
+  grafana_admin: cangoal
+  elastic_elastic: elastic
+  mysql_root: cangoal
+  mysql_replication: cangoal
+  pgsql_postgres: cangoal
+  pgsql_replication: cangoal
+  redis: cangoal
+  kafka_ui_admin: cangoal
+  jenkins_admin: cangoal
+  #htpasswd -nbBC 10 "" <password> | tr -d ':\n' | sed 's/$2y/$2a/'
+  argocd_admin: '$2a$10$JzzAmxScWsiWq5Ap6NUwYOwnLZvUEEPuH6A0ol0JCd3Tk2yuK90LC'
 ```
 
 #### 3.other configs
@@ -224,6 +364,11 @@ make list_images
 make download_charts
 ```
 
+* prepare files for deployment（put in `files` dir）
+  * `node_exporter`
+  * `jaeger-operator.yaml`
+  * `istioctl`
+
 #### 7.run the playbook
 
 * enable roles
@@ -265,7 +410,7 @@ make stop
 #### 1.install ceph storageclass
 
 ##### （1）set global variables
-* `vim global.yaml`
+* `vim vars/global.yaml`
   * set storageclass config
   ```yaml
   storage_class:
@@ -320,7 +465,7 @@ make storageclass
 #### 2.install basic service
 
 ##### （2）set global variables
-* `vim global.yaml`
+* `vim vars/global.yaml`
   * set chart config
     * omitted, refer to global.yaml
   * set ingress config
@@ -363,7 +508,7 @@ make basic
 
 ##### （1）define test tasks
 ```shell
-vim test.yaml
+vim playbooks/test.yaml
 ```
 
 ##### （2）run test tasks
@@ -385,19 +530,19 @@ master-1 ansible_host=10.172.1.11 ansible_user=root ansible_password=cangoal
 ```
 
 ##### （2）install harbor
-run after [step 3](#3init-localhost)
+run after [init localhost](#4init-localhost)
 ```shell
 make install_harbor
 ```
 
-##### （3）create repos below
+##### （3）create repos below in harbor
 * library
 
 #### 3.push images to private registry
 
 ##### （1） set variables
 ```shell
-vim push_images.yaml
+vim playbooks/push_images.yaml
 ```
 ```yaml
 vars:
@@ -410,7 +555,7 @@ vars:
   #use | to match multiple registries
   prefix_replace_pattern: ""
 
-  #匹配的镜像，会用${my_registry} 替换 其地址
+  #匹配的镜像，会用${target_registry} 替换 其地址
   #没有匹配这里的镜像，都会在镜像前面加上${registry_prefix}
   #use | to match multiple registries
   address_replace_pattern: ""
@@ -427,7 +572,7 @@ make push_images
 
 ##### （1） set variables
 ```shell
-vim global.yaml
+vim vars/global.yaml
 ```
 ```yaml
 download_packages:
@@ -461,8 +606,9 @@ make download_packages
 ### Monitor Task
 
 #### 1.deploy monitor
+
 ##### （1）set global variables
-* `vim global.yaml`
+* `vim vars/global.yaml`
   * set chart config
     * omitted, refer to global.yaml
   * set ingress config
@@ -493,8 +639,8 @@ make download_packages
         #this url will send with alerting msg which user can click to access prometheus to get alerting details
         #  e.g. https://k8s.my.local:30443/prometheus
         #set /prometheus if you don't know the exact external_url or you can't access prometheus
-        external_url: "https://{{ domains[0] }}:{{ basic.ingress_nginx.config.https_port }}/prometheus"
-        # e.g. {send_resolved: true, url: "<url|no empty>", max_alerts: 10}
+        external_url: "https://{{ ingress.hosts.prometheus.host }}{% if ingress.hosts.prometheus.host != '' %}.{% endif %}{{ ingress.hosts.prometheus.domains[0] }}:{{ basic.ingress_nginx.config.https_port }}{{ ingress.hosts.prometheus.path }}"
+        # e.g. {send_resolved: true, url: "<url|no empty>", max_alerts: 5}
         webhook_configs: []
         # e.g. {send_resolved: true, smarthost: smtp.qq.com:587 ,from: 1059202624@qq.com, to: 1059202624@qq.com, auth_username: 1059202624@qq.com, auth_password: 'xx'}
         email_configs: []
@@ -528,6 +674,7 @@ make download_packages
           repo: "{{ chart.repo['grafana'] }}"
           path: "grafana"
           version: "6.28.0"
+        admin_password: "{{ password.grafana_admin }}"
         dashboards:
           default:
             node-exporter:
@@ -535,7 +682,7 @@ make download_packages
               revision: 24
               datasource: Prometheus
             node-full:
-              gnetID: 1860
+              gnetId: 1860
               revision: 27
               datasource: Prometheus
             blackbox-exporter:
@@ -552,25 +699,41 @@ make download_packages
               revision: 14
               datasource: Prometheus
             apiserver:
-              gnetID: 12006
+              gnetId: 12006
               revision: 1
               datasource: Prometheus
             etcd:
-              gnetID: 9733
+              gnetId: 9733
               revision: 1
               datasource: Prometheus
             ceph:
-              gnetID: 2842
+              gnetId: 2842
               revision: 14
               datasource: Prometheus
 
     node_exporter:
       version: 1.3.0
-      #will download node-exporter when local_dir is empty
-      # local_dir: "/root/ansible/files/node_exporter"
-      local_dir: ""
+      #will download node-exporter binary when local_dir is empty
+      # this is binary file
+      local_path: "/root/ansible/files/node_exporter"
       install_path: /usr/local/bin/
       port: 9100
+      install_check: true
+
+    exporters:
+      openstack_exporter:
+        target_config:
+          clouds: {}
+            # cloud-1:
+            #   region_name: RegionOne
+            #   auth:
+            #     username: admin
+            #     password: cangoal
+            #     project_name: admin
+            #     project_domain_name: 'Default'
+            #     user_domain_name: 'Default'
+            #     auth_url: 'http://10.10.10.10:35357/v3'
+            #     verify: false
   ```
 
 ##### （2）run monitor task
@@ -583,8 +746,9 @@ make monitor
 ### Log Task
 
 #### 1.deploy log
+
 ##### （1）set global variables
-* `vim global.yaml`
+* `vim vars/global.yaml`
   * set chart config
     * omitted, refer to global.yaml
   * set ingress config
@@ -605,7 +769,7 @@ make monitor
     elastic:
       version: "7.17.3"
       security:
-        password: "elastic"
+        password: "{{ password.elastic_elastic }}"
       elasticsearch:
         name: elasticsearch
         chart:
@@ -644,11 +808,83 @@ make monitor
         config:
           batch_size: 1000
           group_id: logstash_log_k8s
+        pipeline:
+          groks: |
+            [
+              "%{IP:[request][remote_addr]}.*?\[%{HTTPDATE:logtime}\]\s+\"%{WORD:[request][request_method]}\s+%{URIPATH:[request][request_path]}(?:\?*(?<[request][params]>\S+))?\s+HTTP/%{NUMBER:[request][http_version]}\"\s+%{INT:[request][status]}\s+%{NOTSPACE:[request][bytes_sent]}(?:\s+\"(?<[request][http_referer]>.*?)\")?(?:\s+\"(?<[request][user_agent]>.*?)\")?(?:\s*%{NUMBER:[request][request_time]})?",
+              "\[%{TIMESTAMP_ISO8601:logtime}\].*?\[(?<trace_id>.*?)\].*?\[%{LOGLEVEL:level}\s*\].*?\[(?<module>\S+)\]\s*--\s*(?<message>.*)",
+              "%{DATESTAMP:logtime}\s+\[%{LOGLEVEL:level}\]\s%{POSINT:pid}#%{NUMBER:tid}:\s(?<message>.*)",
+              "%{TIMESTAMP_ISO8601:logtime}\s+\[(?<module>\S+)\]\s+%{LOGLEVEL:level}\s+(?<message>.*)",
+              "%{SYSLOGTIMESTAMP:logtime} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST} %{SYSLOGPROG:module}:(?<message>.*)"
+            ]
+          whitelist_names: ["^@","^labels$","^level$","^trace_id$","^module$","^message$","^request$","^origin_message$","^geoip$","^data_stream$"]
+
       filebeat:
         name: filebeat
         chart:
           repo: "{{ chart.repo['elastic'] }}"
           path: "filebeat"
+
+        #description env info(e.g. test、dev、prodution)
+        env: test
+
+        #mount hostPath into container
+        #/var/log don't need to mount
+        #cannot mout on /var/log/ because /var/log has been mounted in readonly mode
+        volumes: []
+        # - name: vol-1
+        #   hostPath: /tmp/a.txt
+        #   mountPath: /tmp/a.txt
+        # - name: vol-2
+        #   hostPath: /tmp/log
+        #   mountPath: /tmp/mylog
+
+        #collect the logs belowed additionly
+        log:
+        - paths:
+          - "/var/log/messages"
+          - "/var/log/syslog"
+          app_name: "syslog"
+          timezone: Asia/Shanghai
+        # - paths:
+        #   - "/tmp/a.txt"
+        #   - "/tmp/mylog/*.txt"
+        #   app_name: "mylog"
+        #   timezone: Asia/Shanghai
+
+        #install filebeat on nodes not in k8s
+        # will download node-exporter binary when local_path is empty
+        # this is binary file
+        local_path: "/root/ansible/files/filebeat"
+        install_path: /usr/local/bin/
+        kafka: "10.10.10.163:19092"
+        http_probe: true
+        http_port: 5066
+        install_check: true
+
+    elastalert:
+      name: elastalert
+      chart:
+        repo: "{{ chart.repo['elastalert2'] }}"
+        path: "elastalert2"
+        version: "2.9.0"
+      resources:
+        requests:
+          cpu: "1000m"
+          memory: "2Gi"
+        limits:
+          cpu: "1000m"
+          memory: "2Gi"
+      writebackIndex: elastalert
+      elasticsearch:
+        host: elasticsearch-master
+        port: 9200
+        username: "elastic"
+        password: "{{ password.elastic_elastic }}"
+      alertmanager:
+        url: "http://{{ monitor.prometheus.name }}-alertmanager.{{ monitor.namespace }}{{ ingress.hosts.alertmanager.path }}"
+      index_map:
+        syslog: "logs-syslog*"
   ```
 
 ##### （2）run log task
@@ -662,7 +898,7 @@ make log
 
 #### 1.deploy service
 ##### （1）set global variables
-* `vim global.yaml`
+* `vim vars/global.yaml`
   * set chart config
     * omitted, refer to global.yaml
   * set ingress config
@@ -709,8 +945,8 @@ make log
         repo: "{{ chart.repo['bitnami'] }}"
         path: "mysql"
         version: "8.5.7"
-      root_password: cangoal
-      replication_password: cangoal
+      root_password: "{{ password.mysql_root }}"
+      replication_password: "{{ password.mysql_replication }}"
       #standalone or replication
       architecture: replication
       resources:
@@ -729,8 +965,8 @@ make log
         repo: "{{ chart.repo['bitnami'] }}"
         path: "postgresql"
         version: "11.7.3"
-      postgres_password: cangoal
-      replication_password: cangoal
+      postgres_password: "{{ password.pgsql_postgres }}"
+      replication_password: "{{ password.pgsql_replication }}"
       #standalone or replication
       architecture: replication
       resources:
@@ -749,7 +985,7 @@ make log
         repo: "{{ chart.repo['bitnami'] }}"
         path: "redis"
         version: "17.0.8"
-      password: cangoal
+      password: "{{ password.redis }}"
       resources:
         requests:
           cpu: "2000m"
@@ -789,7 +1025,7 @@ make log
           version: "0.4.1"
         auth:
           user: admin
-          password: cangoal
+          password: "{{ password.kafka_ui_admin }}"
         #add kafka clusters
         kafka_clusters:
         - name: kafka-k8s
@@ -800,6 +1036,190 @@ make log
 ```shell
 make service
 ```
+
+***
+
+### DevOps Task
+
+#### 1.deploy service
+
+##### （1）set global variables
+* `vim vars/global.yaml`
+  * set chart config
+    * omitted, refer to global.yaml
+  * set ingress config
+    * omitted, refer to global.yaml
+  * set devops config
+  ```yaml
+  devops:
+    namespace: devops
+    repository: "{{ registry_prefix }}"
+    #use default sc when set null
+    storage_class: null
+    jenkins:
+      enabled: true
+      name: jenkins
+      chart:
+        repo: "{{ chart.repo['jenkins'] }}"
+        path: "jenkins"
+        version: "4.1.9"
+      admin_password: "{{ password.jenkins_admin }}"
+      resources:
+        requests:
+          cpu: "1000m"
+          memory: "2Gi"
+        limits:
+          cpu: "2000m"
+          memory: "4Gi"
+        storage: 10Gi
+      agent:
+        storage_class: null
+        #if not enable RWX mode, you can only run one agent
+        pvc_access_mode: ["ReadWriteMany"]
+        image: "{{ registry_prefix }}jenkins/inbound-agent"
+        tag: "4.11.2-4"
+        #if false , use additionalContainers config , or use podTemplates config(choose depending on jenkins chart version)
+        disableDefaultAgent: true
+        maven:
+          image: "{{ registry_prefix }}maven"
+          tag: "3.8.5-openjdk-8"
+          servers:
+          - id: kangpaas-release
+            username: admin
+            password: cangoal
+          mirrors:
+            central: "http://maven.aliyun.com/nexus/content/groups/public"
+        nodejs:
+          image: "{{ registry_prefix }}node"
+          tag: "14"
+    argocd:
+      enabled: true
+      name: argocd
+      chart:
+        repo: "{{ chart.repo['argo'] }}"
+        path: "argo-cd"
+        version: "5.19.12"
+      admin_password: "{{ password.argocd_admin }}"
+      resources:
+        requests:
+          cpu: "1000m"
+          memory: "2Gi"
+        limits:
+          cpu: "2000m"
+          memory: "4Gi"
+        storage: 10Gi
+  ```
+
+##### （2）run service task
+```shell
+make devops
+```
+
+***
+
+### Service-Mesh Task
+
+#### 1.deploy service
+
+##### （1）set global variables
+* `vim vars/global.yaml`
+  * set chart config
+    * omitted, refer to global.yaml
+  * set ingress config
+    * omitted, refer to global.yaml
+  * set service-mesh config
+  ```yaml
+  service_mesh:
+    namespace: &sm_ns "service-mesh"
+    repository: "{{ registry_prefix }}"
+    jaeger:
+      enabled: true
+      name: &jg_nm "jaeger-prod"
+      version: "1.42.0"
+      #operator yaml file
+      #local_path: "/root/ansible/files/jaeger-operator.yaml"
+      local_path: ""
+      prometheus: "http://{{ monitor.prometheus.name }}-server.{{ monitor.namespace}}{{ ingress.hosts.prometheus.path }}"
+      collector:
+        max_replicas: 5
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+          requests:
+            cpu: 2000m
+            memory: 4Gi
+      elasticsearch:
+        url: "http://elasticsearch-master.{{ log.namespace }}:9200"
+        index_prefix: "{{ ref.jg_nm }}"
+        username: "elastic"
+        password: "{{ log.elastic.security.password }}"
+    opentelemetry:
+      enabled: true
+      name: opentelemetry-operator
+      chart:
+        repo: "{{ chart.repo['opentelemetry'] }}"
+        path: "opentelemetry-operator"
+        version: "0.23.0"
+      collector:
+        name: &otlc_nm "otlc"
+      exporter:
+        collector: "http://{{ ref.otlc_nm }}-collector.{{ ref.sm_ns }}:4317"
+        jaeger: "http://{{ ref.jg_nm }}-collector.{{ ref.sm_ns }}:4317"
+      sampler:
+        type: parentbased_traceidratio
+        argument: "1"
+      instrument:
+        java:
+          image: "{{ registry_prefix }}ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.22.1"
+    istio:
+      enabled: true
+      version: "1.17.0"
+      #local_path: "/root/ansible/files/istioctl"
+      local_path: ""
+      install_path: /usr/local/bin/
+      integrations:
+        prometheus: "http://{{ monitor.prometheus.name }}-server.{{monitor.namespace}}{{ ingress.hosts.prometheus.path }}"
+        jaeger:
+          in: "http://{{ ref.jg_nm }}-query.{{ ref.sm_ns }}:16685{{ ingress.hosts.jaeger.path }}"
+          external: "https://{{ ingress.hosts.jaeger.host }}{% if ingress.hosts.jaeger.host != '' %}.{% endif %}{{ ingress.hosts.jaeger.domains[0] }}:{{ basic.ingress_nginx.config.https_port }}{{ ingress.hosts.jaeger.path }}"
+        grafana:
+          in: "http://{{ monitor.prometheus.grafana.name }}.{{ monitor.namespace }}{{ ingress.hosts.grafana.path }}"
+          external: "https://{{ ingress.hosts.grafana.host }}{% if ingress.hosts.grafana.host != '' %}.{% endif %}{{ ingress.hosts.grafana.domains[0] }}:{{ basic.ingress_nginx.config.https_port }}{{ ingress.hosts.grafana.path }}"
+      providers:
+        tracing:
+          service: "{{ ref.jg_nm }}-collector.{{ ref.sm_ns }}.svc.cluster.local"
+          port: 9411
+          maxTagLength: 256
+      telemetry:
+        accessLogging:
+        - disabled: true
+        tracing:
+        - randomSamplingPercentage: 100
+          disableSpanReporting: true
+          customTags: {}
+        metrics: []
+      kiali:
+        name: kiali
+        chart:
+          repo: "{{ chart.repo['kiali'] }}"
+          path: "kiali-server"
+          version: "1.64.0"
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+  ```
+
+##### （2）run service task
+```shell
+make service_mesh
+```
+
+***
 
 ### Author
  👤 **Li Liang**
