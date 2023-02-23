@@ -1,0 +1,15 @@
+- hosts: work_master
+  gather_facts: True
+  become: True
+  tasks:
+  - name: copy scripts
+    template:
+      src: ../scripts/k8s_tools.py.j2
+      dest: /tmp/k8s_tools.py
+      mode: 0755
+  - name: exec scripts
+    shell: "docker run --rm -it -v /tmp:/tmp -v /usr/bin/kubectl:/usr/bin/kubectl -v {{ operations.k8s.kube_config }}:{{ operations.k8s.kube_config }} {{ ansible_image }} python3 /tmp/k8s_tools.py"
+    register: result
+  - name: output result
+    debug:
+      msg: "{{ result }}"

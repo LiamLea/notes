@@ -6,39 +6,7 @@ import requests
 import base64
 import sys
 
-# operations = {{ operations.k8s }}
-
-operations = {
-    "kube_config": "/root/.kube/config",
-    "operations":{
-        "label": {
-            "enabled": True,
-            "tasks": [
-                  {
-                    "namespaces": ["aaa"],
-                    "controllers": [],
-                    "labels": ["aa=11"],
-                    "annotations": [],
-                    "restart": True
-                  }
-            ]
-        },
-        "get_all": {
-            "enabled": False,
-            "export_dir": "/tmp/k8s"
-        },
-        "restore_global": {
-            "enabled": False,
-            "import_dir": "/tmp/k8s"
-        },
-        "list_images": {
-            "enabled": False,
-            "registry_url": "http://192.168.6.111:5000",
-            "username": "admin",
-            "password": "Harbor12345"
-        }
-    }
-}
+operations = {{ operations.k8s }}
 
 export_dir = operations["operations"]["get_all"]["export_dir"]
 import_dir = operations["operations"]["restore_global"]["import_dir"]

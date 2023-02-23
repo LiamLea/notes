@@ -762,6 +762,32 @@ download_packages:
       image: "ubuntu:18.04"
       package_manager: "apt"
 
+operations:
+  k8s:
+    kube_config: "/root/.kube/config"
+    operations:
+      label:
+        enabled: true
+        tasks:
+        - namespaces: []  #e.g. ["springblade"]
+          controllers: [] #e.g. [{namespace: xx,name: xx,type: deployment}]
+          labels:      #e.g. ["istio-injection-"]
+          - "istio-injection=enabled"
+          annotations:
+          - "instrumentation.opentelemetry.io/inject-java={{ service_mesh.namespace }}/my-instrumentation"
+          restart: true
+      get_all:
+        enabled: false
+        export_dir: "/tmp/k8s"
+      restore_global:
+        enabled: false
+        import_dir: "/tmp/k8s"
+      list_images:
+        enabled: false
+        registry_url: "http://192.168.6.111:5000"
+        username: admin
+        password: Harbor12345
+
 ref:
   sm_ns: *sm_ns
   jg_nm: *jg_nm
