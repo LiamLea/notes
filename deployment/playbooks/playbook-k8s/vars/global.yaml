@@ -469,7 +469,7 @@ log:
       username: "elastic"
       password: "{{ password.elastic_elastic }}"
     alertmanager:
-      url: "http://{{ monitor.prometheus.name }}-alertmanager.{{ monitor.namespace }}/alertmanager"
+      url: "http://{{ monitor.prometheus.name }}-alertmanager.{{ monitor.namespace }}{{ ingress.hosts.alertmanager.path }}"
     index_map:
       syslog: "logs-syslog*"
 
@@ -709,7 +709,7 @@ service_mesh:
     integrations:
       prometheus: "http://{{ monitor.prometheus.name }}-server.{{monitor.namespace}}{{ ingress.hosts.prometheus.path }}"
       jaeger:
-        in: "http://{{ ref.jg_nm }}-collector.{{ ref.sm_ns }}:16685/jaeger"
+        in: "http://{{ ref.jg_nm }}-query.{{ ref.sm_ns }}:16685{{ ingress.hosts.jaeger.path }}"
         external: "https://{{ ingress.hosts.jaeger.host }}{% if ingress.hosts.jaeger.host != '' %}.{% endif %}{{ ingress.hosts.jaeger.domains[0] }}:{{ basic.ingress_nginx.config.https_port }}{{ ingress.hosts.jaeger.path }}"
       grafana:
         in: "http://{{ monitor.prometheus.grafana.name }}.{{ monitor.namespace }}{{ ingress.hosts.grafana.path }}"

@@ -12,7 +12,7 @@
       - [4.创建列表](#4创建列表)
         - [（1）方式一](#1方式一)
         - [（2）方式二（利用with_items，推荐）](#2方式二利用with_items推荐)
-      - [5.使用原生字符串：`{% raw %} ... {% endraw %}`](#5使用原生字符串-raw-endraw)
+      - [5.使用原生字符串：`{% raw %} ... {% endraw %}` 或者 `{{ '...' }}`](#5使用原生字符串-raw-endraw-或者)
       - [6.修改列表的每个item（比如添加后缀）](#6修改列表的每个item比如添加后缀)
       - [7.设置变量时，不要用if语句，因为if语句返回的都是string，无法返回特殊类型](#7设置变量时不要用if语句因为if语句返回的都是string无法返回特殊类型)
 
@@ -23,7 +23,7 @@
 |function|description|
 |-|-|
 |`select('match', '<regexp>')`|匹配含有该正则的内容|
-|`regex_replace('<src_regex>', '<dst_regex>')`|进行正则替换|
+|`regex_replace('<src_regex>', '<dst_regex>')`|进行正则替换</br>注意: 正则不能匹配所有，因为即使前面是一个列表，regex_replace还是认为前面是字符串，如果匹配所有，容易改变原先的格式，导致出错|
 |`replace('<src_string>', '<dst_string>')`|进行字符串替换|
 |`trim('<string>')`|两端去除<string>内容|
 |使用python字符串函数：`{{ <var>.<func> }}`|参考下面的例子|
@@ -31,7 +31,7 @@
 |`combine`|合并dict|
 
 ```jinja2
-{{ result.stdout_lines | select('match', '.*image:.*') | list | regex_replace(' *image: *', '') | replace('\"', '')}}
+{{ result.stdout_lines | select('match', '.*image:.+') | list | regex_replace(' *image: *', '') | replace('\"', '')}}
 ```
 
 #### 1.使用python函数
@@ -99,7 +99,7 @@ set_fact:
   with_items: "{{ ingress.hosts['prometheus']['domains'] }}"
 ```
 
-#### 5.使用原生字符串：`{% raw %} ... {% endraw %}`
+#### 5.使用原生字符串：`{% raw %} ... {% endraw %}` 或者 `{{ '...' }}`
 ```yaml
 # {{ variable_1 }}: {{ aa }}
 variable_1: {% raw %} {{ aa }} {% endraw %}
@@ -110,6 +110,12 @@ variable_2: |
   {{ aa }}
   bb
   {% endraw %}
+```
+
+* 如果需要转义: `{{`
+```yaml
+- name: shell
+  shell: "ls | grep -v '{''{'"
 ```
 
 #### 6.修改列表的每个item（比如添加后缀）
