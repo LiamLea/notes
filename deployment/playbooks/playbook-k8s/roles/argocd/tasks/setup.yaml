@@ -15,8 +15,8 @@
       configs:
         params:
           server.insecure: true
-          server.basehref: /argocd
-          server.rootpath: /argocd
+          server.basehref: "{{ ingress.hosts.argocd.path }}"
+          server.rootpath: "{{ ingress.hosts.argocd.path }}"
         secret:
           argocdServerAdminPassword: "{{ devops.argocd.admin_password }}"
       server:
@@ -25,7 +25,7 @@
           annotations:
             cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
             nginx.ingress.kubernetes.io/configuration-snippet: |
-              if ($request_uri ~ "^/argocd.*") {
+              if ($request_uri ~ "^{{ ingress.hosts.argocd.path }}.*") {
                 rewrite ^ $request_uri;
                 rewrite "(?i)/(argocd.*)" /$1 break;
                 proxy_pass http://upstream_balancer$uri;

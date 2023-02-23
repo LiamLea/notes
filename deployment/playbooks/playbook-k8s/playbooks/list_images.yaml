@@ -65,6 +65,9 @@
   - name: include template opentelemetry
     include_tasks: ../roles/opentelemetry/tasks/template.yaml
 
+  - name: include template istio
+    include_tasks: ../roles/istio/tasks/template.yaml
+
   - name: set images
     set_fact:
       my_dict:
@@ -89,6 +92,7 @@
         elastalert: "{{ elastalert_images | unique }}"
         jaeger: "{{ jaeger_images | unique }}"
         opentelemetry: "{{ opentelemetry_images | unique }}"
+        istio: "{{ istio_images | unique }}"
 
   - name: list_images
     debug:

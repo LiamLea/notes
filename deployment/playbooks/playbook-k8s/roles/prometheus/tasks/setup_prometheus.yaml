@@ -14,8 +14,8 @@
           repository: "{{ monitor.repository }}quay.io/prometheus/alertmanager"
         persistentVolume:
           storageClass: "{{ monitor.storage_class }}"
-        prefixURL: "/alertmanager"
-        baseURL: "http://localhost:9093/alertmanager"
+        prefixURL: "{{ ingress.hosts.alertmanager.path }}"
+        baseURL: "http://localhost:9093{{ ingress.hosts.alertmanager.path }}"
         ingress:
           enabled: "{{ ingress.enabled }}"
           annotations:
@@ -51,7 +51,7 @@
         resources:
           limits: "{{ monitor.prometheus.resources.limits }}"
           requests: "{{ monitor.prometheus.resources.requests }}"
-        prefixURL: "/prometheus"
+        prefixURL: "{{ ingress.hosts.prometheus.path }}"
         baseURL: "{{ monitor.prometheus.config.external_url }}"
         global:
           scrape_interval: "{{ monitor.prometheus.config.scrape_interval }}"
@@ -113,9 +113,9 @@
       image:
         repository: "{{ monitor.repository }}k8s.gcr.io/prometheus-adapter/prometheus-adapter"
       prometheus:
-        url: http://prometheus-server
+        url: "http://{{ monitor.prometheus.name }}-server"
         port: 80
-        path: /prometheus
+        path: "{{ ingress.hosts.prometheus.path }}"
       rules: "{{ __config_prometheus_adapter_rules }}"
       logLevel: 2
 
@@ -146,7 +146,7 @@
           repository: "{{ monitor.repository }}busybox"
       grafana.ini:
         server:
-          root_url: "%(protocol)s://%(domain)s/grafana"
+          root_url: "%(protocol)s://%(domain)s{{ ingress.hosts.grafana.path }}"
           serve_from_sub_path: true
       adminPassword: "{{ monitor.prometheus.grafana.admin_password }}"
       datasources:
@@ -155,7 +155,7 @@
           datasources:
           - name: Prometheus
             type: prometheus
-            url: http://prometheus-server/prometheus
+            url: "http://{{ monitor.prometheus.name }}-server{{ ingress.hosts.prometheus.path }}"
             access: proxy
             isDefault: true
 

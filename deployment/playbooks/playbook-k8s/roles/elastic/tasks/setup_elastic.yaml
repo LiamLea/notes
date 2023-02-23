@@ -61,7 +61,7 @@
     atomic: yes
     release_values:
       image: "{{ log.repository }}docker.elastic.co/kibana/kibana"
-      healthCheckPath: "/kibana/app/kibana"
+      healthCheckPath: "{{ ingress.hosts.kibana.path }}/app/kibana"
       kibanaConfig:
         kibana.yml: "{{ __config_kibana }}"
       extraEnvs:

@@ -50,6 +50,7 @@
         image_pull_policy: "IfNotPresent"
         resources: "{{ service_mesh.istio.kiali.resources }}"
         ingress:
+          enabled: "{{ ingress.enabled }}"
           class_name: "{{ ingress.class_name }}"
           override_yaml:
             metadata:
@@ -57,7 +58,7 @@
                 cert-manager.io/cluster-issuer: "{{ ingress.cluster_issuer }}"
       server:
         web_root: "{{ ingress.hosts.kiali.path }}"
-        web_fqdn: "{{ ingress.hosts.kiali.host }}{{ ingress.hosts.kiali.domains[0] }}"
+        web_fqdn: "{{ __kiali_hosts[0] }}"
       external_services:
         prometheus:
           url: "{{ service_mesh.istio.integrations.prometheus }}"
@@ -70,3 +71,11 @@
           enabled: true
           in_cluster_url: "{{ service_mesh.istio.integrations.grafana.in }}"
           url: "{{ service_mesh.istio.integrations.grafana.external }}"
+      kiali_feature_flags:
+        clustering:
+          autodetect_secrets:
+            #安装chart时，有bug，暂时设为false
+            enabled: false
+      auth:
+        #当使用token时，不能指定token，只能使用生成的token
+        strategy: "anonymous"
