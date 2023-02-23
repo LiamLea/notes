@@ -4,7 +4,7 @@ ansible_image = liamlea/ansible:debian-2.10
 ansible_dir = $(shell pwd)
 docker_version = $(shell grep -Ev '^\s*\#|^\s*$$' global.yaml | grep -A 2 '^docker' | grep 'version' | awk '{print $$2}')
 
-TASKS = init_localhost test install_harbor push_images download_packages
+TASKS = init_localhost test install_harbor push_images download_packages operation
 TASKS_1 = storageclass basic monitor log service devops service_mesh
 
 .PHONY := docker
@@ -32,7 +32,7 @@ check: docker
 
 .PHONY := ${TASKS}
 ${TASKS}: docker
-	docker run --rm --network host --name ansible-lil-$@ -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/$@.yaml -e @vars/global.yaml -e @vars/password.yaml"
+	docker run --rm --network host --name ansible-lil-$@ -v ${ansible_dir}:/root/ansible -it ${ansible_image} /bin/bash -c "cd /root/ansible;ansible-playbook playbooks/$@.yaml -e @vars/global.yaml -e @vars/password.yaml -e ansible_image=${ansible_image}"
 
 .PHONY := ${TASKS_1}
 ${TASKS_1}: docker
