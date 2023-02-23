@@ -5,8 +5,19 @@
     target_registry: "10.10.10.250"
     username: "admin"
     password: "Harbor12345"
+
+    #匹配的镜像，会用${registry_prefix} 替换 其地址
+    #没有匹配这里的镜像，都会在镜像前面加上${registry_prefix}
+    #use | to match multiple registries
     prefix_replace_pattern: ""
+
+    #匹配的镜像，会用${target_registry} 替换 其地址
+    #没有匹配这里的镜像，都会在镜像前面加上${registry_prefix}
+    #use | to match multiple registries
     address_replace_pattern: ""
+    
+    #其余镜像都会在前面加上 ${registry_prefix}
+
   tasks:
   - name: login registry
     shell: docker login {{ target_registry }} -u {{ username }} -p {{ password }}
