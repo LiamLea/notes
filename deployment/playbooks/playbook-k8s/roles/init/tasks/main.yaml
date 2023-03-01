@@ -87,11 +87,13 @@
       src: id_rsa
       dest: "~/.ssh"
       mode: 0600
+      force: yes
 
   - name: copy id_rsa.pub
     copy:
       src: id_rsa.pub
       dest: "~/.ssh"
+      force: yes
   when: groups["master"] is defined and inventory_hostname in groups["master"]
 
 - name: create directory ssh

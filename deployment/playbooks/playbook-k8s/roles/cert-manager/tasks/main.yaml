@@ -28,6 +28,7 @@
   copy:
     src: "{{ item }}"
     dest: /tmp/
+    force: yes
   with_items:
   - "secrets.yaml"
   - "issuer.yaml"

@@ -9,7 +9,7 @@
       - [2.service mesh](#2service-mesh)
     - [概述](#概述)
       - [1.Architecture](#1architecture)
-        - [（1）envoy](#1envoy)
+        - [（1）istio-proxy](#1istio-proxy)
         - [（2）istiod](#2istiod)
         - [（3）监控体系架构说明](#3监控体系架构说明)
       - [2.istio使用的端口](#2istio使用的端口)
@@ -36,10 +36,10 @@
 #### 1.Architecture
 ![](./imgs/overview_01.png)
 
-##### （1）envoy
+##### （1）istio-proxy
 * 包含下面组件：
-  * envoy
-  * pilot-agent（也叫istio agent, 用于envoy连接istiod）
+  * **envoy**
+  * **pilot-agent**（也叫istio agent, 用于envoy连接istiod）
 * 启动envoy时，会设置iptables，将所有进入流量转到15006端口，所有外出流量转到15001端口
   * 所有流量进出pod之前，都需要经过envoy
 

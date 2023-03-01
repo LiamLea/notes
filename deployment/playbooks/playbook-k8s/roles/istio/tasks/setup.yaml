@@ -12,6 +12,7 @@
     src: "{{ service_mesh.istio.local_path }}"
     dest: "{{ service_mesh.istio.install_path }}"
     mode: 0755
+    force: yes
   when: service_mesh.istio.local_path.strip() != ""
 
 - name: copy istio profile
