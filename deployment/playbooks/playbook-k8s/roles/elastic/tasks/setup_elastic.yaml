@@ -6,6 +6,7 @@
   copy:
     src: secrets.yaml
     dest: /tmp/
+    force: yes
 
 - name: apply secret
   shell: "kubectl apply -f /tmp/secrets.yaml -n {{ log.namespace }}"

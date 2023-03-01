@@ -9,6 +9,7 @@
   copy:
     src: "{{ service_mesh.jaeger.local_path }}"
     dest: /tmp/jaeger-operator.yaml
+    force: yes
   when: service_mesh.jaeger.local_path.strip() != ""
 
 - name: get image

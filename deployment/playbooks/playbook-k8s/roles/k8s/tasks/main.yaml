@@ -23,6 +23,7 @@
     src: helm
     dest: /usr/sbin/
     mode: 0777
+    force: yes
   when: inventory_hostname in groups["master"]
 
 - name: install nginx

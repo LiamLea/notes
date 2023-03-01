@@ -53,9 +53,9 @@ F-->G("被调用的方法")
 #### 3.RPC框架的核心内容
 * 动态代理
 * 传输协议
-TCP，UDP，HTTP，HTTP2.0（gRPC）
+  * TCP，UDP，HTTP，HTTP2.0（gRPC）
 * 序列化协议
-json，xml
+  * json，xml, protobuf（gRPC）
 * 服务治理
 
 #### 4.RestFul 与 RPC 比较

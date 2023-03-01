@@ -136,6 +136,63 @@ parameters:
     value: '9849'
   - name: service.ports.grpc-2.protocol
     value: TCP
+  - name: mysql.external.mysqlDatabase
+    value: 'nacos'
+```
+
+* 单例模式
+```yaml
+parameters:
+  - name: image.repository
+    value: nacos/nacos-server
+  - name: ingress.hostname
+    value: home.liamlea.local
+  - name: mysql.enabled
+    value: 'false'
+  - name: mysql.external.mysqlMasterHost
+    value: mysql-primary
+  - name: mysql.external.mysqlMasterUser
+    value: root
+  - name: mysql.external.mysqlMasterPassword
+    value: cangoal
+  - name: mysql.external.mysqlSlaveHost
+    value: mysql-secondary
+  - name: image.registry
+    value: 10.10.10.250/library
+  - name: ingress.annotations.cert-manager\.io/cluster-issuer
+    value: ca-issuer
+  - name: ingress.tls
+    value: 'true'
+  - name: ingress.ingressClassName
+    value: nginx
+  - name: service.ports.grpc-1.port
+    value: '9848'
+  - name: service.ports.grpc-1.protocol
+    value: TCP
+  - name: service.ports.grpc-2.port
+    value: '9849'
+  - name: service.ports.grpc-2.protocol
+    value: TCP
+  - name: mysql.external.mysqlDatabase
+    value: 'nacos-test'
+  - name: 'extraEnvVars[0].name'
+    value: PREFER_HOST_MODE
+  - name: 'extraEnvVars[0].value'
+    value: hostname
+  - name: 'extraEnvVars[1].name'
+    value: TZ
+  - name: 'extraEnvVars[1].value'
+    value: Asia/Shanghai
+  - name: 'extraEnvVars[2].name'
+    value: MODE
+  - name: 'extraEnvVars[2].value'
+    value: standalone
+  - name: replicaCount
+    value: '1'
+  - name: 'extraEnvVars[3].name'
+    value: SPRING_DATASOURCE_PLATFORM
+  - name: 'extraEnvVars[3].value'
+    value: mysql
 ```
 
 ***
