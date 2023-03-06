@@ -1,42 +1,18 @@
-# os
+# OS
+
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 <!-- code_chunk_output -->
 
-- [os](#os)
-    - [Application](#application)
-      - [1.file operation](#1file-operation)
-      - [2.flag（command-line flag parsing）](#2flagcommand-line-flag-parsing)
+- [OS](#os)
+    - [使用](#使用)
+      - [1.flag（命令行参数）](#1flag命令行参数)
 
 <!-- /code_chunk_output -->
 
-### Application
+### 使用
 
-####  1.file operation
-```go
-//打开文件
-fobj, err := os.OpenFile("./test.txt", os.O_RDWR|os.O_CREATE, 0644)
-if err != nil {
-  return
-}
-//关闭文件
-defer fobj.Close()
-
-//读文件
-temp := make([]byte, 512)
-for {
-  _, err := fobj.Read(temp)
-  if err != nil {
-    return
-  }
-  fmt.Println(string(temp))
-}
-
-//写文件
-fobj.Write([]byte("xxxx"))
-```
-
-#### 2.flag（command-line flag parsing）
+#### 1.flag（命令行参数）
 ```go
 func main() {
 	name := flag.String("flag_name", "default_value", "promopt")

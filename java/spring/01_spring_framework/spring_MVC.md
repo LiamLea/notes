@@ -22,7 +22,7 @@
 * M: model 模型层
   * 指工程中的JavaBean，用来处理数据
     * 实体类Bean: 专业存储数据的
-    * 业务处理Bean: 指Service或Dao对象，处理业务逻辑和数据访问
+    * 业务处理Bean: 指**Service**或**Dao**对象，处理业务逻辑和数据访问
 * V: view 视图层
   * 指工程中的html或jsp，用来展示数据
 * C：controller 控制层

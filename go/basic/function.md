@@ -8,6 +8,7 @@
       - [1.特点](#1特点)
     - [使用](#使用)
       - [1.函数基本格式](#1函数基本格式)
+        - [（1）当return后面什么都不加时](#1当return后面什么都不加时)
       - [2.传参](#2传参)
       - [3.`defer`关键字](#3defer关键字)
       - [4.万能类型（空接口）：`interface{}`](#4万能类型空接口interface)
@@ -47,6 +48,17 @@ func f1(x int, y int) {
 func(){
   fmt.Println("hhhhh")
 }()
+```
+
+##### （1）当return后面什么都不加时
+
+```go
+func test()(a int, b string){
+  //...
+
+  //return后面什么都不加，则返回(a int, b string)这里定义的形参，即return a,b
+  return
+}
 ```
 
 #### 2.传参
