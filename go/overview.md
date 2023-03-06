@@ -11,12 +11,13 @@
         - [（2）module模式（1.11版本之后）](#2module模式111版本之后)
       - [3.`go.mod`文件格式](#3gomod文件格式)
       - [4.一个go项目中必须存在以下文件：](#4一个go项目中必须存在以下文件)
-      - [5.目录结构](#5目录结构)
+      - [5.go包管理结构](#5go包管理结构)
       - [6.编译（全部基于module模式）](#6编译全部基于module模式)
     - [使用（基于module模式）](#使用基于module模式)
       - [1.查看和修改环境变量](#1查看和修改环境变量)
       - [2.模块管理](#2模块管理)
       - [3.module使用](#3module使用)
+    - [项目包结构](#项目包结构)
 
 <!-- /code_chunk_output -->
 
@@ -25,31 +26,32 @@
 #### 1.环境变量
 ```shell
 #sdk所在目录（即go程序所在的目录）
-GOROOT="/usr/local/go"
+GOROOT=/usr/local/go
 
 #工作目录
-GOPATH="/root/go"
+GOPATH=/root/go
 
 #是否开启go的module功能（用于管理依赖的包和依赖的版本）
 #一定要开启
-GO111MODULE="on"
+GO111MODULE=on
 #能够获取当期所在项目的go.mod文件的绝地路径
 #如果不在任何项目的目录中，则显示为/dev/null，即未检测到
 #比如：cd /tmp/sample-controller-master/，然后执行go env，就会看到
-GOMOD="/tmp/sample-controller-master/go.mod"
+GOMOD=/tmp/sample-controller-master/go.mod
 
 #指定下载go包的代理地址（默认地址需要翻墙，可以换成阿里云的）
 #direct表示，如果再代理地址中没有找到包，则去原始路径寻找
 #比如要下载github.com/kubernetes/sample-controller这个包，如果在代理地址没找到，会去github.com找
-GOPROXY="https://proxy.golang.org,direct"
+#GOPROXY=https://proxy.golang.org,direct
+GOPROXY=https://goproxy.cn
 
 #设置用于检测包的校验和的地址（当设置了代理，这里就会默认去代理地址校验）
-GOSUMDB="sum.golang.org"
+GOSUMDB=sum.golang.org
 
 #指定私有go的仓库
 #比如下面表示下载*.example.com或go.local.com的包，不用去代理地址下载
 #GONOPROXY和GONOSUMDB与下面的效果一样，只要设置其中一个即可
-GOPRIVATE="*.example.com,go.local.com"
+GOPRIVATE=*.example.com,go.local.com
 ```
 
 #### 2.两种包的管理模式
@@ -96,7 +98,7 @@ replace (
 * `go.mod`
 * `go.sum`
 
-#### 5.目录结构
+#### 5.go包管理结构
 * `$GOPATH/src/`（GOPATH模式）
   * 用来存放源码包（没有版本控制）
 * `$GOPATH/bin/`
@@ -134,7 +136,8 @@ go env -w <VARIABLE>=<VALUE>
 #### 2.模块管理
 * 安装模块（最新版本）
 ```shell
-go get -v <module_name>
+#-u并且下载该module相关依赖
+go get -u -v <module_name>
 ```
 
 #### 3.module使用
@@ -142,9 +145,43 @@ go get -v <module_name>
 #会在当前路径下，创建一个go.mod文件
 go mod init <module_name>
 
+#检查代码中的依赖 更新go.mod文件
+go mod tidy
+
 #下载所需要的module
 go mod download
 
 #列出依赖的module
 go mod graph
+```
+
+***
+
+### 项目包结构
+
+[参考](https://github.com/golang-standards/project-layout)
+
+```shell
+<packeage_name>/
+ +- cmd/                         #主程序
+     |
+     +- main.go                  #主程序入口
+     |
+     +- xx/                      #主程序代码
+
+ +- pkg/                         #代码库
+     +- controller/              #存放控制层代码
+     |   +- xx_yy.go
+     |
+     +- service/                 #存放业务层代码
+     |   +- xx_yy.go
+     |
+     +- dao/                     #存放数据库操作代码
+     |   +- xx_yy.go
+     |
+     +- model/                   #存放实体类（java项目中一般用entity目录）
+
+ +- api/                         #对外提供的API
+ 
+ +- go.mod                       #依赖管理
 ```

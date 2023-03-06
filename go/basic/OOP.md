@@ -27,14 +27,17 @@ type <name> struct {}
 * demp
 ```go
 type Book struct {
-  title string  
-  auth string `tag1=xx tag2=yy`  //可以添加一些标签，要用这些标签需要使用反射机制
+  Title string  
+  //可以添加一些标签，要用这些标签需要使用反射机制
+  //比如: auth string `json:"auth1"  xml:"auth2" db:"auth3"`，
+  //  意思就是该字段在json中的映射字段是auth1，在xml中的映射字段是auth2，在数据库中映射的字段是auth3
+  Auth string `tag1:xx tag2:yy`            
 }
 
 func main(){
   var book1 Book
-  book1.title = "xiyouji"
-  book1.auth = "wuchengen"
+  book1.Title = "xiyouji"
+  book1.Auth = "wuchengen"
 }
 ```
 
@@ -42,22 +45,22 @@ func main(){
 ```go
 //定义类：
 type Book struct {
-	name string
-	auth string
+	Name string
+	Auth string
 }
 
 //定义类的方法：
 func (this *Book) getAuth() {
-	fmt.Println(this.auth)
+	fmt.Println(this.Auth)
 
 }
 
-func (this *Book) setAuth(auth string) {
-	this.auth = auth
+func (this *Book) setAuth(Auth string) {
+	this.Auth = Auth
 }
 
 func main()  {
-	book1 := Book{name: "xiyouji", auth: "wuchengen"}
+	book1 := Book{Name: "xiyouji", Auth: "wuchengen"}
 	book1.getAuth()
 	book1.setAuth("haha")
 	book1.getAuth()
@@ -68,12 +71,12 @@ func main()  {
 ```go
 type HistoryBook struct {
   Book    //继承Book这个类：直接写父类的类名
-  country string    //添加一个新的属性
+  Country string    //添加一个新的属性
 }
 
 func main() {
   //创建HistoryBook的实例
-  book2 := HistoryBook{Book: Book{"sanguozhi", auth: "xxx"}, country: "China"}
+  book2 := HistoryBook{Book: Book{"sanguozhi", auth: "xxx"}, Country: "China"}
 }
 ```
 
@@ -87,7 +90,7 @@ type AnimalIF interface {
 }
 
 type Cat struct {
-  color string
+  Color string
 }
 
 func (this *Cat) Sleep() {
@@ -95,7 +98,7 @@ func (this *Cat) Sleep() {
 }
 
 func (this *Cat) GetColor() string {
-  return this.color
+  return this.Color
 }
 
 func (this *Cat) GetType() string {
