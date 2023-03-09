@@ -11,8 +11,9 @@
       - [1.istio的基本概念（与k8s的关联）](#1istio的基本概念与k8s的关联)
       - [2.工作原理](#2工作原理)
         - [（1）工作原理](#1工作原理)
-        - [（2）两个特殊的listener 和 配置原理](#2两个特殊的listener-和-配置原理)
-        - [（3）magical  number: 6](#3magical-number-6)
+        - [（2）具体示例分析](#2具体示例分析)
+        - [（3）两个特殊的listener 和 配置原理](#3两个特殊的listener-和-配置原理)
+        - [（4）`127.0.0.1`和`127.0.0.6`](#4127001和127006)
       - [3.支持转发的流量](#3支持转发的流量)
         - [（1）自动识别协议（当没有指定协议时，默认自动识别）（不建议开启）](#1自动识别协议当没有指定协议时默认自动识别不建议开启)
         - [（2）明确指定协议（server first protocol需要明确指定）](#2明确指定协议server-first-protocol需要明确指定)
@@ -81,7 +82,36 @@
         * 会将外出的流量发送到 PassthroughCluster 这个cluster上
         * 其他流量则发送到 BlackHoleCluster 这个cluster上
 
-##### （2）两个特殊的listener 和 配置原理
+##### （2）具体示例分析
+* 环境信息:
+  * client pod ip: 10.244.139.95
+  * server service ip: nacos.public.svc(10.111.235.166)
+  * server pod ip: 10.244.217.99
+* 请求:
+  * src:10.244.139.95 dst:nacos.public.svc(10.111.235.166):9848
+  * iptables:
+  ```shell
+  -A ISTIO_OUTPUT -s 127.0.0.6/32 -o lo -j RETURN
+  -A ISTIO_OUTPUT ! -d 127.0.0.1/32 -o lo -m owner --uid-owner 1337 -j ISTIO_IN_REDIRECT
+  -A ISTIO_OUTPUT -j ISTIO_REDIRECT
+  -A ISTIO_REDIRECT -p tcp -j REDIRECT --to-ports 15001
+  ```
+  * src: 10.244.139.95 dst: 127.0.0.1:15001
+  * envoy处理
+  *  src: 10.244.139.95 dst: 10.244.217.99
+* 响应:
+  * src: 10.244.217.99 dst: 10.244.139.95
+  * iptables处理
+  ```shell
+  -A ISTIO_INBOUND -p tcp -j ISTIO_IN_REDIRECT
+  -A ISTIO_IN_REDIRECT -p tcp -j REDIRECT --to-ports 15006
+  ```
+  * src: 10.244.217.99 dst: 10.244.139.95:15006
+    * 这一步抓包抓不到，因为抓入站的包是在iptables处理之前
+  * envoy处理
+  * src: 10.111.235.166 dst: 10.244.139.95
+
+##### （3）两个特殊的listener 和 配置原理
 
 * virtualInbound
   * 所以 **进入**流量都要经过这个listener
@@ -91,13 +121,10 @@
 * 所有关于Inbound的配置，是在VirtualInbound这个listener上配的
 * 所有关于Outbound的配置，是在所有listener上配的（不包括两个特殊的listener）
 
-##### （3）magical  number: 6
+##### （4）`127.0.0.1`和`127.0.0.6`
 
-* 15006
-  * 所有流量入口
-* `127.0.0.6` 和 `::6`（[参考](https://github.com/istio/istio/issues/29603)）
-  * 用于标记入站流量，且永远不会命中出站流量的iptables规则
-  * istio proxy用于和upstream（即后端代理的服务）建立连接的地址
+* 声明的端口 proxy通过`127.0.0.1`和`::1`
+* 未声明的端口 proxy通过`127.0.0.6`和`::6`（[参考](https://github.com/istio/istio/issues/29603)）
 
 #### 3.支持转发的流量
 [参考](https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/)

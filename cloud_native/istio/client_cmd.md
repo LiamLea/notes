@@ -32,7 +32,7 @@ istioctl proxy-status
 所有的envoy配置应该都是一样的
 ```shell
 istioctl proxy-config all <proxy-name> -o json
-#all包括：listener、cluster等
+#all包括：listener、route、cluster、endpoint等
 ```
 
 * 查看某个service或pod的destinationRule配置

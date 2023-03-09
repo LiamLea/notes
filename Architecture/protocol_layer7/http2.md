@@ -10,6 +10,7 @@
       - [2.h2c vs h2](#2h2c-vs-h2)
       - [3.frame（是http2通信的最小的单元）](#3frame是http2通信的最小的单元)
         - [（1）frame type](#1frame-type)
+        - [（2）stream id（奇数和偶数）](#2stream-id奇数和偶数)
       - [4.connection preface（连接前言）](#4connection-preface连接前言)
 
 <!-- /code_chunk_output -->
@@ -64,6 +65,10 @@
 |RST_STREAM|立即结束一个stream（通常是因为发生了错误）|
 |GOAWAY|优雅的关闭stream，但仍然完成对已经建立的流的处理|
 |PING|检查一个idle连接是否可用|
+
+##### （2）stream id（奇数和偶数）
+* 奇数：是由client发起的流
+* 偶数：是由server发起的流
 
 #### 4.connection preface（连接前言）
 在建立连接前，client和server都会发送preface给对方
