@@ -293,3 +293,37 @@ kubectl get pods -n aiops-dev -o custom-columns="Name:metadata.name,CPU-request:
 ```shell
 kubectl get pods -A -o custom-columns=PodName:.metadata.name,PodUID:.metadata.uid
 ```
+
+***
+
+### 插件使用
+
+#### 1.安装插件管理工具: krew
+[参考](https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
+```shell
+export OS="$(uname | tr '[:upper:]' '[:lower:]')"
+export ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')"
+export KREW="krew-${OS}_${ARCH}"
+
+#设置代理，不然无法下载
+HTTPS_PROXY="http://10.10.10.250:8123" curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz"
+
+tar zxvf "${KREW}.tar.gz"
+
+#设置代理，不然无法下载
+HTTPS_PROXY="http://10.10.10.250:8123" ./"${KREW}" install krew
+```
+
+#### 2.安装其他插件
+```shell
+HTTPS_PROXY="http://10.10.10.250:8123" kubectl krew install <plugin>
+```
+
+#### 3.常用插件
+
+#####（1）sniff: 在pod内进行抓包
+```shell
+#过滤: -f "port 9848"
+#如果不输出成文件，需要存在wireshark
+kubectl sniff <pod_name>  -o /tmp/<xx>.pcap
+```

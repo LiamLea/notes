@@ -8,6 +8,7 @@
       - [1.NAT Translation Table](#1nat-translation-table)
         - [（1）现在的协议大部分都是有状态的协议](#1现在的协议大部分都是有状态的协议)
         - [（2）映射记录](#2映射记录)
+        - [（3）以k8s service为例（service进行负载和DNAT，数据返回会进行SNAT）](#3以k8s-service为例service进行负载和dnat数据返回会进行snat)
       - [2.Internate address architecture](#2internate-address-architecture)
       - [3.NAT造成的问题](#3nat造成的问题)
       - [4.NAT traversal（NAT穿透）](#4nat-traversalnat穿透)
@@ -42,6 +43,17 @@
   * 会在本机随机开启一个端口，连接远程机器，然后会把根据 ip+port 添加映射记录
 * 对于无连接的协议（ICMP），通过 ip+id 进行映射
   * 比如ICMP协议中会有一个id字段，标识本次所有的icmp包，所以本机可以根据 ip+id 添加映射记录
+
+##### （3）以k8s service为例（service进行负载和DNAT，数据返回会进行SNAT）
+* 环境信息:
+  * service ip: 10.111.235.166
+  * client pod ip: 10.244.139.93
+  * server pod ip: 10.244.217.99
+* 访问:
+  * 请求：client -> service（在宿主机进行DNAT） -> server
+  * 返回: server（在宿主机进行SANT，因为有状态） -> client
+* 抓包结果:
+![](./imgs/nat_00.png)
 
 #### 2.Internate address architecture
 ![](./imgs/nat_01.png)

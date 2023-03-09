@@ -52,10 +52,23 @@
 echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
 ```
 
-* 数据包经过cbr0 bridge，会经过iptables处理
-  * 比如：目标ip为某个service的ip，会转换成pod的ip
-* 当数据包返回时，经过cbr0 bridge，由于iptables contrack保留了之前的状态，所以这边也会做相应转换
-  * 比如：将pod的ip，转换成某个service的ip
+* 请求: 负载和DNAT
+  * 数据包经过cbr0 bridge，会经过iptables处理
+    * 比如：目标ip为某个service的ip，会转换成pod的ip
+* 响应: SANT
+  * 当数据包返回时，经过cbr0 bridge，由于iptables contrack保留了之前的状态，所以这边也会做相应转换
+    * 比如：将pod的ip，转换成某个service的ip
+
+* 示例:
+  * 环境信息:
+    * service ip: 10.111.235.166
+    * client pod ip: 10.244.139.93
+    * server pod ip: 10.244.217.99
+  * 访问:
+    * 请求：client -> service（在宿主机进行DNAT） -> server
+    * 返回: server（在宿主机进行SANT，因为有状态） -> client
+  * 抓包结果:
+  ![](./imgs/nat_00.png)
 
 ##### （4）node-to-node 网络
 本身就需要能够通信

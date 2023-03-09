@@ -194,8 +194,9 @@ message UserResponse {
   int32 age = 3;
 }
 
-//定义rpc接口
+//定义接口
 service UserService {
+  //定义rpc方法
   rpc GetUserInfo(UserRequest) returns (UserResponse) {}
 }
 ```
