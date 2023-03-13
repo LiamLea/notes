@@ -12,6 +12,7 @@
       - [6.MTU and TCP MSS](#6mtu-and-tcp-mss)
         - [（1）MTU（maximum transmission unit）](#1mtumaximum-transmission-unit)
         - [（2）MSS（maximum segment size）](#2mssmaximum-segment-size)
+      - [7.tcp流](#7tcp流)
     - [TCP头部](#tcp头部)
       - [1.序号（与 字节 有关）](#1序号与-字节-有关)
       - [2.确认号](#2确认号)
@@ -66,6 +67,9 @@ cwnd：congestion window
 #### 5.TCP11中状态
 ![](./imgs/tcp_01.gif)
 
+* time_wait状态的原因：
+  * 等待一定时间，确保完成client和server之间的数据传输（默认60s）
+
 #### 6.MTU and TCP MSS
 
 ![](./imgs/tcp_mss_01.png)
@@ -81,6 +85,10 @@ cwnd：congestion window
 * 封装协议的TCP MSS要小一些，因为有封装的头部，所以封装协议会损耗一定的性能
 * MSS值是在三次握手时确定的，会在SYN包中的option部分，声明MSS应该设为多少
 ![](./imgs/tcp_mss_02.png)
+
+#### 7.tcp流
+
+一个tcp流通过`<src_ip>:<src_port> <dst_ip>:<dst_port>`唯一标识
 
 ***
 
