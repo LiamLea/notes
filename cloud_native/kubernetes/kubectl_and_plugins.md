@@ -1,12 +1,14 @@
 # kubectl
 apiserver的客户端程序，是k8s集群的管理入口
 
+
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
 <!-- code_chunk_output -->
 
 - [kubectl](#kubectl)
     - [配置](#配置)
-      - [1.配置文件：`~/.kube/config`](#1配置文件~kubeconfig)
+      - [1.配置文件：`~/.kube/config`](#1配置文件kubeconfig)
     - [基本使用](#基本使用)
       - [1.创建service](#1创建service)
       - [2.删除所有evicted状态的pods](#2删除所有evicted状态的pods)
@@ -35,8 +37,14 @@ apiserver的客户端程序，是k8s集群的管理入口
     - [常用命令](#常用命令)
       - [1.查询所有Pods的requests和limits](#1查询所有pods的requests和limits)
       - [2.查询所有pod和其uid](#2查询所有pod和其uid)
+    - [插件使用](#插件使用)
+      - [1.安装插件管理工具: krew](#1安装插件管理工具-krew)
+      - [2.安装其他插件](#2安装其他插件)
+      - [3.常用插件](#3常用插件)
+        - [（1）sniff: 在pod内进行抓包](#1sniff-在pod内进行抓包)
 
 <!-- /code_chunk_output -->
+
 
 ### 配置
 

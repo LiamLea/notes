@@ -25,6 +25,9 @@
         - [（3）获取webhook的地址](#3获取webhook的地址)
         - [（4）测试](#4测试)
         - [在k8s上部署](#在k8s上部署)
+    - [与短信平台结合](#与短信平台结合)
+      - [1.编写python脚本对接短信平台](#1编写python脚本对接短信平台)
+      - [2.配置alertmanager](#2配置alertmanager)
 
 <!-- /code_chunk_output -->
 
@@ -290,4 +293,99 @@ spec:
     - name: http
       port: 80
       targetPort: http
+```
+
+***
+
+### 与短信平台结合
+
+#### 1.编写python脚本对接短信平台
+```python
+# encoding: utf-8 
+ 
+from flask import Flask, request
+import urllib
+import urllib2
+import json
+import sys
+import datetime
+import requests
+import os
+app = Flask(__name__)
+ 
+reload(sys)
+sys.setdefaultencoding('utf8')
+#phone_l = os.environ.get("phone")
+phone_l = ["15951003638","13915966404","18114715773","19524270032","13770697056","18801940328","17696735460","18655515811","18651653461","18251487770"]
+produce = os.environ.get("produce")
+ 
+ 
+#def send_sms(phonenum, content):
+#    contents = json.dumps({'name': content},ensure_ascii=False)
+#    params =  {'appId': 'P_JKPT', 'phoneList': phonenum, 'smsContent': contents}
+#    url = "http://d-nari-test.sgepri.sgcc.com.cn/hr-sms-service/sms/sendByPhone"
+#    params = urllib.urlencode(params)
+#    newurl = url + "?" + params
+#    req = urllib2.Request(newurl)
+#    result = urllib2.urlopen(req)
+#    res = result.read()
+#    print(res)
+#    return res
+def send_sms(phonenum, content):
+#    contents = json.dumps({'name': content},ensure_ascii=False)
+    contents = json.dumps(content, ensure_ascii=False)
+    print contents
+#    host = "http://d-nari-test.sgepri.sgcc.com.cn"
+#    login_url = "/hr-sms-service/sms/sendByPhone"
+    url = "http://hr-sms-service:8080/sms/sendByPhoneAndTemplate"
+#    body = {"phoneList": [phonenum], "appId": "P_JKPT", "templateCode": "P_JKPT_DXMB", "parameter": {"text": '"{}"'.format(contents)}} 
+    body = {"phoneList": [phonenum], "appId": "P_JKPT", "templateCode": "P_JKPT_DXMB", "parameter": {"text": '"'+content+'"'}}
+    print body
+    r = requests.post(url=url, json=body)
+    #print(r.text)
+ 
+@app.route('/send', methods=['POST'])
+def send():
+    data_dic = json.loads(request.data)
+    try:
+        alerts_l = data_dic['alerts']
+        for alert in alerts_l:
+            instance = alert.get('labels').get('instance')
+            startsAt = (alert.get('startsAt').split('.')[0])
+            time = datetime.datetime.strptime(startsAt, "%Y-%m-%dT%H:%M:%S")
+            startsAtd = (time + datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+            description = alert.get('annotations').get('description')
+            errmessage = (description.split("VALUE =")[0])
+            errname_1 = (description.split("LABELS = ")[1])
+            errname_2 = (errname_1.split("map[")[1])
+            errname = (errname_2.split("]")[0])
+            #value = alert.get('annotations').get('value')
+            value = alert.get('annotations').get('summary')
+           # content = "%s发生了%s 报警时间: %s 问题总结: %s" % (instance, description, startsAtd, value)
+           # content = "系统在%s出现%s的告警信息\n问题类型：%s\n" % (startsAtd,description,value)
+            if produce == "outer":
+               environment = "外网生产环境"
+            elif produce == "inner":
+               environment = "内网生产环境"
+            else:
+               environment = "环境未知"
+
+            content = "\n【发生环境】：%s\n【发生时间】：%s\n【事件内容】：%s\n【异常描述】：%s【问题归属】：%s\n" % (environment,startsAtd,value,errmessage,errname)
+ #           print content
+            for phone in phone_l: 
+                send_sms(phone, content)
+ 
+    except Exception as e:
+        print(e)
+    return 'ok'
+
+app.run(host="0.0.0.0", port=int("8080"))
+```
+
+#### 2.配置alertmanager
+```yaml
+receivers:
+- name: 'web.hook'
+  webhook_configs:
+  - url: 'http://alertmanager-sms.xxzx:8080/send'
 ```

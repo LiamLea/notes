@@ -32,7 +32,6 @@
         - [（1）配置生效的范围（优先级由低到高）](#1配置生效的范围优先级由低到高)
         - [（2）使用telemetry进行配置](#2使用telemetry进行配置)
       - [4.查看配置是否生效的方法（查看envoy的filters等信息）](#4查看配置是否生效的方法查看envoy的filters等信息)
-      - [5.配置pilot agent](#5配置pilot-agent)
 
 <!-- /code_chunk_output -->
 
@@ -383,5 +382,3 @@ spec:
     }
   }
   ```
-
-#### 5.配置pilot agent
