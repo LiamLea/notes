@@ -4,27 +4,36 @@
 <!-- code_chunk_output -->
 
 - [usage](#usage)
+    - [镜像相关](#镜像相关)
+      - [1.在cloud镜像基础上制作镜像](#1在cloud镜像基础上制作镜像)
+        - [(1) 启动一个实例并配置Configuration](#1-启动一个实例并配置configuration)
+        - [(2) 在实例中修改相关配置](#2-在实例中修改相关配置)
+      - [2.从iso安装镜像（一开始不能挂载磁盘）](#2从iso安装镜像一开始不能挂载磁盘)
+      - [3.制作cloud镜像](#3制作cloud镜像)
+      - [4.制作windows镜像(注意cpu问题)](#4制作windows镜像注意cpu问题)
+        - [(1) 下载相关iso并上传为镜像](#1-下载相关iso并上传为镜像)
+        - [(2) 创建volume](#2-创建volume)
+        - [(3) 创建虚拟机](#3-创建虚拟机)
+        - [(4) 安装](#4-安装)
+        - [(5) 安装成功后，需要安装网卡驱动](#5-安装成功后需要安装网卡驱动)
+        - [(6) 把 其他（即未识别的设备）下面 的设备都更新一下驱动](#6-把-其他即未识别的设备下面-的设备都更新一下驱动)
+        - [(7) 使用注意 (上传为镜像模板后)](#7-使用注意-上传为镜像模板后)
+      - [5.上传镜像](#5上传镜像)
+      - [6.下载镜像](#6下载镜像)
     - [基本使用](#基本使用)
-      - [1.镜像相关](#1镜像相关)
-        - [（1）在cloud镜像基础上制作镜像](#1在cloud镜像基础上制作镜像)
-        - [（2）从iso安装镜像（一开不能挂载磁盘）](#2从iso安装镜像一开不能挂载磁盘)
-        - [（3）制作镜像](#3制作镜像)
-        - [（4）制作windows镜像](#4制作windows镜像)
-        - [（5）上传镜像](#5上传镜像)
-        - [（6）下载镜像](#6下载镜像)
-      - [2.flavor相关](#2flavor相关)
-      - [3.port（网卡）相关](#3port网卡相关)
-      - [4.volume（磁盘）相关](#4volume磁盘相关)
+      - [1.flavor相关](#1flavor相关)
+      - [2.port（网卡）相关](#2port网卡相关)
+      - [3.volume（磁盘）相关](#3volume磁盘相关)
         - [（1）基本使用](#1基本使用)
         - [（2）扩容](#2扩容)
-      - [5.创建虚拟机模板（即image）](#5创建虚拟机模板即image)
-      - [6.创建虚拟机](#6创建虚拟机)
+      - [4.创建虚拟机模板（即image）](#4创建虚拟机模板即image)
+      - [5.创建虚拟机](#5创建虚拟机)
         - [（1）依赖cloud-init的功能](#1依赖cloud-init的功能)
         - [（2）手动进行扩容（如果不支持自动扩容）](#2手动进行扩容如果不支持自动扩容)
-      - [7.虚拟机的调度：zone和aggregate](#7虚拟机的调度zone和aggregate)
+      - [6.虚拟机的调度：zone和aggregate](#6虚拟机的调度zone和aggregate)
         - [（1）zone](#1zone)
         - [（2）aggregate](#2aggregate)
-      - [8.snapshot和backup](#8snapshot和backup)
+      - [7.snapshot和backup](#7snapshot和backup)
         - [（1）instance snapshot](#1instance-snapshot)
         - [（2）volume snapshot](#2volume-snapshot)
         - [（3）volume backup](#3volume-backup)
@@ -41,9 +50,7 @@
 
 <!-- /code_chunk_output -->
 
-### 基本使用
-
-#### 1.镜像相关
+### 镜像相关
 
 最好使用官方制作好的cloud镜像，在此基础上改：[下载](https://docs.openstack.org/image-guide/obtain-images.html)
   * 注意上传格式是qcow2
@@ -52,9 +59,10 @@
 * cloud-init很多配置是创建镜像时生效，不是每次重启都生效，比如配置ssh
 * 不仅要修改cloud.cfg而且要本身的配置也修改过来（比如：sshd的配置），因为cloud-init其实实现的不够完美，有时候不生效
 
-##### （1）在cloud镜像基础上制作镜像
-* 启动一个实例
-  * 注意：必须以`#cloud-config`开头（或者其他的格式）
+#### 1.在cloud镜像基础上制作镜像
+
+##### (1) 启动一个实例并配置Configuration
+* 注意：必须以`#cloud-config`开头（或者其他的格式）
 ```yaml
 #cloud-config
 
@@ -66,6 +74,7 @@ users:
    plain_text_passwd: cangoal
 ```
 
+##### (2) 在实例中修改相关配置
 * 修改cloud-init配置
 ```shell
 $ vim /etc/cloud/cloud.cfg
@@ -82,13 +91,13 @@ ssh_pwauth: true
 cloud-init clean
 ```
 
-##### （2）从iso安装镜像（一开不能挂载磁盘）
+#### 2.从iso安装镜像（一开始不能挂载磁盘）
 
 * 从镜像启动不要挂载其他volume（否则不能检测到iso）
 * 启动后，挂载volume，即要安装操作系统的磁盘
 * 进行安装
 
-##### （3）制作镜像
+#### 3.制作cloud镜像
 
 * 只有有一个分区且不能是LVM
   * 这样才能自动扩容根文件系统
@@ -121,15 +130,19 @@ $ grub2-mkconfig -o /etc/grub2.cfg
 yum -y install vim lrzsz unzip zip
 ```
 
-##### （4）制作windows镜像
+#### 4.制作windows镜像(注意cpu问题)
 
-windows镜像参考：[参考1](https://bugzilla.redhat.com/show_bug.cgi?id=1982606),[参考2](https://linuxhint.com/install_virtio_drivers_kvm_qemu_windows_vm/)
+* windows镜像参考：[参考1](https://bugzilla.redhat.com/show_bug.cgi?id=1982606),[参考2](https://linuxhint.com/install_virtio_drivers_kvm_qemu_windows_vm/)
 
-* 下载相关iso并上传为镜像
+* 注意cpu问题，[参考](https://techglimpse.com/windows-10-virtual-machine-shows-100-percentage-cpu-utilization-qemu-kvm/):
+  * windows10虚拟机默认只使用 1 socket，即使添加多个cpu socket也没有
+  * 所以只能设置多个cpu cores
+
+##### (1) 下载相关iso并上传为镜像
   * windows iso
   * [virtio-win](https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/)
 
-* 创建volume
+##### (2) 创建volume
 ```shell
 #创建系统盘
 openstack volume create --size 50 --bootable win10-disk
@@ -139,10 +152,18 @@ openstack volume create --image Windows-10.iso --size 10 win10-iso-disk
 openstack volume create --image virtio-win-0.1.225.iso --size 1 virtio-iso-disk
 ```
 
-* 创建虚拟机
+##### (3) 创建虚拟机
+* 先创建flavor（解决cpu问题）
+
+```shell
+openstack flavor create --vcpus 4 --ram 8192 --disk 50 1s4c/8g --property hw:cpu_sockets='1' --property hw:cpu_cores='8'
+```
+
+* 创建实例
+
 ```shell
 openstack server create \
-  --flavor 4c/8g --nic net-id=10.172.1.0 --security-group 51c2913a-5a5c-46c7-9d47-fe044a862e73 \
+  --flavor 1s4c/8g--nic net-id=10.172.1.0 --security-group 51c2913a-5a5c-46c7-9d47-fe044a862e73 \
   #指定系统盘（通过--image或--voulme的boot_index=0，启动优先级最高）
   --volume win10-disk \
   #添加windows iso的cdrom（uuid就是上面win10-iso-disk的id），并且设置boot_index=1在系统盘后
@@ -152,12 +173,12 @@ openstack server create \
   win10
 ```
 
-* 安装
+##### (4) 安装
   * 选择自动扫描驱动
 
 ![](./imgs/usage_07.png)
 
-* 安装成功后，需要安装网卡驱动
+##### (5) 安装成功后，需要安装网卡驱动
 
 ![](./imgs/usage_02.png)
 ![](./imgs/usage_03.png)
@@ -165,15 +186,15 @@ openstack server create \
 ![](./imgs/usage_05.png)
 ![](./imgs/usage_06.png)
 
-* 把 其他（即未识别的设备）下面 的设备都更新一下驱动
+##### (6) 把 其他（即未识别的设备）下面 的设备都更新一下驱动
 
-* 上传为镜像模板后，使用注意：
+##### (7) 使用注意 (上传为镜像模板后)
   * volume空间要大于模板的空间（50G）
   * 创建虚拟机时，由于volume创建时间比较长，虚拟机创建会报错
     * 等volume创建好后，用那个volume创建虚拟机
   * 网络可能有问题，将 网络适配器 禁用再启用
 
-##### （5）上传镜像
+#### 5.上传镜像
 
 ```shell
 openstack image create --progress --disk-format <image_format> --public --file <path>  <image_name>
@@ -182,13 +203,17 @@ openstack image create --progress --disk-format <image_format> --public --file <
 * 上传volume作为镜像（qcow2）
   * 修改镜像的metadata，删除signature_verified、owner_specified.openstack.sha256和owner_specified.openstack.md5
 
-##### （6）下载镜像
+#### 6.下载镜像
 ```shell
 openstack image list
 openstack image save --file /tmp/centos-7-cloud-template centos-7-cloud-template
 ```
 
-#### 2.flavor相关
+***
+
+### 基本使用
+
+#### 1.flavor相关
 flavor定义了一个instance的规格模板（RAM、Disk、CPU等）
 
 * 创建flavor
@@ -202,7 +227,7 @@ openstack flavor create --vcpus 16 --ram 65536 --disk 50 16c/64g
 ```
 
 
-#### 3.port（网卡）相关
+#### 2.port（网卡）相关
 ![](./imgs/usage_01.png)
 
 * 创建端口（即网卡）
@@ -217,7 +242,7 @@ openstack port create --network <network_name> --fixed-ip ip-address=<ip> --allo
 openstack port set --allowed-address ip-address=10.172.1.13 <port_id>
 ```
 
-#### 4.volume（磁盘）相关
+#### 3.volume（磁盘）相关
 
 ##### （1）基本使用
 volume就是块设备
@@ -236,7 +261,7 @@ openstack volume create --size <size> <volume_name>
 然后扩容
 如果是系统盘，然后再利用扩容后的volume创建instance
 
-#### 5.创建虚拟机模板（即image）
+#### 4.创建虚拟机模板（即image）
 
 * 首先需要利用image启动一个实例
 * 然后创建一个新的volume，挂载到这个实例上
@@ -244,7 +269,7 @@ openstack volume create --size <size> <volume_name>
 * 最后用这个volume生成image（upload to image）（这个过程可能需要一段时间）
 
 
-#### 6.创建虚拟机
+#### 5.创建虚拟机
 * 必须从image创建虚拟机，所以必须要先制作好image
 * 添加网卡
   * 指定网络会自动创建网卡（会随着instance删除而删除）
@@ -311,7 +336,7 @@ lvextend -l 100%VG /dev/mapper/centos-root
 xfs_growfs /dev/mapp/centos-root
 ```
 
-#### 7.虚拟机的调度：zone和aggregate
+#### 6.虚拟机的调度：zone和aggregate
 
 ##### （1）zone
 * 通过aggregate的元信息定义，有一个默认的zone
@@ -338,7 +363,7 @@ openstack aggregate unset --property availability_zone <aggregate>
 
 [参考](https://docs.openstack.org/nova/latest/admin/aggregates.html#:~:text=Host%20aggregates%20are%20a%20mechanism,additional%20hardware%20or%20performance%20characteristics.)
 
-#### 8.snapshot和backup
+#### 7.snapshot和backup
 
 ##### （1）instance snapshot
 给当前的系统生成镜像（即快照）

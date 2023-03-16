@@ -17,6 +17,7 @@
   - [2.openssl利用已有ca，生成数字证书（即对其他公钥进行签名）](#2openssl利用已有ca生成数字证书即对其他公钥进行签名)
   - [3.查看证书内容](#3查看证书内容)
   - [4.创建x509 v3证书（支持多个域名）](#4创建x509-v3证书支持多个域名)
+  - [5.demo](#5demo)
 - [jks（java keystore）](#jksjava-keystore)
   - [1.有两个密钥库](#1有两个密钥库)
   - [2.创建jks](#2创建jks)
@@ -79,6 +80,7 @@ SAN 是 SSL 标准 x509 中定义的一个扩展。使用了 SAN 字段的 SSL �
 ### openssl
 
 **配置文件：/etc/pki/tls/openssl.cnf**
+
 #### 1.openssl实现私有ca
 
 （1）生成私钥
@@ -130,6 +132,19 @@ openssl x509 -req -in <SERVER.CSR> \
         -CAcreateserial \
         -days 3650 -out <SERVER.CRT> \
         -extfile v3.ext       #需要增加这个选项
+```
+
+#### 5.demo
+```shell
+export TMP_HOSTNAME="xx"
+(umask 077;openssl genrsa -out ca.key)
+openssl req -new -x509 -key ca.key -out ca.crt -days 3650 -subj "/CN=${TMP_HOSTNAME}"
+(umask 077;openssl genrsa -out server.key)
+openssl req -new -key server.key -out server.csr -subj "/CN=${TMP_HOSTNAME}"
+openssl x509 -req -in server.csr \
+        -CA ca.crt -CAkey ca.key \
+        -CAcreateserial \
+        -days 3650 -out server.crt
 ```
 
 ***
