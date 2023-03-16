@@ -6,7 +6,7 @@
 - [HTTP](#http)
     - [概述](#概述)
       - [1.HTTP协议特点](#1http协议特点)
-      - [2.HTTP/1.0 、HTTP/1.1 和 HTTP/2.0 比较](#2http10-http11-和-http20-比较)
+      - [2.HTTP/1.0 、HTTP/1.1 和 HTTP/2.0 比较](#2http10--http11-和-http20-比较)
       - [3.一次http请求的过程](#3一次http请求的过程)
       - [4.请求报文格式](#4请求报文格式)
       - [5.响应报文格式](#5响应报文格式)
@@ -51,7 +51,7 @@
 |-|-|-|-|
 |HTTP/1.0|短链接|||
 |HTTP/1.1|长连接（多个http连接可以复用同一个tcp连接，但**不能同时**）|文本形式|使用MIME标准,不仅仅可以输出文本文件,还有其他的文件类型（MIME:multipurpose internet mail extensions,定义了多种文件类型）|
-|HTTP/2.0|多路复用（多个http连接可以**同时**使用同一个tcp连接）|将数据压缩成多个二进制消息，然后在客户端重组|server能够向client端推送信息</br>对header进行压缩|
+|HTTP/2.0|多路复用（一个TCP连接只能有一个HTTP2连接，HTTP2连接可以多路复用，有流的概念）|将数据压缩成多个二进制消息，然后在客户端重组|server能够向client端推送信息</br>对header进行压缩|
 
 #### 3.一次http请求的过程
 ```mermaid
