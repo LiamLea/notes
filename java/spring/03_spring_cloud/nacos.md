@@ -128,13 +128,13 @@ parameters:
     value: 'true'
   - name: ingress.ingressClassName
     value: nginx
-  - name: service.ports.grpc-1.port
+  - name: service.ports.tcp-1.port
     value: '9848'
-  - name: service.ports.grpc-1.protocol
+  - name: service.ports.tcp-1.protocol
     value: TCP
-  - name: service.ports.grpc-2.port
+  - name: service.ports.tcp-2.port
     value: '9849'
-  - name: service.ports.grpc-2.protocol
+  - name: service.ports.tcp-2.protocol
     value: TCP
   - name: mysql.external.mysqlDatabase
     value: 'nacos'
@@ -165,13 +165,13 @@ parameters:
     value: 'true'
   - name: ingress.ingressClassName
     value: nginx
-  - name: service.ports.grpc-1.port
+  - name: service.ports.tcp-1.port
     value: '9848'
-  - name: service.ports.grpc-1.protocol
+  - name: service.ports.tcp-1.protocol
     value: TCP
-  - name: service.ports.grpc-2.port
+  - name: service.ports.tcp-2.port
     value: '9849'
-  - name: service.ports.grpc-2.protocol
+  - name: service.ports.tcp-2.protocol
     value: TCP
   - name: mysql.external.mysqlDatabase
     value: 'nacos-test'
