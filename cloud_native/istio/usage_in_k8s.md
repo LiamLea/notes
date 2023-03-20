@@ -24,10 +24,10 @@
       - [2.对pod的要求](#2对pod的要求)
         - [（1）必须与service关联（流量管理的需求）](#1必须与service关联流量管理的需求)
         - [（2）uid`1337`必须预留](#2uid1337必须预留)
-        - [（3）NET_ADMIN 、NET_RAW 能力 或者 使用istio cni插件](#3net_admin-net_raw-能力-或者-使用istio-cni插件)
+        - [（3）NET_ADMIN 、NET_RAW 能力 或者 使用istio cni插件](#3net_admin--net_raw-能力-或者-使用istio-cni插件)
         - [（4） 设置标签（不是必须）：](#4-设置标签不是必须)
         - [（5）service port使用的协议是server first protocol，必须明确指定协议（比如：TCP）](#5service-port使用的协议是server-first-protocol必须明确指定协议比如tcp)
-        - [（6）不能设置` hostNetwork: true`](#6不能设置-hostnetwork-true)
+        - [（6）不能设置` hostNetwork: true`](#6不能设置hostnetwork-true)
       - [3.对service的要求](#3对service的要求)
         - [（1）明确指定协议：`<protocol>[-<suffix>]`](#1明确指定协议protocol-suffix)
         - [（2）支持的协议：](#2支持的协议)
@@ -78,9 +78,14 @@
         * 发往："1.1.1.1:9080"，经过iptables转发到15001这个端口上（则15001这个listener进行处理）
         * 如果存在"1.1.1.1:9080"这个listener，则会转交给这个listener，不存在的话继续
         * 如果存在"0.0.0.0:9080"这个listener（0.0.0.0表示匹配所有），则会转交给这个listener
+          * 然后会匹配其router规则，如果没有合适的匹配，默认发往PassthroughCluster
       * 如果未匹配到则自己处理（即15001这个listener自己处理）
-        * 会将外出的流量发送到 PassthroughCluster 这个cluster上
-        * 其他流量则发送到 BlackHoleCluster 这个cluster上
+        * 然后会匹配其router规则，如果原始目标地址是15001的，则发送到 BlackHoleCluster 这个cluster上
+        * 如果没有合适的匹配，默认发往PassthroughCluster
+  * 注意外部的流量存在问题（待研究）:
+    * 如果不创建serviceentry，指定其协议的话，会存在问题
+    * 比如需要访问外部的： 192.168.6.111：9848
+    * 内部存在9848这个端口的话，则会用9848相关的filter处理去往外部9848的流量，这样就会存在问题
 
 ##### （2）具体示例分析
 * 环境信息:
@@ -110,6 +115,13 @@
     * 这一步抓包抓不到，因为抓入站的包是在iptables处理之前
   * envoy处理
   * src: 10.111.235.166 dst: 10.244.139.95
+
+* 注意:
+  * 对loopback抓包时，不能发现一个完整的tcp流
+    * 因为外出包经过了iptables过滤才抓到的（目标地址 -> 127.0.0.1:15001）
+    * 进入包也经过了iptables过滤才抓到的（转换成了真实的源地址和目标地址）
+    * 所以在抓包时，发现对应不上（因为源地址和目标地址不一样，导致tcp流不能对应上，即一个tcp流，变成了两个tcp流）
+    * 但是，在对于应用来说，能够对应的上
 
 ##### （3）两个特殊的listener 和 配置原理
 

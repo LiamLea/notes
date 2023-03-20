@@ -89,6 +89,7 @@ cwnd：congestion window
 #### 7.tcp流
 
 一个tcp流通过`<src_ip>:<src_port> <dst_ip>:<dst_port>`唯一标识
+* tcp没有stream id的概念
 * 在wireshark中会给tcp stream编号，第一个tcp stream就是 `stream index: 1`
 
 ***

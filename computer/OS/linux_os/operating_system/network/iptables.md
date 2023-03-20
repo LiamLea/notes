@@ -16,7 +16,7 @@
       - [5.五条链](#5五条链)
       - [6.常用target（不同的表支持不同的target）](#6常用target不同的表支持不同的target)
       - [7.数据包流程图](#7数据包流程图)
-      - [8.`iptables -nL`格式解析](#8iptables-nl格式解析)
+      - [8.`iptables -nL`格式解析](#8iptables--nl格式解析)
       - [9.跟踪数据包的状态（`conntrack`模块）](#9跟踪数据包的状态conntrack模块)
     - [使用](#使用)
       - [1.匹配规则](#1匹配规则)
@@ -25,7 +25,7 @@
       - [4.通用条件](#4通用条件)
       - [5.扩展条件(需要指定模块):](#5扩展条件需要指定模块)
         - [（1）tcp模块：`-m tcp`](#1tcp模块-m-tcp)
-        - [（2）icmp模块： `-m icmp`](#2icmp模块-m-icmp)
+        - [（2）icmp模块： `-m icmp`](#2icmp模块--m-icmp)
         - [（3）mac模块（匹配mac地址）：`-m mac`](#3mac模块匹配mac地址-m-mac)
         - [（4）multiport模块（匹配多端口）：`-m multiport`](#4multiport模块匹配多端口-m-multiport)
         - [（5）iprange模块（匹配IP范围）：`-m iprange`](#5iprange模块匹配ip范围-m-iprange)
@@ -47,7 +47,8 @@
       - [1.nat表的应用](#1nat表的应用)
       - [2.实现端口映射](#2实现端口映射)
       - [3.只允许访问外部，不允许外部访问（利用conntrack模块）](#3只允许访问外部不允许外部访问利用conntrack模块)
-      - [3.捕捉端口扫描器](#3捕捉端口扫描器)
+      - [4.记录 访问2222端口的数据包](#4记录-访问2222端口的数据包)
+      - [5.抓取iptables中某个阶段的流量](#5抓取iptables中某个阶段的流量)
 
 <!-- /code_chunk_output -->
 
@@ -115,6 +116,8 @@ target也可以是某条chain
 |REDIRECT|端口重定向，并将 目标地址 转换为 包进入的网口的主地址|--to-ports|
 |LOG|用于记录日志，可以在DROP之前，进行LOG，进行查看DROP掉了哪些|
 |RETURN|立即返回，不再匹配chain|
+|TRACE|对流量在iptables中的处理进行追踪，并生成日志|
+|NFLOG|用于记录日志 (记录在nflog这个interface中，所以可以进行抓包)|
 
 #### 7.数据包流程图
 ![](./imgs/iptables_01_new.png)
@@ -368,7 +371,17 @@ iptables -A INPUT -p tcp -m conntrack --ctstate ESTABLISHED -j ACCEPT
 iptables -A OUTPUT -p tcp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
 ```
 
-#### 3.捕捉端口扫描器
+#### 4.记录 访问2222端口的数据包
 ```shell
 iptables -t raw -I PREROUTING -p tcp --dport 2222 -j LOG --log-prefix "iptables-scanner: " --log-level 6
+```
+
+#### 5.抓取iptables中某个阶段的流量
+```shell
+#添加要抓取的阶段
+iptables -A INPUT  -j NFLOG
+iptables -t raw -A OUTPUT  -j NFLOG
+
+#进行抓包
+tcpdump -i nflog -nn -w /tmp/xx.pcap
 ```

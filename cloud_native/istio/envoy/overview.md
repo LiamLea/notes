@@ -55,9 +55,10 @@
         * 发往："1.1.1.1:9080"，经过iptables转发到15001这个端口上（则15001这个listener进行处理）
         * 如果存在"1.1.1.1:9080"这个listener，则会转交给这个listener，不存在的话继续
         * 如果存在"0.0.0.0:9080"这个listener（0.0.0.0表示匹配所有），则会转交给这个listener
+          * 然后会匹配其router规则，如果没有合适的匹配，默认发往PassthroughCluster
       * 如果未匹配到则自己处理（即15001这个listener自己处理）
-        * 会将外出的流量发送到 PassthroughCluster 这个cluster上
-        * 其他流量则发送到 BlackHoleCluster 这个cluster上
+        * 然后会匹配其router规则，如果原始目标地址是15001的，则发送到 BlackHoleCluster 这个cluster上
+        * 如果没有合适的匹配，默认发往PassthroughCluster
 
 * 基本格式
 ```json
