@@ -1,0 +1,76 @@
+###############################################################################
+补充
+
+1.buffer(缓冲)和cache(缓存)的区别：
+  缓冲 用于速度不同的设备之间进行数据的传输
+  缓存 用于是为了提高读写大的效率
+
+2.free中free和availabled的区别
+  free 是真正尚未被使用的物理内存数量
+  available 是应用程序认为可用内存数量
+  available = free + buffer + cache (注：只是大概的计算方法)
+原因：Linux 为了提升读写性能，会消耗一部分内存资源缓存磁盘数据，对于内核来说，buffer 和 cache 其实都属于已经被使用的内存。但当应用程序申请内存时，如果 free 内存不够，内核就会回收 buffer 和 cache 的内存来满足应用程序的请求。
+
+###############################################################################
+Jenkins:实现CI,用于构建和测试各种项目
+
+1.安装jenkins并启动服务  //需要由java环境
+
+2.设置镜像源，并安装Git Parameter插件
+
+3.建立工程
+
+(1)配置工程的基本信息
+  新建Item -> 项目名，Freestyle project
+
+(2)设置利用参数进行构建
+#参数的值是根据构建时选择的值决定的,所以该参数名一般设为version
+
+  This project is parameterized ->Git parameterized -> 参数名
+  Branch or Tag       //选择参数的类型为分支或标签
+  origin/master       //默认值设为origin/master
+
+(3)选择源码的来源为Git
+  Git ->Git仓库地址
+  ${参数名}          //设置构建时用哪个版本,默认所有版本
+                     //此处的设置是构建当前参数对应的版本
+
+(4)设置子目录，即每个版本存放在一个目录内
+  Additional Behaviours -> check out to a sub-directory : xx-${参数名}
+
+(5)增加构建步骤    
+#先搭一个web网站，提供这些版本源码
+#mkdir -p /var/www/html/deploy/pkgs
+#chown -R jenkins.jenkins /var/www/html/deploy/
+
+增加构建步骤 -> execute shell
+  pkg_dir=/var/www/html/deploy/pkgs
+  cp -r myblog-${blogver} $pkg_dir  
+  cd $pkg_dir
+  rm -rf myblog-${blogver}/.git
+  tar czf myblog-${blogver}.tar.gz myblog-${blogver}
+  rm -rf myblog-${blogver}
+  md5sum myblog-${blogver}.tar.gz |  awk '{print $1}' > myblog-${blogver}.tar.gz.md5
+  cd ..
+  [ -f live_ver ] && cat live_ver > last_ver
+  echo ${blogver} > live_ver
+
+(6)构建项目
+  Build with Parameters -> 选择一个参数
+
+###############################################################################
+利用jenkins实现自动部署
+
+一.目录规划
+  /var/www/download：保存下载的压缩包
+  /var/www/deploy: 保存解压后的目录和live_ver
+  /var/www/html/nsd1903:指向某个版本的目录的快捷方式,快捷方式是网站的根目录
+
+二.编写程序
+  检查是否有新版本
+  有新版本，则下载
+  校验下载的软件包是否损坏
+  如果没有损坏则部署
+  本地生成当前应用的版本
+
+###############################################################################

@@ -1,0 +1,96 @@
+###############################################################################
+命令补充
+  lftp 是一个文件客户端程序,支持ftp,http等多种文件传输协议,支持tab补全
+
+###############################################################################
+虚拟化
+
+x个物理资源 --> y个逻辑资源
+实现程度:完全,部分,硬件辅助(CPU)    //完全虚拟化性能最差,硬件辅助性能最好
+
+KVM 是linux内核的模块,需要CPU的支持,采用硬件辅助虚拟化技术
+QEMU 是一个虚拟化的仿真工具,通过ioctl与内核kvm交互完成对硬件的虚拟化支持
+libvirt 是一个对虚拟化管理的接口和工具,提供用户端程序virsh,virt-install,virt-manager,virt-view
+必备软件:
+  qemu-kvm
+  libvirt-daemon
+  libvirt-client
+  libvirt-daemon-driver-qemu
+可选功能:
+  virt-install     //系统安装工具
+  virt-manager     //图形管理工具
+  virt-v2v         //虚拟机迁移工具
+  virt-p2v         //物理机迁移工具
+
+virsh虚拟机管理:
+  virsh edit xx   //修改后及时生效,需要重新start虚拟机才生效
+  virsh autostart xx
+  virsh domiflist xx  //查看虚拟网卡信息,其中source指的就是虚拟交换机
+  virsh domblklist xx //查看虚拟机硬盘信息
+
+virsh虚拟网络(即虚拟交换机)管理:
+#与在虚拟机管理命令前加上net前缀,如:
+  virsh net-list
+  virsh net-start xx
+  virsh net-destroy xx
+  virsh net-autostart xx
+  ...
+
+常用镜像盘类型:
+                RAW    |   QCOW2
+   KVM默认  |   否     |    是
+   IO效率   |   高     |    较高
+   占用空间 |   大     |    小
+   压 缩    |  不支持  |    支持
+ 后端盘复用 |  不支持  |    支持
+   快 照    |  不支持  |    支持
+
+qemu-img命令:
+  qemu-img create -f 文件格式 文件 文件大小
+  qemu-img info 文件
+
+###############################################################################
+修改xml文件:virsh edit xx
+
+1.修改cpu和内存
+  <name>xx</name>
+  <memory unit='KiB'>数值</memory>          //最大内存
+  <currentMemory unit='KiB'>数值</memory>   //当前内存
+  <vcpu placement='static'>数值</vcpu>      //cpu的个数
+
+###############################################################################
+网卡配置文件:/etc/sysconfig/network-scripts/ifcfg-xx
+  DEVICE="xx"
+  ONBOOT="yes"
+  NM_CONTROLLED="no"   //不接受NetworkManager控制
+  TYPE="Ethernet"      //网卡类型必须为这个,如果为bridge就是交换机
+  BOOTPROTO="static"   //dhcp,static(静态),none(用于特殊类型)
+  IPADDR="xx"
+  NETMASK="xx"
+  GATEWAY="xx"
+
+###############################################################################
+磁盘扩容:磁盘 -> 分区 -> 文件系统
+
+  virsh domblklist 虚拟机名    //查看磁盘
+  virsh blockresize --path 磁盘 --size 大小 虚拟机名
+
+  LANG=en growpart /dev/vda 1
+
+  xfs_growxfs /dev/vda1
+
+###############################################################################
+云计算基础
+
+云计算是一种按使用量付费的模式
+
+云计算三大服务模式:
+IaaS :Infrastructure as a Service 基础设施服务,提供CPU,内存,存储等
+PaaS :Platform as a Service 平台服务,如淘宝提供网店的平台
+SaaS :Software as a Service 软件服务,如软件商店提供的各种软件
+
+OpenStack是一套IaaS解决方案,是一个开源的云计算管理平台
+
+华为ESC(elastic compute service)
+
+###############################################################################

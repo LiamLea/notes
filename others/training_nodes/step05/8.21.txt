@@ -1,0 +1,174 @@
+###############################################################################
+django(是python编写的web框架)
+
+核心组件：
+  用于创建模型的对象关系映射
+  管理界面
+  URL设计
+  模板语言
+  缓存系统
+
+MTV设计模式：
+  M:Model 模型，负责业务对象和数据库的映射关系
+  T:Template 模板，如何把网页展示给用户
+  V:View 视图，负责业务逻辑,依据模型数据创建的
+
+MTV工作流程：
+          访问                              调用           调用数据模型存取数据
+————————  ----> 服务器 ---> 路由系统URLConf ----> ————————————  ------>  ——————————
+| 客户端|                                         |V(视图函数)|          |M(数据库)|
+————————  <-------------------- T(模板）<-------- ————————————  <------- ——————————
+                返回页面                   渲染                  返回结果
+
+###############################################################################
+部署django
+
+1.安装(在虚拟环境中用pip安装)
+
+2.创建项目
+(1)手动创建
+  django-admin startproject 目录名
+
+(2)用pycharm创建  
+
+3.测试
+  python manage.py runserver
+
+4.项目文件说明
+
+项目名                        # 网站的根目录，即http://127.0.0.1访问的目录          
+├── db.sqlite3                # 文件型数据库
+├── manage.py                 # 项目管理文件
+├── 项目名                    # 项目管理目录
+│   ├── __init__.py           # 告诉python这个目录应该被看做一个python包
+│   ├── settings.py           # 配置文件
+│   ├── urls.py               # URLconf路由文件
+│   └── wsgi.py               # 与WSGI兼容的web服务器入口，部署时的配置文件
+└── templates                 # 模板目录
+
+5.启动mysql数据库，并创建一个库，给django用
+  create database dj1903 default charset utf8
+
+6.修改配置文件:settings.py
+  BASE_DIR                //指明项目所在的目录，不需要修改
+  ALLOWED_HOSTS=['*']     //设置所有主机均可访问
+  
+  DATABASES = {           //使用mysql数据库(最初设置的是sqlite3)，通过提示的网址复制格式
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dj1903',
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
+  }
+  
+  LANGUAGE_CODE = 'zh-hans'     //设置使用中文
+  TIME_ZONE = 'Asia/Shanghai' 
+  USE_TZ = False                //不使用标准时区
+
+6.启动django
+  python manage.py runserver 0:80    //所有网卡监听80端口
+
+7.在数据库中生成数据
+  python manage.py makemigrations   //如果对数据有改动，会创建一个文件，用于操纵数据库
+  python manage.py migrate          //将数据迁移到数据库
+
+8.创建管理员帐号
+  python manage.py createsuperuser   //创建后登录 http://127.0.0.1/admin
+
+###############################################################################
+管理应用
+
+应用是一个web应用程序，可以创建在任何位置，习惯创建在项目根目录下
+一个应用对应一个目录
+一个项目可以包含多个应用
+一个应用可以运用到多个项目中
+
+1.创建应用
+  python manage.py startapp 应用名
+
+2.将应用部署到项目中,修改配置文件:settings.py
+  INSTALLED_APPS=[
+    ...
+    '应用名'
+  ]
+
+3.配置URLconf
+#如果将所有的url与函数的映射关系都放入 项目的urls.py 中会很乱
+#所以与该应用有关的url都交给该应用进行路由
+
+(1)修改配置文件：项目名/urls.py
+  from django.conf.urls import url, include
+  from django.contrib import admin
+  
+  urlpatterns = [
+      url(r'^admin/', admin.site.urls),
+      url(r'^polls/', include('polls.urls')),   //这里的应用是polls
+  ]
+
+(2)修改配置文件：应用名/urls.py       //这里应该是polls/urls.py
+  from django.conf.urls import url
+  from . import views                 //函数在views中定义
+  
+  urlpatterns = [       //匹配过的前缀这里不会匹配,比如访问http://127.0.0.1/polls,就会匹配
+    url(r'^$',views.函数1，name='url名字'),    //url名字随便取
+    url(r'^(\d+)',views.函数2,name='xx')       //会把括号内的内容作为参数传给函数
+  ]                                               
+
+(3)在 应用名/views 文件中编写函数(V)
+  from django.shortcuts import render
+  def 函数1(request):                //会传入请求到作为函数的参数
+    return render(request,'网页名')   //会到templates目录中寻找该网页
+
+  def 函数2(request,variable):        //函数2会接收两个参数
+    return render(request,'网页名',{'xx':variable})
+
+(4)在 templates 中创建网页(T)
+
+###############################################################################
+模型设计(M)
+
+ORM:对象关系映射
+Object，python的对象
+Relationship，关系型数据库
+Mapper，映射
+
+表       <--------> python中的class
+字段     <--------> class中的属性
+行(记录) <--------> class的实例
+
+1.编写 应用名/models.py
+  from django.db import models
+  
+  class Question(models.Model):  # 父类是固定的
+      question_text = models.CharField(max_length=200)
+      pub_date = models.DateTimeField()
+      def __str__(self):            //能够在后台界面，简略显示某条记录时，显示的是该字符串
+        return self.question_text 
+  
+  class Choice(models.Model):
+      choice_text = models.CharField(max_length=100)
+      votes = models.IntegerField(default=0)
+      q = models.ForeignKey(Question)
+      def __str__(self):
+        return "%s: %s" %(self.q,self.choice_text)  //这里的self.q会调用Question的str方法
+
+#说明：
+#模型没有明确给定主键，django将自动创建一个名为 id 的字段作为主键
+#实际创建的表名为 应用名_类名 且全部小写
+#设置了外键的字段名是 属性名_id  ,所以上面 q 对应的字段名为 q_id
+
+2.生成表
+  python manage.py makemigrations
+  python manage.py migrate
+
+3.注册模型到后台              //即可登录后台，进行表的操作
+  from django.contrib import admin
+  from .models import Question, Choice   //.表示当前包，模块名为models
+  
+  admin.site.register(Question)
+  admin.site.register(Choice)
+
+###############################################################################

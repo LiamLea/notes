@@ -1,0 +1,9 @@
+##################################################### 
+邮件服务器配置
+  relayhost=[xx]   //设置中继服务器
+  inet_interfaces=loopback-only  //不能用localhost替代,因为loopback是一个虚拟网卡,此段话的意思是只监听这个网卡
+  myorigin=xx     //设置来源,即发送者的后缀
+  mynetworks=xx   //将来自该网络的邮件发往中继服务器
+  mydestination=   //判断是否是本域邮件,若邮件来源出现在mydestination中则属于本域邮件
+  local_transport=error:local delivery disabled   //拒绝接受任何邮件(可以转发)
+##################################################### 

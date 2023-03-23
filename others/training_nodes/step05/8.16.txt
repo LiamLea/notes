@@ -1,0 +1,110 @@
+###############################################################################
+CI/CD    //continue integration/continue delivery，持续集成/持续交付
+
+dev(开发）---------------------------->  ———————————
+                                         |    git   |  
+app(应用服务器）<------- jenkins <------ ——————————— 
+
+###############################################################################
+Git使用
+
+SCM:software configuration management，如：git,svn
+
+               git add                     git commit
+work(工作区) -----------> stage(暂存区） -------------> 版本库(.git)
+
+暂存区在.git/index中
+
+多用git status,会提示撤销命令操作
+
+1.进行环境配置   //会生成～/.gitconfig文件
+  git config --global user.name "xx"
+  git config --global user.examil "xx"
+  git config --global core.editor vim
+  git config --list
+
+2.创建版本库
+  git init 库名  //不管目录存不存在都不影响
+
+3.提交文件到stage
+  git add .
+#如果有不想添加的文件，通过创建并写入 .gitignore 文件排除
+#当使用.gitignore时要记得排除.gitignore文件本身
+
+4.确认至仓库
+  git commit -m 'xx'
+
+5.在提交至仓库前，恢复删除文件  //恢复的内容是，最近提交到仓库的版本
+  rm -rf *
+  git status
+  git checkout -- *  //恢复的内容，是最近一次提交到仓库的内容
+
+6.删除，改名   //用git命令，就不需要add了，直接commit即可
+  git rm xx
+  git mv xx yy
+
+7.进行版本切换
+  git reflog       //查看每个版本的id
+  git checkout id  //切换到执行版本
+
+8.分支操作
+(1)创建分支,确保工作区是干净的
+  git branch 分支名
+(2)切换分支
+  git checkout 分支名
+(3)在分支内提交到仓库  //分支内容，就会其他分支不同
+  git add .
+  git commit -m 'xx'
+(4)合并分支
+  git merge xx  //则所在分支的内容，会多出合并的分支的内容
+(5)删除分支
+  git branch -d xx
+
+###############################################################################
+搭建gitlab服务器
+
+1.利用docker启动gitlab
+  docker load -i xx.tar
+  docker run -d -h 主机名 --name 容器名 -p 443:443 -p 80:80 -p 22:22 
+  --restart always                    //开机自动启动
+  -v /srv/gitlab/config:/etc/gitlab 
+  -v /srv/gitlab/logs:/var/log/gitlab 
+  -v /srv/gitlab/data:/var/opt/gitlab gitlab_zh:latest
+
+2.在gitlab上配置
+  创建组(对应于一个开发团队) -> 创建项目(与组关联) -> 创建用户(加入组中，并设置为主程序员，即可以管理仓库) 
+
+3.登录创建的用户，配置ssh
+#跟在github上配置一样，设置ssh公钥即可免密上传
+
+4.使用远程仓库
+#进行环境配置
+  git config --global user.name 'xx'
+  git config --global user.email 'xx'
+
+#三种情况
+（1）创建新的仓库
+  git clone git@...
+
+（2）已存在的文件夹
+  git init 
+  git remote add origin git@...
+
+（3）已存在的Git仓库
+  git remote rename origin old-origin
+  git remote add origin git@...
+
+5.给某个版本打上tag标记     
+#根据本地仓库的版本,所以改动后下，需要先commit再tag才有意义
+（1）git tag 标记名    
+（2）git tag            //查看有哪些tag
+（3）git push --tag    //将tag传到远程仓库，git push是不会上传tag的
+
+6.tag和branch的区别
+  tag 对应某次 commit, 用于标记某一个点，是不可移动的。 
+  branch 对应一系列 commit，是很多点连成的一根线，是可以依靠 HEAD 指针移动的。
+  所以，两者的区别决定了使用方式，改动代码用 branch ,不改动只查看用 tag。
+  利用某个tag生成一个branch:
+    git branch 分支名 tag名
+
+###############################################################################

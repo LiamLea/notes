@@ -1,0 +1,108 @@
+###############################################################################
+命令补充
+  eviction 逐出,赶出
+
+###############################################################################
+数据库类型
+
+RDBMS
+  relational databases management system
+  按照预先设置的组织结构,将数据存储到物理介质上
+  数据之间可以做关联操作(比如:外键)
+  主流RDBMS软件:oracle,DB2,MySQL,MariaDB,MS SQL Server
+
+NoSQL
+  Not only SQL
+  泛指非关系型数据库
+  不需要预先定义数据存储结构(即需要先建表)
+  每条记录可以有不同的数据类型和字段个数
+  主流NoSQL软件:Redis,MongoDB,Memcached
+
+###############################################################################
+Redis
+
+remote dictionary server 远程字典服务器
+是一款高性能的键值对分布式内存数据库
+支持数据持久化(定期把内存里数据存储到硬盘)
+
+一.部署Redis
+1.源码包编译安装
+2.初始化配置(运行脚本):utils/install_server.sh
+3.管理服务
+  /etc/init.d/redis_6379 stop
+  /etc/init.d/redis_6379 start
+4.连接服务
+  redis-cli -h IP -p 端口 -a 密码   //不指定就用默认的
+
+二.常用命令
+  set key value                     //存储一个键值对
+  mset key1 value1 key2 value2 ...  //存储多个键值对
+  get key                           //获得key的值
+  mget key1 key2 ...                //获取多个key的值
+  select 数据库编号(0-15)           //切换库
+  keys *                            //显示所有key
+  type key                          //查看key的值的类型
+  exists key                        //查看是否存在指定的key
+  ttl key                           //查看key生存时间
+  expire key 秒数                   //设置key有效时间
+  move key 数据库编号
+  del key
+  flushall                          //删除内存中所有key
+  flushdb                           //删除所在库的所有key
+  save                              //将所有key保存到硬盘
+  shutdown                          //停止服务
+
+三.配置文件解析:/etc/redis/
+1.常用配置
+  port 6379
+  bind 127.0.0.1    //只有本机可以连接
+  daemonize yes     //以守护进程方式运行
+  databases 16      //数据库个数
+  logfile /var/log/redis_6379.log   //日志文件
+  maxclients 10000    //并发连接数
+  dir /var/lib/redis/6379     //数据库目录
+
+2.内存管理
+内存清除策略(lru:least recently used  lfu;least frequently used)
+  volatile-lru       //最近最少使用(针对设置了ttl的key)
+  allkeys-lru        //最近最少使用(针对所有key)
+  volatile-lfu       //使用频率最少(针对设置了ttl的key
+  allkeys-lru        //使用频率最少(针对所有key)
+  volatile-random    //随机清除(针对设置了ttl的key)
+  allkeys-random     //随机清除(针对所有key)
+  volatile-ttl       //移除最近过期的key
+  noeviction         //不删除,写满时报错,默认使用的策略
+
+优化设置
+  maxmemory          //最大内存
+  maxmemory-policy   //定义使用策略
+  maxmemory-samples  //选取key模板的个数(针对lru,lfu),即能够用于比对的标准
+
+3.设置连接密码,ip地址,端口 
+  requirepass 密码
+  bind ip地址
+  port 端口
+#任一项修改后,就不能用脚本停止服务,或者修改脚本即可
+
+###############################################################################
+部署LNMP
+
+一.安装支持redis的模块
+1.安装模块:php-redis    //因为php默认不支持redis,所以需要下载源码包进行安装
+  解压
+  phpize            //生成配置文件php-config及configure命令
+  ./configure --with-php-config=/usr/bin/php-config
+  make
+  make install     //安装后,会提示redis.so存放的路径
+
+2.将模块添加进php   //提前要准备好php环境
+#vim /etc/php.ini
+  extension_dir="目录名";
+  extension="模块名";
+
+3.重启php-fpm服务
+
+4.检查
+  php -m | grep -i redis
+
+###############################################################################

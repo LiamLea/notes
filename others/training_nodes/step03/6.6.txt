@@ -1,0 +1,124 @@
+###############################################################################
+单词补充
+  variable
+  validate 验证
+  revoke 撤回,废除
+
+###############################################################################
+专业术语
+  DB:
+    DataBase,依照某种数据模型进行组织并存放到存储器的数据集合
+  DBMS:
+    DataBase Management System,用来操纵和管理数据库的服务软件,如:mysql,oracle
+  DBS:
+    DataBase System,DB+DBMS
+
+###############################################################################
+mysql相关文件
+  主配置文件:/etc/my.cnf
+  数据库目录:/var/lib/mysql
+  错误日志文件:/var/log/mysqld.log
+
+mysql初始化设置
+  仅允许本机的root连接
+  初始密码在/var/log/mysqld.log日志下
+  连接命令:mysql -h主机名 -u用户名 -p密码 [数据库名]  
+    //当密码有特殊字符时需要用单引号引起来
+    //不加库名,默认在/var/lib/mysql/目录下
+
+连接方式:
+  命令行
+  web页面
+  图形软件
+  脚本
+
+###############################################################################
+SQL命令分类
+  DDL   //data define language,如:create,alter,drop
+  DML   //data manipulate language,如:insert,update,delete
+  DCL   //data control language,如:grant,revoke
+  DTL   //date transaction language,如:commit,rollback,savepoint
+
+###############################################################################
+mysql命令补充
+
+1.修改密码
+    alter user root@localhost identified by "密码"
+
+2.密码策略
+    0:只检查长度
+    1:检查长度和格式要求
+    2:检查长度,格式要求和字典文件
+3.修改密码策略
+    即时生效:set global validate_password_policy=0
+             set global validate_password_length=6
+    永久生效:vim /etc/my.cnf
+             [mysqld]
+             validate_password_policy=0
+             validate_password_length=6
+
+4.任意字符:%
+  任意字段:*
+  模糊匹配:like
+
+5.查看变量:show variables
+6.设置全局变量:set global 变量名=值
+
+7.显示当前信息
+    select database()           //显示当前所在的库
+    select user()               //显示当前的用户
+    select @@hostname           //显示当前的主机名,hostname是内置变量,@@表示后面是变量
+    show create table 表\G;     //显示表的信息
+    show create database 库\G;  //显示库的信息
+
+8.创建表格
+    create table 表名(
+      字段名1 类型(宽度),
+      ...
+    )default charset=utf8;    //能够使用中文
+
+9.记录管理命令
+    select ... from 表
+    insert into 表 values(),(),...
+    delete from 表;
+    update 表 set 字段名=值;
+
+###############################################################################
+MYSQL数据类型
+
+1.字符类型:
+    char      //定长,不够用空格补全,最多255
+    varchar   //变长,按数据实际大小分配存储空间,最多65535
+              //常用char,用过多varchar会降低性能
+    text/blob //存储量大于65535,用于存储视频,文本,图片等
+
+2.数值类型(默认有符号范围)
+    tinyint   //1字节
+    smallint  //2字节(0~65535,有符号范围:-2^15~2^15-1)
+    int       //4字节
+    bigint    //8字节
+    float     //4字节,只有无符号类型
+    double    //8字节,只有无符号类型
+
+3.日期时间类型
+    year                //年,        格式:yyyy
+    date                //日期       格式:yyyymmdd
+    time                //时间       格式:hhmmss
+    datetime/timestamp  //日期和时间,格式:yyyymmddhhmmss
+                        //区别:datetime未赋值时为null
+                               timestamp为赋值时为当前日期时间
+#MYSQL内置时间函数:
+#  curtime()  //获取当前的时间
+#  curdate()  //获取当前的日期
+#  now()      //获取当前的日期时间
+#  year(xx)     //获取年,如year(now())
+#  month(xx)
+#  day(xx)
+#  date(xx)
+#  time(xx)
+
+4.枚举类型
+    enum(值1,值2,...)      //单选
+    set(值1,值2,...)       //多选
+
+###############################################################################

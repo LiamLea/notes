@@ -1,0 +1,169 @@
+###############################################################################
+命令补充:
+  非交互式分区 
+    parted 磁盘 mklabel 分区格式(如:gpt)
+    parted 磁盘 mkpart 分区类型(如:primary) 起点 终点   
+#起点和终点可以用百分比表示,如50%
+
+  利用ssh传递命令:
+    ssh 用户@ip "命令"
+
+###############################################################################
+DAS:direct attach storage,直连存储
+    扩展性差(能够用的数量有限)
+NAS:network attach storage,网络附加存储(如nfs,http,samba,ftp)
+    共享的是文件系统
+SAN:storage area netwrok,存储区域网络
+    共享的是块设备
+DFS:distributed file system,分布式文件系统(如:ceph,hadoop)
+    指文件系统管理的物理存储资源分布在各个网络节点
+
+###############################################################################
+ceph架构和基本概念
+
+存储的基本类型是对象
+
+  三层架构
+    最底层:rados集群  //由osd,mon,mds组成
+    中间层:提供访问dados的库  //支持c,c++,java等
+    最顶层:提供接口    //rbd,radosgw
+
+  OSD 负责物理存储的进程
+  PG  包含一堆对象,一个PG只能分布在不同的OSD上
+     //PG是OSD上一层逻辑
+  pool 抽象的存储池,由多个PG组成
+     //pool是PG上一层逻辑
+  image:将块空间映射成镜像,提供给客户端使用
+  fs 提供文件系统
+  rgw 提供对象存储
+
+###############################################################################
+Ceph
+
+特点:自动切割为小文件
+     每个文件有3个副本
+     并发写并发读
+     osd有日志盘和数据盘,每个数据盘都有一个日志盘.对应一个osd服务
+            //日志盘有缓存功能
+           //实际中日志盘用固态盘(容量小,速度快).数据盘用磁盘
+     通过镜像共享存储空间
+
+
+ceph组件(需要安装相应软件):
+
+  OSD  提供存储设备(至少3个,保证至少3个副本)
+#object storage device,对象存储设备
+
+  MON  monitor,集群监控组件(至少3台,高可用)
+
+  MDS  提供元数据管理,这样才能实现文件系统共享
+#metadata server,元数据服务器
+
+  RGW  提高对象存储
+#rados:reliable,autonomic distributed object storage 可靠自主分布对象存储
+#RGW:rados gateway
+
+命令:
+  ceph-deploy     //配置命令,必须在指定目录下执行
+  ceph            //管理命令,必须在有ceph配置文件的主机上执行,通过ceph-deploy ip可以同步配置文件
+  rbd             //客户端命令
+
+###############################################################################
+部署Ceph集群(部署只需要在一台主机上进行操作)
+
+一.环境准备
+  搭建ceph的yum源             //为了安装ceph相关软件
+  部署ssh秘钥                 //使ceph能够远程配置
+  设置/etc/hosts主机解析      //使ceph能够找到这些主机
+  所有节点主机用NTP同步时间   //ceph对时间要求严格,必须统一
+  添加磁盘                   //用于后面创建日志盘
+#创建分区用作日志盘
+  parted xx mklabel gpt
+  parted xx mkpart primary 起点 终点
+
+二.部署mon和整个集群的配置
+
+1.安装部署软件:ceph-deploy
+
+2.创建目录  //用于存放集群配置文件
+  ceph-deploy 命令必须在此目录下执行
+
+3.生成集群的配置文件,部署monitor
+  ceph-deploy new 主机名1 主机名2 ...
+#填写的主机是monitor
+#主机名需要在/etc/hosts进行解析,否则找不到这些主机
+
+4.在所有节点上安装ceph组件:
+    ceph-mon    //用于支持monitor
+    ceph-osd    //提供存储空间
+    ceph-mds    //用于共享文件系统
+    ceph-radosgw //用于共享对象
+
+5.启动所有monitor节点的mon服务
+  ceph-deploy mon create-initial
+
+三.部署OSD服务器
+
+1.更改用于日志盘的分区的所属   //磁盘不需要改
+  chown ceph:ceph 分区
+#永久更改,/etc/udev/rules.d/xx.rules
+  ENV{DEVNAME}=="/dev/vdb1",OWNER="ceph",GROUP="ceph"
+  ...
+
+2.创建osd,包括日志盘和数据盘
+#先清空磁盘数据
+  ceph-deploy disk zap 主机名或IP:磁盘名 ...
+#创建OSD,并且启动ceph-osd服务
+  ceph-deploy osd create 主机名或IP:数据盘:日志盘
+  ceph-deploy admin IP     //同步配置,使得能够与monitor服务器通信
+
+3.验证
+  ceph -s
+  ceph osd lspools    //查看资源池
+
+四.创建ceph块存储(即image)
+  (rbd:rados block device)
+
+1.创建镜像    //只能在服务端创建 ,客户端使用
+#查看存储池(默认有rbd池)
+  ceph osd lspools
+#创建镜像,必须在服务器端执行
+  rbd create 镜像名 --image-feature layering --size 大小
+#layering指的是COW功能
+#查看镜像的信息
+  rbd list
+  rbd info 镜像名
+#改变镜像的大小
+  rbd resize --size 大小 镜像名 
+
+五.客户端访问(这里全在客户机操作)
+
+1.安装软件:ceph-common
+
+2.同步配置文件:
+  ceph-deploy admin IP地址
+#或者直接拷贝集群上的配置文件
+#/etc/ceph/ceph.conf     //否则不知道集群在哪里
+#/etc/ceph/ceph.client.admin.keyring  //否则无连接权限
+
+3.加载磁盘镜像    
+  rbd map 镜像名     //其实就是加载了一个块设备:/dev/rdbx
+#查看服务器提供的镜像:rbd list
+#查看本机加载的镜像:rbd showmapped
+#移除镜像:rbd unmap /dev/rdbx  //首先要卸载分区
+
+4.进行格式化,挂载使用  //之后其他客户端使用都不需要再次挂载
+
+六.给镜像创建快照
+  rbd snap ls 镜像名  //查看该镜像的快照
+  rbd snap create 镜像名 --snap 快照名
+  rbd sanp rollback 镜像名 --snap 快照名   //还原快照
+
+七.利用快照克隆镜像
+#克隆出来的镜像数据是利用COW技术产生的
+  rdb snap protect 镜像名 --snap 快照名    //将快照保护起来,才能进行一下的操作
+  rbd clone 镜像名 --snap 快照名 新的镜像名 --image-feature layering
+  rbd flatten 克隆的镜像名   //将克隆的镜像独立出来
+  rbd snap unprotect 镜像名 --snap 快照名 //取消保护
+
+###############################################################################

@@ -1,0 +1,64 @@
+##################################################### 
+单词积累
+  ar:access router   接入路由器
+  ac:access controller  接入控制器
+  pvid:port-base vlan id   基于端口的虚拟局域网id
+  //交换机给accsess口下行数据打上PVID标记,上行数据去除PVID(这种数据进入交换机才能确定其属于哪个VLAN)
+  网卡的链路聚合有两种模式:热备份(activebackup)连接冗余 //这种模式下只有一个网卡工作
+                           轮询式(roundrobin)的流量负载均衡
+
+##################################################### 
+VLAN(主要目的是 控制广播)
+  通过交换机划分VALN,实质就是对各个端口进行划分
+  广播域:能接受同样广播消息的节点的集合
+  交换机的所有接口默认属于同一个广播域(都默认属于VLAN 1)
+
+  VLAN作用:分割广播域(随着设备的增多,网络中广播增多,降低了网络的效率)
+           增加安全性
+           提高带宽利用
+           降低延迟
+
+  相关命令:
+    clear configuration interface Ethernet0/0/x  //恢复某个接口的默认状态
+    shutdown   //关闭某个接口
+    undo  命令  //取消某个设置
+
+  静态VLAN的配置
+    1.创建VLAN
+      vlan batch 2 to 4   //默认存在vlan1
+    2.将接口加入到相应的VLAN中
+      如果需要批量处理,可以将多个接口加入到一个组中
+        port-group 数字   //创建组
+        group-member Ethernet0/0/5 to Ethernet0/0/7   //将接口5,6,7加入到该组中
+    3.设置端口链路类型和所属的VLAN
+        //access 接入链路,只能传输一种VLAN的数据
+        //trunk  中继链路,可以传输多种VLAN的数据
+        port link-type access
+        port default vlan 数字
+      或者
+        port link-type trunk
+        port trunk allow-pass vlan all
+
+  TRUNK原理
+    通过trunk口时PVID保留(即传输数据中包含PVID标记)    //这样就可以实现传输多种VLAN的数据
+   
+
+  配置链路聚合(增加网络可靠性和负载均衡)
+    [Huawei]interface eth-trunk 1     //开启链路聚合接口1
+    [Huawei-eth-trunk 1]trunkport Ethernet 	0/0/1 0/0/2
+    [Huawei-eth-trunk 1]port link-type trunk
+    [Huawei-eth-trunk 1]port trunk allow-pass vlan all
+
+  路由:能够连接不同广播域(网段)的设备,并隔离广播
+  路由配置
+    1.配置指定接口的IP地址
+      [Huawei]interface GigabitEthernet 0/0/0
+      [Huawei-GigabitEthernet0/0/1]ip address 192.168.1.254 24
+    2.查看路由表
+      display ip routing-table
+      //静态路由 通过管理员手工配置目标网段的下一跳
+      //直连路由 路由器接口配置ip后自动生成
+    3.配置静态路由(正反都要配置,否则有去无回)
+      ip route-static 192.168.3.0 24 下一跳IP地址
+
+##################################################### 

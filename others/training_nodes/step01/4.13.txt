@@ -1,0 +1,61 @@
+##################################################### 
+单词积累
+  hyper   亢奋的
+  trivial 不重要的,琐碎的
+
+##################################################### 
+命令补充
+  DNS中dc表示domain controller
+
+##################################################### 
+常用协议及其端口号
+  http:Hyper Text Transform protocol            80
+  https:http Secure                            443           
+  DNS:Domain Name System                        53          
+  FTP:File Tansform Protocol                    21          
+  SSH:Secure Shell                              22          
+  TFTP:Trivial File Tansform Protocol(简单文件传输协议) 69    
+  telnet:远程登录                               23           
+  pop3:Post office Protocol (邮局协议,用户收邮件协议) 110     
+  SMTP:Simple Mail Tansport protocol(用户发邮件协议)   25   
+  SNMP:Simple Network Manager Protocol                161     
+  iSCSI:internet Small Computer System Interface(网络共享磁盘协议) 3260
+  DB:database                                  3306
+
+##################################################### 
+端口映射(端口重定向,如:从客户端访问端口1的请求,自动映射到端口2)
+  端口范围:1-65535
+           1-1024     为系统保留端口
+           1024-5000  为一般程序通信端口
+           5000-65535 为用户自定义端口
+
+  查看端口号是否在被占用:ss -tulnp  //t:tcp,u:udp,l:listen.n:numeric(显示端口号,而不是服务名),p:pid和program
+
+  利用防火墙进行端口映射:
+firewall-cmd --permanent --zone=public --add-forward-port=port=原端口:proto=协议:toport=映射到的端口
+
+
+##################################################### 
+
+修改ip(修改后重启网络:systemctl restart network)
+
+  nmcli connection modify 连接名 ipv4.method manual ipv4.address xx ipv4.gateway xx connection.autoconnect yes  //设置开机自启
+  nmcli connection up 连接名
+
+connection和device区别:
+  多个connection可以应用到同一个device,但同一时间只能启动其中一个connection
+
+##################################################### 
+
+添加一个swap分区
+  分区:fdisk
+  更新分区表:partprobe
+  格式化:mkswap
+  启动,查看,关闭:swapon
+                 swapon -s
+                 swapoff
+
+  开机自动挂载格式:/dev/vdc swap swap defaults 0 0
+  检测开机挂载是否设置成功:swapon -a
+
+##################################################### 

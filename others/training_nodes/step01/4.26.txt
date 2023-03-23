@@ -1,0 +1,110 @@
+##################################################### 
+单词积累
+  -v:verbose  冗长的,详述
+  specify    指定
+  dry run    排练,演戏
+
+##################################################### 
+命令补充
+  wget 源文件 -P 目标路径   //不进行重命名,p:prefix
+  growpart 分区名  //扩展分区大小(之后还要扩展相应的文件系统)
+
+##################################################### 
+源码包编译安装
+
+• 主要优点
+– 获得软件的最新版,及时修复bug
+– 软件功能可按需选择/定制,有更多软件可供选择
+– 源码包适用各种平台
+
+1.安装gcc make开发工具(安装依赖关系的软件)
+2.tar解包,释放源代码至指定目录
+3.运行configure 侦测程序,生成makefile文件  //--prefix=指定安装的位置,makefile记录了如何编译和连接源码
+4.make 编译,生成可执行的二进制程序文件
+5.make install 安装,将编译好的文件复制到安装目录
+
+##################################################### 
+rsync同步操作
+
+• 命令用法
+– rsync [选项...]  源目录     目标目录
+
+• 同步与复制的差异
+– 复制:完全拷贝源到目标
+– 同步:增量拷贝,只传输变化过的数据
+
+同步控制
+• rsync操作选项
+– -n:测试同步过程,不做实际修改   //dry-run
+– --delete:删除目标文件夹内多余的文档
+– -a:归档模式,相当于-rlptgoD
+– -v:显示详细操作信息  //verbose
+– -z:传输过程中启用压缩/解压(一般当文件大于5G时使用)
+
+常用组合:rsync -av --delete 源目录  目标目录   //使得目标目录与源目录的内容一模一样
+
+• 远程同步(利用SSH协议)
+– 下行:rsync [...] user@host:远程目录    本地目录  //下行即从网络下载下来
+– 上行:rsync [...] 本地目录   user@host:远程目录   //上行即上传至网络上
+
+##################################################### 
+一.实现ssh的无密码验证,生成公钥 私钥(远程连接就不需要输入密码了)
+
+1.生成公钥 私钥:ssh-keygen   //一路回车
+  存放位置:~/.ssh/
+  相关文件:
+  authorized_keys   //别人传来的公钥,每个人只能有一把公钥
+  id_rsa      //生成的私钥
+  id_rsa.pub  //生成的公钥,用于传给别人,传给别人后重命名位authorized_keys
+  known_hosts //记录自己远程管理过的主机
+
+2.传递公钥:ssh-copy-id  用户名@主机名或ip
+
+##################################################### 
+二.监控目录内容的变化
+
+inotifywait监控
+• 基本用法
+– inotifywait [选项] 目标文件夹
+
+• 常用命令选项
+– -m,持续监控(捕获一个事件后不退出)  //mintor
+– -r,递归监控、包括子目录及文件    
+– -q,减少屏幕输出信息     //quiet
+– -e,指定监视的 modify、move、create、delete、attrib等事件类别 //event
+
+##################################################### 
+三.实现实时同步
+
+#!/bin/bash
+while  inotifywait -rqq /nsd1903 
+  do
+    rsync -a --delete /nsd1903/ root@192.168.4.207:/opt/
+  done
+
+##################################################### 
+cobbler装机平台
+
+1.解压cobbler.zip包
+2.安装cobbler主程序,工具包等
+  yum -y install /opt/cobbler/*.rpm  //可以按照依赖安装软件包
+  yum -y install httpd dhcp mod_ssl
+3.配置cobbler:/etc/cobbler/settings
+  next_server: ip地址
+  server: ip地址
+  manage_dhcp: 1
+  pxe_just_once: 1
+4.配置cobbler的dhcp:/etc/cobbler/dhcp.template
+  :% s/192.168.1/192.168.4/g
+5.绝对路径解压cobbler_boot.tar.gz
+6.启动相关服务:cobblerd,httpd,tftp,rsyncd
+7.同步刷新cobbler配置
+  cobbler sync
+8.导入安装镜像
+  cobbler import --path=挂载点 --name=导入系统命名(随意起)
+9.修改kickstart文件
+  cobbler profile edit --name=xx --kickstart=/var/lib/cobbler/kickstarts/自定义.cfg
+  cobbler profile report
+  cobbler sync
+
+##################################################### 

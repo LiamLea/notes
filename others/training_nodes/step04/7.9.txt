@@ -1,0 +1,68 @@
+###############################################################################
+
+一.项目管理
+
+项目:一组隔离的资源和对象,如:admin,services
+
+1.创建项目和用户(用户必须关联项目)
+#强制修改admin密码
+  source keystonerc_admin
+  openstack user set --password 密码 admin
+#更改keystonerc_admin中PASSWORD字段
+
+二.配额管理
+
+三.云主机类型管理
+  创建云主机类型(flavor)
+
+四.镜像管理
+  创建镜像(用作后端盘)
+#镜像的获取:可以自己制作一个镜像,装好系统,也可以从网上下载
+
+五.网络管理
+1.创建外部网络(admin创建,给一个项目使用)
+2.创建内部网络(普通用户创建)
+3.在外部网络中添加子网
+4.创建路由器(连接外部网络和内部网络)
+
+六.创建云主机
+
+七.绑定浮动IP(即绑定一个公网ip,外网可以直接访问)
+
+1.分配一个浮动IP
+  Access&Secure -> Floating ip -> allocate ip
+
+2.在指定云主机上绑定浮动ip
+
+3.修改防火墙策略(默认策略只能连接外面,外面不能连接内部)
+  Access&Secure -> Security Groups
+
+4.如果新创建防火墙策略,云主机需要进行修改
+
+###############################################################################
+计算节点(nova)扩容
+
+1.准备节点
+  卸载了firewalld和NetManger
+  主机名能否ping通
+  配置yum源,NAT,DNS
+  安装依赖包:qemu-kvm libvirt-daemon libvirt-client libvirt-daemon-driver-qemu python-setuptools
+
+2.修改xx.ini文件
+  ...
+  CONFIG_COMPUTE_HOSTS=xx,xx,...
+  CONFIG_NETWORK_HOSTS=xx,xx,...
+  ...
+
+3.packstack --answer-file=xx.ini
+
+4.修改Horizon配置
+#vim /etc/httpd/conf.d/15-horizon_vhost.conf
+#WSGIProcessGroup apache下面添加
+  WSGIApplicationGroup %{GLOBAL}      //否则无法访问网页
+
+###############################################################################
+迁移云主机(Live migrate Instance,热迁移)
+  对用户是透明的
+
+###############################################################################
