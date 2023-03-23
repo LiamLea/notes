@@ -335,4 +335,4 @@ func main() {
 ![](./imgs/grpc_02.png)
 ![](./imgs/grpc_03.png)
 
-[参考](../../../go/modules/grpc_protobuf.md)
+[参考](../../../programming/go/modules/grpc_protobuf.md)
