@@ -1,0 +1,74 @@
+###############################################################################
+https加密
+
+加密算法:
+  对称加密:AES(advanced encryption standard),DES(data encryption standard)     
+    //算法本身安全,但是在网上传输不安全,秘钥可能被截取(同一个秘钥用于加密和解密)
+
+  非对称加密:RSA,DSA(digital signature algorithm)   
+
+  信息摘要:md5i(message digest),sha256(secure hash algorithm),sha512  
+    //用于数据的完整性校验(生成的码只跟文件内容有关)
+    //同样的内容只生成一种码,可以判断文件的内容是否改变
+
+生成秘钥:
+  生成私钥:
+    openssl genrsa > cert.key
+  生成证书(即公钥):
+    openssl req -new -x509 -key cert.key > cert.pem
+
+修改配置文件
+
+###############################################################################
+LNMP部署(Linux,nginx,mysql,php)
+
+静态:jpg,doc,mp4,gif,...
+动态:java,php,py,...  //代码需要在服务器上执行一次,将结果返回给客户
+
+1.安装软件包
+  部署nginx
+
+  部署mysql:
+    mariadb  //数据库客户程序
+    mariadb-server  //提供数据库服务 
+    mariadb-devel   //其他软件使用mysql需要的依赖库
+
+  部署php:
+    php    //解释器
+    php-fpm  //提供多进程php解释服务,fpm:fastCGI process manager,快速通用网关接口进程管理器
+    php-mysql  //提供使用mysql数据库的功能
+
+2.启动服务:nginx,mariabdb,php-fpm(9000)
+#php-fpm配置文件:/etc/php-fpm.d/www.conf
+  [www]
+  listen=127.0.0.1:9000       //PHP端口号
+  pm.max_children=32         //最大进程数
+  pm.start_servers=15        //最小进程数
+  pm.min_spare_servers=5     //最小空闲进程数
+  pm.max_spare_servers=32    //最大空间进程数
+
+3.修改nginx配置文件
+
+#用户访问:
+#  如果是静态,nginx直接返回文件(即用户会下载该文件)
+#  如果是动态,nginx转发给9000(php)
+#location匹配用户的地址栏(从域名往后的部分)
+#location支持正则:~ 正则表达式  //波浪号代表模糊匹配,用于正则匹配
+
+  server{
+    ...
+    location / {              //默认匹配,即下面没有匹配的,则匹配这个
+      root html;
+      index index.html;
+    }
+
+    location ~ \.php$ {             //匹配动态页面
+      root html;
+      fastcgi_pass 127.0.0.1:9000;  //将请求转发给本机9000端口
+      fastcgi_index index.php;
+      include fastcgi.conf;
+      }
+  }
+
+###############################################################################
+

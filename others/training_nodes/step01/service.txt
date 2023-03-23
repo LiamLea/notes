@@ -1,0 +1,14 @@
+  服务名    | 服务端软件    | 服务端服务 |  客户端软件         |  客户端服务
+  ldap      |               |            |    sssd             | sssd
+  autofs    |               |            |    autofs           | autofs
+  iSCSI     | targetcli     |  target    |iscsi-initiator-utils| iscsid,iscsi
+  nfs       | nfs-utils     | nfs-server |                     |
+  samba     | samba         |   smb      |  cifs-utils         | 
+web虚拟主机 | httpd         |   httpd    |                     | 
+安全web     | httpd         |   httpd    |                     | 
+动态web     | httpd         |   httpd    |                     | 
+web端口映射 | httpd         |   httpd    |                     | 
+  mysql     |mariadb-server |   mariadb  |                     | 
+ 链路聚合   |               |            |                     | 
+
+

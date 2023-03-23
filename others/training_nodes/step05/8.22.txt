@@ -1,0 +1,119 @@
+###############################################################################
+通过python shell操作模型
+
+1.python manage.py shell   //会自动设置好django的环境变量
+  
+2.导入类：from polls.models import Question,Choice
+
+3.添加数据
+(1)通过实例添加
+  q1=Question(question_text='xx',pub_date='xx')
+  q1.save()
+
+(2)通过objects管理器
+  Question.objects.create(question_text='xx',pub_date='xx')
+
+4.查询
+  qset1=Question.objects.all()
+  q1=Question.objects.get(条件)   //只能获取一个，其他的都会报错
+  choices=q1.choice_set.all()     //q1相对应的choice对象，因为Choice是以Question为外键
+                                  //所以可以通过Question对象的 类名小写_set.all() 方法
+                                  //获得对应的Choice对象
+  qset1=Question.objects.filter(条件)
+#filter中的条件(双下划线)
+#id__exact=1 ---> id=1
+#id__gt=1    ---> id>1
+#id__gte=1   ---> id>=1
+#xx__contains='yy'  --->  xx字段内容包含yy的记录
+#xx__startswith='yy' ---> xx字段以yy开头的记录 
+
+5.修改
+  q=Question.objects.get(条件)
+  q.xx=yy
+  q.save()
+
+6.删除
+  q=Question.objects.get(条件)
+  q.delete()
+
+###############################################################################
+步骤
+
+1.修改视图函数,向模板(前端)传递参数
+  from .models import Question   //导入Question模型
+  
+  def index(request):
+    questions=Question.objects.order_by('-xx')  //取出所有内容，且根据xx字段降序排列
+    return render(request,'index.html',{'questions':questions})  //传递参数questions
+
+2.修改模板
+  {% for question in questions %}
+      <p>
+          {{ forloop.counter }}.
+          <a href="{% url 'url的名字' question.id %}" target="_blank">  
+#将id作为参数传过去，传递给url中要括号扩起来的部分
+              {{ question.question_text }}
+          </a>
+          {{ question.pub_date }}
+      </p>
+  {% endfor %}
+
+3.在模板中引入bootstrap
+(1)现将static目录，移动到项目中
+(2)引入bootstrap
+  {% load static %}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      ... ...
+      <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  </head>
+
+4.使用模板继承
+#为了使得所有的网页模板具有一致的风格，可以采用模板继承
+#将每个页面共性的内容放到基础模板中
+#基他页面继承基础模板
+#使用block占位
+
+#创建模板：base.html
+  {% load static %}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      ... ...
+      <title>{% block title %}{% endblock %}</title>
+  </head>
+  <body>
+      {% block content %}{% endblock %}
+  </body>
+  </html>
+
+#其他页面继承模板
+  {% extends 'base.html' %}
+  {% load static %}
+  {% block title %}投票首页{% endblock %}
+  {% block content %}
+  {% block content %}投票首页的内容{% endblock %}
+
+5.实现投票功能
+(1)创建url用于和投票函数功能关联
+# polls/urls.py
+urlpatterns = [
+    ... ...
+    url(r'^(\d+)/vote/$', views.vote, name='vote'),
+]
+
+(2)修改detail.html中的表单，给action填加网址
+   <form action="{% url 'vote' question.id %}" method="post">
+
+(3)编写vote函数，实现计数功能
+def vote(request, question_id):
+    question = Question.objects.get(id=question_id)
+#request是用户的请求，POST是请求中的字典，保存着提交数据
+    choice_id = request.POST.get('choice_id')
+    choice = question.choice_set.get(id=choice_id)
+    choice.votes += 1  # 选项票数加1
+    choice.save()
+    return redirect('result', question_id)
+
+###############################################################################

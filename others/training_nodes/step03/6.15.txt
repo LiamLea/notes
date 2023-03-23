@@ -1,0 +1,105 @@
+###############################################################################
+
+主从同步:实现数据自动同步的服务结构
+原理:主服务器必须开启binlog日志
+     从服务器 用IO线程 读取主服务器的binlog,并存入中继日志relaylog中
+     从服务器 用SQL线程 从relaylog日志读取内容,进行同步
+
+###############################################################################
+搭建MYSQL主从服务器
+
+一.主服务器
+
+1.启动binlog日志
+#vim /etc/my.cnf
+  [mysqld]
+  log-bin=xx
+  server_id=xx
+
+2.授权用于同步的用户
+  grant replication slave on *.* to 用户名@"%" identified by "密码";
+
+3.查看binlog日志信息
+  show master status;
+
+4.主服务器备份数据
+#主服务器备份数据,加--master-data记录利用的日志和备份到的位置,用这个选项之前必须开启binlog日志
+  mysqldump -uroot -p密码 --master-data 数据库名 > 目录/xx.sql
+
+二.从服务器
+
+1.指定server_id(不能与主服务器的相同)
+#vim /etc/my.cnf
+  [mysqld]
+  server_id=xx
+
+2.从服务器恢复数据
+
+3.配置从服务器
+  change master to
+  master_host="ip地址",
+  master_user="用户名",
+  master_password="密码",
+  master_log_file="日志名", //file和pos通过查看备份文件xx.sql得到
+  master_log_pos=xx;       //pos指定从该位置起同步,上面已经恢复了备份
+
+  start salve;      //启动从服务器,stop slave即关闭
+  show slave status\G;   //用于检查是否正常启动,可以进行排错
+
+4.相关文件(删除这四个文件并重启服务,就可以重新配置)
+  master.info               //主库信息
+  relay-log.info            //中继日志信息
+  主机名-relay-bin.xxxxxx   //中继日志
+  主机名-relay-bin.index    //索引文件
+
+###############################################################################
+主从同步结构模式
+
+一.结构类型
+1.一主一从(单向复制)
+
+2.一主多从
+
+3.链式复制(主从从)
+   中间的从服务器的既做从服务器,又做主服务器
+   配置文件需要添加:log_slave_updates   //允许级联复制
+
+4.互为主从
+
+###############################################################################
+复制模式
+  异步复制模式(默认)
+    主库执行完一次事务后,立即通知客户端是否存储成功,不管从库是否已经接收并处理
+  全同步复制模式
+    主库执行完一次事务后,且所有从库都执行了该事务后才将结果返回给客户端
+  半同步复制模式
+    主库执行完一次事务后,等待至少一个从库接收到并写入到relaylog中才将结果返回个客户端
+
+###############################################################################
+半同步复制模式
+
+相关命令:
+  show variables like "have_dynamic_loading";   //查看是否允许动态加载模块
+  select plugin_name,plugin_status from information_schema.plugins where plugin_name like "%semi%";    //查看是否安装了相关插件
+  show variables like "rpl_semi_sync_%_enabled";  //查看是否激活了相应模块
+
+主库:
+#加载rpl_semi_sync_master插件中的semisync_master.so模块
+  insatll plugin rpl_semi_sync_master SONAME "semisync_master.so";
+  set global rpl_semi_master_slave_enabled=1;
+#永久设置
+#vim /etc/my.cnf
+  [mysqld]
+  plugin-load=rpl_semi_sync_master=semisync_master.so   //若有多个模块,用;隔开
+  rpl_semi_sync_master_enabled=1
+
+从库:
+#加载rpl_semi_sync_slave插件中的semisync_slave.so模块
+  install plugin rpl_semi_sync_slave SONAME "semisync_slave.so";
+  set global rpl_semi_sync_slave_enabled=1;
+#永久配置
+#vim /etc/my.cnf
+  plugin-load=rpl_semi_sync_slave=semisync_slave.so
+  rpl_semi_sync_slave_enabled=1
+
+###############################################################################

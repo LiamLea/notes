@@ -1,0 +1,125 @@
+###############################################################################
+命令补充
+
+使用Debian系统:
+  dpkg        //对应rpm
+  apt-get     //对应yum
+
+  0 号进程是 scheduler
+  1 号进程是 init/systemd （所有 user thread 的祖先)
+  2 号进程是 [kthreadd] （所有 kernel thread 的父进程)
+
+###############################################################################
+容器
+
+容器技术使用的内核技术:
+  Cgroups(Control Groups)  资源管理
+  NameSpace  进程隔离
+  SELinux安全 权限划分
+
+6种命名空间:
+  UTS    	  //unix timesharing system，隔离主机名
+  process     //隔离进程
+  net         //隔离网络
+  filesystem  //隔离文件系统
+  user        //隔离用户
+  ipc         //隔离进程信号
+
+实质是在物理机上实施隔离,启动一个容器就是启动一个进程
+
+真机能够管理容器,容器看不见真机
+
+###############################################################################
+Docker
+
+Docker是完整的一套容器管理系统,提供了一组命令,不需要过多关心底层内核技术
+
+优点:
+  相比于传统的虚拟化技术,容器更加简洁高效
+  传统虚拟机需要给每个VM安装操作系统
+  容器使用的共享公共库和程序
+
+缺点:
+  容器的隔离性没有虚拟化强
+  共用Linux内核,安全性有缺陷
+  SELinux难以驾驭
+  监控容器和排错是挑战
+
+###############################################################################
+部署Docker
+
+一.准备
+  需要64位系统
+  至少RHEL7以上的版本
+  关闭防火墙
+
+二.配置yum源:RHEL7-extras.iso
+
+三.安装并启动服务:docker
+
+###############################################################################
+Docker镜像
+
+在Docker中容器是基于镜像启动的,镜像采用分层技术(分层通过COW技术实现)
+
+查看镜像:docker images
+# REPOSITORY:TAG   //名字和标签 唯一标识一个镜像
+# IMAGE ID    //标识一个物理文件,如两个镜像的IMAGE ID一样,表示两个镜像指向同一个物理文件
+
+搜索镜像:docker search xx   //必须能上网,搜索关键字
+下载镜像:docker pull xx
+上传镜像:docker push xx
+
+导出镜像:docker save 名字:标签 -o xx.tar
+导入镜像:docker load -i xx.tar    //i:input
+
+###############################################################################
+docker命令
+
+一.镜像常用命令(镜像用名字和标签标识)
+  docker images
+  docker history xx    //查看镜像制作历史(看有多少层)
+  docker inspect xx     //查看底层详细信息(有用的信息:Env和Cmd)
+  docker pull xx       //下载时,镜像只需用名字标识
+  docker push xx
+
+  docker rmi xx         //要先删容器,再删镜像(xx也可用IMAGE ID)
+#批量删除镜像:
+# docker rmi `docker images -q`
+
+  docker save xx -o xx.tar   //导出镜像
+
+  docker load -i xx.tar
+#批量加载镜像:
+# for i in *;do docker load -i $i;done
+
+  docker search
+  docker tag xx yy      //修改镜像名称和标签(生成一个新的镜像,都指向同一个物理文件)
+
+二.容器命令(用id标识容器)
+  docker run -it xx [命令]
+//-it  i:interactive,t:tty,即新开一个交互的伪终端
+//-itd  即新开一个交互的伪终端,并且放在后台运行
+//有默认的启动命令,也可以指定命令.命令必须是容器里有的
+//ctrl+p+q 退出容器且容器不关闭
+
+  docker ps       //查看容器列表 -aq,查看全部且只显示id号
+  docker stop xx  //xx为容器id
+  docker start xx
+  docker restart xx
+
+  docker rm xx       //必须要先关闭容器
+//docker rm $(docker ps -aq)  删除所有容器
+
+  docker inspect xx //查看容器底层信息
+//docker insepct -f "{{.NetworkSettings.IPAddress}}" xx
+//docker insepct -f "{{.NetworkSettings.MaxAddress}}" xx
+
+  docker top xx     //查看容器进程列表
+
+  docker attach xx   //进入容器,不建议使用,因为退出容器会关闭容器 
+  docker exec -it xx 命令    //进入容器
+#区别:attch连接的是console,即pid为1的进程
+#     exec连接时创建一个子进程
+
+###############################################################################

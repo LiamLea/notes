@@ -1,0 +1,128 @@
+###############################################################################
+redis主从复制
+
+工作过程:
+  slave向master发送sync
+  master启动后台存盘进程,并收集所有修改数据命令
+  master完成后台存盘后,传送整个命令文件到slave
+  slave接受到文件,加载到内存中完成首次完全同步
+  后续有新数据产生时,master继续收集数据修改命令,传给slave
+
+相关命令:
+  info replication   //查看主从的状态
+  slaveof 主ip 端口   //默认都是master,在从服务器上执行
+  slave no one        //反客为主,将slave转换为master
+
+永久设置slave:/etc/redis/xx.conf
+  slaveof 主ip 端口
+
+一.配置带验证的主从复制
+
+1.master设置密码
+  requirepass 密码
+
+2.slave配置
+  slaveof ip port
+  masterauth 密码
+
+二.哨兵服务器(至少需要三台,因为要投票选取master)
+  监视master服务器,发现master宕机后,将从库升级为主库
+  主配置文件:/etc/sentinel.conf
+1.创建配置文件:
+  bind 0.0.0.0
+  sentinel monitor 主机名 主ip 端口 票数  
+#票数:当有n个哨兵服务器发现master宕机时,才将slave提升为master,一般设置为1
+  sentinel auth-pass 主机名 密码
+
+2.启动服务
+  redis-sentinel /etc/sentinel.conf
+
+###############################################################################
+数据持久化(将数据从内存放出到磁盘)
+
+一.RDB(redis database)
+  数据化持久方式之一,默认方式
+  按照指定时间间隔,将内存中的数据集快照写入硬盘
+  恢复时,将快照文件直接读入内存
+  存放数据的文件:dump.rdb   
+
+1.优化设置
+  save 60 10000   //在60秒内有10000个key变化,则进行存盘
+  save 300 10
+  save 900 1
+  手动存盘
+  save    //阻塞写存盘
+  bgsave  //不阻塞写存盘
+
+2.备份数据:/var/lib/redis/xx/dump.rdb   //只需要复制该文件,重新启动服务即可
+
+3.优点:
+  高性能的持久化实现  
+#创建一个子进程执行存盘,先将数据写入临时文件,持久化过程结束后,再用这个临时文件替换上次持久化好的文件
+  适合大规模数据恢复
+
+4.缺点:
+  意外宕机时,会丢失最后一次持久化的所有数据
+
+二.AOF(append only file)
+  追加方式记录写操作
+  存放数据的文件:appendonly.aof
+
+1.开启AOF:/etc/redis/xx.conf
+  appendonly yes
+
+2.优化配置
+  appendfsync always    //时时记录
+              everysec  //每秒记录一次
+              no        //等cpu空闲才记录
+  auto-aof-rewrite-min-size 64mb   //aof文件达到64mb首次合并,即相同的命令合并,减小文件大小
+  auto-aof-rewrite-percentage 100  //容量增长到合并后的两倍时,再次进行合并,以此类推
+
+3.修复aof文件
+  redis-check-aof --fix appendonlu.aof   //恢复到最后一次的正确操作
+
+4.优点:
+  出现宕机,仅可能丢失1秒的数据
+
+5.缺点:
+  aof文件通常大于rbd文件,恢复时也会较慢一些
+
+###############################################################################
+数据类型
+
+一.string的操作
+  set key value
+  setrange key offset value
+  strlen key
+  append key value
+  setbit key offset value(0或1)
+  bitcount key    //查看有多少位置1
+  decr key   //decrease,将key中的值减1
+  decrby key value   //将key中的值减去value
+  incr key
+  incrby key value
+  incrbyfloat key value  //用于浮点数的增加
+  get key start end
+  mget key1 key2 ...
+  mset key1 value1 key2 value2 ...
+
+二.list
+  lpush key value1 value2 ...  //在列表头插入
+  lrange key start stop        //从列表头输出
+  lpop key    //返回并删除头元素
+  llen key    //返回列表的长度
+  lindex key index 
+  lset key index value  //修改index位置的值
+  rpush key value1 value2 ...  //在列表尾插入
+  rpop key    //返回并删除列表尾元素
+
+三.hash表
+#一个key可对应多个field,一个field对应一个value
+  hset key field1 value1 field2 value2 ...
+  hget key field
+  hmget key field1 field2 ...
+  hgetall key
+  hkeys key
+  hdel key field1 field2 ...
+
+###############################################################################

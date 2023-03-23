@@ -1,0 +1,125 @@
+###############################################################################
+命令补充
+  
+生成指定秘钥:
+  ssh-keygen -f xx -N ''
+
+传递公钥
+  ssh-copy-id -i xx ip     //i:identity_file,用于传递指定公钥
+
+用ssh访问时就需要指明使用的私钥
+  ssh -i xx ip     //也可以通过修改配置文件:/etc/ssh/ssh_config
+
+###############################################################################
+ansible
+
+有两个集合:主机集合 命令集合   //每个主机都会遍历命令集合
+
+安装ansible     //通过制作yum源安装
+模块:paramiko
+     PyYAML
+     Jinja2
+     httplib2
+     six
+
+###############################################################################
+ansible主机管理(利用的SSH协议)
+
+配置文件查找顺序(找到即停止):     //为了让每个人设置自己的inventory文件
+  ANSIBLE_CONFIG变量定义的配置文件
+  ./ansible.cfg                   //当前目录下
+  ~/ansible.cfg
+  /etc/ansible/ansible.cfg
+
+1.自定义配置文件
+#创建配置文件ansible.cfg
+  [defaults]
+  inventory = xx    //指定托管主机地址的配置文件
+  host_key_checking=False    //连接托管主机时,不需要输入yes
+
+2.配置inventory文件
+  [组名]
+  主机名或ip
+  ...
+#扩展参数: ansible_ssh_port=xx   
+#          ansible_ssh_user=xx
+#          ansible_ssh_private_key_file="xx"
+#
+#给单主机设置,只需要在主机名后加参数即可
+#
+#给组设置
+#[组名:vars]     //组名处可以写all,对所有组生效
+#参数=xx
+#...
+#
+#
+#子组定义:
+#[组名:children]    //该组会拥有下面组的所有主机
+#组1
+#组2
+#...
+
+3.ansible命令
+  ansible 主机集合 命令集合
+
+主机集合:
+  组名或者主机名(多个内容逗号隔开)
+
+命令集合:
+  -m 模块名称 -a 模块参数
+  -i inventory文件路径
+  -e xx    //外部变量
+  --list-hosts     //列出要执行的主机名
+
+
+4.部署公钥和私钥,不然第一次需要输入密码,而且不安全
+
+
+###############################################################################
+常用模块
+#ansible-doc -l       //列出所有模块
+#ansible-doc 模块名   //查看具体模块的用法,查看EXAPLES,很重要
+
+1.ping     //不是真正的ping,测试ssh的连通性
+
+2.command   //默认模块,远程不开启bash执行命令
+             //不用,因为不能使用bash特性
+
+3.shell     //远程开启ash执行命令
+  ansible xx -m shell -a '命令'
+#ansible all -m shell -a "echo ${HOSTNAME}"    //有两次解析,第一次在本机解析.第二次在远程解析
+#ansible all -m shell -a 'echo ${HOSTNAME}'
+#ansible all -m command -a 'echo ${HOSTNAME}'
+#ansible all -m shell -a 'echo \${HOSTNAME}'
+#
+#ansbile all -m shell -a 'chdir=目录 命令"    //切换目录
+#ansible all -m shell -a 'cd 目录;命令"
+
+4.script    //在远程执行脚本,不局限于shell
+  ansible xx -m script -a '脚本名'
+
+5.yum
+  ansible xx -m yum -a 'name=包名 state=installed'
+  ansible xx -m yum -a 'name=包名 state=rmoved'
+
+6.service
+  ansible xx -m service -a 'name=服务名 state=started enabled=yes'
+
+7.copy
+#src:若路径以"/"结尾,则表示复制目录的内容,若不以"/"结尾,则复制该文件夹
+  ansible xx -m copy -a 'src=xx dest=xx'    
+//backup=yes 覆盖前先备份原文件
+
+8.lineinfile   //类似sed的行编辑,修改整行
+  ansible xx -m lineinfile -a 'path=xx regexp=xx line=xx'
+
+9.replace   //类似sed的行编辑,替换字符串
+  ansible xx -m replace -a 'path=xx regexp=xx replace=xx'
+
+10.setup     //统计目标主机的信息
+  ansible xx -m setup -a 'filter=xx'   //过滤某项信息,以JSON格式显示
+
+注意：template 只能用playbook实现    //可以在传递的文件中使用变量
+				     //变量名，是用setup查出来的
+
+###############################################################################
