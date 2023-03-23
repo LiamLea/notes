@@ -1,6 +1,0 @@
-- hosts: all
-  gather_facts: True
-  become: True
-  roles:
-  - { role: "cert-manager", when: "inventory_hostname in groups['work_master']" }
-  - { role: "ingress-nginx", when: "inventory_hostname in groups['work_master']" }

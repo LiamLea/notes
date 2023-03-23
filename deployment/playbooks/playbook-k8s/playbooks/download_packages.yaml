@@ -1,5 +1,0 @@
-- hosts: work_master
-  gather_facts: True
-  become: True
-  roles:
-  - { role: download-packages }

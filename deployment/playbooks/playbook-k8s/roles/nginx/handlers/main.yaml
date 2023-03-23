@@ -1,3 +1,0 @@
-- name: restart nginx
-  shell: docker restart nginx-lb
-  when: nginx_installed.rc == 0

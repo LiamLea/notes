@@ -1,6 +1,0 @@
-[Service]
-{% if docker["http_proxy"]["enabled"] %}
-Environment="HTTP_PROXY={{ docker.http_proxy.server }}"
-Environment="HTTPS_PROXY={{ docker.http_proxy.server }}"
-Environment="NO_PROXY={{ docker['http_proxy']['no_proxy'] | select() | list | join(',') }}"
-{% endif %}

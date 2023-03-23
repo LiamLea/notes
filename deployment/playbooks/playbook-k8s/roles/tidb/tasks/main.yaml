@@ -1,3 +1,0 @@
-- name: setup tidb
-  include_tasks: setup_tidb.yaml
-  when: inventory_hostname in groups["work_master"]

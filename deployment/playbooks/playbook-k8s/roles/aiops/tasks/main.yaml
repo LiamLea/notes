@@ -1,5 +1,0 @@
-- name: init phase
-  include_tasks: init_db.yaml
-
-- name: install phase
-  include_tasks: setup_aiops.yaml
