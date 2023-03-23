@@ -32,7 +32,7 @@
 是一种 数据 序列化和反序列化 协议
 
 #### 2.gRPC
-[参考](../../Architecture/distributed_system/microservice/rpc.md)
+[参考](../../../Architecture/distributed_system/microservice/rpc.md)
 
 ***
 

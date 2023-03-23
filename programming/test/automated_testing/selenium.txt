@@ -1,0 +1,101 @@
+###############################################################################
+自动化测试基础
+
+1.软件开发的生命周期： 
+  需求调研 -> 需求分析评审 -> 软件架构设计 -> 编码 -> 单元测试 -> 集成测试 -> 系统测试 -> 预发布系统测试 -> 上线
+
+2.常用的测试：
+  黑盒测试(功能测试)：功能符合用户的需求
+  白盒测试：知道里面的逻辑，验证符合用户的需求
+  冒烟测试：主功能，主路径测试
+  自动化测试：人工测试转为工具自动执行
+  性能测试：模拟多种峰值和负载去测试各项性能指标（工具：jmeter，loadrunner）
+
+3.自动化测试优点：
+  方便，自动验证功能是否有问题
+  节约人力成本
+  覆盖更全，增加软件的稳定性
+
+适用场景：
+  软件需求变更少，项目周期长，稳定性要强，环境要隔离独立
+  如果整个系统需求变更多，只能抽取部分功能做自动化测试
+  
+###############################################################################
+selenium基础
+
+1.环境准备
+  安装selenium模块
+  下载相应浏览器的驱动，放入python的路径下
+
+2.打开浏览器（即创建驱动）
+  driver=selenium.webdriver.Chrome()
+
+3.打开指定网页
+  driver.get(url)
+
+3.定位元素(一定要唯一)：  
+（1）通过id：	driver.find_element_by_id('xx')
+（2）通过name：	driver.find_element_by_name('xx')
+（3）通过class：	driver.find_element_by_class_name('xx')
+（4）通过a标签的内容：	driver.find_element_by_link_text('xx')      
+（5）通过a标签的部分内容：driver.find_element_by_partial_link_text('xx')
+（6）通过标签名：	driver.find_element_by_tag_name('xx')
+
+4.操作元素
+（1）send_keys('xx')		//网元素内输入内容
+（2）click()		//点击相应元素
+（3）clear()		//清空元素的内容
+（4）back()		//后退页面
+（5）maximize_window()	//最大化窗口
+（6）submit()		//提交表单
+
+5.元素的属性：
+（1）tag_name		//标签名
+（2）text			//文本内容
+
+6.通过 css selector定位（css selector通过拷贝得到）:		
+  driver.find_element_by_css_selector('xx')
+7.通过xpath定位（xpath通过拷贝得到）：
+  driver.find_element_by_path('xx')
+8.css selector和下xpath比较：
+  这两种是最常用的方法，，缺点是太长，看起来不方便
+  css是尽量描述该元素的属性，从而唯一确定一个元素，有时可能会匹配到多个
+  xpath利用路径能够唯一确定一个元素
+
+9.模拟用户事件
+  from selenium.webdriver.common.action_chains import ActionChains
+  ActionChains(driver).事件链(以.隔开）	//这是一个链，最后调用perform()方法时，事件依次执行
+
+事件:
+  click(ele)			//单击某个元素
+  context_click(ele)		//鼠标右键某个元素
+  double_click(ele)		//双击某个元素
+  move_to_element(ele)	//鼠标移动到某个元素，即hover
+  ele.send_keys('xx')		//输入内容到某个元素，输入之前先清空clear()
+
+10.设置等待时间
+（1）强制等待：time.sleep(n)
+（2）隐形等待：driver.implicitly_wait(n)		//最长等待n秒,对下面的查找都有效
+（3）显性等待：				//最长等待n秒，每m秒检测一次，超市没有找到则抛出异常
+  from selenium.webdriver.support.ui import WebDriverWait
+  from selenium.webdriver.common.by import By
+  from selenium.webdriver.support import expected_conditions as EC
+  ele=WebDriverWait(driver,n,m).until(EC.presence_of_element_located((By.xx,'xx'))
+
+###############################################################################
+selenium进阶
+
+1.对弹出的处理：
+（1）出现弹窗后，首先要切换到弹窗
+  win=driver.switch_to_alert()
+（2）处理弹窗
+  win.accept()	//确定
+  win.dismiss()	//取消
+
+2.自动化测试验证码解决方案
+（1）破解验证码：ocr或AI机器学习，不可取
+（2）绕过验证码：让开发人员临时关闭或提供一个万能的验证码
+（3）使用cookie（登录主要是为了拿cookie，获取登录凭证），最常用的方法：
+  driver.add_cookie({'name':'token','value':'xx'})
+
+###############################################################################
