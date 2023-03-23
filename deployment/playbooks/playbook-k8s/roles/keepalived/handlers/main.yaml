@@ -1,3 +1,0 @@
-- name: restart keepalived
-  shell: docker restart keepalived
-  when: keepalived_installed.rc == 0

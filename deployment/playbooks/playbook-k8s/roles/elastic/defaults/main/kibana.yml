@@ -1,5 +1,0 @@
-__config_kibana: |
-  server:
-    basePath: {{ ingress.hosts.kibana.path }}
-    rewriteBasePath: true
-  xpack.security.enabled: true

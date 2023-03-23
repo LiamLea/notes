@@ -1,2 +1,0 @@
-__postgresql_extend_conf: |-
-  max_connections = 100

@@ -1,7 +1,0 @@
-- hosts: harbor
-  gather_facts: True
-  become: True
-  roles:
-  - init
-  - docker
-  - harbor

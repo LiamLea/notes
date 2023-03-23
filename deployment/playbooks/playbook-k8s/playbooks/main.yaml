@@ -1,7 +1,0 @@
-- hosts: cluster
-  gather_facts: True
-  become: True
-  roles:
-  - init
-  - docker
-  - { role: k8s, when: "inventory_hostname in groups['k8s']" }

@@ -1,9 +1,0 @@
-- name: restart ntp
-  service:
-    name: "{{ item }}"
-    state: restarted
-    enabled: true
-  with_items:
-  - ntp
-  - ntpd
-  ignore_errors: true

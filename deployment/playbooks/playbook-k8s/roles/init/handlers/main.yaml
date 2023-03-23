@@ -1,3 +1,0 @@
-- name: reboot host
-  reboot:
-    reboot_timeout: 600

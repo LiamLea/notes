@@ -1,4 +1,0 @@
-keepalived:
-  id: 249
-  vip: 3.1.5.249
-  image: "{{ kubernetes.repository }}/keepalived:stable"

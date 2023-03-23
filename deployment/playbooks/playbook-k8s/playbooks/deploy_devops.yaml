@@ -1,6 +1,0 @@
-- hosts: work_master
-  gather_facts: True
-  become: True
-  roles:
-  - { role: jenkins , when: "devops.jenkins.enabled" }
-  - { role: argocd , when: "devops.argocd.enabled" }

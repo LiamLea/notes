@@ -1,8 +1,0 @@
-- name: check nfs service
-  shell: ss -tulnp src :2049 | grep 2049
-  ignore_errors: True
-  register: nfs_service
-
-- name: start nfs service
-  shell: "docker run -d --name nfs --privileged -v {{ nfs_path }}:/nfsshare -e SHARED_DIRECTORY=/nfsshare -p 2049:2049 --restart always {{ nfs.image }}"
-  when: nfs_service.rc != 0
