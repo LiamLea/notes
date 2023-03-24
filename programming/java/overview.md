@@ -10,7 +10,7 @@
         - [（2）元注解（负责注解其他注解）](#2元注解负责注解其他注解)
         - [（3）自定义注解](#3自定义注解)
         - [（4）与反射的结合](#4与反射的结合)
-      - [2.反射（reflection）](#2反射reflection)
+      - [2.反射 (本质: 根据字符串获取对象)](#2反射-本质-根据字符串获取对象)
 
 <!-- /code_chunk_output -->
 
@@ -48,34 +48,36 @@ public @interface <Annotation_name> {
 通过反射获取到对象的注解信息
 然后执行相应的操作
 
-#### 2.反射（reflection）
+#### 2.反射 (本质: 根据字符串获取对象)
 使java成为准动态语言
 从一个对象或者包名等得到某个类的完整结构
 
 ```java
 public class Test01 {
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+
+        //获取class对象
         Class c1 = Class.forName("com.bongli.test.User");
 
-        //获取类的名称
+        //获取该class对象的名称
         System.out.println(c1.getName());
         System.out.println(c1.getSimpleName());
 
-        //获取类的所有属性
+        //获取该class对象的所有属性
         Field[] fields = c1.getDeclaredFields();
         for (Field field : fields) {
             System.out.println(field);
         }
 
-        //获取本类的所有方法
+        //获取该class对象的所有方法
         Method[] methods = c1.getDeclaredMethods();
         for (Method method :  methods) {
             System.out.println(method);
         }
 
-        //获取构造器
+        //获取该class对象的构造器
         Constructor constructor = c1.getDeclaredConstructor(int.class, String.class, int.class);
-        //通过反射方式调用方法
+        //通过构造器 实例化该class对象
         User user2 = (User)constructor.newInstance(19, "liyi", 1111);
         Method getName = c1.getDeclaredMethod("getName");
         getName.invoke(user2);

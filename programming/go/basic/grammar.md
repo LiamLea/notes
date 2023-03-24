@@ -21,7 +21,7 @@
       - [6.指针](#6指针)
       - [7.定义一个新的类型：type](#7定义一个新的类型type)
       - [8.new和make](#8new和make)
-      - [9.反射:`reflect`](#9反射reflect)
+      - [9.反射:`reflect` (本质: 根据字符串获取对象)](#9反射reflect-本质-根据字符串获取对象)
 
 <!-- /code_chunk_output -->
 
@@ -221,7 +221,7 @@ fmt.Println(s2)
 //&[]
 ```
 
-#### 9.反射:`reflect`
+#### 9.反射:`reflect` (本质: 根据字符串获取对象)
 ```go
 reflect.TypeOf(xx)    //获取对象的类型等信息
 reflect.ValueOf(xx)   //获取对象的值
