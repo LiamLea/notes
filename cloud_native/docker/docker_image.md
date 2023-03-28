@@ -5,9 +5,9 @@
 
 - [docker镜像](#docker镜像)
     - [概述](#概述)
-      - [1.image: a JSON manifest(包含files的信息) + files(config、layer)](#1image-a-json-manifest包含files的信息-filesconfig-layer)
+      - [1.image: a JSON manifest(包含files的信息) + files(config、layer)](#1image-a-json-manifest包含files的信息--filesconfig-layer)
         - [（1）index（在registry中存储会有index）](#1index在registry中存储会有index)
-        - [（2）image content: a JSON manifest(包含files的信息) + files(config、layer)](#2image-content-a-json-manifest包含files的信息-filesconfig-layer)
+        - [（2）image content: a JSON manifest(包含files的信息) + files(config、layer)](#2image-content-a-json-manifest包含files的信息--filesconfig-layer)
         - [（3）snapshot（对于containerd）](#3snapshot对于containerd)
         - [（4）利用ctr查看镜像的content](#4利用ctr查看镜像的content)
       - [2.container](#2container)
@@ -19,8 +19,10 @@
         - [（1） 特点](#1-特点)
         - [（2）`/var/lib/docker/overlay2/<id>/`目录下可能有的内容](#2varlibdockeroverlay2id目录下可能有的内容)
         - [（3）根据overlay2的`<id>`获取`<container_id>`](#3根据overlay2的id获取container_id)
-      - [6.docker registry](#6docker-registry)
-      - [7.打包镜像](#7打包镜像)
+      - [6.docker目录说明: `/var/lib/docker/`](#6docker目录说明-varlibdocker)
+      - [7.containerd目录说明](#7containerd目录说明)
+      - [8.docker registry](#8docker-registry)
+      - [9.打包镜像](#9打包镜像)
 
 <!-- /code_chunk_output -->
 
@@ -167,13 +169,26 @@ docker inspect `docker ps -qa` > /tmp/a.txt
 #然后去/tmp/a.txt中查找`<id>`
 ```
 
-#### 6.docker registry
+#### 6.docker目录说明: `/var/lib/docker/`
+
+|目录|说明|
+|-|-|
+|`overlay2`|存储各层的数据（包括只读层、可写层）|
+|`containers`|存储各容器的metadata（包括`resolve.conf`、`hostname`等|
+
+#### 7.containerd目录说明
+|目录|说明|
+|-|-|
+|`/run/containerd/io.containerd.runtime.v2.task/k8s.io/<container_id>/rootfs/`|只读和可写层merge之后的目录|
+|`/var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/<sandbox(pod)_id>/`|把pod的共享数据放里面（比如网络数据: `resolve.conf`、`hosts`等|
+
+#### 8.docker registry
 一个registry可以存在多个repository（一般一个软件有一个repository，里面存储该软件不通版本的镜像）
 repository可分为"顶层仓库"和"用户仓库"
 用户仓库名称格式：用户名/仓库名
 
 
-#### 7.打包镜像
+#### 9.打包镜像
 可以打包多个镜像
 打包镜像只指定仓库，会将该仓库所有的镜像都打包
 打包镜像指定仓库和标签，只会打包指定镜像

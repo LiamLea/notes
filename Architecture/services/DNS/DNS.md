@@ -13,6 +13,7 @@
         - [（4）forwarding DNS server（转发DNS）](#4forwarding-dns-server转发dns)
       - [3.域名解析时的各项解析记录](#3域名解析时的各项解析记录)
       - [4.DNS的search选项](#4dns的search选项)
+      - [5.`/etc/resolv.conf`最多只有3个nameserver生效](#5etcresolvconf最多只有3个nameserver生效)
     - [使用](#使用)
       - [1.`dig`](#1dig)
 
@@ -84,6 +85,8 @@ ping <HOST>
 * 首先会在本地解析`<HOST>`
 * 当本地无法解析时，会去DNS服务器解析`<HOST>`
 * 当DNS服务器无法解析`<HOST>`时，会加上search中设置的域，即会尝试去DNS服务器解析`<HOST>.<DOMAIN1>`，`<HOST>.<DOMAIN2>`
+
+#### 5.`/etc/resolv.conf`最多只有3个nameserver生效
 
 ***
 

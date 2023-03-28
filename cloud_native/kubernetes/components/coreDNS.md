@@ -6,6 +6,9 @@
 - [coreDNS](#coredns)
     - [概述](#概述)
       - [1.容器如何使用DNS](#1容器如何使用dns)
+      - [2.内存需求](#2内存需求)
+      - [3.forward](#3forward)
+        - [(1) 健康检查](#1-健康检查)
     - [配置](#配置)
       - [1.配置文件：Corefile](#1配置文件corefile)
       - [2.修改配置](#2修改配置)
@@ -26,6 +29,21 @@ kubectl get svc -n kube-system
 --cluster-dns=<dns-service-ip>
 --cluster-domain=<default-local-domain>
 ```
+
+#### 2.内存需求
+
+* 主要受pods和services数量的影响
+[参考](https://github.com/coredns/deployment/blob/master/kubernetes/Scaling_CoreDNS.md)
+
+#### 3.forward
+[参考](https://coredns.io/plugins/forward/)
+
+* 最多只有3个forward nameserver生效
+
+##### (1) 健康检查
+* 会检查forward的nameserver的状态
+  * 如果健康检查失败，就不会将请求发往这些nameserver
+  * 如果所有的upstream健康检查都失败，则会随即发送到其中一个upstream（会引发大量的i/o timeout）
 
 ***
 
