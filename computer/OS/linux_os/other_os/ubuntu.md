@@ -7,6 +7,9 @@
     - [修改网络配置](#修改网络配置)
       - [1.配置文件](#1配置文件)
       - [2.修改DNS](#2修改dns)
+      - [3.使用systemd-resolved管理DNS解析](#3使用systemd-resolved管理dns解析)
+        - [(1) 运行systemd-resolved (相当于在本地启动一个DNS服务)](#1-运行systemd-resolved-相当于在本地启动一个dns服务)
+        - [(2) DNS解析指向该本地服务](#2-dns解析指向该本地服务)
     - [软件相关](#软件相关)
       - [1.下载软件包即其依赖](#1下载软件包即其依赖)
       - [2.安装有依赖关系的包](#2安装有依赖关系的包)
@@ -40,6 +43,37 @@
 ln -fs /run/systemd/resolve/resolv.conf /etc/resolv.conf
 vim /etc/systemd/resolv.conf
 systemctl restart systemd-resolved
+```
+
+#### 3.使用systemd-resolved管理DNS解析
+
+[参考](https://man.archlinux.org/man/resolved.conf.5)
+
+##### (1) 运行systemd-resolved (相当于在本地启动一个DNS服务)
+* 配置文件: `/etc/systemd/resolved.conf`
+  * 指定upstream DNS server
+```shell
+[Resolve]
+#会查询第一个，如果第一个超时，才会查下面的（跟/etc/resolv.conf规则一样）
+DNS=8.8.8.8 114.114.114.114 8.8.4.4
+#当未获取到DNS server，会用这里的
+FallbackDNS=1.1.1.1
+```
+
+* 重启systemd-resolved
+
+* 查看生效结果
+```shell
+cat /run/systemd/resolve/resolv.conf
+```
+
+##### (2) DNS解析指向该本地服务
+```shell
+$ cat /etc/resolv.conf
+
+nameserver 127.0.0.53
+options edns0 trust-ad
+search .
 ```
 
 ***
