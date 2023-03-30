@@ -6,8 +6,11 @@
 - [shadowsocks](#shadowsocks)
     - [使用](#使用)
       - [1.启动shadowsocks client（sock5 proxy）](#1启动shadowsocks-clientsock5-proxy)
-      - [2.启动polipo（http proxy -> sock5 proxy）](#2启动polipohttp-proxy-sock5-proxy)
+      - [2.启动polipo（http proxy -> sock5 proxy）](#2启动polipohttp-proxy---sock5-proxy)
       - [3.验证](#3验证)
+    - [其他使用](#其他使用)
+      - [1.ssh -> sock5 proxy](#1ssh---sock5-proxy)
+        - [(1) 添加ssh配置](#1-添加ssh配置)
 
 <!-- /code_chunk_output -->
 
@@ -39,6 +42,9 @@ docker run --network host --restart always -itd -v /etc/shadowsocks.json:/etc/sh
 
 #### 2.启动polipo（http proxy -> sock5 proxy）
 
+* 注意: http proxy时域名也会丢给proxy进行解析
+  * 所以不存在DNS污染问题
+
 * 配置polipo
 ```shell
 $ mkdir /etc/polipo
@@ -68,3 +74,24 @@ docker run --network host --restart always  -itd -v /etc/polipo:/etc/polipo lsio
 ```shell
 HTTPS_PROXY="http://127.0.0.1:8123" curl https://google.com
 ```
+
+***
+
+### 其他使用
+
+#### 1.ssh -> sock5 proxy
+
+##### (1) 添加ssh配置
+```shell
+vim ~/.ssh/config
+
+#当用ssh协议连接github.com这个域名时进行proxy
+#-X 5 指定proxy协议, 支持: 4 (socks4)、5 (socks5, 默认)、connect (https)
+#127.0.0.1:1080指定proxy的地址
+#指定需要转发的地址，使用变量: %h %p
+Host  github.com
+  ProxyCommand nc -X 5 -x 127.0.0.1:1080 %h %p
+```
+
+* 当无法连接到sock5 proxy时，会报如下错误（请检查sock5 proxy）:
+  * Connection closed by UNKNOWN port 65535

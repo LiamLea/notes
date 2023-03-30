@@ -13,7 +13,12 @@
         - [（4）forwarding DNS server（转发DNS）](#4forwarding-dns-server转发dns)
       - [3.域名解析时的各项解析记录](#3域名解析时的各项解析记录)
       - [4.DNS的search选项](#4dns的search选项)
-      - [5.`/etc/resolv.conf`最多只有3个nameserver生效](#5etcresolvconf最多只有3个nameserver生效)
+      - [5.`/etc/resolv.conf`使用注意](#5etcresolvconf使用注意)
+        - [(1) 最多只有3个nameserver生效](#1-最多只有3个nameserver生效)
+        - [(2) 只会按顺序查询一个nameserver（如果nameserver超时，才会查询下一个）](#2-只会按顺序查询一个nameserver如果nameserver超时才会查询下一个)
+      - [6.DNS security](#6dns-security)
+        - [(1) DNS over TLS](#1-dns-over-tls)
+        - [(2) DNS over HTTPS](#2-dns-over-https)
     - [使用](#使用)
       - [1.`dig`](#1dig)
 
@@ -86,7 +91,24 @@ ping <HOST>
 * 当本地无法解析时，会去DNS服务器解析`<HOST>`
 * 当DNS服务器无法解析`<HOST>`时，会加上search中设置的域，即会尝试去DNS服务器解析`<HOST>.<DOMAIN1>`，`<HOST>.<DOMAIN2>`
 
-#### 5.`/etc/resolv.conf`最多只有3个nameserver生效
+#### 5.`/etc/resolv.conf`使用注意
+
+[参考](https://man7.org/linux/man-pages/man5/resolv.conf.5.html)
+
+##### (1) 最多只有3个nameserver生效
+
+##### (2) 只会按顺序查询一个nameserver（如果nameserver超时，才会查询下一个）
+
+比如： 查询`aa.my.local`域名
+  * 如果第一个nameserver不能查询到结果
+  * 第二个nameserver能查询到结果
+  * 则返回的结果是查询不到结果
+
+#### 6.DNS security
+
+##### (1) DNS over TLS
+
+##### (2) DNS over HTTPS
 
 ***
 
