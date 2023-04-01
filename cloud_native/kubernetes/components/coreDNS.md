@@ -38,7 +38,7 @@ kubectl get svc -n kube-system
 #### 3.forward
 [参考](https://coredns.io/plugins/forward/)
 
-* 最多只有3个forward nameserver生效
+* 最多只有3个forward nameserver生效，会转发到其中一个nameserver
 
 ##### (1) 健康检查
 * 会检查forward的nameserver的状态
@@ -50,7 +50,18 @@ kubectl get svc -n kube-system
 ### 配置
 
 #### 1.配置文件：Corefile
-每一组配置都是一个插件（比如errors是一个插件，health也是一个插件）
+
+[插件参考](https://github.com/coredns/coredns/tree/master/plugin)
+
+* 基本格式
+```shell
+#server block格式，可以设置多个server block
+<zone>:<port> {
+  <plugin> <params> {}
+}
+```
+
+* 常用配置
 ```shell
 # . 表示根域，即所有匹配所有的域
 # 53 表示监听在53端口上
@@ -62,11 +73,13 @@ kubectl get svc -n kube-system
     #将coreDNS状态报告到 http://localhost:8080/health
     health
 
-    #在k8s中的设置
-    #是 cluster.local in-addr.arpa ip6.arpa 这些域的权威域
+    #kubernetes plugin，会读取kubernetes中的配置
+    #匹配域: cluster.local（k8s所在的域） in-addr.arpa、ip6.arpa（rDNS）
     kubernetes cluster.local in-addr.arpa ip6.arpa {
        pods insecure
        upstream
+       #如果这两个域（in-addr.arpa、ip6.arpa）没有查询到结果，则将请求出入下一个插件
+       #即rDNS没有查询结果，则将请求传入下一个插件
        fallthrough in-addr.arpa ip6.arpa
        ttl 30
     }
@@ -78,14 +91,14 @@ kubectl get svc -n kube-system
         #添加域名解析
         172.28.202.162 gitlab.devops.nari
 
-        #如果域匹配了，但是没有任何结果，则将请求出入下一个插件
+        #如果没有查询到结果，则将请求传入下一个插件
         fallthrough
     }
 
     #暴露0.0.0.0:9153端口，提供prometheus的metric接口
     prometheus :9153
 
-    #转发不能解析的域名
+    #转发到下面的其中一个nameserver (如果在上面已经返回了解析结果，就不会走到这一步)
     #. 表示根域，即所有匹配所有的域
     #转发到/etc/resolve.conf中设置的DNS服务器，也可以直接写DNS服务器地址，比如：forward . 114.114.114.114 8.8.8.8
     forward . /etc/resolv.conf

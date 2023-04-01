@@ -9,8 +9,15 @@
       - [2.启动polipo（http proxy -> sock5 proxy）](#2启动polipohttp-proxy---sock5-proxy)
       - [3.验证](#3验证)
     - [其他使用](#其他使用)
-      - [1.ssh -> sock5 proxy](#1ssh---sock5-proxy)
+      - [1.ssh -> socks5 proxy](#1ssh---socks5-proxy)
         - [(1) 添加ssh配置](#1-添加ssh配置)
+      - [2.tcp -> socks5](#2tcp---socks5)
+        - [(1) 安装redsocks](#1-安装redsocks)
+        - [(2) 设置iptables规则，将tcp流量转发到redsocks](#2-设置iptables规则将tcp流量转发到redsocks)
+        - [(3)不能使用http proxy这种应用层转发方式将流量转发给redsocks](#3不能使用http-proxy这种应用层转发方式将流量转发给redsocks)
+        - [(4) 测试](#4-测试)
+      - [3.udp -> socks5（比较复杂）](#3udp---socks5比较复杂)
+      - [4.DNS -> tcp -> socks](#4dns---tcp---socks)
 
 <!-- /code_chunk_output -->
 
@@ -79,7 +86,7 @@ HTTPS_PROXY="http://127.0.0.1:8123" curl https://google.com
 
 ### 其他使用
 
-#### 1.ssh -> sock5 proxy
+#### 1.ssh -> socks5 proxy
 
 ##### (1) 添加ssh配置
 ```shell
@@ -95,3 +102,67 @@ Host  github.com
 
 * 当无法连接到sock5 proxy时，会报如下错误（请检查sock5 proxy）:
   * Connection closed by UNKNOWN port 65535
+
+#### 2.tcp -> socks5
+
+##### (1) 安装redsocks
+* 配置: `/etc/redsocks.conf`
+```go
+base {
+  log_debug = on;
+  log_info = on;
+  log = "stderr";
+  daemon = off;
+  user = redsocks;
+  group = redsocks;
+  redirector = iptables;
+}
+
+redsocks {
+  //本地监听地址
+  local_ip = 0.0.0.0;
+  local_port = 12345;
+
+  //socks5地址
+  type = socks5;
+  ip = 127.0.0.1;
+  port = 1080;
+}
+```
+
+* 启动服务
+```shell
+docker run --rm --privileged=true  -itd --network host -v /etc/redsocks.conf:/etc/redsocks.conf --entrypoint /usr/sbin/redsocks  ncarlier/redsocks -c /etc/redsocks.conf
+```
+
+##### (2) 设置iptables规则，将tcp流量转发到redsocks
+* 注意:
+  * iptables的output不影响回复流量（即对方发起的，然后需要回复给对方的流量）
+```shell
+iptables -t nat -N REDSOCKS
+#设置哪些不转发
+iptables -t nat -A REDSOCKS -d 0.0.0.0/8 -j RETURN
+iptables -t nat -A REDSOCKS -d 127.0.0.0/8 -j RETURN
+iptables -t nat -A REDSOCKS -d 172.17.0.0/24 -j RETURN
+iptables -t nat -A REDSOCKS -d 192.168.0.0/16 -j RETURN
+#其余的都转发
+iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345
+
+#使规则生效
+iptables -t nat -A OUTPUT -p tcp   -j REDSOCKS
+```
+
+##### (3)不能使用http proxy这种应用层转发方式将流量转发给redsocks
+因为使用tcp proxy和http proxy转发的内容是不一样的
+* 比如需要转发https请求时
+  * http proxy转发，是将http的请求内容转发过去
+  * 而tcp proxy转发，则将TLS转发过去
+
+##### (4) 测试
+```shell
+curl https://google.com
+```
+
+#### 3.udp -> socks5（比较复杂）
+
+#### 4.DNS -> tcp -> socks

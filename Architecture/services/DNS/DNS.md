@@ -19,6 +19,11 @@
       - [6.DNS security](#6dns-security)
         - [(1) DNS over TLS](#1-dns-over-tls)
         - [(2) DNS over HTTPS](#2-dns-over-https)
+        - [(3) 常用DOT和DOH的nameserver](#3-常用dot和doh的nameserver)
+      - [7.reverse DNS (ip -> domain name)](#7reverse-dns-ip---domain-name)
+        - [(1) why](#1-why)
+        - [(2) 前提： 只有存在PTR记录的域名，才能做reverse DNS](#2-前提-只有存在ptr记录的域名才能做reverse-dns)
+        - [(3) 工作原理（以10.107.93.137为例）](#3-工作原理以1010793137为例)
     - [使用](#使用)
       - [1.`dig`](#1dig)
 
@@ -51,32 +56,22 @@
 
 #### 3.域名解析时的各项解析记录
 
-* A记录
-  将域名指向一个IPv4地址
-</br>
-* AAA记录
-  将域名指向一个IPv6地址
-</br>
-* CNAME记录
-  该域名的别名
-</br>
-* MX记录
-指向邮件服务器地址
-</br>
-* NS记录
-域名解析服务器记录
-</br>
-* TXT记录
-  可任意填写，可为空
-</br>
-* SRV记录
-  服务记录(记录了哪台计算机提供了哪个服务)
-</br>
-* SOA记录
-  SOA叫做起始授权机构记录，NS用于标识多台域名解析服务器，SOA记录用于在众多NS记录中那一台是主服务器
-</br>
-* PTR记录
-  PTR记录是A记录的逆向记录，又称做IP反查记录或指针记录，负责将IP反向解析为域名
+```shell
+#获取一个server的所有记录，下面列出的记录，不是一定都有的
+dig <server> any
+```
+
+|记录|对应内容|说明|
+|-|-|-|
+|A|ip地址||
+|AAAA|ipv6地址||
+|NS|域名服务器||
+|SRV|服务记录(记录了哪台计算机提供了哪个服务)|
+|SOA|起始授权机构记录，NS用于标识多台域名解析服务器，SOA记录用于在众多NS记录中那一台是主服务器|
+|CNAME|域名的别名|
+|MX|邮件服务地址|
+|TXT|说明信息|
+|PTR|用于reverse DNS|记录的格式: `<ip反写>.in-addr.arpa` 或 `<ipv6反写>.in6.arpa`|
 
 #### 4.DNS的search选项
 ```shell
@@ -109,6 +104,75 @@ ping <HOST>
 ##### (1) DNS over TLS
 
 ##### (2) DNS over HTTPS
+
+##### (3) 常用DOT和DOH的nameserver
+[参考](https://dnsprivacy.org/public_resolvers/)
+
+#### 7.reverse DNS (ip -> domain name)
+
+[参考](https://phoenixnap.com/kb/reverse-dns-lookup)
+
+##### (1) why
+* 过滤垃圾邮件
+* 有一些协议需要rDNS的支持
+* 
+
+##### (2) 前提： 只有存在PTR记录的域名，才能做reverse DNS
+* 不存在PTR记录时
+```shell
+$ dig baidu.com any
+
+; <<>> DiG 9.18.1-1ubuntu1.3-Ubuntu <<>> baidu.com any
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 44719
+;; flags: qr rd ra; QUERY: 1, ANSWER: 17, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 65494
+;; QUESTION SECTION:
+;baidu.com.			IN	ANY
+
+;; ANSWER SECTION:
+baidu.com.		6872	IN	SOA	dns.baidu.com. sa.baidu.com. 2012146352 300 300 2592000 7200
+baidu.com.		6872	IN	TXT	"google-site-verification=GHb98-6msqyx_qqjGl5eRatD3QTHyVB6-xQ3gJB5UwM"
+baidu.com.		6872	IN	TXT	"_globalsign-domain-verification=qjb28W2jJSrWj04NHpB0CvgK9tle5JkOq-EcyWBgnE"
+baidu.com.		6872	IN	TXT	"v=spf1 include:spf1.baidu.com include:spf2.baidu.com include:spf3.baidu.com include:spf4.baidu.com a mx ptr -all"
+baidu.com.		6872	IN	MX	10 mx.maillb.baidu.com.
+baidu.com.		6872	IN	MX	20 mx50.baidu.com.
+baidu.com.		6872	IN	MX	20 mx1.baidu.com.
+baidu.com.		6872	IN	MX	20 jpmx.baidu.com.
+baidu.com.		6872	IN	MX	15 mx.n.shifen.com.
+baidu.com.		6872	IN	MX	20 usmx01.baidu.com.
+baidu.com.		272	IN	A	39.156.66.10
+baidu.com.		272	IN	A	110.242.68.66
+baidu.com.		21272	IN	NS	dns.baidu.com.
+baidu.com.		21272	IN	NS	ns3.baidu.com.
+baidu.com.		21272	IN	NS	ns7.baidu.com.
+baidu.com.		21272	IN	NS	ns2.baidu.com.
+baidu.com.		21272	IN	NS	ns4.baidu.com.
+
+;; Query time: 9243 msec
+;; SERVER: 127.0.0.53#53(127.0.0.53) (TCP)
+;; WHEN: Fri Mar 31 15:01:11 CST 2023
+;; MSG SIZE  rcvd: 631
+
+
+$ nslookup 39.156.66.10
+** server can't find 10.66.156.39.in-addr.arpa: NXDOMAIN
+```
+
+* 当存在PTR记录时
+```shell
+$ nslookup 10.107.93.137
+Server:		10.96.0.10
+Address:	10.96.0.10:53
+
+137.93.107.10.in-addr.arpa	name = grafana.monitor.svc.cluster.local
+```
+
+##### (3) 工作原理（以10.107.93.137为例）
+将`10.107.93.137` -转换成-> `137.93.107.10.in-addr.arpa` -查询DNS-> 得到结果
 
 ***
 
