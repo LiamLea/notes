@@ -9,7 +9,9 @@
       - [2.修改DNS](#2修改dns)
       - [3.使用systemd-resolved管理DNS解析](#3使用systemd-resolved管理dns解析)
         - [(1) 运行systemd-resolved (相当于在本地启动一个DNS服务)](#1-运行systemd-resolved-相当于在本地启动一个dns服务)
-        - [(2) DNS解析指向该本地服务](#2-dns解析指向该本地服务)
+        - [(2) 关闭interface上的DNS (使用NetworkManager时这样关闭)](#2-关闭interface上的dns-使用networkmanager时这样关闭)
+        - [(3) DNS解析指向该本地服务](#3-dns解析指向该本地服务)
+        - [(4) 管理DNS命令: resolvectl](#4-管理dns命令-resolvectl)
     - [软件相关](#软件相关)
       - [1.下载软件包即其依赖](#1下载软件包即其依赖)
       - [2.安装有依赖关系的包](#2安装有依赖关系的包)
@@ -54,10 +56,16 @@ systemctl restart systemd-resolved
   * 指定upstream DNS server
 ```shell
 [Resolve]
+#注意: 如果interface上设置了DNS，会优先使用interface上的
 #会查询第一个，如果第一个超时，才会查下面的（跟/etc/resolv.conf规则一样）
 DNS=8.8.8.8 114.114.114.114 8.8.4.4
 #当未获取到DNS server，会用这里的
 FallbackDNS=1.1.1.1
+#使用DNS over TLS协议
+DNSOverTLS=true
+
+#会读取/etc/hosts作为dns server的条目
+#ReadEtcHosts=yes
 ```
 
 * 重启systemd-resolved
@@ -67,13 +75,73 @@ FallbackDNS=1.1.1.1
 cat /run/systemd/resolve/resolv.conf
 ```
 
-##### (2) DNS解析指向该本地服务
+##### (2) 关闭interface上的DNS (使用NetworkManager时这样关闭)
+* interface上设置DNS时
+
+```shell
+#下面生效的DNS是172.20.10.1
+$ resolvectl status 
+Global
+           Protocols: -LLMNR -mDNS +DNSOverTLS DNSSEC=no/unsupported
+    resolv.conf mode: stub
+  Current DNS Server: 9.9.9.9
+         DNS Servers: 8.8.8.8 9.9.9.9 8.8.4.4
+Fallback DNS Servers: 1.1.1.1
+
+Link 2 (wlp0s20f3)
+    Current Scopes: DNS
+         Protocols: +DefaultRoute +LLMNR -mDNS +DNSOverTLS DNSSEC=no/unsupported
+Current DNS Server: 172.20.10.1
+       DNS Servers: 172.20.10.1 fe80::855:4e1c:5315:fb1b%22099
+
+```
+
+* 关闭interface上的DNS
+```shell
+$ vim /etc/NetworkManager/conf.d/dns.conf
+
+[main]
+dns=none
+systemd-resolved=false
+
+$ systemctl restart NetworkManager
+```
+
+* 查看是否设置成功
+```shell
+$ resolvectl status 
+Global
+           Protocols: -LLMNR -mDNS +DNSOverTLS DNSSEC=no/unsupported
+    resolv.conf mode: stub
+  Current DNS Server: 9.9.9.9
+         DNS Servers: 8.8.8.8 9.9.9.9 8.8.4.4
+Fallback DNS Servers: 1.1.1.1
+
+Link 2 (wlp0s20f3)
+Current Scopes: none
+     Protocols: -DefaultRoute +LLMNR -mDNS +DNSOverTLS DNSSEC=no/unsupported
+```
+
+##### (3) DNS解析指向该本地服务
 ```shell
 $ cat /etc/resolv.conf
 
 nameserver 127.0.0.53
 options edns0 trust-ad
 search .
+```
+
+##### (4) 管理DNS命令: resolvectl
+
+* 查看DNS状态
+```shell
+resolvectl status 
+```
+
+* 调整systemd-resolved日志级别
+```shell
+#info等
+resolvectl log-level debug 
 ```
 
 ***

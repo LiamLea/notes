@@ -37,6 +37,7 @@
         - [（4）删除自定义链](#4删除自定义链)
       - [8.通过文件批量修改iptables规则](#8通过文件批量修改iptables规则)
       - [9.持久化iptables规则](#9持久化iptables规则)
+      - [10.iptables的output不影响回复流量（即对方发起的，然后需要回复给对方的流量）](#10iptables的output不影响回复流量即对方发起的然后需要回复给对方的流量)
     - [调试iptables](#调试iptables)
       - [1.利用LOG target（建议）](#1利用log-target建议)
       - [2.利用TRACE target（终极办法）](#2利用trace-target终极办法)
@@ -276,6 +277,8 @@ iptables-restore < /tmp/iptables.rules
 #### 9.持久化iptables规则
 默认重启后，iptables就会清空
 可以在redhat上安装`iptables-services`，在debian上安装`iptables-persistent`，从而能够实现iptables规则持久化（本质就是利用iptables save/restore命令）
+
+#### 10.iptables的output不影响回复流量（即对方发起的，然后需要回复给对方的流量）
 
 ***
 
