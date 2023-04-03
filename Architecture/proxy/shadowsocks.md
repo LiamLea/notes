@@ -12,10 +12,11 @@
       - [1.ssh -> socks5 proxy](#1ssh---socks5-proxy)
         - [(1) 添加ssh配置](#1-添加ssh配置)
       - [2.tcp -> socks5](#2tcp---socks5)
-        - [(1) 安装redsocks](#1-安装redsocks)
-        - [(2) 设置iptables规则，将tcp流量转发到redsocks](#2-设置iptables规则将tcp流量转发到redsocks)
-        - [(3)不能使用http proxy这种应用层转发方式将流量转发给redsocks](#3不能使用http-proxy这种应用层转发方式将流量转发给redsocks)
-        - [(4) 测试](#4-测试)
+        - [(1) 注意（重要）](#1-注意重要)
+        - [(2) 安装redsocks](#2-安装redsocks)
+        - [(3) 设置iptables规则，将tcp流量转发到redsocks](#3-设置iptables规则将tcp流量转发到redsocks)
+        - [(4)不能使用http proxy这种应用层转发方式将流量转发给redsocks](#4不能使用http-proxy这种应用层转发方式将流量转发给redsocks)
+        - [(5) 测试](#5-测试)
       - [3.udp -> socks5（比较复杂）](#3udp---socks5比较复杂)
       - [4.DNS -> tcp -> socks](#4dns---tcp---socks)
 
@@ -105,7 +106,17 @@ Host  github.com
 
 #### 2.tcp -> socks5
 
-##### (1) 安装redsocks
+##### (1) 注意（重要）
+* proxy server需要获取original destination
+  * 因为改变了tcp的destination
+    * 如果不获取original destination，proxy server不知道将数据包转发到哪里
+    * 使用http proxy就不会存在这样的问题，因为http请求里包含了original destination信息
+  * 方法:
+    * 可以通过tcp socket的特性获取original destination
+    * 通过iptables的TPROXY target进行处理（不用REDIRET）
+      * [TPROXY参考](https://powerdns.org/tproxydoc/tproxy.md.html)
+
+##### (2) 安装redsocks
 * 配置: `/etc/redsocks.conf`
 ```go
 base {
@@ -115,6 +126,7 @@ base {
   daemon = off;
   user = redsocks;
   group = redsocks;
+  //说明使用的转发方式，需要根据具体的转发方式，获取到original destination
   redirector = iptables;
 }
 
@@ -135,7 +147,7 @@ redsocks {
 docker run --rm --privileged=true  -itd --network host -v /etc/redsocks.conf:/etc/redsocks.conf --entrypoint /usr/sbin/redsocks  ncarlier/redsocks -c /etc/redsocks.conf
 ```
 
-##### (2) 设置iptables规则，将tcp流量转发到redsocks
+##### (3) 设置iptables规则，将tcp流量转发到redsocks
 * 注意:
   * iptables的output不影响回复流量（即对方发起的，然后需要回复给对方的流量）
 ```shell
@@ -152,17 +164,22 @@ iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 12345
 iptables -t nat -A OUTPUT -p tcp   -j REDSOCKS
 ```
 
-##### (3)不能使用http proxy这种应用层转发方式将流量转发给redsocks
+##### (4)不能使用http proxy这种应用层转发方式将流量转发给redsocks
 因为使用tcp proxy和http proxy转发的内容是不一样的
 * 比如需要转发https请求时
   * http proxy转发，是将http的请求内容转发过去
   * 而tcp proxy转发，则将TLS转发过去
 
-##### (4) 测试
+##### (5) 测试
 ```shell
 curl https://google.com
 ```
 
 #### 3.udp -> socks5（比较复杂）
+存在和tcp一样的问题，即需要获取original destination
+由于udp socket没有获取original destination的特性，所有需要使用其他方式
+* TPROXY
+* 在配置文件中指定original destination信息
+  * 这样只能服务一种应用层协议，比如DNS（那original destination信息就设置为DNS服务器的地址）
 
 #### 4.DNS -> tcp -> socks

@@ -20,6 +20,7 @@
         - [（2）ceph-mds（metadata server）](#2ceph-mdsmetadata-server)
         - [（3）RGW（rados gateway）](#3rgwrados-gateway)
       - [4.目录规划](#4目录规划)
+      - [5.strong replication consistency](#5strong-replication-consistency)
     - [RADOS](#rados)
       - [1.基础概念](#1基础概念)
         - [（1）bluestore（一个osd是一个bluestore）](#1bluestore一个osd是一个bluestore)
@@ -32,6 +33,7 @@
         - [（1）两类pool](#1两类pool)
         - [（2）pool的相关参数](#2pool的相关参数)
         - [（3）pool需要与application关联](#3pool需要与application关联)
+        - [size vs min_size](#size-vs-min_size)
       - [4.placement group](#4placement-group)
         - [（1）原理](#1原理)
         - [（2）为什么需要pg](#2为什么需要pg)
@@ -115,6 +117,9 @@
 #### 4.目录规划
 * 日志路径：`/var/log/ceph/`
 * 数据路径：`/var/lib/ceph/`
+
+#### 5.strong replication consistency
+即当副本数 < min_size时，才能进行I/O（即不能读写）
 
 ***
 
@@ -205,6 +210,10 @@ ceph osd pool set <pool_name> <key> <value>
 #CephFS和RGW会自动关联，不需要明确执行这个命令
 ceph osd pool application enable {pool-name} {application-name}
 ```
+
+##### size vs min_size
+当副本数 < size时，会进入degrade状态，不会影响I/O（即读写）
+当副本书 < min_size时，则无法进行I/O
 
 #### 4.placement group
 实现数据的分发
