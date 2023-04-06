@@ -11,9 +11,6 @@
       - [2.hybrid cloud](#2hybrid-cloud)
         - [（1）混合云中可以包含哪些环境](#1混合云中可以包含哪些环境)
         - [（2）不同环境如何进行通信](#2不同环境如何进行通信)
-      - [3.基础概念](#3基础概念)
-        - [（1）failure domain（故障域）](#1failure-domain故障域)
-        - [（2）zone vs region](#2zone-vs-region)
 
 <!-- /code_chunk_output -->
 
@@ -54,14 +51,3 @@
 * API
 * VPN
 * WAN
-
-#### 3.基础概念
-
-##### （1）failure domain（故障域）
-一个故障域，就是其中某个资源出现问题，会相互影响
-不同的故障域，资源是相互独立的，不会影响到对方
-
-##### （2）zone vs region
-zone是部署区域，一个zone是一个故障域
-region是地理区域，由地理位置靠近的zone组成，一个region也是一个故障域（防止某地因为发生自然灾害，导致该地区的服务不可用）
-![](./imgs/overview_02.png)

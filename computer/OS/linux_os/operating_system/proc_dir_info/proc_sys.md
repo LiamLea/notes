@@ -6,12 +6,12 @@
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 <!-- code_chunk_output -->
 
-- [`/proc/sys/` —— 内核有关参数](#procsys-内核有关参数)
-    - [`/proc/sys/kernel` —— 内核参数](#procsyskernel-内核参数)
+- [`/proc/sys/` —— 内核有关参数](#procsys--内核有关参数)
+    - [`/proc/sys/kernel` —— 内核参数](#procsyskernel--内核参数)
       - [1.`/proc/sys/kernel/sysrq`](#1procsyskernelsysrq)
       - [2.`/proc/sys/kernel/printk`](#2procsyskernelprintk)
       - [3.`/proc/sys/kernel/panic`](#3procsyskernelpanic)
-    - [`/proc/sys/vm` —— 虚拟内存参数](#procsysvm-虚拟内存参数)
+    - [`/proc/sys/vm` —— 虚拟内存参数](#procsysvm--虚拟内存参数)
       - [1.`/proc/sys/vm/overcommit_memory`](#1procsysvmovercommit_memory)
       - [2.`/proc/sys/vm/overcommit_kbytes`](#2procsysvmovercommit_kbytes)
       - [3.`/pro/sys/vm/overcommit_ratio`](#3prosysvmovercommit_ratio)
@@ -20,19 +20,19 @@
       - [6.`/proc/sys/vm/max_map_count`](#6procsysvmmax_map_count)
       - [7.`/proc/sys/vm/drop_cache`](#7procsysvmdrop_cache)
       - [8.`/proc/sys/vm/block_dump`](#8procsysvmblock_dump)
-    - [`/proc/sys/fs` —— 文件系统参数](#procsysfs-文件系统参数)
+    - [`/proc/sys/fs` —— 文件系统参数](#procsysfs--文件系统参数)
       - [1.`/proc/sys/fs/file-max`](#1procsysfsfile-max)
       - [2.`/proc/sys/fs/file-nr`](#2procsysfsfile-nr)
-      - [3.`ulimit -Hn`（不要用root用户查看）](#3ulimit-hn不要用root用户查看)
+      - [3.`ulimit -Hn`（不要用root用户查看）](#3ulimit--hn不要用root用户查看)
     - [进程和线程相关参数](#进程和线程相关参数)
       - [1.`/proc/sys/kernel/pid_max`](#1procsyskernelpid_max)
       - [2.`/proc/sys/kernel/threads-max`](#2procsyskernelthreads-max)
-      - [3.`ulimit -u`（不要用root用户查看）](#3ulimit-u不要用root用户查看)
+      - [3.`ulimit -u`（不要用root用户查看）](#3ulimit--u不要用root用户查看)
       - [4.进程的运行参数](#4进程的运行参数)
-    - [`/proc/sys/net` —— 网络参数](#procsysnet-网络参数)
+    - [`/proc/sys/net` —— 网络参数](#procsysnet--网络参数)
       - [1.socket buffer](#1socket-buffer)
       - [2.all和default和eth*的区别](#2all和default和eth的区别)
-      - [3.`/proc/sys/net/ipv4/ —— ipv4相关参数](#3procsysnetipv4-ipv4相关参数)
+      - [3.`/proc/sys/net/ipv4/ —— ipv4相关参数](#3procsysnetipv4--ipv4相关参数)
         - [（1）`/proc/sys/net/ipv4/ip_local_port_range`](#1procsysnetipv4ip_local_port_range)
         - [（2）`/proc/sys/net/ipv4/icmp_echo_ignore_all`](#2procsysnetipv4icmp_echo_ignore_all)
         - [（3）`/proc/sys/net/ipv4/icmp_echo_ignore_broadcasts`](#3procsysnetipv4icmp_echo_ignore_broadcasts)
@@ -43,13 +43,15 @@
 
 <!-- /code_chunk_output -->
 
+[参考](https://www.kernel.org/doc/html/latest/admin-guide/sysctl/index.html)
+
 ### `/proc/sys/kernel` —— 内核参数
 
 #### 1.`/proc/sys/kernel/sysrq`
-sysrq功能：可以在系统出现故障的时候协助恢复和调试系统，只要系统还能响应键盘的按键中断
+system request：允许发起系统请求（可以在系统出现故障的时候协助恢复和调试系统，只要系统还能响应键盘的按键中断）
 ```shell
 echo 1 > /proc/sys/kernel/sysrq     #开启sysrq功能
-echo h > /proc/sysrq-trigger        #查看帮助
+echo h > /proc/sysrq-trigger        #查看帮助(会打印到系统日志中)
 echo f > /proc/sysrq-trigger        #人为触发OOM killer
 ```
 
