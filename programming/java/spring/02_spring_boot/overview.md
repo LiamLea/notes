@@ -46,13 +46,15 @@ public class MainApplication {
 }
 ```
 
+[参考spring](../01_spring_framework/IoC_container.md)
+
 ##### （1）创建SpringApplication
 
 注意下面要寻找的内容都在：`META-INF/spring.factories`中
 * 保存一些信息
 * 判断当前应用类型（比如: servlet）
 * 寻找 启动引导器（bootstrappers）
-* 寻找 应用初始化器（ApplicationCOntextInitializers）
+* 寻找 应用初始化器（ApplicationContextInitializers）
 * 寻找 应用监听器（ApplicationListeners）
   * 应用监听器就是一种事件触发机制，当启动到某一个过程，会调用相应的监听器，从而触发相应的动作
   * 每个模块都可以自定义监听器，都会被spring找到，到时候会触发
