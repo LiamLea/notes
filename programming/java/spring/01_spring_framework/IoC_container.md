@@ -22,6 +22,9 @@
         - [(2) 如何存储创建的bean对象](#2-如何存储创建的bean对象)
         - [(3)容器如何管理bean对象](#3容器如何管理bean对象)
       - [2.循环依赖问题](#2循环依赖问题)
+      - [3.spring源码解析](#3spring源码解析)
+        - [(1) 启动流程](#1-启动流程)
+        - [(2) 创建bean（在上面的好几个阶段都可能有bean的创建）](#2-创建bean在上面的好几个阶段都可能有bean的创建)
 
 <!-- /code_chunk_output -->
 
@@ -205,8 +208,6 @@ public class DataConfig {
 
 ### 源码分析
 
-![](./imgs/IoC_container_01.png)
-
 #### 1.基础
 ##### (1) 怎么知道要创建什么bean对象
 * 配置文件
@@ -230,3 +231,46 @@ public class DataConfig {
         * 这样即使初始化未完成，也能进行对象赋值
         * 一级缓存: 存放完整的bean对象
         * 二级和三级缓存: 用于过渡，存放实例化但未初始化的bean对象
+
+#### 3.spring源码解析
+
+* beanFactory是管理bean对象的接口
+* ApplicationContext是IoC容器，存储和管理bean对象的类（这个类实现了beanFactory这个接口）
+* `META-INF/spring.factories`
+    * 用于指定AutoConfiguration Classes
+    * 为什么需要这个文件: 
+        * 因为我们整个项目里面的入口文件只会扫描整个项目里面下的@Compont @Configuration等注解，但是如果我们是引用了其他jar包，而其他jar包只有@Bean或者@Compont等注解，是不会扫描到的。
+
+##### (1) 启动流程
+* 创建SpringApplication
+    * 初始化一些变量
+        * webapplicationtype（比如 servelet）
+        * set initializer
+            * 在META-INFO/spring.factories中寻找ApplicationContextInitializer
+        * set listener
+            * 在META-INFO/spring.factories中寻找ApplicationListener
+* 执行SpringApplication run方法
+    * 读取environment信息（即配置文件、环境变量等）
+    * create IoC容器: createApplicationContext()
+    * prepare IoC容器
+        * 设置environment、listener等
+        * 应用初始化器
+    * refresh IoC容器
+        * prepareRefresh()
+            * 设置environment、listener等
+        * 创建beanFactory 
+        * invokeBeanFactoryPostProcessors()
+            * 自动装配: 加载所有beanDefinition
+        * 在beanFactory中注册beanPostProcessors
+        * 创建web server: onRefresh()
+        
+##### (2) 创建bean（在上面的好几个阶段都可能有bean的创建）
+* 实例化: createBeanInstance()
+* 属性赋值: populateBean()
+* 初始化: initializeBean()
+    * 根据bean类型进行相关对象赋值: invokeAwareMethods()
+    * beanPostProcessorsBeforeInitialization
+    * invokeInitMethod
+    * beanPostProcessorsAfterInitialization
+
+![](./imgs/IoC_container_02.png)

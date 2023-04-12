@@ -34,6 +34,7 @@
 |注解|说明|
 |-|-|
 |`@Import`|给容器中注册指定组件（即创建对象）|
+|`@EnableAutoConfiguration` 配合 `META-INF/spring.factories`文件|实现自动创建bean对象|
 |`@Conditional*`|满足指定条件，则注册组件|
 |`@Autowired`|自动装配（根据类型），自动装配的作用：用户可以使用容器内的组件|
 |`@Resource`|自动装配（根据类型或名称）|
