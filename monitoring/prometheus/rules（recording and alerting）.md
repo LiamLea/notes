@@ -14,6 +14,8 @@
       - [1.recording rule的格式](#1recording-rule的格式)
     - [alerting rule（告警规则）](#alerting-rule告警规则)
       - [1.alerting rule的格式](#1alerting-rule的格式)
+        - [(1) 发送的告警格式](#1-发送的告警格式)
+        - [(2) 告警模板](#2-告警模板)
 
 <!-- /code_chunk_output -->
 
@@ -91,4 +93,19 @@ annotations:
 #   description: "描述信息"
 #   summary: "概述信息"
 #   value: '{{ $value }}'
+```
+
+##### (1) 发送的告警格式
+[参考](https://prometheus.io/docs/alerting/latest/notifications/)
+
+##### (2) 告警模板
+```yaml
+- alert: BlackboxProbeFailed
+  annotations:
+    description: "value = {{ $value }}"
+    summary: "Blackbox probe failed: {{ $labels.instance }}"
+  expr: probe_success == 0
+  for: 1m
+  labels:
+    severity: critical
 ```
