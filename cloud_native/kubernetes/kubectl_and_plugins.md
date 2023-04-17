@@ -333,5 +333,6 @@ HTTPS_PROXY="http://10.10.10.250:8123" kubectl krew install <plugin>
 ```shell
 #过滤: -f "port 9848"
 #如果不输出成文件，需要存在wireshark
+#当权限不足时，使用: -p
 kubectl sniff <pod_name>  -o /tmp/<xx>.pcap
 ```
