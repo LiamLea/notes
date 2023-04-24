@@ -42,3 +42,10 @@
 
 ##### （3）bus大致架构
 ![](./imgs/overview_05.png)
+
+#### 4.cpu
+
+##### (1) frequency
+
+* 决定了多少cpu cycles per second
+  * 一个cpu cyclie能够执行一些操作
