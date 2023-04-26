@@ -22,6 +22,7 @@
       - [7.定义一个新的类型：type](#7定义一个新的类型type)
       - [8.new和make](#8new和make)
       - [9.反射:`reflect` (本质: 根据字符串获取对象)](#9反射reflect-本质-根据字符串获取对象)
+      - [10.范型和interface{}](#10范型和interface)
 
 <!-- /code_chunk_output -->
 
@@ -148,6 +149,9 @@ else {
 for <初始语句>;<条件表达式>;<每次循环的结束语句> {
   ...
 }
+
+//比如:
+for i, j, k := 0, 0, 0; j < lb || k < lc; {}
 ```
 
 * 无限循环（类似于while）
@@ -209,8 +213,14 @@ type <new_type_name> <underlying_type>
 
 #### 8.new和make
 都是用来分配内存的
-new会指向已经初始化的内存空间，返回的是指针
-make分配内存并初始化，返回的是数据（一般用于slice、map以及channel）
+* `new(T)`分配内存并用0填充
+  * 返回的是`*T`
+  * `new(map[int]int)`，就无法初始化，因为无法指定map的大小
+  * `new([10]int)`用0填充这个列表
+* `make(T,...)`分配内存并**初始化**
+  * 返回的是`T`
+    * 所以不能make(int)这些，因为int等基础类型返回的是指针
+    * make相当于这些类型的构造函数: slice、map、channel
 
 ```go
 s1 := make([]int, 10)     //等价于s1 := new([10]int)
@@ -226,3 +236,17 @@ fmt.Println(s2)
 reflect.TypeOf(xx)    //获取对象的类型等信息
 reflect.ValueOf(xx)   //获取对象的值
 ```
+
+#### 10.范型和interface{}
+* interface{} 类型不能比较大小
+* 范型是对interface{}的扩展： 能使得其支持具体类型的操作
+  * 比如支持比较大小的操作
+    ```go
+    func compare[T constraints.Ordered](a, b T) {
+        // works
+        if a > b {
+            fmt.Printf("%v is bigger than %v", a, b)
+        }
+    }
+    ```
+
