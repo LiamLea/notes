@@ -11,6 +11,7 @@
       - [2.度量算法](#2度量算法)
         - [(1) 时间复杂度: T(n)](#1-时间复杂度-tn)
         - [(2) 空间复杂度: S(n)](#2-空间复杂度-sn)
+        - [(3) 常见复杂度估算](#3-常见复杂度估算)
       - [3.asymptotic notions](#3asymptotic-notions)
         - [(1) O (big O: order of the function，函数的阶)](#1-o-big-o-order-of-the-function函数的阶)
         - [(2) Ω (big Omega: last letter of greek alphbet)](#2-ω-big-omega-last-letter-of-greek-alphbet)
@@ -47,6 +48,13 @@
 ##### (1) 时间复杂度: T(n)
 
 ##### (2) 空间复杂度: S(n)
+
+##### (3) 常见复杂度估算
+
+|表达时|复杂度|
+|-|-|
+|`T(n) = T(n/2) + O(1)`|`O(logn)`|
+|`T(n) = T(n/2) + O(n)`|`O(nlog)`|
 
 #### 3.asymptotic notions
 
