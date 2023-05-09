@@ -306,5 +306,5 @@ ip route show table <table_id>
 ```shell
 -rw-r--r-- 1 root root        313 Jan  5 14:16 a.imgs
 
-#1表示硬链接数
+#1表示硬链接数 
 ```
