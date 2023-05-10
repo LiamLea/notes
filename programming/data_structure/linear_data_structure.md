@@ -19,6 +19,14 @@
         - [(2) merge sort (合并排序)](#2-merge-sort-合并排序)
         - [(3) selection sort (选择排序)](#3-selection-sort-选择排序)
         - [(4) insertion sort (插入排序)](#4-insertion-sort-插入排序)
+    - [string (串)](#string-串)
+      - [1.pattern matching](#1pattern-matching)
+        - [(1) brute-force matching](#1-brute-force-matching)
+      - [2.KMP算法 (解决pattern matching问题)](#2kmp算法-解决pattern-matching问题)
+        - [(1) 算法](#1-算法)
+        - [(2) next表](#2-next表)
+        - [(3) 改进: 构建next表](#3-改进-构建next表)
+        - [(4) 与brute-force比较](#4-与brute-force比较)
 
 <!-- /code_chunk_output -->
 
@@ -141,3 +149,88 @@ func bubbleSort[T constraints.Ordered](list []T, lo int, hi int) {
 * 最坏情况: `T(n) = O(n^2)`
 * 适合数据结构:
     * list (因为移动操作效率高)
+
+***
+
+### string (串)
+
+#### 1.pattern matching
+
+##### (1) brute-force matching
+* 算法
+    * 将 模式串 与 文本 对齐，并进行比较，以字符为单位依次移动模式串
+
+* 时间复杂度
+    * T(n) = O(m * (n + m -1)) = O(m * n)
+        * n是文本的长度, m是模式串的长度 (n >> m)
+
+#### 2.KMP算法 (解决pattern matching问题)
+
+##### (1) 算法
+* 表示
+    * 模式串P，下标j
+    * 文本T，下标i
+
+* 说明
+    * 本质就是前面已经比较过的部分，不再重复比较
+    * 这个已经比较过的部分其实存在P中
+    * 直接从P的某个位置开始，从T中刚刚失败的字符开始，继续进行匹配
+* 伪代码
+```shell
+i=0, j=0
+while j < len(P) && i < len(T)
+    if P[j] == T[i] || j<0 :
+        i++
+        j++
+    else:
+        j=next(j)
+```
+
+* 时间复杂度: `T(n) = O(n)`
+
+* 最坏情况
+![](./imgs/string_02.png)
+
+##### (2) next表
+* `next(j)` 表示在`P[0, j)`中，最大 自匹配的真前缀和真后缀 长度
+    * 所以`P[0, next(j))`就是自匹配的部分
+    ![](./imgs/string_01.png)
+
+    * 特殊的: `next(0) = -1`
+
+* 构建next表
+```shell
+j = 0
+t = next(0) = -1
+while j < len(P) - 1
+    if t < 0 || P[j] == P[t]
+        j++
+        t++
+        next(j) = t
+    else
+        #如果一直匹配不到，则t会变为-1
+        t = next(t)
+```
+
+##### (3) 改进: 构建next表
+* 如果P[j]和P[t]相等，则P[t]肯定也不会匹配当前不匹配的字符
+```shell
+j = 0
+t = next(0) = -1
+while j < len(P) - 1
+    if t < 0 || P[j] == P[t]
+        j++
+        t++
+        if P[j] != P[t]:
+            next(j) = t
+        else:
+            next(j) = next(t)
+    else
+        #如果一直匹配不到，则t会变为-1
+        t = next(t)
+```
+
+##### (4) 与brute-force比较
+
+* 当字符集较小时，比如二进制字符集（即字符串由0和1组成）
+    * KMP算法 较 brute-force才有较大的优势
