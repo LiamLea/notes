@@ -10,11 +10,14 @@
       - [1.linear data structure](#1linear-data-structure)
       - [2.vector](#2vector)
         - [(1) ordered vector vs unordered vector](#1-ordered-vector-vs-unordered-vector)
-      - [3.list (列表、链表)](#3list-列表-链表)
+      - [3.bitmap (位图, 用于描述有限整数集)](#3bitmap-位图-用于描述有限整数集)
+        - [(1) 实现 (基于vector实现)](#1-实现-基于vector实现)
+        - [(2) 应用: 大数据去重](#2-应用-大数据去重)
+      - [4.list (列表、链表)](#4list-列表-链表)
         - [(1) 与vector比较](#1-与vector比较)
-      - [4.stack and queue](#4stack-and-queue)
+      - [5.stack and queue](#5stack-and-queue)
         - [(1) stack permutation (栈混洗)](#1-stack-permutation-栈混洗)
-      - [5.排序算法 (无序 -> 有序)](#5排序算法-无序---有序)
+      - [6.排序算法 (无序 -> 有序)](#6排序算法-无序---有序)
         - [(1) bubble sort (冒泡排序)](#1-bubble-sort-冒泡排序)
         - [(2) merge sort (合并排序)](#2-merge-sort-合并排序)
         - [(3) selection sort (选择排序)](#3-selection-sort-选择排序)
@@ -27,6 +30,12 @@
         - [(2) next表](#2-next表)
         - [(3) 改进: 构建next表](#3-改进-构建next表)
         - [(4) 与brute-force比较](#4-与brute-force比较)
+      - [3.BM算法](#3bm算法)
+        - [(1) bc表 (bad-character)](#1-bc表-bad-character)
+        - [(2) gs表(good-suffix)](#2-gs表good-suffix)
+        - [(3) 将bc和gs结合](#3-将bc和gs结合)
+      - [4.karp-rabin算法](#4karp-rabin算法)
+        - [(1) 算法](#1-算法-1)
 
 <!-- /code_chunk_output -->
 
@@ -51,7 +60,19 @@
 * 对有序向量的处理，很多算法有优势
     * 所以处理前，通过排序算法将 无序向量 -> 有序向量
 
-#### 3.list (列表、链表)
+#### 3.bitmap (位图, 用于描述有限整数集)
+
+##### (1) 实现 (基于vector实现)
+rank对应整数，值是一个bit，0表示不存在，1表示存在
+由于在高级语言中，没法直接操作bit位，最小操作单元是byte，所以
+根据需要操作的整数k, k/8确定一个byte的位置，k%8确定 需要比对的bit的位置，然后做位与操作，判断指定的位置是否存在
+![](./imgs/bitmap_01.png)
+
+##### (2) 应用: 大数据去重
+
+* 大数据时代数据特点: 小集合 + 大数据
+
+#### 4.list (列表、链表)
 
 * list节点空间不连续，通过指针连接起来
 * 一个list节点，包含以下信息:
@@ -74,7 +95,7 @@
 * 循位置访问（call by position）的意思是，给定位置（在示例代码实现里是指向 ListNode 的指针）访问该位置。因为指针已经给定，所以不用遍历。
 * 循秩访问（call by rank，即下标）的意思是，给定一个数字 i，要求访问第 i 个元素。只好从 header 往后找，或者从 trailer 往前找。
 
-#### 4.stack and queue
+#### 5.stack and queue
 
 * stack 
     * LIFO (last in first out)
@@ -87,7 +108,7 @@
     * 将A中的元素pop出来，push到S中
     * S可以选择在指定情况下将元素pop出来，push到B中
 
-#### 5.排序算法 (无序 -> 有序)
+#### 6.排序算法 (无序 -> 有序)
 
 ##### (1) bubble sort (冒泡排序)
 
@@ -234,3 +255,57 @@ while j < len(P) - 1
 
 * 当字符集较小时，比如二进制字符集（即字符串由0和1组成）
     * KMP算法 较 brute-force才有较大的优势
+
+#### 3.BM算法
+
+##### (1) bc表 (bad-character)
+
+* 概述
+    * 遇到文本串中不匹配字符时，在模式串中查找是否还有这样的字符，
+        * 如果有，则将模式串中最后一个该字符，与上述位置对齐
+        * 如果没有，则将模式串-1位置，与上述位置对齐
+* 表示
+    * 模式串P, 长度m
+    * 文本T, 长度n
+    * 字符集S
+
+* 伪代码
+```shell
+bc = [-1] * lenth(S)
+for i in range(P):
+    bc[p[i]] = i
+```
+
+* 时间复杂度
+    * 最好情况: Ω(n/m) 
+    * 最坏情况: O(n*m)
+    * 当字符集越大，效果越好
+
+##### (2) gs表(good-suffix)
+
+* 概述
+    * 寻找匹配最大后缀的子串
+* 从后往前寻找，时间复杂度: O(m)
+
+##### (3) 将bc和gs结合
+
+* 时间复杂度
+    * 最好情况: O(n/m)
+    * 最坏情况: O(n + m)
+
+#### 4.karp-rabin算法
+
+本质: 转换为数字，然后进行比较
+
+##### (1) 算法
+
+* 转化为数字
+    * 任何一个长度为d的字符集都可以看作是 d进制的数字 
+        * 比如C就相当于26进制中的2
+    * 当字符集过大，导致数字变大，这样比较时间不再是O(1)
+        * 通过hash将数字范围控制
+    * 每一个子串都需要进行hash，怎么使得所有子串的hash只需要O(1)的时间
+        * 由于子串是相邻的，即前一个子串和后一个子串，只有开头和末尾的字符不同，所以后一个子串的hash可以通过前一个子串的hash快速的得到
+* 解决hash冲突
+    * 第一次比较相当于筛选
+    * 第二次比较严格比较
