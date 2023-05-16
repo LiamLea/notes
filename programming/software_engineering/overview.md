@@ -28,16 +28,10 @@
         - [(1) scrum开发方法](#1-scrum开发方法)
         - [(2) ExtremeProgramming (XP, 极限编程)开发方法](#2-extremeprogramming-xp-极限编程开发方法)
       - [6.软件项目计划](#6软件项目计划)
-    - [scrum](#scrum)
-      - [1.scrum框架](#1scrum框架)
-        - [(1) 角色](#1-角色)
-        - [(2) 制品](#2-制品)
-        - [(3) 活动](#3-活动)
-      - [2.scrum规划](#2scrum规划)
-        - [(1) 发布规划](#1-发布规划)
-        - [(2) 迭代计划](#2-迭代计划)
-      - [3.user story](#3user-story)
-        - [(1) 定义](#1-定义)
+      - [7.建模方法](#7建模方法)
+        - [(1) use case modeling (用例建模)](#1-use-case-modeling-用例建模)
+        - [(2) class diagram modeling (类图建模)](#2-class-diagram-modeling-类图建模)
+        - [(3) software behavior modeling (软件行为建模)](#3-software-behavior-modeling-软件行为建模)
 
 <!-- /code_chunk_output -->
 
@@ -51,7 +45,7 @@
 * 问题定义
     * 提出问题和可行性研究
 * 需求开发
-    * 需求分析并编写需求文档
+    * 需求分析并编写需求规格说明 (SRS: software requirement specification)
 * 软件设计
     * 原型、架构、接口等设计
 * 软件构造
@@ -182,50 +176,43 @@
     ![](./imgs/se_08.png)
 * 建立初始时间表
 
-***
+#### 7.建模方法
 
-### scrum
+##### (1) use case modeling (用例建模)
+* 一个用例定义系统的一系列行为
+    * 能为参与者提供有价值和可观测的结果
 
-#### 1.scrum框架
+![](./imgs/se_14.png)
+![](./imgs/se_13.png)
 
-##### (1) 角色
-* product owner
-* scrum manager
-* team
+##### (2) class diagram modeling (类图建模)
+![](./imgs/se_11.png)
+* 补充说明
+    * `+` 表示public
+    * `-` 表示private
+    * `#` 表示protected
+    * 多样性
+    ![](./imgs/se_12.png)
 
-##### (2) 制品
-* product backlog
-    * 产品功能列表
-* sprint backlog
-    * 迭代开发任务列表
-* working software
-    * 可交付软件产品
+        * 2表示鸟只能与有2个翅膀实例关联
+        * 1表示翅膀只能与1个鸟实例关联
 
-##### (3) 活动
-* sprint planning
-* daily scrum meeting
-* spring review
-* sprint retrospective
+##### (3) software behavior modeling (软件行为建模)
 
-#### 2.scrum规划
+* sequence diagram (顺序图、时序图、序列图)
+    * 刻画系统实现某个功能的必要步骤
+    * 说明:
+        * 横轴: 表面正在进行操作的对象/参与者
+        * 纵轴: 时间（向下表示时间的顺延）
+        * 顶端多个矩形框： 定义参与交互的对象（类实例）名
+        * 每个对象下面的虚直线： 表示该对象的生命线
+        * 对象间的各种箭头： 表示各种类型的消息
+            * 虚线箭头: 表示返回值
+        * 生命线上的竖直矩形：表示对象激活期，表面对象正在执行某操作
+![](./imgs/se_15.png)
 
-##### (1) 发布规划
-* 定义user stories(用户故事)，并进行优先级划分
-* 制定发布计划
-
-##### (2) 迭代计划
-* 确定迭代目标
-* 选择user stories(用户故事)，并分解为多个任务
-* 对故事和任务进行时间估算
-
-#### 3.user story
-
-##### (1) 定义
-是从用户角度对功能的简要描述，story格式:
-* `作为一个<角色>，可以<活动>，以便于<价值>`
-    * 角色
-        * 谁要使用这个功能
-    * 活动
-        * 需要执行什么操作
-    * 价值
-        * 完成操作后带来什么好处
+* state chart/machine diagram (状态图)
+    * 用来表示一个类的全生命周期过程
+    * 说明
+        * 建模元素: 状态、事件、状态转移
+![](./imgs/se_16.png)
