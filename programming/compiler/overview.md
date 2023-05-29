@@ -10,7 +10,7 @@
       - [1.compiler vs interpreter](#1compiler-vs-interpreter)
       - [2.编译过程](#2编译过程)
         - [(1) lexical analysis (词法分析)](#1-lexical-analysis-词法分析)
-        - [(2) syntatic analysis (语法分析)](#2-syntatic-analysis-语法分析)
+        - [(2) syntactic analysis (语法分析)](#2-syntactic-analysis-语法分析)
         - [(3) semantic analysis (语义分析，中间代码产生)](#3-semantic-analysis-语义分析中间代码产生)
         - [(4) optimism (优化)](#4-optimism-优化)
         - [(5) code generation (目标代码生存)](#5-code-generation-目标代码生存)
@@ -43,7 +43,7 @@
 * 目标: 识别出一个个单词符号 (token)
 * 依赖规则: 构词规则
 
-##### (2) syntatic analysis (语法分析)
+##### (2) syntactic analysis (语法分析)
 * 目标: 将单词符号串分解成各类语法单位
 * 依赖规则: 语法规则
     * 语法定义了什么符号是合法的
