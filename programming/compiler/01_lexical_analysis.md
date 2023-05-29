@@ -14,7 +14,7 @@
       - [2.词法分析实现](#2词法分析实现)
         - [(1) 状态转换图](#1-状态转换图)
         - [(2) 简单案例实现](#2-简单案例实现)
-      - [3.正规式和正规集](#3正规式和正规集)
+      - [3.正规式（正则表示式）和正规集](#3正规式正则表示式和正规集)
         - [(1) 正规式定义](#1-正规式定义)
         - [(2) 举例](#2-举例)
       - [4.DFA (determinitive finite automata, 确定有限自动机)](#4dfa-determinitive-finite-automata-确定有限自动机)
@@ -26,10 +26,18 @@
         - [(1) 定义](#1-定义-1)
         - [(2) 非确定性](#2-非确定性)
         - [(3) 举例](#3-举例-1)
-      - [6.正规式和有限机的等价（转换）](#6正规式和有限机的等价转换)
+      - [6.正规式（正则表达式）和有限机的等价（转换）](#6正规式正则表达式和有限机的等价转换)
         - [(1) 正规式 -> NFA](#1-正规式---nfa)
         - [(2) NFA -> DFA](#2-nfa---dfa)
         - [(3) 设计一个DFA](#3-设计一个dfa)
+      - [7.DFA化简](#7dfa化简)
+        - [(1) why](#1-why)
+        - [(2) 化简算法](#2-化简算法)
+      - [8.Lex语言](#8lex语言)
+        - [(1) 说明](#1-说明)
+        - [(2) 包含两部分: 辅助定义式 + 识别规则](#2-包含两部分-辅助定义式--识别规则)
+        - [(3) 创建词法分析器流程](#3-创建词法分析器流程)
+        - [(4) demo](#4-demo)
 
 <!-- /code_chunk_output -->
 
@@ -129,7 +137,7 @@ BEGIN
 END;
 ```
 
-#### 3.正规式和正规集
+#### 3.正规式（正则表示式）和正规集
 正规式用于描述正规集
 
 ##### (1) 正规式定义
@@ -142,7 +150,7 @@ END;
 ##### (2) 举例
 * 字母表Σ={0, 1}
     * 则存在正规式: 0， 1， ε， φ ， 1*， (101)*, ...
-    * 则存在正规集: {0}，{1}， {ε}， φ， {1}*，{101}*, ...
+    * 则存在正规集: {0}，{1}， {ε}， φ， `{1}*`，`{101}*`, ...
 
 #### 4.DFA (determinitive finite automata, 确定有限自动机)
 
@@ -209,7 +217,7 @@ M(Z,a)={A,Z}
 
 ![](./imgs/lexical_analysis_07.png)
 
-#### 6.正规式和有限机的等价（转换）
+#### 6.正规式（正则表达式）和有限机的等价（转换）
 
 ##### (1) 正规式 -> NFA
 * 转换规则
@@ -239,7 +247,7 @@ M(Z,a)={A,Z}
     * 逐渐填充这个表
     ![](./imgs/lexical_analysis_12.png)
     
-        * 第0列第1行: εCLOSURE(X)
+        * 第0列第1行: ε-CLOSURE(X)
         * 由于只有两个字符a和b，所以只有两列Ia和Ib
         * Ia的第一行（根据上述定义的概念填充），同理填充Ib的第一行
         * 然后观察Ia和Ib的第一行，是否出现在第0列中
@@ -260,3 +268,96 @@ M(Z,a)={A,Z}
 * NFA -> DFA
 ![](./imgs/lexical_analysis_17.png)
 ![](./imgs/lexical_analysis_18.png)
+
+#### 7.DFA化简
+
+##### (1) why
+由正规式 得到的 DFA不唯一，经过DFA化简后唯一
+
+##### (2) 化简算法
+
+略
+
+#### 8.Lex语言
+
+##### (1) 说明
+* Lex是lexical analyzer的意思，用于编写词法分析器
+    * 通过正规式（正则表达式）识别单词
+![](./imgs/lexical_analysis_19.png)
+
+##### (2) 包含两部分: 辅助定义式 + 识别规则
+* 辅助定义式
+    ```shell
+    #Ri是正规式（正则表达式），可以引用之前定义的Di
+    #Di是Ri的简名
+    D1->R1
+    .
+    .
+    .
+    Dn->Rn
+    ```
+    * 举例
+    ```shell
+    Letter -> A|B|…|Z
+    Digit -> 0|1|…|9
+    Id -> Letter(Letter|Digit)*
+    ```
+* 识别规则
+    ```shell
+    #Pi是词形，是正规式（正则表达式），可以使用上述定义的辅助定义式
+    #Ai是词形Pi的动作（程序）
+    P1{A1}
+    .
+    .
+    .
+    Pn{An}
+    ```
+    * 会识别最大匹配
+    * 当有多个Pi同时匹配，则前面的优先
+
+##### (3) 创建词法分析器流程
+
+* 列出正规式
+    * 辅助定义式
+        ```
+        digit -> 0|1|...|9
+        letter -> A|B|...|Z
+        ```
+    * 识别规则 
+        ```
+        digit(digit)* {Return(4, val)} 
+        letter(letter|digit)* {Return(5，Token)}
+         * {Return(6, _)} 
+         ** {Return(7, _)}
+        ```
+* 正规式 -> NFA
+    * 各识别规则的正规式 -> NFA
+    ![](./imgs/lexical_analysis_20.png)
+    * 合并为一个NFA
+    ![](./imgs/lexical_analysis_21.png)
+
+* NFA -> DFA
+![](./imgs/lexical_analysis_22.png)
+
+* 实现程序
+```
+PROGRAM LEX(input,output)
+BEGIN TOKEN:=’’; getchar;
+    CASE char OF
+    ‘0’..’9’: [while char IN[‘0’..’9’]DO
+        BEGIN TOKEN:=TOKEN+char; getchar
+        END; retract;
+        IF VAL(token,value) THEN return(4,value)];
+    ‘A’..’Z’:[while char IN[‘A’..’Z’,’0’..’9’]DO
+        BEGIN TOKEN:=TOKEN+char; getchar
+        END; retract;
+        Return(5,token)];
+    ‘*’: [getchar;
+            IF char=’*’ THEN Return(7,-)
+            ELSE [retract;Return(6,-)];
+    ELSE: ERROR;
+    END{of case};
+END;
+```
+
+##### (4) demo
