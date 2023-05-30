@@ -30,6 +30,14 @@
       - [6. LR (自下向上)](#6-lr-自下向上)
         - [(1) 基本概念](#1-基本概念)
         - [(2) 分析动作 表 和 状态转移 表](#2-分析动作-表-和-状态转移-表)
+      - [6. LR(0) 分析表](#6-lr0-分析表)
+        - [(1) 项目](#1-项目)
+        - [(2) 构建识别活前缀的DFA](#2-构建识别活前缀的dfa)
+        - [(3) 构建分析表](#3-构建分析表-1)
+      - [7.SLR(1)](#7slr1)
+        - [(1) 解决冲突](#1-解决冲突)
+        - [(2) 算法概述](#2-算法概述)
+      - [8.LR无法解决所有二义问题](#8lr无法解决所有二义问题)
 
 <!-- /code_chunk_output -->
 
@@ -97,20 +105,22 @@
 
 * L: left-to-right (从左向右扫描)
 * L: leftmost derivation (最左推导)
-* 1: 每次使用一个输入符进行比对
+* 1: 每次会使用前瞻字符（即当前输入字符的下一个字符）来帮助决策
 
 ##### (1) FIRST和FOLLOW集
 * FIRST(X)
-    * 表示获取第一个终止字符
+    * 表示X生存式，能够产生的句子的首个终止符
+        * * 因为生成式最终会生成句子，即不含有非终止符
     * 比如: 
         * 存在生成式: 
             * F -> abc
             * F -> dd
         * 则FIRST(F) = {a,d}
 * FLLOW(A)
+    * 表示紧跟A后面的终止符
+        * 因为生成式最终会生成句子，即不含有非终止符
     * 能够从开始符，推导出这种格式 S =*> $\alpha A\beta$，则FLLOW(A) = FIRST($\beta$)
         * 其中开始符的FOLLOW(S)=#
-    * 表示A后面的第一个终止符
     * 比如：
         * 存在生成式: 
             * 开始符号是E
@@ -279,3 +289,84 @@
 * 为了识别活前缀及可归前缀
 * $goto[S_i,X_j]$
     * 表示当状态为$S_i$时，输入符号为$X_j$ (非终止符)，则转移到指定状态
+
+#### 6. LR(0) 分析表
+对一个文法的LR(0)项目集规范族不存在移进归约或归约归约冲突时，称该
+文法为LR(0)文法
+
+##### (1) 项目
+* 用于描述分析过程中，已经归约的部分和等待归约的部分
+* 一个项目就是一种分析过程中的状态
+![](./imgs/syntactic_analysis_10.png)
+![](./imgs/syntactic_analysis_11.png)
+
+* 项目集规范族
+    * 一种状态就是项目集合
+    * $S_i是S_k$关于符号X的后继状态
+        * 则$BASIC(S_i)=\{A -> \alpha X.\beta \}$
+            * 其中$A -> \alpha.X\beta \in S_k$
+            * 即当输入字符是X时，$S_i是S_k$的下一个状态
+        * 则$CLOSURE(S_i)$，包括
+            * $BASIC(S_i)$
+            * .后面如果紧跟非终止符且有相应的生成式，则进行相应转换，转换后，继续重复
+    * $GOTO(S_k,X) = S_i$
+        * 规定了识别文法规范句型活前缀的DFA从状态I(项目集)出发，经过X弧所应该到达的状态(项目集合)
+
+* 分类
+![](./imgs/syntactic_analysis_20.png)
+
+* 举例
+![](./imgs/syntactic_analysis_12.png)
+![](./imgs/syntactic_analysis_13.png)
+后面的以此类推
+
+##### (2) 构建识别活前缀的DFA
+![](./imgs/syntactic_analysis_21.png)
+![](./imgs/syntactic_analysis_22.png)
+![](./imgs/syntactic_analysis_23.png)
+
+##### (3) 构建分析表
+![](./imgs/syntactic_analysis_14.png)
+![](./imgs/syntactic_analysis_15.png)
+![](./imgs/syntactic_analysis_16.png)
+![](./imgs/syntactic_analysis_17.png)
+![](./imgs/syntactic_analysis_18.png)
+![](./imgs/syntactic_analysis_19.png)
+
+#### 7.SLR(1)
+* S: simple
+* L: left to right
+* R: Rightmost derivation in reverse
+* 1: 每次会使用前瞻字符（即当前输入字符的下一个字符）来帮助决策
+
+##### (1) 解决冲突
+解决移进-归约冲突和和归约-归约冲突
+
+如果对于一个文法的LR(0)项目集规范族所含有的动作冲突都能用以上方法来解
+决，则称该文法为SLR(1)文法
+
+##### (2) 算法概述
+
+* 构建状态描述序列
+* 判断是不是SLR(1)文法
+    * 移进-归约冲突
+        * 如果$FOLLOW(E) \cap \{x\} = \empty $
+            * E是归约式
+            * x是当前输入符号
+    * 归约-归约冲突
+        * 如果$FOLLOW(E) \cap FOLLOW(F) = \empty $
+            * E是归约式
+            * F是另一个规约式
+    * 如果所有冲突满足上述条件，则是SLR(1)文法
+
+* 构建SLR(1)分析表
+    * 与LR(0)区别：
+        * 当动作是归约时，需要判断
+            * 若$a \in Follow(A)$，则置$action[Si, a]=r_j$
+            * 从而避免了冲突
+
+#### 8.LR无法解决所有二义问题
+
+可通过其他方式解决二义问题：
+* 通过相关约定来解决，比如：
+    * 约定算符优先级
