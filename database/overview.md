@@ -1,106 +1,155 @@
 # overview
 
+
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
 <!-- code_chunk_output -->
 
 - [overview](#overview)
     - [概述](#概述)
-      - [1.数据库的高可用](#1数据库的高可用)
-        - [（1）面临的问题](#1面临的问题)
-        - [（2）解决思路](#2解决思路)
-      - [2  .备份类型](#2-备份类型)
-      - [3.database schema](#3database-schema)
-    - [高可用解决方案对比](#高可用解决方案对比)
-      - [1.shared disk failover](#1shared-disk-failover)
-      - [2.file system（block device）replication](#2file-systemblock-devicereplication)
-      - [3.write-ahead log shipping](#3write-ahead-log-shipping)
-      - [4.logical replication](#4logical-replication)
-      - [5.trigger-based master-standby replication](#5trigger-based-master-standby-replication)
-      - [6.statement-based replication middleware](#6statement-based-replication-middleware)
-      - [7.synchronous multimaster replication](#7synchronous-multimaster-replication)
-      - [8.asynchronous multimaster replication](#8asynchronous-multimaster-replication)
-      - [9.data partitioning（数据分片）](#9data-partitioning数据分片)
-      - [10.Multiple-Server Parallel Query Execution](#10multiple-server-parallel-query-execution)
+      - [1.基本概念](#1基本概念)
+        - [(1) table](#1-table)
+        - [(2) database (DB)](#2-database-db)
+        - [(3) database management system (DBMS)](#3-database-management-system-dbms)
+        - [(4) database application (DBAP)](#4-database-application-dbap)
+        - [(5) database system (数据库系统)](#5-database-system-数据库系统)
+        - [(6) SQL (structured query language)](#6-sql-structured-query-language)
+      - [2.数据库系统的标准结构](#2数据库系统的标准结构)
+        - [(1) 模式和视图](#1-模式和视图)
+        - [(2) 三级模式和视图](#2-三级模式和视图)
+        - [(3) 两层映射](#3-两层映射)
+        - [(4) 逻辑数据独立性 和 物理数据独立性](#4-逻辑数据独立性-和-物理数据独立性)
+      - [3.数据模型](#3数据模型)
+        - [(1) 关系模型定义](#1-关系模型定义)
+        - [(2) 三大经典数据模型](#2-三大经典数据模型)
+    - [relational model](#relational-model)
+      - [1.三要素](#1三要素)
+        - [(1) 基本结构](#1-基本结构)
+        - [(2) 基本操作](#2-基本操作)
+        - [(3) 完整性约束](#3-完整性约束)
 
 <!-- /code_chunk_output -->
 
 ### 概述
 
-#### 1.数据库的高可用
+#### 1.基本概念
 
-##### （1）面临的问题
-* 对于只读的数据库，高可用很容易实现
-* 对于可读写的数据库，**同步**是最大的问题（即两个数据库的内容要保持一致）
+##### (1) table
 
-##### （2）解决思路
-* 设置多个数据库，只有一个primary，其他都是standby，写操作只能在primary上执行
-* **同步**解决方案，即只有当**所有server**都commit transaction，才认为该tansaction被commit了
-* **异步**解决方案，提交时间和传播到其他服务器 之间存在一定的延迟
-  * 可能导致：切换到备份服务器时，数据丢失
-  * 当 同步方式 很慢时，采用异步方式
+* 表名
+* 表标题（格式）
+* 表内容（值）
+* 行/元组/记录 (row/tuple/record)
+* 列/字段/属性/数据项 (column/field/attribute/data item)
 
-#### 2  .备份类型
-* warm standby
-warm standby的服务器不能被连接，直到该服务器成为primary服务器
+* 关系模式: 
+    * 表名 + 表标题
+* 表/关系: 
+    * 表名 + 表标题 + 表内容
 
-* host standby
-host standby的服务器能够接收只读的请求
+##### (2) database (DB)
+有关联关系的表的集合
 
-#### 3.database schema
+##### (3) database management system (DBMS)
+管理数据库的系统软件，比如：mysql、oracle等
+* 功能（用户角度）:
+    * DDL: data definition language (数据定义语言)
+    * DML: data manipulation language (数据操纵语言)
+    * DCL: data control language (数据控制语言)
+        * 权限控制等
+    * 数据库维护
+        * 包括转储、恢复、性能检测等
+* 功能（系统角度）:
+![](./imgs/overview_01.png)
 
-是一个抽象的设计，用于描述 数据如何组织 和 数据间的关系
-database schema在不同DBMS（database management system）中是不同的：
-* 在mysql中
-  * 一个schema代表一个数据库
-* 在oracle中
-  * 一个schema代表一个数据库的一部分：属于某个用户的表和其他对象
-* 在postgrelsql中
-  * 一个schema代表一个数据库中的一个命名空间，该命名空间中存储数据库对象（如：表等）
+##### (4) database application (DBAP)
+数据库应用（即使用数据库的应用程序）
+
+##### (5) database system (数据库系统)
+DBMS + DBAP
+
+##### (6) SQL (structured query language)
+
+DDL + DML + DCL
+
+#### 2.数据库系统的标准结构
+
+##### (1) 模式和视图
+
+* schema (视图，也称为数据的结构)
+    * 对数据库中数据所进行的一种结构性的描述
+* view (视图) / data (数据)
+    * 数据库中的数据
+
+* 模式是对视图的抽象
+* 视图是某种模式展现形式下的数据
+
+##### (2) 三级模式和视图
+![](./imgs/overview_02.png)
+
+* external schema 和 external view
+    * 也称为用户模式、子模式和用户视图、子视图
+    * 用来描述用户能够看到的数据
+* conceptual schema 和 conceptual view
+    * 也称为逻辑模式、全局模式和逻辑视图、全局视图
+    * 用来描述全局角度理解/管理的数据，含有相应的关联约束
+* internal schema 和 internal view
+    * 也称为物理模式、存储模式和物理视图、存储视图
+    * 用来描述存储在介质上的数据，含存储路径、存储方式 、索引方式等
+
+##### (3) 两层映射
+
+* E-C mappinng: external schema 和 conceptual schema的映射
+    * 将外模式映射为概念模式
+    * 便于用户观察和使用
+* C-I mapping: conceptual schema 和 internal schema的映射
+    * 将概念模式映射为内模式
+    * 便于计算机进行存储和处理
+
+##### (4) 逻辑数据独立性 和 物理数据独立性
+
+* 逻辑数据独立性
+    * 当概念模式变化时，可以不改变外部模式(只需改变E-C Mapping)，从而无需改变应用程序
+* 物理数据独立性
+    * 当内部模式变化时，可以不改变概念模式(只需改变C-I Mapping) ，从而不改变外部模式
+
+#### 3.数据模型
+
+##### (1) 关系模型定义
+![](./imgs/overview_04.png)
+* 规定 模式的统一描述方式，包括：数据结构、操作和约束
+* 模型是对模式的抽象，模式是对数据的抽象
+* 比如：关系模型
+    * 所有模式都可为抽象表(Table)的形式 [数据结构]
+        * 而每一个具体的模式都是拥有不同列名的具体的表
+    * 对这种表形式的数据有哪些[操作]和[约束]
+
+    ![](./imgs/overview_03.png)
+
+##### (2) 三大经典数据模型
+
+* 关系模型
+    * **表**的形式组织数据
+* 层次模型
+    * **树**的形式组织数据
+    ![](./imgs/overview_05.png)
+* 网状模型
+    * **图**的形式组织数据
+    ![](./imgs/overview_06.png)
 
 ***
 
-### 高可用解决方案对比
+### relational model
 
-该图是以pg为视角
-![](./imgs/pg_01.png)
+#### 1.三要素
 
-#### 1.shared disk failover
-多个数据库共享同一个磁盘
-缺点：
-* 当磁盘出问题，所有database都不可用
+##### (1) 基本结构
+relation (即table)
 
-#### 2.file system（block device）replication
-每个server上都有一个内容相同的文件系统（或块设备）
-* 需要保证的是数据一致性
+##### (2) 基本操作
+关系运算，基本的： $\cup 、- 、\cap、\times (广义积)、\div、 \pi(投影)、\sigma(选择)$
 
-#### 3.write-ahead log shipping
-A standby server can be implemented using file-based log shipping (Section 26.2) or streaming replication (see Section 26.2.5), or a combination of both. For information on hot standby, see Section 26.5.
-
-#### 4.logical replication
-类似于WAL log方式，这里可以通过TCP连接，直接读取变化
-发送stream of data modification到另一台服务器
-
-#### 5.trigger-based master-standby replication
-standby服务器会发送all data modification queries到master服务器
-master服务器会异步的将变化发送给standby服务器
-
-#### 6.statement-based replication middleware
-中间件会拦截所有sql，将只读语句发送到其中一个服务器，当写语句发送到所有所有服务器
-
-#### 7.synchronous multimaster replication
-每个server既是master又是standby
-写请求会发送到其中一台server，然后该server会发送到其他server
-只有所有server都完成commit，才认为commit成功
-
-#### 8.asynchronous multimaster replication
-每个server既是master又是standby
-写请求会发送到其中一台server，然后该server会发送到其他server
-不会等所有server都commit
-所以会存在数据冲突的问题，所以需要定期解决数据冲突
-
-#### 9.data partitioning（数据分片）
-将**表**划分多个集合，每个集合只能被一个server修改
-
-#### 10.Multiple-Server Parallel Query Execution
-多个服务器处理一个查询
-通过将**数据**在服务器间切分
+##### (3) 完整性约束
+* 实体完整性
+* 参照完整性
+* 用户自定义的完整性
