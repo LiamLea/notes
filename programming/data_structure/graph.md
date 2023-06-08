@@ -31,23 +31,7 @@
 
 #### 1.graph
 
-* G = (V; E)
-    * v: vertex, 节点
-    * E: edge, 边
-
-* adjacency (邻接关系): 形容 两个连接的顶点 的关系
-* incidence (关联关系): 形容 顶点与边 的关系
-
-* undirected edge (无向边): 没有方向的边
-* undigraph (无向图): 所有边均为 无向边
-* digraph (有向图): 所有边均为 有向边
-* mixed graph (混合图): 既有无向边，又有有向边
-
-* 路径 `path = <V0,V1,..., Vk>`
-    * 由顶点构成的一个序列
-    * 简单路径: 不含重复的顶点
-
-* DAG (directed acyclic graph): 有向无环图
+[参考](../../basic/discrete_mathematics/graph_theory/overview.md)
 
 #### 2.图的表示
 
