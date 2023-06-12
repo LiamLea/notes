@@ -7,6 +7,7 @@
   - [2.相关指标](#2相关指标)
     - [（1）`STAT`](#1stat)
     - [（2）`%CPU`](#2cpu)
+  - [3.cpu负载过高](#3cpu负载过高)
 
 <!-- /code_chunk_output -->
 
@@ -51,3 +52,9 @@ s     #session leader
 #process duration，进程运行的时长
 #所有进程的cpu使用率，加起来应该 = CPU数 * 100
 ```
+
+#### 3.cpu负载过高
+
+* 需要关注cpu的使用率
+  * 当cpu大部分时间都是空闲的，则可能是io时间比较常
+  * 当cpu steal时间比较多，则宿主机超分导致虚拟机cpu抢占严重
