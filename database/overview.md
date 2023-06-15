@@ -83,7 +83,7 @@ DDL + DML + DCL
 ![](./imgs/overview_02.png)
 
 * external schema 和 external view
-    * 也称为用户模式、子模式和用户视图、子视图
+    * 也称为用户模式、子模式和用户视图（简称视图）、子视图
     * 用来描述用户能够看到的数据
 * conceptual schema 和 conceptual view
     * 也称为逻辑模式、全局模式和逻辑视图、全局视图
