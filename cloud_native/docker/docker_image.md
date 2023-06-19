@@ -19,6 +19,7 @@
         - [（1） 特点](#1-特点)
         - [（2）`/var/lib/docker/overlay2/<id>/`目录下可能有的内容](#2varlibdockeroverlay2id目录下可能有的内容)
         - [（3）根据overlay2的`<id>`获取`<container_id>`](#3根据overlay2的id获取container_id)
+        - [(4) overlay2的id和layer id的对应关系](#4-overlay2的id和layer-id的对应关系)
       - [6.docker目录说明: `/var/lib/docker/`](#6docker目录说明-varlibdocker)
       - [7.containerd目录说明](#7containerd目录说明)
       - [8.docker registry](#8docker-registry)
@@ -167,6 +168,13 @@ sha256:790d6af1dbdc34750316956467c9713468594ee9ec35d7e5b25bdd71841dac1b	1.618kB	
 ```shell
 docker inspect `docker ps -qa` > /tmp/a.txt
 #然后去/tmp/a.txt中查找`<id>`
+```
+
+##### (4) overlay2的id和layer id的对应关系
+```shell
+cat /var/lib/docker/image/overlay2/layerdb/sha256/<layer_id>/cache-id 
+
+#<overlay2_id>
 ```
 
 #### 6.docker目录说明: `/var/lib/docker/`

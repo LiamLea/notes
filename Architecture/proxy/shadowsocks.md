@@ -5,9 +5,10 @@
 
 - [shadowsocks](#shadowsocks)
     - [使用](#使用)
-      - [1.启动shadowsocks client（sock5 proxy）](#1启动shadowsocks-clientsock5-proxy)
-      - [2.启动polipo（http proxy -> sock5 proxy）](#2启动polipohttp-proxy---sock5-proxy)
-      - [3.验证](#3验证)
+      - [1.启动shadowsocks server](#1启动shadowsocks-server)
+      - [2.启动shadowsocks client（sock5 proxy）](#2启动shadowsocks-clientsock5-proxy)
+      - [3.启动polipo（http proxy -> sock5 proxy）](#3启动polipohttp-proxy---sock5-proxy)
+      - [4.验证](#4验证)
     - [其他使用](#其他使用)
       - [1.ssh -> socks5 proxy](#1ssh---socks5-proxy)
         - [(1) 添加ssh配置](#1-添加ssh配置)
@@ -25,7 +26,28 @@
 ### 使用
 
 [参考](https://github.com/shadowsocks/shadowsocks-libev)
-#### 1.启动shadowsocks client（sock5 proxy）
+
+#### 1.启动shadowsocks server
+* 创建配置文件
+```shell
+vim /etc/shadowsocks.json
+```
+```json
+{
+  "server":"0.0.0.0",
+  "server_port":13863,
+  "password":"***",
+  "timeout":600,
+  "method":"aes-256-cfb"
+}
+```
+
+* 启动服务端
+```shell
+docker run --network host --restart always -itd -v /etc/shadowsocks.json:/etc/shadowsocks.json shadowsocks/shadowsocks-libev ss-server -c /etc/shadowsocks.json
+```
+
+#### 2.启动shadowsocks client（sock5 proxy）
 
 * 创建配置文件
 ```shell
@@ -48,7 +70,7 @@ vim /etc/shadowsocks.json
 docker run --network host --restart always -itd -v /etc/shadowsocks.json:/etc/shadowsocks.json shadowsocks/shadowsocks-libev ss-local -c /etc/shadowsocks.json
 ```
 
-#### 2.启动polipo（http proxy -> sock5 proxy）
+#### 3.启动polipo（http proxy -> sock5 proxy）
 
 * 注意: http proxy时域名也会丢给proxy进行解析
   * 所以不存在DNS污染问题
@@ -77,7 +99,7 @@ serverSlots1 = 32
 docker run --network host --restart always  -itd -v /etc/polipo:/etc/polipo lsiocommunity/polipo polipo -c /etc/polipo/config
 ```
 
-#### 3.验证
+#### 4.验证
 
 ```shell
 HTTPS_PROXY="http://127.0.0.1:8123" curl https://google.com
