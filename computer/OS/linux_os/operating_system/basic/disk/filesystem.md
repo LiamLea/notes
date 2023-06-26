@@ -10,16 +10,22 @@
       - [3.数据块和扇区](#3数据块和扇区)
       - [4.文件系统中的基本操作单位是数据块](#4文件系统中的基本操作单位是数据块)
       - [5.虚拟文件系统（VFS）](#5虚拟文件系统vfs)
-      - [6.文件系统基本数据结构](#6文件系统基本数据结构)
+      - [6.五种文件分配方式 (file allocation method)](#6五种文件分配方式-file-allocation-method)
+        - [(1) contiguous allocation](#1-contiguous-allocation)
+        - [(2) linked file allocation](#2-linked-file-allocation)
+        - [(3) indexed file allocation](#3-indexed-file-allocation)
+        - [(4) file allocation table (FAT)](#4-file-allocation-table-fat)
+        - [(5) Inode](#5-inode)
+      - [7.文件系统基本数据结构](#7文件系统基本数据结构)
         - [（1）文件卷控制块（superblock）](#1文件卷控制块superblock)
         - [（2）文件控制块（inode，即索引节点）](#2文件控制块inode即索引节点)
         - [（3）目录项（dentry：directory entry）](#3目录项dentrydirectory-entry)
-      - [7.文件数据块的两种缓存方式](#7文件数据块的两种缓存方式)
+      - [8.文件数据块的两种缓存方式](#8文件数据块的两种缓存方式)
         - [（1）数据块缓存](#1数据块缓存)
         - [（2）页缓存](#2页缓存)
-      - [8.UFS多级索引分配](#8ufs多级索引分配)
-      - [9.文件系统架构的demo](#9文件系统架构的demo)
-      - [10.几种特殊的文件系统类型](#10几种特殊的文件系统类型)
+      - [9.UFS多级索引分配](#9ufs多级索引分配)
+      - [10.文件系统架构的demo](#10文件系统架构的demo)
+      - [11.几种特殊的文件系统类型](#11几种特殊的文件系统类型)
         - [（1）`tmpfs`、`ramfs或/dev/ram*`](#1tmpfs-ramfs或devram)
         - [（2）`/dev/loop*`](#2devloop)
 
@@ -44,7 +50,7 @@
 #### 3.数据块和扇区
 数据块是逻辑存储单元
 扇区是物理存储单元（一般为512 bytes）
-多个扇区构成一个数据块
+连续的多个扇区构成一个数据块
 
 #### 4.文件系统中的基本操作单位是数据块
 
@@ -56,7 +62,30 @@
 * 索引节点
 * 挂载点
 
-#### 6.文件系统基本数据结构
+#### 6.五种文件分配方式 (file allocation method)
+
+##### (1) contiguous allocation
+![](./imgs/fa_01.png)
+
+##### (2) linked file allocation
+![](./imgs/fa_02.png)
+
+##### (3) indexed file allocation
+![](./imgs/fa_03.png)
+
+##### (4) file allocation table (FAT)
+![](./imgs/fa_04.png)
+
+* FAT存储在内存中
+* 与linked allocation比较：
+  * FAT适合随即访问
+    * linked allocation需要遍历之前所有的块
+    * FAT遍历的是之前块的地址
+
+##### (5) Inode
+![](./imgs/fa_05.png)
+
+#### 7.文件系统基本数据结构
 
 ![](./imgs/filesystem_06.png)
 #####（1）文件卷控制块（superblock）
@@ -83,7 +112,7 @@
 foo 和 bar
 foo 和 bar2  
 
-#### 7.文件数据块的两种缓存方式
+#### 8.文件数据块的两种缓存方式
 
 #####（1）数据块缓存
 
@@ -98,13 +127,13 @@ foo 和 bar2
 * 问题：需要协调用于页缓存的页面数
 ![](./imgs/filesystem_02.png)
 
-#### 8.UFS多级索引分配
+#### 9.UFS多级索引分配
 ![](./imgs/filesystem_03.png)
 
-#### 9.文件系统架构的demo
+#### 10.文件系统架构的demo
 ![](./imgs/filesystem_04.png)
 
-#### 10.几种特殊的文件系统类型
+#### 11.几种特殊的文件系统类型
 
 ##### （1）`tmpfs`、`ramfs或/dev/ram*`
 * `tmpfs`将数据放在虚拟内存中
