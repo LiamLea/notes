@@ -58,7 +58,7 @@
 
 * 创建表
     ```SQL
-    create table 表名( 列名 数据类型 [Primary key Primary key | Unique] [Not null]
+    create table 表名( 列名 数据类型 [Primary key | Unique] [Not null]
         [, 列名 数据类型 [Not null] , … ]);
 
     #Primary key: 主键约束，每个表只能创建一个主键约束

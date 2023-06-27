@@ -32,6 +32,10 @@
 
 ### 概述
 
+**注意**: 数据结构中的heap和heap memory、heap file都不一样
+* 数据结构中的heap是有偏序的
+* heap memory和heap file都是无序的
+
 #### 1.heap (priority queue)
 * 堆序性 (本质要求)
     * `H[i] <= H[parent(i)]`
