@@ -14,9 +14,12 @@
       - [2.dense index 和 sparse index](#2dense-index-和-sparse-index)
         - [(1) 稠密索引](#1-稠密索引)
         - [(2) 稀疏索引](#2-稀疏索引)
-      - [3.primary index和secondary index](#3primary-index和secondary-index)
+      - [3.primary index、secondary index、clustered index](#3primary-index-secondary-index-clustered-index)
         - [(1) 主索引](#1-主索引)
         - [(2) 辅助索引](#2-辅助索引)
+        - [(3) 聚簇索引](#3-聚簇索引)
+      - [4.inverted index](#4inverted-index)
+      - [5.multi-level index](#5multi-level-index)
 
 <!-- /code_chunk_output -->
 
@@ -86,19 +89,56 @@ DROP INDEX indexname;
         * 从该索引项所对应的记录开始顺序进行Table的检索
 ![](./imgs/index_02.png)
 
-#### 3.primary index和secondary index
+#### 3.primary index、secondary index、clustered index
 
 ##### (1) 主索引
-创建主键，系统会**自动创建**主索引（即用主键创建索引）
+创建**主键**，系统会**自动创建**主索引（即用主键创建索引）
 * 主索引特点
     * 是**稀疏索引**
     * 是**有序**的
         * 因为是稀疏索引，所以排序后，更方便查找
-        * 如果主索引对于的字段也是排序，才能充分发挥这种优势
+        * 如果主文件的**主键是排序的**，才能充分发挥这种优势
     * 索引的字段值是 **块锚** 的字段值，指针指向 **数据块**
         * **block anchor (块锚)**，也叫anchor record (锚记录)
             * 每一个数据块的第一条记录
+    * 能够决定记录的**存储位置**
+        * 比如插入一条数据，如果主键是有序的，则会将记录存储在指定数据块中
 
 ![](./imgs/index_06.png)
 
 ##### (2) 辅助索引
+除了主索引外的索引
+* 辅助索引特点
+    * 是**稠密索引**
+    * 允许主文件中的索引字段**重复**
+
+![](./imgs/index_07.png)
+
+##### (3) 聚簇索引
+* 聚簇字段
+    * 字段值可以**重复**且经过了**排序**
+    * 聚簇索引通常定义在聚簇字段上
+* 聚簇索引
+    * 索引中邻近的记录在主文件中也是临近存储的
+    * 聚簇索引通常是对聚簇字段上的每一个不同值有一个索引项
+        * 由于有相同聚簇字段值的记录可能存储于若干块中，则索引项的指针指向其中的第一个块
+    * 一个主文件只能有一个聚簇索引文件，但可以有多个非聚簇索引文件
+    * 主索引通常是聚簇索引（当主键是有序的）
+    * 能够决定记录的**存储位置**
+        * 比如插入一条数据，则会将记录存储在指定数据块中
+
+![](./imgs/index_08.png)
+
+#### 4.inverted index
+
+* forward index (正排索引)
+    * 一个文档包含了哪些词汇
+* inverted index (倒排索引)
+    * 一个词汇包含在哪些文档中
+
+![](./imgs/index_09.png)
+
+#### 5.multi-level index
+
+当索引项比较多时，可以对索引再建立索引，依此类推，形成
+多级索引
