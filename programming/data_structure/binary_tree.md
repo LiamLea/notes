@@ -39,11 +39,13 @@
     * vertex (节点)
     * edge (边)
     * degree (度)
-        * in-degree + out-degree
+        * 在树中，度就是指**出度**（因为入度总是为1）
         * in-degree
             * the number edges that comes at the particular node
         * out-degree
             * the number of edges that leaves a particular node
+        * 树的度
+          * 是最大的 结点度
 * rooted tree (有根树)
     * 指定任何一个节点v为根的树
     * 任何一个节点v与根之间存在**唯一路径**

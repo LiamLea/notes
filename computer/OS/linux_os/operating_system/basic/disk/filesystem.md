@@ -76,6 +76,8 @@
 ##### (4) file allocation table (FAT)
 ![](./imgs/fa_04.png)
 
+* FAT内容
+  * 每一项 有两个指针：当前数据块的地址 和 在FAT中的地址（存储下一个数据块地址）
 * FAT存储在内存中
 * 与linked allocation比较：
   * FAT适合随即访问
@@ -83,6 +85,8 @@
     * FAT遍历的是之前块的地址
 
 ##### (5) Inode
+* 一个文件一个Inode
+
 ![](./imgs/fa_05.png)
 
 #### 7.文件系统基本数据结构
