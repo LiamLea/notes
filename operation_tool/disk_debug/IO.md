@@ -14,7 +14,7 @@
         - [(3) convert data](#3-convert-data)
         - [(4) test disk performance](#4-test-disk-performance)
     - [io相关](#io相关)
-        - [`iostat -dx 10`](#iostat-dx-10)
+        - [`iostat -dx 10`](#iostat--dx-10)
         - [`iotop`](#iotop)
         - [`ioping`（测试延迟）](#ioping测试延迟)
 
@@ -91,7 +91,9 @@ Disk stats (read/write):
 dd if=输入文件 of=输出文件
 
 #参数
+# 注意这里提到的I/O都是对于dd程序而言的，而不是系统和磁盘的I/O
 bs=xx         #一次I/O的大小（默认512B）
+              
 count=xx      #进行多少次I/O
 ```
 

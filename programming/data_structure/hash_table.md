@@ -21,7 +21,10 @@
         - [(2) probing chain](#2-probing-chain)
         - [(3) lazy removal](#3-lazy-removal)
         - [(4) 优点和缺点](#4-优点和缺点)
-      - [5.应用](#5应用)
+      - [5.排解散列冲突: dynamic hashing](#5排解散列冲突-dynamic-hashing)
+        - [(1) extendable hashing](#1-extendable-hashing)
+        - [(2) linear hashing (解决桶利用率问题)](#2-linear-hashing-解决桶利用率问题)
+      - [6.应用](#6应用)
         - [(1) bucket sort](#1-bucket-sort)
         - [(2) counting sort (计算排序)](#2-counting-sort-计算排序)
 
@@ -120,7 +123,51 @@ key存入的bucket不总是确定
     * 冲突增多
     * hash table可能变满，这时就需要扩展hash table，不然新的key无法存入hash table中
 
-#### 5.应用
+#### 5.排解散列冲突: dynamic hashing
+
+##### (1) extendable hashing
+* 增加一个中间数组（数组的长度能够增长）
+    * 数组中存储的是指针，指针指向bucket（指针可能指向同一个bucket）
+* hash函数为每一个键计算出一个K位的二进制序列（比如32位）
+    * i表示使用二进制序列的前i位进行散列
+        * 数组的大小n=2^i
+        * i最初为1
+* 当一个bucket满了
+    * 判断该bucket使用多少位进行hash的
+    * 如果使用了i位
+        * 则i会加1（即数组的大小会加倍），然后对满的bucket进行重新散列
+    * 如果未使用到i位
+        * 则增加bucket
+
+* 举例
+    * 刚开始使用二进制的1位进行散列
+        * bucket右上角的数字表示该bucket是取第几位进行的散列
+        * 当bucket满时，使用1位进行hash且i=1，则i+1（即数组扩容）
+    ![](./imgs/hash_07.png)
+    * 当bucket满了，i+1（即数组加倍），并重新散列该bucket中的数据
+        * 当bucket满了，使用了1位进行hash且i=2，则i无需要增加，只需要增加一个bucket
+    ![](./imgs/hash_08.png)
+
+* 存在问题
+    * 数组翻倍，需要做大量工作
+    * 桶利用率可能很低（即数组大量增长，但是利用率不足）
+
+##### (2) linear hashing (解决桶利用率问题)
+* n 表示当前的桶数
+* r 表示散列表中的记录总数
+* hash函数为每一个键计算出一个K位的二进制序列（比如32位）
+    * 使用二进制序列的前$log_2{n}$位进行散列（从右开始取）
+* 当bucket满了单r/n < 1.7时，则增加溢出桶
+* 当 r/n > 1.7时，需要散列表要增加1（即bucket加1）
+    * 该桶为1a2a3…ai，则该桶由0a2a3..ai对应的块分裂
+
+* 举例
+![](./imgs/hash_09.png)
+![](./imgs/hash_10.png)
+![](./imgs/hash_11.png)
+![](./imgs/hash_12.png)
+
+#### 6.应用
 
 ##### (1) bucket sort
 * 说明
