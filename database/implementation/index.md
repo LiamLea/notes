@@ -20,6 +20,10 @@
         - [(3) 聚簇索引](#3-聚簇索引)
       - [4.inverted index](#4inverted-index)
       - [5.multi-level index](#5multi-level-index)
+      - [6.hash index](#6hash-index)
+        - [(1) 一般散列索引](#1-一般散列索引)
+        - [(2) extendable hashing index](#2-extendable-hashing-index)
+        - [(3) linear hashing index](#3-linear-hashing-index)
 
 <!-- /code_chunk_output -->
 
@@ -140,5 +144,24 @@ DROP INDEX indexname;
 
 #### 5.multi-level index
 
-当索引项比较多时，可以对索引再建立索引，依此类推，形成
-多级索引
+当索引项比较多时，可以对索引再建立索引，依此类推，形成多级索引
+实现方式：使用B+树组织索引（具体内容参考数据结构的B+树）
+
+#### 6.hash index
+
+##### (1) 一般散列索引
+![](./imgs/index_10.png)
+
+将键值为k的记录record(k)，经过hash函数，放入到指定的bucket中
+* 内存数据 可利用散列 确定内存页
+* 主文件 可利用散列 确定存储块
+* 索引 可利用散列 确定索引项的存储块
+![](./imgs/index_11.png)
+![](./imgs/index_12.png)
+
+##### (2) extendable hashing index
+参考数据结构
+
+##### (3) linear hashing index
+参考数据结构
+

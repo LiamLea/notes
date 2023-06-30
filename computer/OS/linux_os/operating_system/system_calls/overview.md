@@ -8,7 +8,7 @@
       - [1.打开文件（返回文件描述符）: `open()`](#1打开文件返回文件描述符-open)
       - [2.关闭文件: `close()`](#2关闭文件-close)
       - [3.I/O操作:`read()/write()`](#3io操作readwrite)
-      - [4.将内存中的数据flush到磁盘：`fsync()`、`fdatasync( )`、`sync()`](#4将内存中的数据flush到磁盘fsync-fdatasync-sync)
+      - [4.将内存中的数据flush到磁盘：`fsync()`、`fdatasync( )`、`sync()`](#4将内存中的数据flush到磁盘fsync-fdatasync--sync)
 
 <!-- /code_chunk_output -->
 
@@ -30,6 +30,7 @@
   * 当往已有数据的文件中写数据，close时会进行flush，所以速度会比较慢
 
 #### 3.I/O操作:`read()/write()`
+注意这里的I/O是指系统I/O，一次系统I/O可能会调用多次磁盘I/O，一次磁盘I/O会读取多个data block
 * 一次I/O就是调用一次 write/read系统调用
 * 在linux中，I/O操作是**异步**的，为了提高性能
   * 即先 写入/读取 到**内存**中，所以`I/O request size < 可用内存的大小`
