@@ -147,6 +147,8 @@ func bubbleSort[T constraints.Ordered](list []T, lo int, hi int) {
     * 将序列等分，一直递归
     * 然后合并序列，比较两个序列的头元素，从而按顺序合并
 * 最坏情况: `T(n) = O(nlogn)`
+* 缺点
+    * 是non-in-place的，所以额外的需要O(n)的空间复杂度，这样会增加内存的使用
 
 ##### (3) selection sort (选择排序)
 * 说明
