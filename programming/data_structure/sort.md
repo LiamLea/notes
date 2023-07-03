@@ -19,6 +19,13 @@
         - [(1) diminishing increment (递减增量)](#1-diminishing-increment-递减增量)
         - [(2) step sequence (步长序列)](#2-step-sequence-步长序列)
         - [(3) 算法](#3-算法)
+      - [4.internal sort and external sort](#4internal-sort-and-external-sort)
+        - [(1) 内排序](#1-内排序)
+        - [(2) 外排序](#2-外排序)
+    - [external  sort](#external--sort)
+      - [1.external merge sort (polyphase merge sort)](#1external-merge-sort-polyphase-merge-sort)
+        - [(1) 算法概述](#1-算法概述)
+        - [(2) 以two-phase为例](#2-以two-phase为例)
 
 <!-- /code_chunk_output -->
 
@@ -91,3 +98,57 @@ S = {W1=1,W2,W3, ... ,Wk, ...}
 * 对每一列进行插入排序
 * 迭代，最后转成为1列，然后进行插入排序
 
+#### 4.internal sort and external sort
+
+##### (1) 内排序
+将所有数据加载到内存中进行排序，前面所介绍的排序算法（QuickSort, Merge Sort, HeapSort等）都是内排序算法
+
+##### (2) 外排序
+用于处理大数据的排序问题，因为无法将数据全部加载进内存，常用的排序算法就是external merge sort (aka polyphase sort)
+
+***
+
+### external  sort
+
+#### 1.external merge sort (polyphase merge sort)
+
+##### (1) 算法概述
+
+* phase 1:
+  * 将数据集划分为多个子集（子集能够装入内存）
+  * 将每个子集进行排序
+* phase 2:
+  * 将子集进行合并
+    * 选择所有子集的第一个元素加载到内存（如果内存不够，就要**更多phase**，每个phase合并有限量的子集）
+    * 比较所有子集的第一个元素，选出最小/最大的元素，放入到output中，然后在子集中指针移动到下一个元素
+    * 重复上述的步骤
+* phase N:
+  * 如果内存不够，无法在一个phase中合并所有子集，就要**更多phase**，每个phase合并有限量的子集
+
+##### (2) 以two-phase为例
+
+* 假设:
+  * 一个数据块能存储5个元素
+  * 内存有6块（页）
+  * 待排序的数据有60个元素，则需要12块
+
+* phase 1:
+  * 划分子集，并进行子集排序
+    * 待排序数据的块数 / 子集数 < 内存块数
+      * 如果子集数 > 内存块数，则需要多次phase
+      * 所以划分4为个子集，只需要两次phase
+  ![](./imgs/sort_02.png)
+
+* phase 2:
+  * 归并阶段
+  ![](./imgs/sort_03.png)
+  ![](./imgs/sort_04.png)
+  * 子集2中的第一块处理完了，则将第一块踢出内存，将第二块加载到内存中
+  * 输出结果的第一块写完了，则存到外存中
+  * 依照上图进行类推，从而完成合并
+
+* two-phase的算法复杂性（假设一次I/O只读一个数据块），则需要的I/O数：
+  * 考虑最终结果的写回
+    * 4 * 待排序的数据的块数 = 4*12=48
+      * 子集合排序阶段读一遍写一遍 2 * 待排序的数据的块数
+      * 合并阶段读一遍写一遍 2 * 待排序的数据的块数
