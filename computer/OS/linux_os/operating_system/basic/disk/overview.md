@@ -40,6 +40,8 @@
 
 [参考](./imgs/https://medium.com/databasss/on-disk-io-part-1-flavours-of-io-8e1ace1de017)
 
+注意这里的I/O是指系统I/O，一次系统I/O可能会调用多次磁盘I/O，一次磁盘I/O会读取多个data block
+
 ##### （1）I/O
 * 一次读写请求
   * 在linux中，一次I/O就是调用一次 write/read系统调用
