@@ -19,7 +19,7 @@
 适合**north-south流量**多的场景
 很多东西向的流量会在core核心层进行路由
 
-![](./imgs/data_center_01.jpg)
+![](./imgs/data_center_01.png)
 
 * Access layer（接入层）
   * 控制终端用户访问网络资源
