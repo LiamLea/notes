@@ -34,3 +34,5 @@
 适合**east-west流量**多的场景
 全网状
 ![](./imgs/data_center_02.png)
+
+* 这样广播域就会很大，解决方案： portland
