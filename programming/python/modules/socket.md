@@ -54,7 +54,7 @@ laddr=('0.0.0.0', 0)>                   #绑定的地址，默认是本机所有
 ```
 #### 2.服务端套接字
 ```python
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.bind(("0.0.0.0", 80))
 sock.listen()
 while True:
