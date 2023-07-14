@@ -12,7 +12,7 @@
       - [6.MTU and TCP MSS](#6mtu-and-tcp-mss)
         - [（1）MTU（maximum transmission unit）](#1mtumaximum-transmission-unit)
         - [（2）MSS（maximum segment size）](#2mssmaximum-segment-size)
-      - [7.tcp流](#7tcp流)
+      - [7.tcp流 (`<src_ip>:<src_port> <dst_ip>:<dst_port>`唯一标识)](#7tcp流-src_ipsrc_port-dst_ipdst_port唯一标识)
     - [TCP头部](#tcp头部)
       - [1.序号（与 字节 有关）](#1序号与-字节-有关)
       - [2.确认号](#2确认号)
@@ -86,11 +86,17 @@ cwnd：congestion window
 * MSS值是在三次握手时确定的，会在SYN包中的option部分，声明MSS应该设为多少
 ![](./imgs/tcp_mss_02.png)
 
-#### 7.tcp流
+#### 7.tcp流 (`<src_ip>:<src_port> <dst_ip>:<dst_port>`唯一标识)
 
-一个tcp流通过`<src_ip>:<src_port> <dst_ip>:<dst_port>`唯一标识
-* tcp没有stream id的概念
-* 在wireshark中会给tcp stream编号，第一个tcp stream就是 `stream index: 1`
+* 一个tcp流通过`<src_ip>:<src_port> <dst_ip>:<dst_port>`唯一标识
+  * tcp没有stream id的概念
+  * 在wireshark中会给tcp stream编号，第一个tcp stream就是 `stream index: 1`
+
+* client端，发起一个新的tcp请求，需要开启一个新的端口
+  * 所以client连接数不能超过65535
+  
+* server端，接受一个请求后，会创建一个新的socket (`<src_ip>:<src_port> <dst_ip>:<dst_port>`唯一标识)
+  * 所以server端，同一个端口能够建立多个连接，即连接数能够超过65535
 
 ***
 
