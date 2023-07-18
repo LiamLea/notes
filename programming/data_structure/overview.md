@@ -22,7 +22,7 @@
       - [5.iteration (迭代) vs recursion (递归)](#5iteration-迭代-vs-recursion-递归)
         - [(1) recursion的复杂度: 递推方法](#1-recursion的复杂度-递推方法)
       - [6.核心策略](#6核心策略)
-        - [(1) decrase and conquer (减而治之)](#1-decrase-and-conquer-减而治之)
+        - [(1) decrease and conquer (减而治之)](#1-decrease-and-conquer-减而治之)
         - [(2) divide and conquer (分而治之)](#2-divide-and-conquer-分而治之)
         - [(3) transform and conquer (变治法)](#3-transform-and-conquer-变治法)
         - [(4) 递归 时间复杂度较高的情况](#4-递归-时间复杂度较高的情况)
@@ -117,7 +117,7 @@ T(n-1) 求 和T(n-2)的关系
 
 #### 6.核心策略
 
-##### (1) decrase and conquer (减而治之)
+##### (1) decrease and conquer (减而治之)
 将一个问题**简化**成为**规模更小**的问题
 * 比如求和: 将F(n)简化成F(n-1) + 最后一个常数，然后进行迭代
 
