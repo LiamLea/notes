@@ -15,6 +15,7 @@
       - [5.冲突域和广播域](#5冲突域和广播域)
       - [6.BUM frame](#6bum-frame)
       - [7.IXP(internet exchange points)](#7ixpinternet-exchange-points)
+      - [8.判断两个设备是否在同一局域网内](#8判断两个设备是否在同一局域网内)
 
 <!-- /code_chunk_output -->
 
@@ -67,3 +68,11 @@
 ![](./imgs/overview_02.png)
 
 [查看世界上的所有IXPs](https://www.internetexchangemap.com/)
+
+#### 8.判断两个设备是否在同一局域网内
+
+* 对于没有ip的两个设置，可以给网卡配置同一网段的ip，然后使用arping
+
+```shell
+arping -I eth0  <ip>
+```
