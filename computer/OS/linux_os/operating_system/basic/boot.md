@@ -6,7 +6,9 @@
 - [boot](#boot)
     - [概述](#概述)
       - [1.启动流程](#1启动流程)
-        - [（1）bootloader有**两个阶段**：](#1bootloader有两个阶段)
+        - [(1) BIOS](#1-bios)
+        - [(2) BIOS (legcy) vs UEFI](#2-bios-legcy-vs-uefi)
+        - [(3) bootloader有**两个阶段**：](#3-bootloader有两个阶段)
       - [2.内存有两种：](#2内存有两种)
     - [使用](#使用)
       - [1.在grub中手动引导系统启动（即grub.cfg文件未生效）](#1在grub中手动引导系统启动即grubcfg文件未生效)
@@ -45,7 +47,16 @@ end
 D-->E("init程序")
 ```
 
-##### （1）bootloader有**两个阶段**：
+##### (1) BIOS
+* 存储在 EPROM (Erasable Programmable Read-Only Memory)上的
+* 作为连接操作系统和硬件的桥梁，从而使操作系统接管硬件
+
+##### (2) BIOS (legcy) vs UEFI
+* 功能类似
+* UEFI (Unified Extensible Firmware Interface.)
+  * 存储在 `.efi`文件中，这个文件存储在磁盘上一个特殊的分区（EFI System Partition）上 
+
+##### (3) bootloader有**两个阶段**：
 * bootloader程序的主要作用是**识别磁盘的文件系统**
 * stage1
   * 读取磁盘的主引导扇区（MBR），指明去哪个分区（即文件系统）读取 引导加载程序（bootloader）

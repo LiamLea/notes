@@ -28,10 +28,9 @@
         - [(2) difficulty target (leading zero)](#2-difficulty-target-leading-zero)
         - [(3) hash rate (算力)](#3-hash-rate-算力)
       - [7.常见的node类型](#7常见的node类型)
-        - [(1) miner](#1-miner)
-        - [(2) mining pool](#2-mining-pool)
-        - [(3) full node](#3-full-node)
-        - [(4) pruned node](#4-pruned-node)
+        - [(1) mining node](#1-mining-node)
+        - [(2) full node](#2-full-node)
+        - [(3) pruned node](#3-pruned-node)
       - [8.smart contract (智能合约)](#8smart-contract-智能合约)
         - [(1) 特点](#1-特点)
       - [9.POS (proof of stake)](#9pos-proof-of-stake)
@@ -186,18 +185,20 @@
 
 #### 7.常见的node类型
 
-##### (1) miner
-* 负责接受mining pool分发的hash计算任务，并把结果汇报给mining pool
+##### (1) mining node
+* miner
+    * 负责接受mining pool分发的hash计算任务，并把结果汇报给mining pool
+* mining pool
+    * 负责管理hash计算任务，创建block
+    * 保存整个block chain数据
 
-##### (2) mining pool
-* 负责管理hash计算任务，创建block
-* 保存整个block chain数据
-
-##### (3) full node
+##### (2) full node
+* 验证transaction和block
 * 负责保存整个block chain数据
 
-##### (4) pruned node
-* 负责保存最近的一些block的数据
+##### (3) pruned node
+* 验证transaction和block
+* 设置limit，只保存一定数量的block的数据
 
 #### 8.smart contract (智能合约)
 * 一小段 存储在区块链中 能够 自动执行合约条款的 计算机程序
