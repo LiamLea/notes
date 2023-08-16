@@ -23,6 +23,10 @@
 
 ##### (2) DHT (distributed hash table) 和 gossip protocol
 
+* gossip protocol
+  * 用于发现peer
+* DHT
+  * 根据文件的hash值，定为文件位置（即去哪些peer上去下载）
 * 每个peer维护一部分DHT
     * 当需要查找某个节点（或数据时），peer先计算hash值，然后根据自己的DHT找到最近的节点
     * 下一个节点会查询自己的DHT，找到离自己最新的节点

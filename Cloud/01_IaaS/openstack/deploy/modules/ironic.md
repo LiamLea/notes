@@ -9,6 +9,7 @@
     - [概述](#概述)
       - [1.流程概述](#1流程概述)
         - [(1) PXE详细流程](#1-pxe详细流程)
+        - [(2) 部署用户镜像 (PXE完成后)](#2-部署用户镜像-pxe完成后)
     - [deploy](#deploy)
       - [1.修改配置](#1修改配置)
       - [2.部署](#2部署)
@@ -22,6 +23,10 @@
       - [4.使该节点avaliable](#4使该节点avaliable)
       - [5.检查该节点验证状态](#5检查该节点验证状态)
       - [6.deploy instance](#6deploy-instance)
+    - [troubleshooting](#troubleshooting)
+      - [1.debug deploy](#1debug-deploy)
+        - [(1) 设置deploy image的root密码](#1-设置deploy-image的root密码)
+      - [2.node需要支持ipmi控制boot device](#2node需要支持ipmi控制boot-device)
 
 <!-- /code_chunk_output -->
 
@@ -44,7 +49,13 @@
     * 会根据 相关配置和bare-metal的信息，来动态配置**DHCP option**
         * TFTP地址、HTTP地址
         * **PXE引导文件**
-            * 这个文件很重要，如果返回的不对无法进行PXE装机
+            * 这个文件很重要，不同的boot mode、cpu架构、pxe或是ipxe 需要不同的引导文件，如果返回的不对，则无法装机
+
+                * ipxe
+                    * boot.ipxe都支持
+                * pxe
+                    * 能够支持uefi boot mode的引导文件: snponly.efi、pxelinux.0等
+                    * 能够支持BIOS (leagcy) boot mode的引导文件: undionly.kpxe、bootx64.efi等
         * 比如:
         ```python
         #根据节点不同的boot mode返回的pxe引导文件不一样
@@ -59,7 +70,12 @@
         ```
 * bare-metal根据获取的信息去TFTP (PXE) 或 HTTP (iPXE) 下载指定文件
 * 根据配置的deploy kernel和deploy ramdisk进行PXE装机
-* 装机完成后，在该bare-metal上运行指定的镜像 (即user镜像)
+    * 运行临时的操作系统
+
+##### (2) 部署用户镜像 (PXE完成后)
+* 临时的操作系统上会运行IPA(ironic-python-agent) 这个程序
+    * ironic-controller控制这个程序来安装用户镜像
+    * 当安装成功后，IPA会通知ironic-controller
 
 ***
 
@@ -208,3 +224,40 @@ openstack baremetal node validate $NODEID
 openstack server create --image cirros --flavor my-baremetal-flavor \
  --network public1 demo
 ```
+
+***
+
+### troubleshooting
+
+#### 1.debug deploy
+
+[参考](https://docs.openstack.org/ironic-python-agent/zed/admin/troubleshooting.html)
+
+##### (1) 设置deploy image的root密码
+
+* 官方提供的deploy kernel默认开启了[dynamic-login](https://github.com/openstack/diskimage-builder/tree/master/diskimage_builder/elements/dynamic-login)功能
+
+* 将root密码进行加密
+```shell
+$ openssl passwd -1 -stdin <<< cangoal | sed 's/\$/\$\$/g'
+#对$进行转义
+$$1$$NdWMb6x7$$F66z7yk1d5NHUeMoxn/st/
+```
+
+* 修改配置文件: `/etc/ironic/ironic.conf`
+```shell
+$ vim /etc/kolla/ironic-conductor/ironic.conf
+#将rootpwd="$$1$$NdWMb6x7$$F66z7yk1d5NHUeMoxn/st/"添加到kernel_append_params（老版本是pxe_append_params）中
+```
+
+* 重启ironic-conductor容器
+
+* 进行instance部署
+    * 就可以使用root/cangoal登陆到deploy image中进行debug
+
+#### 2.node需要支持ipmi控制boot device
+
+* node能够通过ipmi去控制boot device（比如pxe、disk等）
+* 如果不支持，需要手动进BIOS调
+    * 将disk启动放在pxe前面
+    * 重新安装instance时，需要disk格式化了，否则会从disk启动，无法从pxe启动
