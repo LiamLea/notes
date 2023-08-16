@@ -164,6 +164,10 @@ upstream <NAME> {
 ```
 
 #### 5.在http上下文中的upstream
+
+* **注意**
+  * 这里的`<NAME>`，影响http的头: `Host: <NAME>`
+  
 ```python
 upstream <NAME> {
   #与stream相似，区别：
