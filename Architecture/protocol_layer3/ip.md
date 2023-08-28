@@ -17,6 +17,7 @@
         - [(1) 表示](#1-表示)
         - [(2) prefix](#2-prefix)
         - [(3) scope id](#3-scope-id)
+        - [(4) GUA (global unicast address)](#4-gua-global-unicast-address)
       - [2.ipv6网关地址是link-local address](#2ipv6网关地址是link-local-address)
       - [3.NDP (Neighbor Discovery Protocol) (等价于ipv4的ARP)](#3ndp-neighbor-discovery-protocol-等价于ipv4的arp)
       - [4.三类Autoconiguration](#4三类autoconiguration)
@@ -26,7 +27,9 @@
       - [5.Autoconiguration解析 (使用ICMPv6协议)](#5autoconiguration解析-使用icmpv6协议)
         - [(1) Router Solicitation](#1-router-solicitation)
         - [(2) Router Advertisement](#2-router-advertisement)
-      - [6.PD (Prefix Delegation)](#6pd-prefix-delegation)
+      - [6.ipv6 PD (Prefix Delegation，委托前缀)](#6ipv6-pd-prefix-delegation委托前缀)
+        - [(1) 概述](#1-概述)
+        - [(2) 原理](#2-原理)
     - [ipv4保留地址](#ipv4保留地址)
     - [ipv6保留地址](#ipv6保留地址)
     - [ipv6 troubleshooting](#ipv6-troubleshooting)
@@ -95,6 +98,25 @@
   * 如果不指定，当有多个网卡时，每个网卡都有自己的link-local address，会产生歧义，不知道使用哪个网卡发送该数据包
 * `<scope_id>`一般为网卡名
 
+##### (4) GUA (global unicast address)
+![](./imgs/ip_03.png)
+![](./imgs/ip_04.png)
+
+* Global Routing Prefix
+  * 由供应商分配给用户侧的
+  * GUA都是2开头的，原因:
+    * Bits 0-3
+      * 为001
+    * Bit 4
+      * 预留的，为0
+    * Bits 5-7
+      * 用于flag或其他用途
+* Subnet ID
+  * 用于划分子网
+  * 所以设置ipv6时，至少都是`/64`
+* Interface ID
+  * 用于device/subnet
+
 #### 2.ipv6网关地址是link-local address
 * 对于ipv6来说，每个网卡必须有一个link-local address (`fe80::/10`)，用于链路通信
   * link-local地址通过mac地址计算而来（EUI-64方案） 
@@ -148,7 +170,15 @@ server端回复给客户端的数据，以下信息比较重要
 
 ![](./imgs/ip_02.png)
 
-#### 6.PD (Prefix Delegation)
+#### 6.ipv6 PD (Prefix Delegation，委托前缀)
+
+##### (1) 概述
+* 网络运行商分配给用户侧的ipv6网段
+  * 用户可以使用该网段，在自己网络环境中分配公网ip
+
+##### (2) 原理
+* 通过stateful DHCPv6进行分配
+  * 信息在Prefix Delegation这个字段中
 
 ***
 
@@ -173,9 +203,9 @@ server端回复给客户端的数据，以下信息比较重要
 
 |地址块|地址范围|用于范围|用途|
 |-|-|-|-|
-|fe80::/10|全范围|Subnet|链路地址|
-|fd00::/8|全范围|Private Network|私有网络内通信|
-|ff00::/8|全范围|Internet|组播地址|
+|`fe80::/10`|全范围|Subnet|链路地址|
+|`fc00::/7` |全范围(`fc00::/7 —— fdff::/7`)|Private Network|ULA(Unique Local Addresses)，用于私有网络|
+|`ff00::/8`|全范围|Internet|组播地址|
 
 ***
 
