@@ -41,6 +41,18 @@
       - [14.从host能够ping instance（默认不可以）](#14从host能够ping-instance默认不可以)
         - [（1）分配floating ip](#1分配floating-ip)
         - [（2）在host上配置路由](#2在host上配置路由)
+    - [配置IPv6](#配置ipv6)
+      - [1.网络规划](#1网络规划)
+      - [2.创建public网络](#2创建public网络)
+        - [(1) 创建ipv6 subnet](#1-创建ipv6-subnet)
+        - [(2) 如果需要删除subnet](#2-如果需要删除subnet)
+      - [3.创建tenant网络](#3创建tenant网络)
+        - [(1) 创建ipv6 subnet](#1-创建ipv6-subnet-1)
+        - [(2) 将创建的ipv6 subnet连接到router上](#2-将创建的ipv6-subnet连接到router上)
+      - [4.设置路由](#4设置路由)
+        - [(1) 获取public网络的link-local地址](#1-获取public网络的link-local地址)
+        - [(2) 在物理路器上添加路由](#2-在物理路器上添加路由)
+      - [5.验证](#5验证)
     - [测试](#测试)
       - [1.测试 ceph性能](#1测试-ceph性能)
       - [2.测试镜像上传、创建虚拟机等功能](#2测试镜像上传-创建虚拟机等功能)
@@ -605,6 +617,119 @@ ip route add 10.172.0.0/16 via 10.10.10.68
 
 ***
 
+### 配置IPv6
+
+[参考](https://object-storage-ca-ymq-1.vexxhost.net/swift/v1/6e4619c416ff4bd19e1c087f27a43eea/www-assets-prod/presentation-media/IPv6-Deployment-OpenStack.pdf)
+
+* openstack不支持ipv6的NAT
+
+#### 1.网络规划
+
+* 网关路由器使用ipv6 PD
+  * 可以使用运营商分配的ipv6，划分多个子网，在内网中进行分配
+
+* 网关路由器使用ipv6 NAT（不建议）
+  * ipv6就可以随便规划
+  * 但是这种存在问题，一般不支持ipv6的端口转发
+
+#### 2.创建public网络
+
+* 默认已经创建好public1网络
+
+##### (1) 创建ipv6 subnet
+
+* 默认不创建ipv6 subnet时，还是会自动配置ipv6的，因为有router advertisement机制
+  * 但是无法使用neutron等处理ipv6了，导致路由等会有问题，所以这里还是要创建一下
+
+```shell
+#用于外部通信的那张网卡 所在的网段，真实存在的网关
+#gateway不指定就默认为<prefix>::1
+openstack subnet create --no-dhcp \
+    --ip-version 6 \
+    --network public1 \
+    --subnet-range dd00:4191:d066::/64 \
+     public1-ipv6
+```
+
+##### (2) 如果需要删除subnet
+* 查看分配的ipv6地址
+```shell
+$ openstack port list
+
+| 54a1890b-bd27-4777-b85b-7c26f9281154 |           | fa:16:3e:7c:53:fb | ip_address='10.10.10.224', subnet_id='6b857ae4-3474-4506-b2c3-3312c61558e9'        | ACTIVE |
+|                                      |           |                   | ip_address='dd00:4191:d066::b8', subnet_id='41d744fc-7977-4eef-a570-d34ac3e4da4b'  |     
+```
+
+* unset分配的ipv6地址
+```shell
+openstack port unset --fixed-ip  subnet='41d744fc-7977-4eef-a570-d34ac3e4da4b',ip-address='dd00:4191:d066::b8' 54a1890b-bd27-4777-b85b-7c26f9281154
+```
+
+* 然后删除public中的ipv6 subnet就行了
+
+#### 3.创建tenant网络
+
+##### (1) 创建ipv6 subnet
+
+```shell
+#设置tenant的ipv6网段，根据ipv6 PD分配的网段进行设置
+#  比如：ipv6 PD分配的网段是 dd00:4191:d066::/48，则这里网络可以选择： dd00:4191:d066:1::/64、dd00:4191:d066:2::/64、dd00:4191:d066:3::/64等
+#gateway不指定就默认为<prefix>::1
+openstack subnet create \
+    --ip-version 6 \
+    --network demo-net \
+    --subnet-range dd00:4191:d066:1::/64 \
+    --ipv6-ra-mode=slaac \
+     --ipv6-address-mode=slaac \
+    demo-ipv6
+```
+
+##### (2) 将创建的ipv6 subnet连接到router上
+```shell
+openstack router add subnet demo-router demo-ipv6
+```
+
+#### 4.设置路由
+
+* 注意: 在物理的外出路由器上，而不是在openstack中
+  * 因为物理网路不知道去往tenant网络的路由
+
+##### (1) 获取public网络的link-local地址
+
+* 根据下面命令找到link-local的ip是`fe80::f816:3eff:fe7c:53fb`
+```shell
+$ ip netns ls
+
+qdhcp-4c432d1a-0fb9-4ea6-a0f1-2c39aa8a1d63 (id: 2)
+qrouter-5bdda72e-6743-4c79-b265-3a29ae82f349 (id: 0)
+
+$ ip netns exec qrouter-5bdda72e-6743-4c79-b265-3a29ae82f349 /bin/bash
+
+$ ip a
+
+38: qg-54a1890b-bd: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+    .....
+    inet6 dd00:4191:d066::4a/64 scope global 
+       valid_lft forever preferred_lft forever
+    inet6 fe80::f816:3eff:fe7c:53fb/64 scope link 
+       valid_lft forever preferred_lft forever
+```
+
+##### (2) 在物理路器上添加路由
+
+|接口名|目标网络|前缀长度|网关地址|
+|-|-|-|-|
+|LAN|dd00:4191:d066:1::|64|fe80::f816:3eff:fe7c:53fb|
+
+#### 5.验证
+
+* 创建虚拟机（注意关于ipv6的安全策略）
+```shell
+ping6 mirrors.aliyun.com
+```
+
+***
+
 ### 测试
 
 #### 1.测试 ceph性能
@@ -655,6 +780,9 @@ kolla-ansible -i ./multinode mariadb_recovery
 
 * 可以覆盖某个具体服务的具体配置
 [参考](https://docs.openstack.org/kayobe/latest/configuration/reference/kolla-ansible.html)
+
+* 某个服务的具体配置
+[参考](https://docs.openstack.org/2023.1/configuration/)
 
 ***
 

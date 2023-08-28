@@ -43,6 +43,9 @@ apt-get -y install miniupnpc
 
 ##### (2) 设置端口转发
 
+* 注意优先路由器有限制
+  * 比如： 低于1024的端口不能被转发（即添加时，会报718错误）
+
 ```shell
 upnpc -a <local_ip> <local_port> <external_port> <protocol> [remove_host]
 # -a表示add
