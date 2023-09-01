@@ -11,6 +11,7 @@
         - [(1) tracker](#1-tracker)
         - [(2) DHT (distributed hash table) 和 gossip protocol](#2-dht-distributed-hash-table-和-gossip-protocol)
       - [2.gossip protocol](#2gossip-protocol)
+      - [3.DHT工作原理](#3dht工作原理)
 
 <!-- /code_chunk_output -->
 
@@ -37,3 +38,18 @@
 #### 2.gossip protocol
 
 https://www.analyticssteps.com/blogs/gentle-introduction-gossip-protocol
+
+#### 3.DHT工作原理
+
+* 加入DHT网络
+  * 首先与bootstrap peer交换信息，获取peer信息，然后与更多的peer交换信息
+* locate（定位）
+  * 根据文件中的hash信息、peer上的路由信息，找到相应的peer
+  * 询问peer
+    * 发DHT请求（key为文件的hash值）
+    * peer收到请求后，查看key是否存在本地，返回离这个key最近的peer
+  * 一直重复上述步骤，直至找到提供该文件的peer
+* 定位到peer后
+  * 可以存储key-value
+    * key为文件的hash, value为node的id（即提供该文件的下载节点）
+  * 可以获取key-value，从而进行下载
