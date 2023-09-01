@@ -1,12 +1,21 @@
-# shadowsocks
+# Socks
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 <!-- code_chunk_output -->
 
-- [shadowsocks](#shadowsocks)
-    - [使用](#使用)
+- [Socks](#socks)
+    - [概述](#概述)
+      - [1.socks介绍](#1socks介绍)
+        - [(1) what](#1-what)
+        - [(2) why](#2-why)
+      - [2.socks协议](#2socks协议)
+        - [(1) 确定认证方法](#1-确定认证方法)
+        - [(2) 建立连接](#2-建立连接)
+        - [(3) 代理请求](#3-代理请求)
+      - [3.socks server和socks server之间通信](#3socks-server和socks-server之间通信)
+    - [shadowsocks使用](#shadowsocks使用)
       - [1.启动shadowsocks server](#1启动shadowsocks-server)
-      - [2.启动shadowsocks client（sock5 proxy）](#2启动shadowsocks-clientsock5-proxy)
+      - [2.启动shadowsocks local](#2启动shadowsocks-local)
       - [3.启动polipo（http proxy -> sock5 proxy）](#3启动polipohttp-proxy---sock5-proxy)
       - [4.验证](#4验证)
     - [其他使用](#其他使用)
@@ -23,7 +32,100 @@
 
 <!-- /code_chunk_output -->
 
-### 使用
+### 概述
+
+#### 1.socks介绍
+
+##### (1) what
+* 是一种进行**tcp/udp转发**的协议
+* 运行在application layer 和 transport layer之间
+
+##### (2) why
+* 正常tcp转发需要通过nginx等，而且一个端口只能转发到配置中的地址，而socks可以通过传递参数，从而告诉socks server，应该转发到指定的地址
+
+#### 2.socks协议
+[参考](https://datatracker.ietf.org/doc/html/rfc1928)
+
+##### (1) 确定认证方法
+
+* socks client -发送请求-> socks server
+  * frame格式
+    |字段|大小|说明|可设置的值|
+    |-|-|-|-|
+    |VER|1个8bit的数据|socks版本|05、04|
+    |NMETHODS|1个8bit的数据|指定METHODS字段的大小||
+    |METHODS|由NMETHODS指定（范围: 1-255个8bit的数据）|表示自己支持的认证方法，服务端根据自身的情况在客户端支持的方法中选择一个|NO AUTHENTICATION REQUIRED、GSSAPI、USERNAME/PASSWORD等|
+
+* socks client <-确定认证方法- socks serve
+  * frame格式
+    |字段|大小|说明|可设置的值|
+    |-|-|-|-|
+    |VER|1个8bit的数据|socks版本|05、04|
+    |METHODS|1个8bit的数据|确定的认证方法|当返回X'FF'时，表示客户端支持的认证方法，服务端都不支持，所以断开连接|
+
+* demo
+  * client -> server
+  ![](./imgs/socks_01.png)
+  * client <- server
+  ![](./imgs/socks_02.png)
+
+##### (2) 建立连接
+
+* socks client -发送请求-> socks server
+  * frame格式
+    |字段|大小|说明|可设置的值|
+    |-|-|-|-|
+    |VER|1个8bit的数据|socks版本|05、04|
+    |CMD|1个8bit的数据|进行的动作|CONNECT、BIND、UDP|
+    |RSV|1个8bit的数据|保留||
+    |**ATYP**|1个8bit的数据|address type of following address|IPv4、DOMAINNAME、IPv6|
+    |**DST.ADDR**|可变|**需要代理的目标地址**（即客户端真正想要访问的地址）|
+    |**DST.PORT**|2个8bit的数据|**需要代理的目标端口**（即客户端真正想要访问的地址）|
+  
+  * CMD
+    * CONNECT（最常用）
+      * 表示这是一个连接操作，即进行TCP转发
+    * BIND
+        * 表示client接受来自服务端的连接（当FTP时需要）
+    * UDP
+      * 表示进行UDP转发
+
+* socks client <-返回结果- socks server
+  * frame格式
+    |字段|大小|说明|可设置的值|
+    |-|-|-|-|
+    |VER|1个8bit的数据|socks版本|05、04|
+    |REP|1个8bit的数据|返回的结果|succeeded、Host unreachable、Connection refused等|
+    |ATYP|1个8bit的数据|address type of following address|IPv4、DOMAINNAME、IPv6|
+    |BND.ADDR|可变|server绑定的地址（一般不设置这个值，设为0.0.0.0）|
+    |BND.PORT|2个8bit的数据|server绑定的端口（一般不设置这个值，设为0）|
+
+* demo
+  * client -> server
+  ![](./imgs/socks_03.png)
+  * client <- server
+  ![](./imgs/socks_04.png)
+
+##### (3) 代理请求
+
+* 注意：建立socks连接后，流量都是正常的，没有socks这层协议存在了，数据都发往socks server了
+
+![](./imgs/socks_05.png)
+
+#### 3.socks server和socks server之间通信
+
+* socks server和socks server之间通信，就单纯使用tcp交换数据
+  * 他们之间不需要特殊的协议，只要能够交换到数据即可，受到数据后自己进行解析处理
+  * 比如:
+    * shadowsocks server就是socks sever
+    * shadowsocks local就是socks server
+    * polipo是socks client
+    * polipo和shadowsocks local使用socks协议
+    * shadowsocks local和shadowsocks server使用单处的tcp协议
+
+***
+
+### shadowsocks使用
 
 [参考](https://github.com/shadowsocks/shadowsocks-libev)
 
@@ -47,7 +149,7 @@ vim /etc/shadowsocks.json
 docker run --network host --restart always -itd -v /etc/shadowsocks.json:/etc/shadowsocks.json shadowsocks/shadowsocks-libev ss-server -c /etc/shadowsocks.json
 ```
 
-#### 2.启动shadowsocks client（sock5 proxy）
+#### 2.启动shadowsocks local
 
 * 创建配置文件
 ```shell
