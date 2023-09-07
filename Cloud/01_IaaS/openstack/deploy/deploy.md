@@ -69,6 +69,9 @@
       - [2.创建instance时，Sending discover failed（通过dhcp获取ip失败）](#2创建instance时sending-discover-failed通过dhcp获取ip失败)
       - [3.vm创建启动都没问题，在启动操作系统时等好久（一般是DHCP的问题，即网络的问题）](#3vm创建启动都没问题在启动操作系统时等好久一般是dhcp的问题即网络的问题)
       - [4.网络不通，但是通过抓包能够获取ARP的包（证明二层是同的，一般是三层设置了什么策略，比如iptables）](#4网络不通但是通过抓包能够获取arp的包证明二层是同的一般是三层设置了什么策略比如iptables)
+    - [kolla-ansible脚本解析](#kolla-ansible脚本解析)
+      - [1.初始化机器](#1初始化机器)
+      - [2.部署](#2部署)
 
 <!-- /code_chunk_output -->
 
@@ -805,3 +808,17 @@ kolla-ansible -i ./multinode prechecks
 #### 3.vm创建启动都没问题，在启动操作系统时等好久（一般是DHCP的问题，即网络的问题）
 
 #### 4.网络不通，但是通过抓包能够获取ARP的包（证明二层是同的，一般是三层设置了什么策略，比如iptables）
+
+***
+
+### kolla-ansible脚本解析
+
+#### 1.初始化机器
+安装初始化组件: docker等
+
+* 入口playbook: `<kolla_ansible_path>/ansible/kolla-host.yml`
+
+#### 2.部署
+
+进行openstack部署
+* 入口playbook: `<kolla_ansible_path>/ansible/site.yml`

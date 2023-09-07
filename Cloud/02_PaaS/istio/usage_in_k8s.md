@@ -239,10 +239,15 @@ spec:
 
 ##### （2）支持的协议：
 * grpc
+  * 低层是http2协议
 * grpc-web
 * http
   * 不支持1.0，nginx（proxy时，默认使用的是1.0，所以需要明确指定为1.1）
 * http2
+  * 当被代理的应用是有状态的，就不适用http2转发，以Nacos为例子:
+    * nacos client会首先和server建立一个http2连接，获取基础信息
+      * 然后会断开这个连接，再次建立一个http2连接，会保持这个连接
+    * 当使用http2 proxy或grpc proxy时，经常会共享http2连接，比如client断开http2连接，建立新的http2连接，而proxy没有立即断开，而是采用旧的连接，过了一会才断开并建立新的http2连接，由于nacos自身的设计（即server端发现这个数据包后上一个数据包发送的不是同一个源地址，则会断开连接），因为第二次http2连接的某些数据包，由于proxy重新建立连接http2有延迟，导致数据包的源地址不一样了
 * https
 * mongo
 * mysql
