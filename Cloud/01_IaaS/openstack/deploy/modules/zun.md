@@ -9,6 +9,10 @@
     - [deploy](#deploy)
       - [1.修改配置](#1修改配置)
       - [2.部署](#2部署)
+    - [使用](#使用)
+      - [1.上传镜像](#1上传镜像)
+      - [2.创建容器](#2创建容器)
+      - [3.操作容器](#3操作容器)
 
 <!-- /code_chunk_output -->
 
@@ -39,4 +43,22 @@ docker_yum_package_pin: "20.*"
 #### 2.部署
 ```shell
 kolla-ansible -i ./multinode deploy
+```
+
+***
+
+### 使用
+
+#### 1.上传镜像
+```shell
+docker pull cirros
+docker save cirros | openstack image create cirros-img --public \
+  --container-format docker --disk-format raw
+```
+
+#### 2.创建容器
+
+#### 3.操作容器
+```shell
+openstack appcontainer exec --interactive <container_id> /bin/sh
 ```

@@ -27,6 +27,7 @@
       - [3.相关工具推荐](#3相关工具推荐)
       - [4.shortcut冲突:](#4shortcut冲突)
         - [(1) ctl+shift+f: 这个是中文键盘切换简体和繁体的快捷键](#1-ctlshiftf-这个是中文键盘切换简体和繁体的快捷键)
+      - [5.安装图形化界面](#5安装图形化界面)
 
 <!-- /code_chunk_output -->
 
@@ -252,3 +253,12 @@ text/x-python=PyCharm.desktop
 #### 4.shortcut冲突: 
 
 ##### (1) ctl+shift+f: 这个是中文键盘切换简体和繁体的快捷键
+
+#### 5.安装图形化界面
+```shell
+#安装图形化界面
+apt-get install gnome-desktop
+
+#安装图形化需要的软件
+apt-get install gnome-software
+```
