@@ -427,7 +427,7 @@ openstack project list
 
 * 查看project的compute、volume、network这三个方面的限额（quota）
 ```shell
-openstacl quota show <project>
+openstack quota show <project>
 ```
 
 * 设置限额（quota）
