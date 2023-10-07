@@ -30,6 +30,7 @@
       - [6.ipv6 PD (Prefix Delegation，委托前缀)](#6ipv6-pd-prefix-delegation委托前缀)
         - [(1) 概述](#1-概述)
         - [(2) 原理](#2-原理)
+        - [(3) 配置](#3-配置)
     - [ipv4保留地址](#ipv4保留地址)
     - [ipv6保留地址](#ipv6保留地址)
     - [ipv6 troubleshooting](#ipv6-troubleshooting)
@@ -179,6 +180,22 @@ server端回复给客户端的数据，以下信息比较重要
 ##### (2) 原理
 * 通过stateful DHCPv6进行分配
   * 信息在Prefix Delegation这个字段中
+
+##### (3) 配置
+
+* 路由器开启IPv6 DP
+* 路由器关闭IPv6 DHCP（使用SLAAC）
+* 路由器关闭**防火墙**
+  * 不然可能无法ping同和访问
+* 注意: 当主机上有多个网卡配置不同的IPv6时，需要关闭其他网卡IPv6的**默认路由**
+
+```shell
+$ vim /etc/sysctl.conf
+
+net.ipv6.conf.enp4s0.accept_ra_defrtr = 0
+
+$ sysctl -p
+```
 
 ***
 

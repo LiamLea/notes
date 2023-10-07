@@ -41,6 +41,7 @@
       - [8.LoadBalancer相关](#8loadbalancer相关)
         - [（1）创建LoadBalancer](#1创建loadbalancer)
       - [9.创建VIP（将floating ip与某个内部vip绑定）](#9创建vip将floating-ip与某个内部vip绑定)
+      - [10.重置虚拟机状态（当虚拟机处于error时）](#10重置虚拟机状态当虚拟机处于error时)
     - [管理](#管理)
       - [1.project管理](#1project管理)
         - [（1）project管理](#1project管理-1)
@@ -409,6 +410,13 @@ openstack floating ip create --subnet <subnet> --port <port> --floating-ip-addre
 ```
 * 此时该vip其实还没有分配，只不过是与floating ip进行了绑定
  * 然后多个虚拟机允许该vip通过，然后通过keepalived将这个vip配置在这些虚拟机间，这样访问floating ip就能实现高可用
+
+#### 10.重置虚拟机状态（当虚拟机处于error时）
+
+```shell
+openstack server set --state active <instance>
+openstack server stop <instance>
+``` 
 
 ***
 
