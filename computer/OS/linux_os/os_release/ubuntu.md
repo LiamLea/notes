@@ -28,6 +28,10 @@
       - [4.shortcut冲突:](#4shortcut冲突)
         - [(1) ctl+shift+f: 这个是中文键盘切换简体和繁体的快捷键](#1-ctlshiftf-这个是中文键盘切换简体和繁体的快捷键)
       - [5.安装图形化界面](#5安装图形化界面)
+        - [(1) 安装](#1-安装)
+        - [(2) 设置分辨率](#2-设置分辨率)
+        - [(3) 设置网卡被NetworkManager管控](#3-设置网卡被networkmanager管控)
+        - [(4) 命令行开启screen sharing](#4-命令行开启screen-sharing)
 
 <!-- /code_chunk_output -->
 
@@ -255,10 +259,82 @@ text/x-python=PyCharm.desktop
 ##### (1) ctl+shift+f: 这个是中文键盘切换简体和繁体的快捷键
 
 #### 5.安装图形化界面
+
+##### (1) 安装
 ```shell
 #安装图形化界面
 apt-get install gnome-desktop
 
 #安装图形化需要的软件
 apt-get install gnome-software
+```
+
+##### (2) 设置分辨率
+* 当分辨率选项较少时
+
+```shell
+$ vim /etc/default/grub
+
+#GRUB_GFXMODE=640x480
+GRUB_GFXMODE=1920x1080 
+
+$ update-grub
+$ reboot
+```
+
+##### (3) 设置网卡被NetworkManager管控
+
+```shell
+$ vim /usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf
+
+#添加这一项: except:type:ethernet
+
+$ vim /etc/NetworkManager/NetworkManager.conf
+
+...
+[ifupdown]
+managed=true
+...
+
+$ systemctl restart NetworkManager
+```
+
+##### (4) 命令行开启screen sharing
+
+```shell
+$ vim /etc/gdm3/custom.conf
+
+[daemon]
+AutomaticLoginEnable=true
+AutomaticLogin=<username>
+
+#获取连接
+$ nmcli con
+NAME                UUID                                  TYPE      DEVICE 
+Wired connection 1  00c60637-2077-3fc7-9de7-6610f1bf960a  ethernet  ens3 
+
+# dconf的配置存在~/.config/dconf/user中
+
+# 查看是否绑定到先有的网络连接上
+# 所以网卡重新创建后（比如openstack从镜像创建虚拟机），这里需要重新配置
+$ dconf read /org/gnome/settings-daemon/plugins/sharing/vino-server/enabled-connections
+$ dconf write /org/gnome/settings-daemon/plugins/sharing/vino-server/enabled-connections "['00c60637-2077-3fc7-9de7-6610f1bf960a  ethernet']"
+
+#设置密码
+$ PASSWORD="passwordgoeshere"
+$ dconf write /org/gnome/desktop/remote-access/vnc-password \"\'$(echo -n $PASSWORD | base64)\'\"
+
+#其他设置
+$ dconf write /org/gnome/desktop/remote-access/authentication-methods "['vnc']"
+$ dconf write /org/gnome/desktop/remote-access/prompt-enabled false
+```
+
+* 网卡重新生成后
+  * 注意要在相关用户下执行这个命令
+```shell
+$ nmcli con
+NAME                UUID                                  TYPE      DEVICE 
+Wired connection 1  00c60637-2077-3fc7-9de7-6610f1bf960a  ethernet  ens3 
+
+$ dconf write /org/gnome/settings-daemon/plugins/sharing/vino-server/enabled-connections "['00c60637-2077-3fc7-9de7-6610f1bf960a']"
 ```
