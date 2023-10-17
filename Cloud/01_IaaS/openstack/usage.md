@@ -243,6 +243,11 @@ openstack port create --network <network_name> --fixed-ip ip-address=<ip> --allo
 openstack port set --allowed-address ip-address=10.172.1.13 <port_id>
 ```
 
+* 创建一个端口（即网卡）不设置ip且允许设置任意ip
+```shell
+openstack port create --network <network_name> --no-fixed-ip --disable-port-security openstack-public-port
+```
+
 #### 3.volume（磁盘）相关
 
 ##### （1）基本使用
@@ -440,7 +445,7 @@ openstack quota show <project>
 
 * 设置限额（quota）
 ```shell
-openstack quota set --cores 60 --ram 122880 --instances 100 --volumes 150 --snapshots 150 <project>
+openstack quota set --cores 60 --ram 122880 --gigabytes 1000 --instances 100 --volumes 150 --snapshots 150 <project>
 ```
 
 #### 2.server管理
@@ -452,7 +457,7 @@ openstack server list --all-projects
 ### Demo
 
 ```shell
-openstack quota set --cores 146 --ram 299008 --instances 100 --volumes 150 --snapshots 150 admin
+openstack quota set --cores 146 --ram 299008 --gigabytes 1000 --instances 100 --volumes 150 --snapshots 150 admin
 
 openstack server create \
   --image centos-7-cloud-template \

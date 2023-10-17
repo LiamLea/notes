@@ -14,6 +14,7 @@
   - [插入图片](#插入图片)
   - [插入上标和下标](#插入上标和下标)
   - [数学表示式](#数学表示式)
+  - [下拉展示详情](#下拉展示详情)
 - [高级用法](#高级用法)
   - [列表](#列表)
     - [无序列表](#无序列表)
@@ -105,6 +106,14 @@ A<sub>2</sub>
 ## 数学表示式
 
 [参考](https://meta.wikimedia.org/wiki/Help:Displaying_a_formula)
+
+## 下拉展示详情
+<details>
+  <summary>The DUDE Prompt</summary>
+<blockquote>From "Sape", via email, Re: my YouTube video.</blockquote>
+Hello ChatGPT.
+
+</details>
 
 # 高级用法
 ## 列表

@@ -69,6 +69,7 @@
       - [2.创建instance时，Sending discover failed（通过dhcp获取ip失败）](#2创建instance时sending-discover-failed通过dhcp获取ip失败)
       - [3.vm创建启动都没问题，在启动操作系统时等好久（一般是DHCP的问题，即网络的问题）](#3vm创建启动都没问题在启动操作系统时等好久一般是dhcp的问题即网络的问题)
       - [4.网络不通，但是通过抓包能够获取ARP的包（证明二层是同的，一般是三层设置了什么策略，比如iptables）](#4网络不通但是通过抓包能够获取arp的包证明二层是同的一般是三层设置了什么策略比如iptables)
+      - [5.jina2版本问题: The error was: No filter named 'service_enabled_and_mapped_to_host' found](#5jina2版本问题-the-error-was-no-filter-named-service_enabled_and_mapped_to_host-found)
     - [kolla-ansible脚本解析](#kolla-ansible脚本解析)
       - [1.初始化机器](#1初始化机器)
       - [2.部署](#2部署)
@@ -90,6 +91,8 @@
 ***
 
 ### 部署
+
+[参考quick start](https://docs.openstack.org/kolla-ansible/xena/user/quickstart.html)
 
 #### 1.确定相关版本
 * kolla-ansible版本
@@ -158,13 +161,33 @@ options kvm_intel nested=1
 #### 4.准备好ansible部署机
 
 ##### （1）安装ansible所需依赖
-```shell
-yum -y install python3-devel libffi-devel gcc openssl-devel python3-libselinux
 
-#apt-get -y install python-dev libffi-dev gcc libssl-dev python-selinux python-setuptools python3-venv
+* 设置镜像源头（所有节点）
+```shell
+sudo sed -i "s@http://.*archive.ubuntu.com@http://mirrors.huaweicloud.com@g" /etc/apt/sources.list
+sudo sed -i "s@http://.*security.ubuntu.com@http://mirrors.huaweicloud.com@g" /etc/apt/sources.list
+```
+
+* 安装
+```shell
+apt-get -y install python3-dev libffi-dev gcc libssl-dev python3-selinux python3-setuptools python3-venv sshpass
+
+#yum -y install python3-devel libffi-devel gcc openssl-devel python3-libselinux
 ```
 
 ##### （2）在虚拟环境中安装python包依赖
+
+* 设置pip源（所有节点）
+```shell
+$ mkdir ~/.pip/
+$ vim ~/.pip/pip.conf
+
+[global]
+index-url=http://pypi.douban.com/simple/
+trusted-host=pypi.douban.com
+```
+
+* 安装
 ```shell
 python3 -m venv /root/kolla-env
 source /root/kolla-env/bin/activate
@@ -241,8 +264,9 @@ keystone_admin_password: cangoal
 ```
 
 #### 7.配置：`/etc/kolla/globals.yml`
-
-[配置参考](https://docs.openstack.org/train/configuration/)
+[quick start](https://docs.openstack.org/kolla-ansible/xena/user/quickstart.html)
+[具体配置](https://docs.openstack.org/kolla-ansible/xena/reference/index.html)
+[服务的详细配置](https://docs.openstack.org/train/configuration/)
 
 * 注意：当不同主机的变量不一样时（比如网卡名不一样），需要 **注释** `globals.yaml`中的配置，然后在inventory配置相应的变量
   * 比如：
@@ -325,6 +349,7 @@ enable_prometheus_openstack_exporter: "yes" #待测试（需要enable_prometheus
 ```
 
 * 配置网卡up和混杂模式
+  * `#!/bin/bash`一定要以这个开头，不然不会执行
 ```shell
 $ vim /etc/rc.local
 
@@ -808,6 +833,12 @@ kolla-ansible -i ./multinode prechecks
 #### 3.vm创建启动都没问题，在启动操作系统时等好久（一般是DHCP的问题，即网络的问题）
 
 #### 4.网络不通，但是通过抓包能够获取ARP的包（证明二层是同的，一般是三层设置了什么策略，比如iptables）
+
+#### 5.jina2版本问题: The error was: No filter named 'service_enabled_and_mapped_to_host' found
+
+```shell
+pip install --force-reinstall -v "Jinja2==3.0.2"
+```
 
 ***
 

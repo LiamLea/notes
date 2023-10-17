@@ -29,10 +29,15 @@
   - [16.查看一个文件是否有硬连接](#16查看一个文件是否有硬连接)
   - [17. 截断一个 正被使用的 文件](#17-截断一个-正被使用的-文件)
   - [18.查看系统支持的字符集](#18查看系统支持的字符集)
-  - [19.`getconf` —— 获取系统的变量](#19getconf-获取系统的变量)
+  - [19.`getconf` —— 获取系统的变量](#19getconf--获取系统的变量)
   - [20.kill父进程和其所有的子进程](#20kill父进程和其所有的子进程)
   - [21.强制卸载某个文件系统](#21强制卸载某个文件系统)
   - [22.base64](#22base64)
+  - [23.将进程放到后台运行](#23将进程放到后台运行)
+    - [(1) hangup信号](#1-hangup信号)
+    - [(2) nohup](#2-nohup)
+    - [(3)对于正在前台运行的进程: ctrl+z 和 bg](#3对于正在前台运行的进程-ctrlz-和-bg)
+    - [(4) 获取后台进程的STDOUT](#4-获取后台进程的stdout)
 
 <!-- /code_chunk_output -->
 
@@ -278,4 +283,81 @@ umount -f <PATH>
 * base64编码
 ```shell
 echo -n '<CONTENT>' | base64 -w 0    #wrap，0表示禁止换行
+```
+
+#### 23.将进程放到后台运行
+
+##### (1) hangup信号
+
+* 用于当前shell中的进程发送hangup信号
+* 一般在shell退出时
+
+* 查看shell退出时是否会发送hangup信号
+```shell
+shopt -p
+#shopt -u huponexit 表示disable，即不会发送hangup信号
+#shopt -s huponexit 表示enable，即会发送hangup信号
+```
+
+* 临时关闭hangup
+```shell
+shopt -u huponexit
+```
+
+##### (2) nohup
+
+nohup表示不会响应hangup信号
+```shell
+nohup <command> &
+```
+
+##### (3)对于正在前台运行的进程: ctrl+z 和 bg
+
+* 在前台运行进程
+```shell
+<command>
+```
+* ctrl+z将进程放入后台并暂停运行
+* bg使后台的进程开始运行
+```shell
+bg %<job_id>
+
+#bg <pid>
+```
+
+
+
+* 退出shell不会导致后台进程关闭
+  * 方法一：使用后台进程脱离当前shell运行
+  ```shell
+  disown %<job_id>
+  #disown <pid>
+  ```
+  * 方法二：disable hangup（退出shell不发送hangup信号）
+  ```shell
+  shopt -u huponexit
+  exit
+  ```
+
+##### (4) 获取后台进程的STDOUT
+
+* gdb时进程会**暂停运行**
+```shell
+#会使得进程暂停运行
+gdb -p <pid>
+
+#关闭STDOUT文件描述符
+call close(1)
+
+#打开新的文件作为STDOUT
+call open("/tmp/c.txt", 0101, 0600)
+
+#关闭STDERR文件描述符
+call close(2)
+
+#打开新的文件作为STDERR
+# 不能使用一个文件，不然有问题
+call open("/tmp/d.txt", 0101, 0600)
+
+quit
 ```
