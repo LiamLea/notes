@@ -32,6 +32,11 @@
         - [(2) 设置分辨率](#2-设置分辨率)
         - [(3) 设置网卡被NetworkManager管控](#3-设置网卡被networkmanager管控)
         - [(4) 命令行开启screen sharing](#4-命令行开启screen-sharing)
+      - [6.设置suspend](#6设置suspend)
+        - [(1) lock、suspend和hibernate区别](#1-lock-suspend和hibernate区别)
+        - [(2) 设置close lid 不 suspend](#2-设置close-lid-不-suspend)
+        - [(3) 关闭自动suspend](#3-关闭自动suspend)
+        - [(4) 主动suspend](#4-主动suspend)
 
 <!-- /code_chunk_output -->
 
@@ -70,8 +75,11 @@ FallbackDNS=1.1.1.1
 #使用DNS over TLS协议
 DNSOverTLS=true
 
-#会读取/etc/hosts作为dns server的条目
+# 会读取/etc/hosts作为dns server的条目
 #ReadEtcHosts=yes
+
+# 监听其他端口，默认只监听127.0.0.53
+#DNSStubListenerExtra=0.0.0.0
 ```
 
 * 重启systemd-resolved
@@ -337,4 +345,38 @@ NAME                UUID                                  TYPE      DEVICE
 Wired connection 1  00c60637-2077-3fc7-9de7-6610f1bf960a  ethernet  ens3 
 
 $ dconf write /org/gnome/settings-daemon/plugins/sharing/vino-server/enabled-connections "['00c60637-2077-3fc7-9de7-6610f1bf960a']"
+```
+
+#### 6.设置suspend
+
+##### (1) lock、suspend和hibernate区别
+
+* lock只是锁屏
+* suspend，系统暂停运行，状态存储在内存中
+* hibernate，系统暂停运行，状态存储在磁盘中，即使电脑没电了，下次启动也能恢复状态
+
+##### (2) 设置close lid 不 suspend
+
+```shell
+$ vim /etc/systemd/logind.conf
+
+[Login]
+HandleLidSwitch=ignore
+HandleLidSwitchExternalPower=ignore
+HandleLidSwitchDocked=ignore
+
+$ systemctl restart systemd-logind.service
+```
+
+##### (3) 关闭自动suspend
+Settings -> Power
+
+* 默认是在inactive一段时间后，自动进入suspend
+  * inactive就是没有移动鼠标和打击键盘
+
+##### (4) 主动suspend
+
+```shell
+#可以设置快捷键
+systemctl suspend
 ```
