@@ -136,6 +136,14 @@ jps
     -m        #输出传入 main 方法的参数
 ```
 #### 2.`jstat`（JVM statistics Monitoring）
+
+* 需要特别关注: gc中的FGC（即full gc的次数）
+  * 频繁的FGC，对性能影响很大，会导致各种超时
+  ```shell
+  #1秒打印一次，一共打印10次
+  jstat -gc <vmid> 1000 10
+  ```
+
 ```shell
 jstat <OPTION> <VMID>   #VMID就是JVM的id，即进程号
 

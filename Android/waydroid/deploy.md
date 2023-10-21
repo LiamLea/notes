@@ -31,12 +31,16 @@
         - [(1) 中文输入法: Gboard](#1-中文输入法-gboard)
         - [(2) VPN: shadowsocks](#2-vpn-shadowsocks)
         - [(3) 应用宝](#3-应用宝)
+        - [(4) 控屏软件: touchpad for big phone & tab](#4-控屏软件-touchpad-for-big-phone--tab)
       - [6.登陆google play](#6登陆google-play)
         - [(1) 设置谷歌设置认证](#1-设置谷歌设置认证)
         - [(2) 登陆google play](#2-登陆google-play)
       - [7.其他使用](#7其他使用)
         - [(1) 截屏](#1-截屏)
         - [(2) 开启developer mode](#2-开启developer-mode)
+    - [配置GPS](#配置gps)
+      - [1.利用gpsfake虚拟一个gps设备](#1利用gpsfake虚拟一个gps设备)
+      - [2.将gps设备挂载进waydroid容器里](#2将gps设备挂载进waydroid容器里)
     - [Troubleshooting](#troubleshooting)
       - [1.重置](#1重置)
       - [2.Failed to start Clipboard manager service](#2failed-to-start-clipboard-manager-service)
@@ -226,6 +230,10 @@ waydroid remove <package_name>
 ##### (3) 应用宝
 [下载地址](https://sj.qq.com/)
 
+##### (4) 控屏软件: touchpad for big phone & tab
+在google play中下载即可
+有些app，通过电脑鼠标无法操作，需要利用到这个软件模拟触屏等操作
+
 #### 6.登陆google play
 
 * 需要先开启VPN
@@ -254,6 +262,35 @@ sudo systemctl restart waydroid-container.service
 
 * settings -> About Phone -> Build Number
   * 多次点击`Build Number`就可以开启
+
+***
+
+### 配置GPS
+
+#### 1.利用gpsfake虚拟一个gps设备
+
+```shell
+gpsfake -c 1 ~/Downloads/output-3.nmea
+
+#查看虚拟出的gps设备，这里是/dev/pts/12
+gpsmon
+```
+
+#### 2.将gps设备挂载进waydroid容器里
+
+```shell
+$ vim /var/lib/waydroid/lxc/waydroid/config_nodes
+
+lxc.mount.entry = /dev/pts/11 dev/gps none bind,create=file,optional 0 0
+
+$ systemctl restart waydroid-container.service
+```
+
+* 查看gps设备
+```shell
+waydroid shell
+ls /dev/gps
+```
 
 ***
 
