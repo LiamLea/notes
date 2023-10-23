@@ -39,11 +39,19 @@
         - [(1) 截屏](#1-截屏)
         - [(2) 开启developer mode](#2-开启developer-mode)
     - [配置GPS](#配置gps)
-      - [1.利用gpsfake虚拟一个gps设备](#1利用gpsfake虚拟一个gps设备)
-      - [2.将gps设备挂载进waydroid容器里](#2将gps设备挂载进waydroid容器里)
+      - [1.制作支持GPS的镜像](#1制作支持gps的镜像)
+        - [(1) 选择包含GPS镜像](#1-选择包含gps镜像)
+        - [(2)制作镜像](#2制作镜像)
+        - [(3) umount镜像](#3-umount镜像)
+      - [2.初始化waydroid](#2初始化waydroid)
+      - [3.模拟一个gps设备](#3模拟一个gps设备)
+        - [(1) 准备nmea文件 (注意要多设几个point)](#1-准备nmea文件-注意要多设几个point)
+        - [(2) 创建gps设置](#2-创建gps设置)
+      - [4.将gps设备挂载进waydroid容器里](#4将gps设备挂载进waydroid容器里)
     - [Troubleshooting](#troubleshooting)
       - [1.重置](#1重置)
       - [2.Failed to start Clipboard manager service](#2failed-to-start-clipboard-manager-service)
+      - [3.查看日志](#3查看日志)
 
 <!-- /code_chunk_output -->
 
@@ -156,12 +164,15 @@ sudo waydroid shell <command>
 sudo apt install lzip
 
 git clone https://github.com/casualsnek/waydroid_script
+
 cd waydroid_script
 python3 -m venv venv
-venv/bin/pip install -r requirements.txt
+source venv/bin/activate
+
+sudo pip install -r requirements.txt
 
 #要设置代理，否则相关文件无法下载
-HTTP_PROXY="127.0.0.1:1095" HTTPS_PROXY="127.0.0.1:1095" sudo venv/bin/python3 main.py install libhoudini
+HTTP_PROXY="127.0.0.1:1095" HTTPS_PROXY="127.0.0.1:1095" sudo python3 main.py install libhoudini
 ```
 
 #### 3.设置窗口大小
@@ -267,29 +278,144 @@ sudo systemctl restart waydroid-container.service
 
 ### 配置GPS
 
-#### 1.利用gpsfake虚拟一个gps设备
+#### 1.制作支持GPS的镜像
 
+##### (1) 选择包含GPS镜像
+* cpu架构要一致
+* 要包含GNSS相关库
+* 比如x86_64架构的就可以选择: 
+  * [Bliss-v14.10-x86_64-OFFICIAL-opengapps-20230325.iso](https://sourceforge.net/projects/blissos-dev/files/Beta/Bliss-v14.10-x86_64-OFFICIAL-opengapps-20230325.iso/download)
+
+##### (2)制作镜像
+
+* 对原有镜像进行扩容，因为需要复制一些文件进去
 ```shell
-gpsfake -c 1 ~/Downloads/output-3.nmea
+qemu-img resize <vendor_image> +10M
+resize2fs <vendor_image>
 
-#查看虚拟出的gps设备，这里是/dev/pts/12
-gpsmon
+qemu-img resize <system_image> +20M
+resize2fs <system_image>
 ```
 
-#### 2.将gps设备挂载进waydroid容器里
+* 相关准备
+```shell
+mkdir /mnt/android /mnt/system /mnt/vendor
+mount -o loop <bliss_iso> /mnt/android
+mount -o loop <vendor_image> /mnt/vendor
+mount -o loop <system_image> /mnt/system
+
+mkdir /tmp/android
+cp /mnt/android/system.sfs /tmp/android/
+cd /tmp/android/
+unsquashfs system.sfs
+umount /mnt/android
+mount -o loop /tmp/android/squashfs-root/system.img /mnt/android
+```
+
+* 复制文件
 
 ```shell
-$ vim /var/lib/waydroid/lxc/waydroid/config_nodes
+# 拷贝到vendor镜像
+cp /mnt/android/system/vendor/bin/hw/android.hardware.gnss@1.0-service /mnt/vendor/bin/hw/
+# 使用权限等都一样
+#ls -l /mnt/vendor/bin/hw/
+#chown root:2000 /mnt/vendor/bin/hw/android.hardware.gnss@1.0-service
+
+# 拷贝到system镜像
+cp /mnt/android/system/vendor/etc/init/android.hardware.gnss@1.0-service.rc /mnt/system/system/etc/init/
+cp /mnt/android/system/vendor/lib/hw/android.hardware.gnss@1.0-impl.so /mnt/system/system/lib/hw/
+cp /mnt/android/system/vendor/lib64/hw/android.hardware.gnss@1.0-impl.so /mnt/system/system/lib64/hw/
+cp /mnt/android/system/lib/hw/gps.default.so /mnt/system/system/lib/hw/
+cp /mnt/android/system/lib64/hw/gps.default.so /mnt/system/system/lib64/hw/
+```
+
+* 修改配置
+
+```shell
+vim /mnt/system/system/etc/vintf/manifest.xml
+```
+```xml
+    <hal format="hidl">
+        <name>android.hardware.gnss</name>
+        <transport>hwbinder</transport>
+        <version>1.0</version>
+        <interface>
+            <name>IGnss</name>
+            <instance>default</instance>
+        </interface>
+        <fqname>@1.0::IGnss/default</fqname>
+    </hal>
+```
+
+```shell
+vim /mnt/system/system/etc/vintf/compatibility_matrix.legacy.xml
+```
+```xml
+    <hal format="hidl" optional="true">
+        <name>android.hardware.gnss</name>
+        <version>1.0</version>
+        <interface>
+            <name>IGnss</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+```
+
+```shell
+$ vim /mnt/system/system/build.prop
+
+ro.factory.hasGPS=true
+#gps设备名称，这里设置的是/dev/gps，则后续需要将gps设备挂载到/dev/gps上
+ro.kernel.android.gps=gps
+ro.kernel.android.gps.speed=115200
+```
+
+##### (3) umount镜像
+```shell
+umount /mnt/android /mnt/vendor /mnt/system
+```
+
+#### 2.初始化waydroid
+使用新的镜像初始化waydroid
+
+#### 3.模拟一个gps设备
+
+##### (1) 准备nmea文件 (注意要多设几个point)
+
+[生成地址](https://www.nmeagen.org/)
+
+* 要多设置几个邻近的point，不然应用可能无法读取到定位
+
+##### (2) 创建gps设置
+
+* 这里使用[virtualgps.py](https://github.com/LiamLea/virtualgps)
+```shell
+python3 virtualgps.py --nmea /home/liamlea/Downloads/output-4.nmea
+
+# 会返回虚拟的gps设备名称： /dev/pts/11
+```
+
+* 设置gps设备权限
+  * `virtualgps.py`进行了配置，所以这里无需进行
+```shell
+chmod 666 <gps_device>
+```
+
+#### 4.将gps设备挂载进waydroid容器里
+
+```shell
+$ sudo vim /var/lib/waydroid/lxc/waydroid/config_nodes
 
 lxc.mount.entry = /dev/pts/11 dev/gps none bind,create=file,optional 0 0
 
-$ systemctl restart waydroid-container.service
+$ sudo systemctl restart waydroid-container.service
 ```
 
 * 查看gps设备
 ```shell
 waydroid shell
-ls /dev/gps
+cat /dev/gps
+#如果有数据，证明gps设备创建成功
 ```
 
 ***
@@ -302,6 +428,9 @@ ls /dev/gps
 
 sudo systemctl stop waydroid-container.service
 
+#注意在安装waydroid那个用户下执行
+sudo rm -rf /var/lib/waydroid /home/.waydroid ~/waydroid ~/.share/waydroid ~/.local/share/applications/*aydroid* ~/.local/share/waydroid
+
 rm -rf /var/lib/waydroid /home/.waydroid ~/waydroid ~/.share/waydroid ~/.local/share/applications/*aydroid* ~/.local/share/waydroid
 
 sudo waydroid init -f
@@ -310,4 +439,15 @@ sudo waydroid init -f
 #### 2.Failed to start Clipboard manager service
 ```shell
 pip3 install pyclip
+```
+
+#### 3.查看日志
+* 查看waydroid日志
+```shell
+waydroid log
+```
+* 查看android系统运行日志
+```shell
+waydroid shell
+logcat
 ```
