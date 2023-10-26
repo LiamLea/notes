@@ -21,9 +21,10 @@
 |KUBE-SERVICES|用于匹配service的ip|
 |KUBE-NODEPORTS|用于匹配nodeport|
 |KUBE-SVC|用于关联多个KUBE-SEP，这样就能实现负载|
-|KUBE-SEP|用于匹配service enpoint（即pod的ip）|
-|KUBE-POSTROUTING|会对包进行标记（0x4000/0x4000）|
-|KUBE-POSTROUTING|对被标记的包进行SNAT|
+|KUBE-SEP|用于匹配service enpoint（即pod的ip）
+|KUBE-MARK-MASQ|给数据包打上MASQ(MASQUERADE)(`0x4000/0x4000`) 标记|
+|KUBE-MARK-DROP|给数据包打上DROP(`0x8000/0x8000`)标记|
+|KUBE-POSTROUTING|判断是不是`0x4000/0x4000`</br>如果不是则返回</br>是则对被标记的包m进行MASQUERADE（即SNAT），然后将标记改为`0x4000/0x0`|
 
 #### 2.chain的顺序
 通过`iptables-save`中的nat表进行分析
@@ -43,8 +44,9 @@
 #### 1.常用配置
 
 ```shell
-#设置pod的cidr，这个不会影响pod的地址（影响pod的地址的是网络插件）
-#但是这个会影响iptables的相关配置，所以网络插件设置的pod的cidr必须和这里一致
-#traffic sent to a Service cluster IP from outside this range will be masqueraded and traffic sent from pods to an external LoadBalancer IP will be directed to the respective cluster IP instead
+#建议不设置这个参数
+#这个用于设置iptables，在这个范围外访问service的地址都会进行MASQURADE
+#其实没有存在的必要，很多网络插件都进行了SNAT
+#如果设置了这个参数，但是没有覆盖全面的ip，这样外部ip会进行MASQURADE，从而影响相关参数
 --cluster-cidr
 ```

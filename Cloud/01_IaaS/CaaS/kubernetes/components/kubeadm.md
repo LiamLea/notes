@@ -84,7 +84,12 @@ kubernetesVersion: v1.17.3
 networking:
   dnsDomain: cluster.local
   serviceSubnet: 10.96.0.0/12
-  podSubnet: 10.244.0.0/16
+
+  #建议不设置podSubnet
+  #这个用于设置iptables，在这个范围外访问service的地址都会进行MASQURADE
+  #其实没有存在的必要，很多网络插件都进行了SNAT
+  #如果设置了这个参数，但是没有覆盖全面的ip，这样外部ip会进行MASQURADE，从而影响相关参数
+  #podSubnet: 10.244.0.0/16
 
 #apiserver的相关配置
 apiServer:

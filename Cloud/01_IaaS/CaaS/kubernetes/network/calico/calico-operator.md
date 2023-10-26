@@ -64,7 +64,7 @@ spec:
     #配置ip pools（当比Kubeadm init指定的pod网段小，可以配置多个ippool）
     #每个ippool都需要指定隧道模式（不同的ippool可以用不同的隧道模式）
     ipPools:
-    - cidr: 10.244.0.0/16   #classless inter-domain routing，无类别域间路由（即kubeadm init时，设置的pod的cidr）
+    - cidr: 10.244.0.0/16   #classless inter-domain routing，无类别域间路由（只要跟宿主机网络不冲突即可）
       blockSize: 26         #将一个ip pool分为多个更小的block（每个block的网段长度）
       encapsulation: IPIP   #VXLAN、IPIP（需要开启bgp）、IPIPCrossSubnet
       natOutgoing: <bool | default=Enabled>    #访问集群外的地址会进行snat，将pod的ip转换为node的ip
