@@ -47,6 +47,8 @@
 
 #### 1.collections（管理模块）
 
+[参考](https://docs.ansible.com/ansible/latest/collections/index.html)
+
 ##### （1）介绍
 collections是ansible管理modules的新的方式，即会分类进行管理，比如有以下类别：
 * ansible.builtin这个collection存放内置的模块，比如：copy、file等模块

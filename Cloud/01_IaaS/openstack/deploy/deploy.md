@@ -23,22 +23,26 @@
       - [5.配置清单文件（@ansible）](#5配置清单文件ansible)
       - [6.生成和修改密码](#6生成和修改密码)
       - [7.配置：`/etc/kolla/globals.yml`](#7配置etckollaglobalsyml)
-        - [（1）网络配置（建议生产环境使用）](#1网络配置建议生产环境使用)
-      - [8.使用ceph](#8使用ceph)
+        - [(1) 使用OVN (建议)](#1-使用ovn-建议)
+        - [(2) DVR模式（Distributed Virtual Routing，Distributed Floating IPs）（建议生产使用）](#2-dvr模式distributed-virtual-routingdistributed-floating-ips建议生产使用)
+      - [8.使用ceph (可选)](#8使用ceph-可选)
         - [（1）修改配置](#1修改配置)
         - [（2）标记磁盘（@storage-nodes）](#2标记磁盘storage-nodes)
-      - [9.修改配置解决相关bug](#9修改配置解决相关bug)
+      - [9.使用LVM (可选)](#9使用lvm-可选)
+        - [(1) 准备好LVM](#1-准备好lvm)
+        - [(2) 配置](#2-配置)
+      - [10.修改配置解决相关bug](#10修改配置解决相关bug)
         - [（1）解决无法从volume-based image创建volume的问题](#1解决无法从volume-based-image创建volume的问题)
         - [（2）ceph-mgr内存使用越来越多](#2ceph-mgr内存使用越来越多)
-      - [10.进行部署](#10进行部署)
-      - [11.使用openstack](#11使用openstack)
-      - [12.部署Loadbalancer](#12部署loadbalancer)
-      - [12.执行一个demo](#12执行一个demo)
+      - [11.进行部署](#11进行部署)
+      - [12.使用openstack](#12使用openstack)
+      - [13.部署Loadbalancer](#13部署loadbalancer)
+      - [14.执行一个demo](#14执行一个demo)
         - [（1）创建供应商网络（即external网络）](#1创建供应商网络即external网络)
         - [（2）创建租户网络](#2创建租户网络)
         - [（3）创建路由器](#3创建路由器)
-      - [13.创建security group用于对外（即当使用floating ip时）](#13创建security-group用于对外即当使用floating-ip时)
-      - [14.从host能够ping instance（默认不可以）](#14从host能够ping-instance默认不可以)
+      - [15.创建security group用于对外（即当使用floating ip时）](#15创建security-group用于对外即当使用floating-ip时)
+      - [16.从host能够ping instance（默认不可以）](#16从host能够ping-instance默认不可以)
         - [（1）分配floating ip](#1分配floating-ip)
         - [（2）在host上配置路由](#2在host上配置路由)
     - [配置IPv6](#配置ipv6)
@@ -360,18 +364,28 @@ ip link set eth1 promisc on
 $ chmod +x /etc/rc.local
 ```
 
-##### （1）网络配置（建议生产环境使用）
-[参考](https://docs.openstack.org/kolla-ansible/latest/reference/networking/neutron.html)
+##### (1) 使用OVN (建议)
+* 不同版本enable OVN的配置有所不一样
+[参考](https://docs.openstack.org/kolla-ansible/zed/reference/networking/neutron.html)
 
-* DVR模式（Neutron Distributed Virtual Routing）（通过控制路由实现的）
+##### (2) DVR模式（Distributed Virtual Routing，Distributed Floating IPs）（建议生产使用）
+[参考](https://docs.openstack.org/networking-ovn/latest/admin/refarch/refarch.html#:~:text=Distributed%20Floating%20IPs%20(DVR),connectivity%20to%20the%20external%20network.)
+
+* 实现
+  * 通过控制路由实现的
+* 特点
   * 每个compute node上配一个external interface
   * external流量 和 floating ip流量 从该external interface出去
   * 跨节点的fixed ip流量（即内部流量）还是需要经过network node进行路由
+
+![](./imgs/deploy_07.png)
+
+* 配置
 ```shell
 enable_neutron_dvr: "yes"
 ```
 
-#### 8.使用ceph
+#### 8.使用ceph (可选)
 
 注意：ceph osd数量**至少是3个**，因为pool的默认副本数为3，如果osd数量小于3，会导致ceph不可用
 
@@ -410,7 +424,32 @@ parted <ssd_disk> -s -- mklabel gpt mkpart KOLLA_CEPH_OSD_BOOTSTRAP_BS_xx_W 1 -1
 parted <ssd_disk> -s -- mklabel gpt mkpart KOLLA_CEPH_OSD_BOOTSTRAP_BS_xx_D  1 -1
 ```
 
-#### 9.修改配置解决相关bug
+#### 9.使用LVM (可选)
+
+##### (1) 准备好LVM
+* 如果不准备，有些版本的kolla-ansible会自动使用loop device创建
+  * 但是这种重启后，需要重启挂载
+  ```shell
+  loseup -f /var/lib/cinder_data.img
+  docker restart cinder_volume
+  ```
+* 自己准备
+  * 使用loop device
+    * [参考](https://landoflinux.com/linux_lvm_example_02.html)
+  * 使用真正的磁盘
+
+##### (2) 配置
+```shell
+vim /etc/kolla/globals.yml
+```
+```yaml
+enable_cinder: "yes"
+enable_cinder_backup: "yes"
+enable_cinder_backend_lvm: "yes"
+cinder_volume_group: "cinder-volumes"
+```
+
+#### 10.修改配置解决相关bug
 
 ##### （1）解决无法从volume-based image创建volume的问题
 * 配置glance-api
@@ -443,15 +482,16 @@ ceph mgr module disable dashboard
 ceph mgr module ls
 ```
 
-#### 10.进行部署
+#### 11.进行部署
 ```shell
 kolla-ansible -i ./multinode bootstrap-servers
 kolla-ansible -i ./multinode prechecks
-#可以提前准备镜像：kolla-ansible -i ./multinode pull
+#可以提前准备镜像：
+kolla-ansible -i ./multinode pull
 kolla-ansible -i ./multinode deploy
 ```
 
-#### 11.使用openstack
+#### 12.使用openstack
 
 ```shell
 #安装openstack客户端(注意client版本，可能跟openstack版本不兼容)
@@ -460,7 +500,7 @@ pip install python-openstackclient==5.5.1
 kolla-ansible post-deploy
 ```
 
-#### 12.部署Loadbalancer
+#### 13.部署Loadbalancer
 
 [参考](https://docs.openstack.org/kolla-ansible/train/reference/networking/octavia.html)
 * 制作镜像
@@ -540,15 +580,23 @@ octavia_amp_flavor_id: "8b81c090-1129-452c-bd31-5d5a9b3bb116"
 kolla-ansible -i ./multinode deploy
 ```
 
-#### 12.执行一个demo
+#### 14.执行一个demo
 ```shell
-source /etc/kolla/admin-openrc.sh
-#会创建example networks、images等待
-#需要先修改init-runonce中的相关配置：EXT_NET_CIDR、EXT_NET_RANGE、EXT_NET_GATEWAY
-/root/kolla-env/share/kolla-ansible/init-runonce
+openstack network create --external     --provider-physical-network physnet1     --provider-network-type flat     public1 
+openstack subnet create --no-dhcp --network public1 --subnet-range 10.172.1.0/24 --gateway 10.172.1.254 --allocation-pool start=10.172.1.50,end=10.172.1.60 public1-subnet
+openstack network create     --provider-network-type vxlan     demo-net
+openstack subnet create     --network demo-net     --subnet-range 3.1.5.0/24     --gateway 3.1.5.254     --dns-nameserver 114.114.114.114     demo-subnet
+openstack router create demo-router
+openstack router add subnet demo-router demo-subnet
+openstack router set --enable-snat --external-gateway public1 demo-router
+openstack security group create public
+openstack security group rule create --ingress  --remote-ip 0.0.0.0/0 public
+openstack security group rule create --ingress  --ethertype ipv6 --remote-ip ::/0 public
+openstack image create --progress --disk-format qcow2 --public --file /tmp/cirros-0.4.0-x86_64-disk.img  cirros
+openstack image list
+openstack flavor create --vcpus 2 --ram 4096 --disk 20 2c/4g
 ```
 
-下面的这些操作在init-runonce这个脚本中已经实现了
 ##### （1）创建供应商网络（即external网络）
 
 ![](./imgs/deploy_01.png)
@@ -618,7 +666,7 @@ openstack router add subnet demo-router demo-subnet
 openstack router set --enable-snat --external-gateway public1 demo-router
 ```
 
-#### 13.创建security group用于对外（即当使用floating ip时）
+#### 15.创建security group用于对外（即当使用floating ip时）
 * 可以具体到端口，一般不会具体到ip（因为对外提供服务不会限制某些具体ip）
 
 ```shell
@@ -630,7 +678,7 @@ openstack security group rule create --ingress  --ethertype ipv6 --remote-ip ::/
 ```
 
 
-#### 14.从host能够ping instance（默认不可以）
+#### 16.从host能够ping instance（默认不可以）
 
 ##### （1）分配floating ip
 
