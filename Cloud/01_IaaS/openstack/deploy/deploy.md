@@ -436,6 +436,12 @@ parted <ssd_disk> -s -- mklabel gpt mkpart KOLLA_CEPH_OSD_BOOTSTRAP_BS_xx_D  1 -
 * 自己准备
   * 使用loop device
     * [参考](https://landoflinux.com/linux_lvm_example_02.html)
+    ```shell
+    fallocate -l 50G /var/lib/cinder_data.img
+    losetup -f /var/lib/cinder_data.img
+    losetup -a
+    vgcreate cinder-volumes /dev/<loop>
+    ```
   * 使用真正的磁盘
 
 ##### (2) 配置

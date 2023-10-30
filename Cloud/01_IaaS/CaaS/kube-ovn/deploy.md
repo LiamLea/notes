@@ -121,33 +121,44 @@ ovn_sb_connection: "tcp:[192.168.137.176]:6642,tcp:[192.168.137.177]:6642,tcp:[1
 
 #### 3.测试
 
+* 查看vpc
+```shell
+$ kubectl get vpc
+
+NAME                                           ENABLEEXTERNAL   STANDBY   SUBNETS                                                                                                  NAMESPACES
+neutron-6b412af2-5e61-461e-b93e-1549c4f45251   false            true      ["net2","neutron-8c0f90c1-3b87-4aae-ae73-a87e98eb8849","neutron-9bd921d6-d451-4c25-802a-42f6b9991db8"]   
+ovn-cluster                                    false            true      ["join","ovn-default","subnet1"]            
+```
+
+* 将namespace加入vpc
+```shell
+kubectl create ns net2
+kubetl edit vpc neutron-6b412af2-5e61-461e-b93e-1549c4f45251
+```
 ```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: net2
----
-apiVersion: kubeovn.io/v1
-kind: Vpc
-metadata:
-  labels:
-    ovn.kubernetes.io/vpc_external: "true"
-  name: neutron-22040ed5-0598-4f77-bffd-e7fd4db47e93
+...
 spec:
   namespaces:
   - net2
----
+...
+```
+
+* 创建subnet
+```yaml
 kind: Subnet
 apiVersion: kubeovn.io/v1
 metadata:
   name: net2
 spec:
-  vpc: neutron-22040ed5-0598-4f77-bffd-e7fd4db47e93
+  vpc: neutron-6b412af2-5e61-461e-b93e-1549c4f45251
   namespaces:
     - net2
-  cidrBlock: 12.0.1.0/24
+  cidrBlock: 10.67.0.0/24
   natOutgoing: false
----
+```
+
+* 等一会，创建pod
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -163,3 +174,14 @@ spec:
       name: ubuntu
   restartPolicy: Always
 ```
+
+* 验证
+  * 查看subnet是否生效
+  ```shell
+  kubectl get pods -n net2 -o wide
+  ```
+  * 从pod中ping openstack的虚拟机
+  ```shell
+  kubectl exec -n net2  -it ubuntu /bin/bash
+  ping <vm_ip>
+  ```

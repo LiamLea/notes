@@ -331,6 +331,10 @@ ip tuntap add tap0 mode tap
 
 ##### （2）查看应用程序使用的是哪个tap
 
+* 查找哪些进程打开`/dev/net/tun`
+```shell
+ls -l /proc/10154/fd
+```
 * 查看哪个文件描述符打开`/dev/net/tun`
 ```shell
 ls -l /proc/<pid>/fd/

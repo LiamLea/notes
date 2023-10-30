@@ -35,16 +35,23 @@ iptables -> tcpdump -> NIC -> Wire
 ##### （1）方法一
 
 默认`ip netns`无法显示和操作容器中的netns
-* 获取容器的pid
+
+* 获取network namespace
 ```shell
-pid=`docker inspect -f '{{.State.Pid}}' <CONTAINER_ID>`
-#根据pid可以找到netns：
-#  /proc/<PID>/net/ns
+lsns -t net -o NS,PATH,TYPE,NPROCS,PPID,PID,USER,UID,COMMAND
 ```
-* 创建`/var/run/netns/`目录
-```shell
-mkdir -p /var/run/netns/
-```
+
+* 或者
+  * 获取容器的pid
+  ```shell
+  pid=`docker inspect -f '{{.State.Pid}}' <CONTAINER_ID>`
+  #根据pid可以找到netns：
+  #  /proc/<PID>/net/ns
+  ```
+  * 创建`/var/run/netns/`目录
+  ```shell
+  mkdir -p /var/run/netns/
+  ```
 
 * 将netns连接到`/var/run/netns/`目录下
 ```shell
