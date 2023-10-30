@@ -60,9 +60,10 @@ spec:
   gateway: 10.66.0.1
   gatewayType: distributed
   natOutgoing: true
+```
 
----
-
+* 等一会创建（立即创建上面配置可能还没生效）
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
