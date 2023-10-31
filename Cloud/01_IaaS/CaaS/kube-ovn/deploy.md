@@ -154,6 +154,7 @@ spec:
   namespaces:
     - net2
   cidrBlock: 10.67.0.0/24
+  gateway: 10.67.0.1
   natOutgoing: false
 ```
 

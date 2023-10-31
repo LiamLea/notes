@@ -51,7 +51,7 @@
 * 列出配置信息（逻辑网络）
 
 ```python
-$ ovn-nbct show
+$ ovn-nbctl show
 
 """
 展示了 逻辑网络和连接 （即需要创建的虚拟设备和连接）

@@ -6,14 +6,32 @@
 <!-- code_chunk_output -->
 
 - [useage](#useage)
+    - [客户端命令](#客户端命令)
     - [subnet](#subnet)
       - [1.内置subnet](#1内置subnet)
         - [(1) default subnet (安装就存在)](#1-default-subnet-安装就存在)
         - [(2) join subnet](#2-join-subnet)
       - [2.自定义subnet](#2自定义subnet)
+      - [3.subnet ACL](#3subnet-acl)
+    - [VPC](#vpc)
+      - [1.VPC (virtual private cloud)](#1vpc-virtual-private-cloud)
+      - [2.创建vpc和subnet](#2创建vpc和subnet)
+      - [3.使VPC能够连接外网](#3使vpc能够连接外网)
+        - [(1) 安装multus](#1-安装multus)
+        - [(2) 创建VPC和subnet](#2-创建vpc和subnet)
+        - [(3) 创建VPC gateway (即provider网络)](#3-创建vpc-gateway-即provider网络)
 
 <!-- /code_chunk_output -->
 
+### 客户端命令
+[参考](https://kubeovn.github.io/docs/v1.11.x/en/ops/kubectl-ko/)
+
+```shell
+kubectl ko --help
+#具体命令参考OVN
+```
+
+***
 
 ### subnet
 
@@ -58,24 +76,230 @@ spec:
   - test
   cidrBlock: 10.66.0.0/16
   gateway: 10.66.0.1
+  #支持的模式: distributed和centralized
   gatewayType: distributed
-  natOutgoing: true
+  #是否做SNAT，能够隐藏原始ip
+  natOutgoing: false
 ```
 
-* 等一会创建（立即创建上面配置可能还没生效）
+* distributed gateway
+  * 每个节点都是一个gateway
+  ![](./imgs/usage_01.png)
+* centralized gateway
+  * 加上natOutgoing 就能固定外出的ip
+  ![](./imgs/usage_02.png)
+  ```yaml
+  gatewayType: centralized
+  gatewayNode: "node1,node2"
+  #gatewayNode: "kube-ovn-worker:172.18.0.2, kube-ovn-control-plane:172.18.0.3"
+  ```
+
+#### 3.subnet ACL
+
+* [match规则](https://man7.org/linux/man-pages/man5/ovn-sb.5.html#Logical_Flow_TABLE)
+
 ```yaml
-apiVersion: v1
-kind: Pod
+#允许10.10.0.2访问所有地址，不能其他地址访问10.10.0.2
+apiVersion: kubeovn.io/v1
+kind: Subnet
 metadata:
-  name: ubuntu
-  namespace: test
+  name: acl
 spec:
-  containers:
-    - image: docker.io/kubeovn/kube-ovn:v1.8.0
-      command:
-        - "sleep"
-        - "604800"
-      imagePullPolicy: IfNotPresent
-      name: ubuntu
-  restartPolicy: Always
+  acls:
+    - action: drop
+      direction: to-lport
+      match: ip4.dst == 10.10.0.2 && ip
+      priority: 1002
+    - action: allow-related
+      direction: from-lport
+      match: ip4.src == 10.10.0.2 && ip
+      priority: 1002
+  cidrBlock: 10.10.0.0/24
+```
+
+***
+
+### VPC
+
+#### 1.VPC (virtual private cloud)
+* VPC之间网络隔离
+  * Subnet
+  * routing policies
+  * security policies
+  * outbound gateways
+  * EIP
+  * 等等
+
+#### 2.创建vpc和subnet
+
+```yaml
+kind: Vpc
+apiVersion: kubeovn.io/v1
+metadata:
+  name: vpc-test
+spec:
+  namespaces:
+    - net1
+
+---
+kind: Subnet
+apiVersion: kubeovn.io/v1
+metadata:
+  name: net1
+spec:
+  vpc: vpc-test
+  namespaces:
+    - net1
+  cidrBlock: 10.68.0.0/24
+---
+
+
+```
+
+#### 3.使VPC能够连接外网
+
+##### (1) 安装multus
+[参考](https://github.com/k8snetworkplumbingwg/multus-cni/blob/master/docs/how-to-use.md)
+
+##### (2) 创建VPC和subnet
+
+* VPC
+```yaml
+kind: Vpc
+apiVersion: kubeovn.io/v1
+metadata:
+  name: vpc-test
+spec:
+  namespaces:
+    - net1
+```
+
+* subnet
+```yaml
+kind: Subnet
+apiVersion: kubeovn.io/v1
+metadata:
+  name: net1
+spec:
+  vpc: vpc-test
+  namespaces:
+    - net1
+  cidrBlock: 10.68.0.0/24
+```
+
+##### (3) 创建VPC gateway (即provider网络)
+
+* 创建subnet
+  * 该subnet是物理网络，用于给VPC gateway设置网络
+    * 所以已经被使用的地址，要在这里排除掉，防止出现冲突 
+```yaml
+apiVersion: kubeovn.io/v1
+kind: Subnet
+metadata:
+  name: ovn-vpc-external-network
+spec:
+  protocol: IPv4
+  provider: ovn-vpc-external-network.kube-system
+  cidrBlock: 10.172.1.0/24
+  gateway: 10.172.1.254  # IP address of the physical gateway
+  excludeIps:
+  - 10.172.1.1..10.172.1.51
+  - 10.172.1.58..10.172.1.254
+```
+
+* 往pod中添加一个macvlan类型的网卡
+  * 指定使用上面创建的subnet
+  * 指定物理网卡（比如: `eth0`）
+    * 虚拟网卡（子网卡）不能访问母网卡的地址
+    * 如果有两张物理网卡且在同一网段内，用第二张网卡进行macvlan不生效（猜测是这个原因，待验证）
+    * 物理网卡的要求
+      * 对于openstack VM，则需要disable port security
+      * 对于VMware，则MAC Address Changes, Forged Transmits and Promiscuous Mode Operation should be set to allow
+      * [更多](https://kubeovn.github.io/docs/v1.11.x/en/guide/vpc/#configuring-the-external-network)
+
+```yaml
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: ovn-vpc-external-network
+  namespace: kube-system
+spec:
+  config: '{
+      "cniVersion": "0.3.0",
+      "type": "macvlan",
+      "master": "eth0",
+      "mode": "bridge",
+      "ipam": {
+        "type": "kube-ovn",
+        "server_socket": "/run/openvswitch/kube-ovn-daemon.sock",
+        "provider": "ovn-vpc-external-network.kube-system"
+      }
+    }'
+```
+
+* enable VPC gateway
+```yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ovn-vpc-nat-gw-config
+  namespace: kube-system
+data:
+  image: 'docker.io/kubeovn/vpc-nat-gateway:v1.11.10' 
+  enable-vpc-nat-gw: 'true'
+```
+
+* 部署vpc nat gateway
+  * 可以绑定到具体的节点上
+  * 如果不生效重启一下
+```yaml
+kind: VpcNatGateway
+apiVersion: kubeovn.io/v1
+metadata:
+  name: gw-test
+spec:
+  vpc: vpc-test   #指定VPC
+  subnet: net1    #指定subnet
+  lanIp: 10.68.0.254  #未被使用的地址
+  selector:
+    - "kubernetes.io/os: linux"
+    - "kubernetes.io/hostname: master-1"
+```
+
+* 验证
+```shell
+$ kubectl exec -n kube-system -it vpc-nat-gw-gw-test-0 -- /bin/bash
+
+#查看地址
+$ ip a
+
+#多出一张net1网卡，配置了物理网络地址
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: net1@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UNKNOWN group default 
+    link/ether f2:7f:64:5c:b2:8e brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 10.172.1.53/24 brd 10.172.1.255 scope global net1
+       valid_lft forever preferred_lft forever
+    inet6 dd00:4191:d066:1:f07f:64ff:fe5c:b28e/64 scope global dynamic mngtmpaddr 
+       valid_lft 86362sec preferred_lft 14362sec
+    inet6 fe80::f07f:64ff:fe5c:b28e/64 scope link 
+       valid_lft forever preferred_lft forever
+14: eth0@if15: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1350 qdisc noqueue state UP group default 
+    link/ether 00:00:00:cd:90:6d brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 10.68.0.254/24 brd 10.68.0.255 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::200:ff:fecd:906d/64 scope link 
+       valid_lft forever preferred_lft forever
+
+#测试网络连通
+
+#ping 物理网关
+$ ping 10.172.1.254
+
+#ping 外网
+$ ping 8.8.8.8
 ```
