@@ -47,6 +47,7 @@
         - [（3）VEPA（Virtual Ethernet Port Aggregator）](#3vepavirtual-ethernet-port-aggregator)
         - [（4）passthru](#4passthru)
         - [（5）source](#5source)
+      - [3.DEBUG](#3debug)
     - [IPVLAN](#ipvlan)
       - [1.概述](#1概述-7)
       - [2.ipvlan有两种模式](#2ipvlan有两种模式)
@@ -365,7 +366,11 @@ iff:	tapf8d27a1f-62
 ### MACVLAN
 
 #### 1.概述
-在一个物理网卡 虚拟 多个 网卡 每个网卡有自己的mac地址
+* 物理网卡作为交换机，然后虚拟网卡连接到该交换机上（二层网络）
+  * 因为二层网络这个特性
+    * 所以一个虚拟网卡必须有独立的mac
+    * 数据外出时，没有走物理网卡的三层网络（即没有经过主机的iptables）
+
 ![](./imgs/macvlan_01.png)
 
 #### 2.macvlan有五种模式
@@ -389,6 +394,15 @@ iff:	tapf8d27a1f-62
 ##### （5）source
 只允许指定的源mac地址通过
 
+#### 3.DEBUG
+
+```shell
+#在虚拟的网卡上
+arping <interface>
+
+#如果arping能通，证明连接没问题
+```
+
 ***
 
 ### IPVLAN
@@ -399,9 +413,8 @@ iff:	tapf8d27a1f-62
 
 #### 2.ipvlan有两种模式
 
-
 ##### （1）l2模式
-物理网卡就像交换机一样
+只是一个网卡上配置多个ip，不是一个交换机（因为mac地址都一样）
 ![](./imgs/ipvlan_mode_01.png)
 
 ##### （2）l3模式

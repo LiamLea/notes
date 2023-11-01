@@ -29,6 +29,7 @@
         - [（3）mac模块（匹配mac地址）：`-m mac`](#3mac模块匹配mac地址-m-mac)
         - [（4）multiport模块（匹配多端口）：`-m multiport`](#4multiport模块匹配多端口-m-multiport)
         - [（5）iprange模块（匹配IP范围）：`-m iprange`](#5iprange模块匹配ip范围-m-iprange)
+        - [(6) set模块（批量匹配）: `-m set --match-set`](#6-set模块批量匹配--m-set--match-set)
       - [6.条件取反：`!`](#6条件取反)
       - [7.custom chains（自定义链）](#7custom-chains自定义链)
         - [（1）创建链](#1创建链)
@@ -103,6 +104,8 @@ target描述了对包的处理过程（比如：DROP，会将匹配到的包丢�
 |FORWARD|路由（不会 与 输入和输出 出现在同一个表中）|
 
 #### 6.常用target（不同的表支持不同的target）
+
+[参考](https://www.frozentux.net/iptables-tutorial/chunkyhtml/index.html)
 
 target也可以是某条chain
 
@@ -230,6 +233,16 @@ iptables [-t <TABLE>] <OPTIONS> [<CHAIN>] [<CONDITIONS>] [-j <TARGET> [<TARGET_O
 ```shell
 -m iprange --src-range IP1-IP2
 -m iprange --dst-range IP1-IP2
+```
+
+##### (6) set模块（批量匹配）: `-m set --match-set`
+* 使用`<my_set>`这个ipset 与 src进行比较，如果匹配了则ACCEPT
+```shell
+-m set --match-set <my_set> src -j ACCEPT
+```
+* 查看ipset
+```shell
+ipset list
 ```
 
 #### 6.条件取反：`!`
