@@ -18,8 +18,9 @@
       - [2.创建vpc和subnet](#2创建vpc和subnet)
       - [3.使VPC能够连接外网](#3使vpc能够连接外网)
         - [(1) 安装multus](#1-安装multus)
-        - [(2) 创建VPC和subnet](#2-创建vpc和subnet)
-        - [(3) 创建VPC gateway (即provider网络)](#3-创建vpc-gateway-即provider网络)
+        - [(2) 创建VPC gateway (即provider网络)](#2-创建vpc-gateway-即provider网络)
+        - [(3) 设置路由和SNAT](#3-设置路由和snat)
+        - [(4) 验证](#4-验证)
 
 <!-- /code_chunk_output -->
 
@@ -132,37 +133,6 @@ spec:
 
 #### 2.创建vpc和subnet
 
-```yaml
-kind: Vpc
-apiVersion: kubeovn.io/v1
-metadata:
-  name: vpc-test
-spec:
-  namespaces:
-    - net1
-
----
-kind: Subnet
-apiVersion: kubeovn.io/v1
-metadata:
-  name: net1
-spec:
-  vpc: vpc-test
-  namespaces:
-    - net1
-  cidrBlock: 10.68.0.0/24
----
-
-
-```
-
-#### 3.使VPC能够连接外网
-
-##### (1) 安装multus
-[参考](https://github.com/k8snetworkplumbingwg/multus-cni/blob/master/docs/how-to-use.md)
-
-##### (2) 创建VPC和subnet
-
 * VPC
 ```yaml
 kind: Vpc
@@ -187,7 +157,12 @@ spec:
   cidrBlock: 10.68.0.0/24
 ```
 
-##### (3) 创建VPC gateway (即provider网络)
+#### 3.使VPC能够连接外网
+
+##### (1) 安装multus
+[参考](https://github.com/k8snetworkplumbingwg/multus-cni/blob/master/docs/how-to-use.md)
+
+##### (2) 创建VPC gateway (即provider网络)
 
 * 创建subnet
   * 该subnet是物理网络，用于给VPC gateway设置网络
@@ -245,7 +220,7 @@ metadata:
   name: ovn-vpc-nat-gw-config
   namespace: kube-system
 data:
-  image: 'docker.io/kubeovn/vpc-nat-gateway:v1.11.10' 
+  image: 'docker.io/kubeovn/vpc-nat-gateway:v1.11.11' 
   enable-vpc-nat-gw: 'true'
 ```
 
@@ -267,8 +242,13 @@ spec:
 ```
 
 * 验证
+
 ```shell
 $ kubectl exec -n kube-system -it vpc-nat-gw-gw-test-0 -- /bin/bash
+
+#存在一个bug, net1 arp可能没有开启，需要enable一下
+# ip a查看net1是否存在NOARP标志
+ip link set net1 arp on
 
 #查看地址
 $ ip a
@@ -301,5 +281,70 @@ $ ip a
 $ ping 10.172.1.254
 
 #ping 外网
+$ ping 8.8.8.8
+```
+
+##### (3) 设置路由和SNAT
+
+* 设置路由
+```yaml
+kind: Vpc
+apiVersion: kubeovn.io/v1
+metadata:
+  name: vpc-test
+spec:
+  namespaces:
+    - net1
+  staticRoutes:
+  - cidr: 0.0.0.0/0
+    nextHopIP: 10.68.0.254  #NAT gateway的地址
+    policy: policyDst
+```
+
+* 设置SNAT
+```yaml
+kind: IptablesEIP
+apiVersion: kubeovn.io/v1
+metadata:
+  name: eips01
+spec:
+  natGwDp: gw-test  #网关名
+---
+kind: IptablesSnatRule
+apiVersion: kubeovn.io/v1
+metadata:
+  name: snat01
+spec:
+  eip: eips01
+  internalCIDR: 10.68.0.0/24
+```
+
+* 查看
+```shell
+kubectl get iptables-eips
+```
+
+##### (4) 验证
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu
+  namespace: net1
+spec:
+  containers:
+    - image: docker.io/kubeovn/kube-ovn:v1.8.0
+      command:
+        - "sleep"
+        - "604800"
+      imagePullPolicy: IfNotPresent
+      name: ubuntu
+  restartPolicy: Always
+```
+
+```shell
+#查看路由
+#此时默认路由并不是指定10.68.0.254，这没问题
+$ ip r
 $ ping 8.8.8.8
 ```
