@@ -11,6 +11,8 @@
       - [3.安装依赖](#3安装依赖)
       - [4.安装](#4安装)
       - [5.使用已经编译好的包（替代上面的所有步骤）](#5使用已经编译好的包替代上面的所有步骤)
+        - [(1) redhat系列](#1-redhat系列)
+        - [(2) ubuntu](#2-ubuntu)
       - [5.设置grub](#5设置grub)
 
 <!-- /code_chunk_output -->
@@ -78,8 +80,23 @@ make install
 ```
 
 #### 5.使用已经编译好的包（替代上面的所有步骤）
-[下载地址](https://pkgs.org/download/kernel)
-  * 选择一个包，找到DOWNLOAD选项，进行下载
+
+##### (1) redhat系列
+
+* 有外网
+[epel仓库](http://elrepo.org/tiki/HomePage)
+```shell
+rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+#对于el7系列
+yum install https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+
+#安装最新版
+yum --enablerepo=elrepo-kernel install kernel-lt
+```
+
+* 无外网
+[下载地址](https://elrepo.org/linux/kernel/)
+
 ```shell
 #找到DOWNLOAD选项，进行下载
 rpm -ivh kernel-lt-5.4.225-1.el7.elrepo.x86_64.rpm
@@ -90,6 +107,28 @@ rpm -ivh kernel-lt-devel-5.4.225-1.el7.elrepo.x86_64.rpm
 rpm -ivh kernel-lt-headers-5.4.225-1.el7.elrepo.x86_64.rpm
 rpm -ivh kernel-lt-tools-5.4.225-1.el7.elrepo.x86_64.rpm
 rpm -ivh kernel-lt-tools-libs-devel-5.4.225-1.el7.elrepo.x86_64.rpm
+```
+
+##### (2) ubuntu
+
+* 有外网
+```shell
+sudo add-apt-repository ppa:cappelikan/ppa
+sudo apt update
+sudo apt install mainline
+```
+
+* 无外网
+[下载地址](https://kernel.ubuntu.com/mainline/)
+
+```shell
+dpkg -i linux-headers-6.4.16-060416_6.4.16-060416.202309130834_all.deb
+dpkg -i linux-headers-6.4.16-060416-generic_6.4.16-060416.202309130834_amd64.deb
+dpkg -i linux-image-unsigned-6.4.16-060416-generic_6.4.16-060416.202309130834_amd64.deb	
+dpkg -i linux-modules-6.4.16-060416-generic_6.4.16-060416.202309130834_amd64.deb
+
+#这个命令会自动安装依赖（需要外网）
+sudo apt-get -f install
 ```
 
 #### 5.设置grub
