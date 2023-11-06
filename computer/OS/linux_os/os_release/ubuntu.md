@@ -173,7 +173,10 @@ apt-get install <PACKAGE> --download-only
 ```shell
 #在包的目录下执行
 
-dpkg -i *
+sudo dpkg -i *
+
+#这个命令会自动安装依赖（需要外网）
+sudo apt-get -f install
 ```
 
 #### 3.关闭自动升级

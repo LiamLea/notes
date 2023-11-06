@@ -271,15 +271,16 @@ ceph osd pool application enable {pool-name} {application-name}
 |-|-|-|
 |undersized|副本数没有达到设置的要求||
 |degraded|数据存在，副本数不够</br>或者某一个或更多object找不到|可能某个osd挂掉（正好其中一个副本在上面）|
-|down|某个副本down了||
 |peering|该pg中的osd正在尝试通信，达成共识|osd之间无法通信，可能某个osd挂掉了|
 |recovering|osd同步 对象和它的副本 的数据|osd因为宕机，导致某个副本或对象数据滞后，重新启动后，需要同步数据|
 |backfill（需要进行backfill）|是一种特殊的recovering，同步该pg的全部内容|当有新的osd加入（或者剔除某一个osd）时，该osd所在pg的都会进行backfill|
 |backfilling（正在进行backfill）|||
 |backfill_toofull|磁盘容量快满了，导致没法backfill（可以调整osd的权重平衡所有osd的存储或者backfill_ratio提高阈值|
 |stale|pg的状态没有更新，处于一种未知状态|osd集中的primary osd没有向mon汇报pg的状态</br>或者其他osd向mon汇报primary osd宕机了|
-|inconsistent|对象和副本之间的数据不一致||
-|incomplete（严重）|pg检测到数据不完整（即数据丢失），需要启动相应的osd来恢复数据|某几个osd宕机，导致对象和它的副本都无法获取，即数据丢失|
+|inconsistent|对象和其副本之间的数据不一致||
+|incomplete|副本数不足||
+|down（严重）|there are no valid copies of the PGs on any active OSDs||
+|inactive（严重）|不能处理对pg的请求|
 
 ##### （6）需要关注长时间处于down的pg
 因为pg处于down的状态，因为副本down了（即osd down了），当osd down超过一定的时间，osd会变为out，该pg会重新remapped，即不再是down的状态了
