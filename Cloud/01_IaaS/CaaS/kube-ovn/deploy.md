@@ -158,7 +158,14 @@ spec:
   natOutgoing: false
 ```
 
-* 等一会，创建pod
+* 查看subnet是否创建成功
+  * 如果配置正确但未成功，重启 ovn-controller
+```shell
+kubectl get subnet
+#看V4AVAILABLE是否有可用地址，如果没有证明创建的有问题
+```
+
+* 创建pod
 ```yaml
 apiVersion: v1
 kind: Pod
