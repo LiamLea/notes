@@ -7,20 +7,24 @@
 
 - [useage](#useage)
     - [客户端命令](#客户端命令)
-    - [subnet](#subnet)
+    - [subnet (OVN中的switch)](#subnet-ovn中的switch)
       - [1.内置subnet](#1内置subnet)
         - [(1) default subnet (安装就存在)](#1-default-subnet-安装就存在)
         - [(2) join subnet](#2-join-subnet)
       - [2.自定义subnet](#2自定义subnet)
       - [3.subnet ACL](#3subnet-acl)
-    - [VPC](#vpc)
+    - [VPC (OVN中的router)](#vpc-ovn中的router)
       - [1.VPC (virtual private cloud)](#1vpc-virtual-private-cloud)
       - [2.创建vpc和subnet](#2创建vpc和subnet)
       - [3.使VPC能够连接外网](#3使vpc能够连接外网)
         - [(1) 安装multus](#1-安装multus)
         - [(2) 创建VPC gateway (即provider网络)](#2-创建vpc-gateway-即provider网络)
         - [(3) 设置路由和SNAT](#3-设置路由和snat)
-        - [(4) 验证](#4-验证)
+        - [(4) 设置路由](#4-设置路由)
+        - [(5) 验证](#5-验证)
+    - [与openstack集成网络](#与openstack集成网络)
+      - [1.方法一: 流量都从opentack出](#1方法一-流量都从opentack出)
+      - [2.方法二: 流量都从k8s出](#2方法二-流量都从k8s出)
 
 <!-- /code_chunk_output -->
 
@@ -34,7 +38,7 @@ kubectl ko --help
 
 ***
 
-### subnet
+### subnet (OVN中的switch)
 
 #### 1.内置subnet
 
@@ -81,6 +85,17 @@ spec:
   gatewayType: distributed
   #是否做SNAT，能够隐藏原始ip
   natOutgoing: false
+
+  #excludeIps:
+  #- 10.172.1.1..10.172.1.51
+  #- 10.172.1.58..10.172.1.254
+```
+
+* 查看subnet是否创建成功
+  * 如果配置正确但未成功，重启 ovn-controller
+```shell
+kubectl get subnet
+#看V4AVAILABLE是否有可用地址，如果没有证明创建的有问题
 ```
 
 * distributed gateway
@@ -120,7 +135,7 @@ spec:
 
 ***
 
-### VPC
+### VPC (OVN中的router)
 
 #### 1.VPC (virtual private cloud)
 * VPC之间网络隔离
@@ -155,6 +170,13 @@ spec:
   namespaces:
     - net1
   cidrBlock: 10.68.0.0/24
+```
+
+* 查看subnet是否创建成功
+  * 如果配置正确但未成功，重启 ovn-controller
+```shell
+kubectl get subnet
+#看V4AVAILABLE是否有可用地址，如果没有证明创建的有问题
 ```
 
 #### 3.使VPC能够连接外网
@@ -248,7 +270,7 @@ $ kubectl exec -n kube-system -it vpc-nat-gw-gw-test-0 -- /bin/bash
 
 #存在一个bug, net1 arp可能没有开启，需要enable一下
 # ip a查看net1是否存在NOARP标志
-ip link set net1 arp on
+$ ip link set net1 arp on
 
 #查看地址
 $ ip a
@@ -286,6 +308,42 @@ $ ping 8.8.8.8
 
 ##### (3) 设置路由和SNAT
 
+* 设置EIP
+```yaml
+kind: IptablesEIP
+apiVersion: kubeovn.io/v1
+metadata:
+  name: eips01
+spec:
+  natGwDp: gw-test  #网关名
+```
+
+* 设置SNAT
+
+```yaml
+kind: IptablesSnatRule
+apiVersion: kubeovn.io/v1
+metadata:
+  name: snat01
+spec:
+  eip: eips01
+  internalCIDR: 10.68.0.0/24
+```
+
+* 查看
+```shell
+$ kubectl get iptables-eips
+
+$ kubectl exec -n kube-system -it vpc-nat-gw-gw-test-0 -- /bin/bash
+
+$ ip a
+#能够看到分配
+
+$ iptables -t nat -nL
+#能够看到设置的snat
+```
+
+##### (4) 设置路由
 * 设置路由
 ```yaml
 kind: Vpc
@@ -301,30 +359,7 @@ spec:
     policy: policyDst
 ```
 
-* 设置SNAT
-```yaml
-kind: IptablesEIP
-apiVersion: kubeovn.io/v1
-metadata:
-  name: eips01
-spec:
-  natGwDp: gw-test  #网关名
----
-kind: IptablesSnatRule
-apiVersion: kubeovn.io/v1
-metadata:
-  name: snat01
-spec:
-  eip: eips01
-  internalCIDR: 10.68.0.0/24
-```
-
-* 查看
-```shell
-kubectl get iptables-eips
-```
-
-##### (4) 验证
+##### (5) 验证
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -347,4 +382,51 @@ spec:
 #此时默认路由并不是指定10.68.0.254，这没问题
 $ ip r
 $ ping 8.8.8.8
+```
+
+***
+
+### 与openstack集成网络
+
+#### 1.方法一: 流量都从opentack出
+
+* 设置snat
+```shell
+kubectl-ko nbctl lr-nat-list <router>
+kubectl-ko nbctl lr-nat-add <router> snat <EXTERNAL_IP> <LOGICAL_IP>
+```
+
+* EIP通过nat实现
+```shell
+$ kubectl-ko nbctl lr-nat-list <router>
+
+TYPE             EXTERNAL_IP        EXTERNAL_PORT    LOGICAL_IP            EXTERNAL_MAC         LOGICAL_PORT
+dnat_and_snat    10.172.1.51                         3.1.5.116
+
+$ kubectl-ko nbctl lr-nat-add <router> dnat_and_snat <EXTERNAL_IP> <LOGICAL_IP>
+```
+
+#### 2.方法二: 流量都从k8s出
+
+参考 使VPC能够连接外网，额外的配置
+
+* 在路由器上添加路由
+```shell
+kubectl-ko nbctl lr-route-add 100c2ac6-382b-4708-a8f6-4e97bed4e11c 0.0.0.0/0 10.67.0.254 
+```
+
+* 在NAT gateway中设置openstack网段的SNAT
+```yaml
+kind: IptablesSnatRule
+apiVersion: kubeovn.io/v1
+metadata:
+  name: snat02-1
+spec:
+  eip: eips02
+  internalCIDR: 3.1.5.0/24
+```
+
+* 在NAT gateway中设置openstack网段的路由
+```shell
+ip r add 3.1.5.0/24 via 10.67.0.1 dev eth0
 ```
