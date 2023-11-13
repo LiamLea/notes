@@ -355,17 +355,38 @@ xfs_growfs /dev/mapp/centos-root
 #创建aggregate，通过aggregate的元信息创建zone
 openstack aggregate create --zone <new_zone> <new_aggregate>
 
+#将某个aggregate与其zone取消关联
+openstack aggregate unset --property availability_zone <aggregate>
+
 #加机器加入到某个aggregate（即加入相应的zone）
 openstack aggregate add host <aggregate> <my_host>
 
-#将某个aggregate与其zone取消关联
-openstack aggregate unset --property availability_zone <aggregate>
+#加机器移除到某个aggregate（即加入相应的zone）
+openstack aggregate remove host <aggregate> <my_host>
+
+#查看所有zone（即主机所处的zone，如果创建了zone，但该zone中没有主机则不显示）
+openstack availability zone list
+
+#查看主机所在的zone
+openstack host list
 ```
+
+* 创建主机时，可以指定availability zone
 
 ##### （2）aggregate
 * 将机器分组
   * 一个机器可以属于多个aggregate
+  
+  * aggregate不仅能指定zone，还能设置**更多自定义属性**（从而影响调度）
+  ```shell
+  openstack aggregate set --property ssd=true <aggregate>
+  ```
+
   * aggrgate与flavor关联（对用户不可见）
+  ```shell
+  openstack flavor set \
+    --property aggregate_instance_extra_specs:ssd=true ssd.large
+  ```
 
 [参考](https://docs.openstack.org/nova/latest/admin/aggregates.html#:~:text=Host%20aggregates%20are%20a%20mechanism,additional%20hardware%20or%20performance%20characteristics.)
 

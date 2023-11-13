@@ -102,7 +102,7 @@ $ ovs-vsctl set open . external-ids:ovn-encap-ip=192.168.137.200
 #### 2.neutron和ovs配置（初始化安装）
 
 * enable ovn
-  * 不能版本配置有所区别，具体参考文档
+  * 不同版本配置有所区别，具体参考文档
 ```shell
 $ vim /etc/kolla/globals.yml
 

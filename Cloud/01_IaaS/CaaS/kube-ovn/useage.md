@@ -22,8 +22,11 @@
         - [(3) 设置路由和SNAT](#3-设置路由和snat)
         - [(4) 设置路由](#4-设置路由)
         - [(5) 验证](#5-验证)
+    - [LoadBalancer](#loadbalancer)
     - [与openstack集成网络](#与openstack集成网络)
       - [1.方法一: 流量都从opentack出](#1方法一-流量都从opentack出)
+        - [(1) 直接设置OVN](#1-直接设置ovn)
+        - [(2) 通过openstack和k8s设置（推荐）](#2-通过openstack和k8s设置推荐)
       - [2.方法二: 流量都从k8s出](#2方法二-流量都从k8s出)
 
 <!-- /code_chunk_output -->
@@ -39,6 +42,8 @@ kubectl ko --help
 ***
 
 ### subnet (OVN中的switch)
+
+OVN中的switch，并连接到相应的路由器上（即所在的VPC）
 
 #### 1.内置subnet
 
@@ -386,10 +391,17 @@ $ ping 8.8.8.8
 
 ***
 
+### LoadBalancer
+
+[参考](https://kubeovn.github.io/docs/v1.11.x/en/advance/vpc-internal-lb/)
+
+***
+
 ### 与openstack集成网络
 
 #### 1.方法一: 流量都从opentack出
 
+##### (1) 直接设置OVN
 * 设置snat
 ```shell
 kubectl-ko nbctl lr-nat-list <router>
@@ -405,6 +417,26 @@ dnat_and_snat    10.172.1.51                         3.1.5.116
 
 $ kubectl-ko nbctl lr-nat-add <router> dnat_and_snat <EXTERNAL_IP> <LOGICAL_IP>
 ```
+
+##### (2) 通过openstack和k8s设置（推荐）
+
+* 在openstack上设置好网络
+* 在k8s上创建相应的subnet
+```yaml
+kind: Subnet
+apiVersion: kubeovn.io/v1
+metadata:
+  name: neutron-3b2f44f3-89b3-4d81-8131-cde77aef1d14
+spec:
+  vpc: neutron-1c763efb-7f17-475c-b8d9-a6ea1e6d93ad
+  namespaces:
+    - test2
+  cidrBlock: 3.1.5.0/24
+```
+
+* 设置floating ip
+  * 在openstack创建指定ip的端口（该端口不要使用）
+  * 创建floating ip与该端口绑定
 
 #### 2.方法二: 流量都从k8s出
 
