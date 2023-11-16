@@ -44,7 +44,7 @@
 
 |daemon|port|http port|说明|
 |-|-|-|-|
-|ResourceManger|8032、8030 (scheduler)、8031 (resource-tracker)、8033 (admin)|8088、8090 (https)|管理资源，进行调度|
+|ResourceManger|8032、8030 (scheduler)、8031 (resource-tracker)、8033 (admin)|8088、8090 (https)|管理资源，进行调度（替代了原先的JobTracker）|
 |NodeManger||8042、8044 (https)|管理节点|
 |WebAppProxy||||
 
@@ -219,6 +219,8 @@ scp -r /home/hdfs/hadoop-3.3.6/etc hdfs@hadoop-03:/home/hdfs/hadoop-3.3.6/
 
 #### 5.启动服务
 
+以下命令都在主节点上执行，会自动运行其他节点上的程序
+
 * 启动hdfs
 
 ```shell
@@ -230,6 +232,18 @@ sbin/start-dfs.sh
 
 ```shell
 sbin/start-yarn.sh
+```
+
+* 开启自启
+```shell
+$ vim /etc/rc.local
+
+#!/bin/bash
+
+su - hdfs /home/hdfs/hadoop-3.3.6/sbin/start-dfs.sh
+su - hdfs /home/hdfs/hadoop-3.3.6/sbin/start-yarn.sh
+
+$ chmod +x /etc/rc.local
 ```
 
 #### 6.验证
