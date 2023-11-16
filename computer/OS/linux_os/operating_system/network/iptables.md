@@ -16,6 +16,8 @@
       - [5.五条链](#5五条链)
       - [6.常用target（不同的表支持不同的target）](#6常用target不同的表支持不同的target)
       - [7.数据包流程图](#7数据包流程图)
+        - [(1) 分三个部分: 进入、转发或被本地进程接受、外出](#1-分三个部分-进入-转发或被本地进程接受-外出)
+        - [(2) 外出时，会先经过路由才进入iptables](#2-外出时会先经过路由才进入iptables)
       - [8.`iptables -nL`格式解析](#8iptables--nl格式解析)
       - [9.跟踪数据包的状态（`conntrack`模块）](#9跟踪数据包的状态conntrack模块)
     - [使用](#使用)
@@ -125,12 +127,25 @@ target也可以是某条chain
 |NFLOG|用于记录日志 (记录在nflog这个interface中，所以可以进行抓包)|
 
 #### 7.数据包流程图
-![](./imgs/iptables_01_new.png)
+![](./imgs/iptables_03.png)
+
+##### (1) 分三个部分: 进入、转发或被本地进程接受、外出
+
+* 进入走两个链:
+  * PREROUTING
+  * INPUT
+
+* 转发或被本地进程接受：
+  * 收到消息需要转发时会走FORWARD
+
+* 外出走两个链:
+  * OUTPUT
+  * POSTROUTING
+
+##### (2) 外出时，会先经过路由才进入iptables
 
 #### 8.`iptables -nL`格式解析
 ![](./imgs/iptables_02.png)
-
-
 
 #### 9.跟踪数据包的状态（`conntrack`模块）
 详情见 conntrack.md
@@ -320,8 +335,18 @@ sysctl net.netfilter.nf_log.2=nf_log_ipv4
 ```
 
 ##### （2） 添加跟踪规则（在raw表中添加）
+
+* 跟踪进入的包
+
 ```shell
 iptables -t raw -A PREROUTING <这里填需要跟踪的包的条件> -j TRACE
+```
+
+* 跟踪外出的包
+  * 首先要确认有路由，否则不会进入iptables
+
+```shell
+iptables -t raw -A OUTPUT <这里填需要跟踪的包的条件> -j TRACE
 ```
 
 ##### （3） 查看日志：`/var/log/messages`

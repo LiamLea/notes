@@ -87,9 +87,30 @@ rdb remove <pool_name>/<image_name>
 
 ##### （2）加载image
 ```shell
-rbd device map <pool_name>/<image_name>
+$ vim /etc/ceph/rbdmap
+
+<pool_name>/<image_name>
+
+$ rbdmap map
 
 #如果rbd的某些功能与kernel不匹配，需要按照提示disable这些功能
+#临时的: rbd device map <pool_name>/<image_name>
+```
+
+* 格式化和挂载
+```shell
+fdisk /dev/rbd0
+mkfs.xfs /dev/rbd0p1
+mkdir /mnt/data
+chown -R <user>:<user> /mnt/data
+```
+
+* 开机自动挂载
+```shell
+$ vim /etc/fstab
+
+#_netdev很重要，表示网络启动后才进行挂载
+/dev/rbd0p1 /mnt/data xfs defaults,_netdev 0 2
 ```
 
 ##### （3）查看加载的image（即块设备）

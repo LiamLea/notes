@@ -10,6 +10,7 @@
       - [1.Hadoop MapReduce](#1hadoop-mapreduce)
         - [(1) 基本架构](#1-基本架构)
         - [(2) 执行过程](#2-执行过程)
+      - [2.Yarn](#2yarn)
 
 <!-- /code_chunk_output -->
 
@@ -40,3 +41,9 @@
 ![](./imgs/hpmp_01.png)
 ![](./imgs/hpmp_02.png)
 ![](./imgs/hpmp_03.png)
+
+#### 2.Yarn
+
+![](./imgs/hpyarn_01.png)
+
+* 管理节点、进行MapReduce job的调度（代替了原先的JobTracker）
