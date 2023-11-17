@@ -18,15 +18,23 @@
 
 * 创建目录
 ```shell
-bin/hdfs dfs -mkdir <dir>
+$HADOOP_HOME/bin/hdfs dfs -mkdir <dir>
 ```
 
 * 删除目录
 ```shell
-bin/hdfs dfs -rm -R <dir>
+$HADOOP_HOME/bin/hdfs dfs -rm -R <dir>
 ```
 
 #### 2.文件操作
-```shell
 
+* 文件授权
+
+```shell
+#也就是 +200，即owner能够写
+$HADOOP_HOME/bin/hadoop fs -chmod u+w   /tmp
+#也就是 +020，即group能够写
+$HADOOP_HOME/bin/hadoop fs -chmod g+w   /tmp
+#也就是 +002，即others能够写
+$HADOOP_HOME/bin/hadoop fs -chmod o+w   /tmp
 ```
