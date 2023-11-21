@@ -11,6 +11,7 @@
         - [(1) 基本架构](#1-基本架构)
         - [(2) 执行过程](#2-执行过程)
       - [2.Yarn](#2yarn)
+        - [(1) 4类角色](#1-4类角色)
 
 <!-- /code_chunk_output -->
 
@@ -47,3 +48,13 @@
 ![](./imgs/hpyarn_01.png)
 
 * 管理节点、进行MapReduce job的调度（代替了原先的JobTracker）
+
+##### (1) 4类角色
+* Resource Manager
+    * 集群资源管理
+* Node Manager
+    * 单机资源管理
+* **Application Manager**
+    * 单任务管理（需要用户实现具体的内容）
+* Task
+    * 单任务执行
