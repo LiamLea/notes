@@ -8,6 +8,9 @@
 <!-- code_chunk_output -->
 
 - [IDE使用](#ide使用)
+    - [安装](#安装)
+      - [1.linux存在输入的bug](#1linux存在输入的bug)
+    - [使用](#使用)
       - [1.图标的含义](#1图标的含义)
       - [2.structure使用](#2structure使用)
       - [3.search](#3search)
@@ -17,6 +20,20 @@
 
 <!-- /code_chunk_output -->
 
+
+### 安装
+
+#### 1.linux存在输入的bug
+
+* Help -> edit custom vm options
+
+```shell
+-Drecreate.x11.input.method=true
+```
+
+***
+
+### 使用
 
 #### 1.图标的含义
 

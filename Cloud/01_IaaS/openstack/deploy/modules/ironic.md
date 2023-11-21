@@ -38,7 +38,7 @@
 
 * 通过ipmi管理机器
 * 通过dnsmasq提供DHCP、TFTP、HTTP服务，进行PXE装机
-* 通过临时内核 运行指定 镜像
+* 通过临时内核（即deploy kernel） 运行指定 镜像
 
 ##### (1) PXE详细流程
 * 通过**neutron-dhcp**组件，提供**dnsmasq**服务
