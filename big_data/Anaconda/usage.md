@@ -31,8 +31,13 @@ bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
 
 * 手动进入conda环境
 ```shell
-source ~/miniconda3/etc/profile.d/conda.sh
-conda activate base
+# /root/miniconda3/bin/conda shell.bash hook 该命令获取脚本
+# eval "..." 执行脚本（引号内为需要执行的脚本内容）
+eval "$(/root/miniconda3/bin/conda shell.bash hook)"
+
+# 上面方法无效 ，使用下面这种方法
+#source ~/miniconda3/etc/profile.d/conda.sh
+#conda activate base
 ```
 
 * 初始化shell（这样登陆shell就会进入conda环境）（不建议）

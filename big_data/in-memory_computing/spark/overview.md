@@ -8,6 +8,7 @@
 - [overview](#overview)
     - [概述](#概述)
       - [1.架构](#1架构)
+      - [2.python on spark](#2python-on-spark)
 
 <!-- /code_chunk_output -->
 
@@ -22,6 +23,9 @@
 * Worker Node
     * 单机资源管理
 * driver
-    * 单任务管理
+    * 单任务管理（类似于yarn的Application Manager）
 * Executor
     * 单任务执行
+
+#### 2.python on spark
+![](./imgs/overview_02.png)
