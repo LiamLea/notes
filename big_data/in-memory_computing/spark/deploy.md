@@ -50,3 +50,8 @@ YARN_CONF_DIR=/home/hdfs/hadoop-3.3.6/etc/hadoop
   --deploy-mode cluster \
   examples/jars/spark-examples*.jar 
 ```
+
+* python
+```shell
+./bin/spark-submit  --master yarn   --deploy-mode cluster   examples/src/main/python/pi.py 100
+```
