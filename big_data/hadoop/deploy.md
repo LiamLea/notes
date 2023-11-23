@@ -141,6 +141,9 @@ $ vim etc/hadoop/core-site.xml
 |dfs.blocksize|268435456|块大小|
 |dfs.namenode.handler.count|100|handler进程数，用于处理来自DataNode的rpc|
 
+* 客户端配置
+    * 即作为客户端 连接hdfs时使用的配置，不是服务端配置，所以每个客户端都需要自己自行做一些配置
+
 ##### (5) yarn配置
 
 |配置项|默认值|说明|
