@@ -32,6 +32,8 @@
 
 #### 1.RDD (resilient distributed datasets)
 
+内存抽象（将多个台机器的内存抽象成一个内存）
+
 ##### (1) dataset
 * 基于**数据集合**，而不是单个数据
 * 由确定的粗粒度操作产生（比如：map、filter等）
@@ -39,6 +41,7 @@
 ##### (2) distributed
 * partitioning
     * 可以设置partitioning规则，将相关的数据集划分到一个partition（即可以放在同一台机器），便于计算
+    * 一个**partition**一个**task**任务，从而保证每个partition的处理是独立的
 
 ##### (3) resilient
 * Fault tolerance
