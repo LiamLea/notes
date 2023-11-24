@@ -12,9 +12,12 @@
         - [(1) 指定分区数](#1-指定分区数)
         - [(2) 使用序列](#2-使用序列)
         - [(2) 从文件读取数据](#2-从文件读取数据)
-      - [3.Operator (算子)](#3operator-算子)
+      - [3.常用Operator (算子)](#3常用operator-算子)
         - [(1) transformation operators](#1-transformation-operators)
         - [(2) action operators](#2-action-operators)
+      - [3.分区相关Operator](#3分区相关operator)
+        - [(1) transformation operators](#1-transformation-operators-1)
+        - [(2) action operators](#2-action-operators-1)
 
 <!-- /code_chunk_output -->
 
@@ -31,7 +34,7 @@ sc = SparkContext(conf=conf)
 #创建RDD，指定分区数为3
 rdd = sc.parallelize([1,2,3,4,5,6,7,8,8,10], 3)
 
-#收集该RDD的所有分区，转化为本地集合
+#将RDD各个分区的数据，统一收集到driver中，形成一个List对象
 result = rdd.collect()
 ```
 
@@ -73,7 +76,7 @@ rdd = sc.textFile("hdfs://hadoop-01:9000/user/hdfs/input")
     * item: 二元组，元组的第一部分是文件的路径，元组的第二部分是文件的内容
     * 分区：将列表划分为一定数量的子集
 
-#### 3.Operator (算子)
+#### 3.常用Operator (算子)
 * 算子: 分布式集合对象的API
 
 ##### (1) transformation operators
@@ -116,6 +119,8 @@ rdd = sc.textFile("hdfs://hadoop-01:9000/user/hdfs/input")
     rdd1 = rdd.reduceByKey(add)
     #rdd1: [('b', 1), ('a', 4), ('c', 5)]
     ```
+    * 性能远高于 groupByKey + reduce
+        * 因为就近就行了reduce，避免了groupByKey导致的数据传输
 
 * `groupByKey()`
     * 针对 二元组 （即能够`for k,v in item`）
@@ -187,3 +192,42 @@ rdd = sc.textFile("hdfs://hadoop-01:9000/user/hdfs/input")
 
 * 特点
     * RDD -> 非RDD
+
+* `collect()`
+    * 将RDD各个分区的数据，统一收集到driver中，形成一个List对象
+    * 如果集太大，就会有问题，因为内存不够用
+* `countByKey()`
+    * 计算同一个key的数量
+* `reduce(func(Callable[[T, T], T]))`
+    * 迭代执行`func(list[0], list[1])`，直至该list中只有一个item
+* first()、take()、top()、count()
+* `takeSample(withReplacement: bool, num: int)`
+    * with replacement 表示一个对象可以重复采样（而不是对象的值）
+        * 比如： 数据[1,1,2,3,4]，如果不允许replacement，则采出的样本最多只有两个1，如果允许，采出的样本可能为[1,1,1,1,1,4]
+* `takeOrdered(num: int, key: Optional[Callable[[T], S]] = None)`
+    * 先对数据进行变换（可以不变），然后进行升序排序，最后取出前n个（取出的数据是原始数据，而不是变换后的数据）
+* `foreach(func: Callable[[T], None])`
+    * 和map类似，只是没有返回值
+    * 所以数据不会收集到driver中
+* `saveAsTextFile(path)`
+    * 有几个分区就写入几个文件（所以数据没有收集到driver中）
+    * 支持写入hdfs中
+
+#### 3.分区相关Operator
+
+##### (1) transformation operators
+* `mapPartitions(func: Callable[[Iterable[T]], Iterable[U]])`
+    * 与map本质是一样，只不过一次性将整个分区数据传入到函数中，当数据比较分散时，能够提高性能
+    * 只不过func接受的参数是整个partition数据，然后的也是整个partition数据
+
+* `partitionBy(numPartitions: Optional[int], partitionFunc: Callable[[K], int] = <function portable_hash>)`
+    * 针对 二元组 （即能够`for k,v in item`）
+    * numPartitions表示分区数，比如设为3时，则分区号就为0、1、2
+    * partitionFunc将key作为参数传入，返回一个int（即分区号）
+
+* `coalesce(numPartitions: int, shuffle: bool = False)`
+    * 调节数据使分区数为n，是否进行shuffle，当为False时，表示不进行shuffle（即不增加分区）
+        * 当分区数减少时，直接将一个分区的数据合并到另一个分区（基本不算shuffle）
+
+##### (2) action operators
+* `foreach(func: Callable[[Iterable[T]], None])`
