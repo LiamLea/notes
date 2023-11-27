@@ -41,6 +41,11 @@ $HADOOP_HOME/bin/hadoop fs -chmod g+w   /tmp
 $HADOOP_HOME/bin/hadoop fs -chmod o+w   /tmp
 ```
 
+* 上传文件
+```shell
+$HADOOP_HOME/bin/hadoop fs -put <local_file> <remote_path>
+```
+
 ***
 
 ### yarn使用
