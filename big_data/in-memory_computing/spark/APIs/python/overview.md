@@ -74,6 +74,7 @@ if __name__ == '__main__':
     # 配置driver
     conf  = SparkConf().setAppName("WordCount").setMaster("yarn")
     #conf.set("spark.submit.deployMode", "cluster")
+    #conf.set("spark.files", "xx")
     #conf.set("spark.submit.pyFiles", "xx.py")
     conf.set("spark.hadoop.dfs.client.use.datanode.hostname", "true")
     sc = SparkContext(conf=conf)

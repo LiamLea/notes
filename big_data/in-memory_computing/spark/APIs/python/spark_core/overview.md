@@ -18,6 +18,15 @@
       - [3.分区相关Operator](#3分区相关operator)
         - [(1) transformation operators](#1-transformation-operators-1)
         - [(2) action operators](#2-action-operators-1)
+      - [4.rdd缓存](#4rdd缓存)
+      - [5.rdd checkpoint](#5rdd-checkpoint)
+      - [5.常用库](#5常用库)
+        - [(1) operator库中（包含了常用的函数）](#1-operator库中包含了常用的函数)
+      - [6.broadcast 和 accumaltor](#6broadcast-和-accumaltor)
+        - [(1) copy variable（默认）](#1-copy-variable默认)
+        - [(2) broadcast变量（只读）](#2-broadcast变量只读)
+        - [(3) accumaltor（数值）](#3-accumaltor数值)
+        - [(4) 适用场景](#4-适用场景)
 
 <!-- /code_chunk_output -->
 
@@ -26,6 +35,7 @@
 
 ```python
 from pyspark import SparkConf,SparkContext
+import operator
 
 #创建SparkContext对象
 conf  = SparkConf().setAppName("WordCount")
@@ -40,12 +50,12 @@ result = rdd.collect()
 
 #### 1.配置
 
-[参考](https://spark.apache.org/docs/latest/configuration.html)
-
-比如对hdfs客户端进行配置，使用hostname连接hdfs
 ```python
 conf  = SparkConf().setAppName("WordCount")
+#使用hostname连接hdfs
 conf.set("spark.hadoop.dfs.client.use.datanode.hostname", "true")
+#可以迭代读取某个目录下的文件
+conf.set("spark.hadoop.mapreduce.input.fileinputformat.input.dir.recursive", "true")
 ```
 
 #### 2.创建RDD
@@ -96,6 +106,7 @@ rdd = sc.textFile("hdfs://hadoop-01:9000/user/hdfs/input")
 
     rdd = sc.parallelize([0,1,2,3,4,5,6,7,8,9,10])
     rdd1 = rdd.map(add)
+    #或者rdd1 = rdd.map(operator.add)
     ```
 
 * `flatMap(func: Callable[[T], Iterable[U]])`
@@ -227,7 +238,199 @@ rdd = sc.textFile("hdfs://hadoop-01:9000/user/hdfs/input")
 
 * `coalesce(numPartitions: int, shuffle: bool = False)`
     * 调节数据使分区数为n，是否进行shuffle，当为False时，表示不进行shuffle（即不增加分区）
-        * 当分区数减少时，直接将一个分区的数据合并到另一个分区（基本不算shuffle）
+        * 当分区数减少时，属于narrow dependencies，所以不进行reshuffle
 
 ##### (2) action operators
 * `foreach(func: Callable[[Iterable[T]], None])`
+
+#### 4.rdd缓存
+
+* 使用内存缓存
+```python
+rdd.cache()
+#本质调用的是 rdd.persist(MEMORY_ONLY)
+```
+
+* 使用其他方式
+```python
+rdd.persist(DISK_ONLY)
+rdd.persist(MEMORY_AND_DISK)
+#等等
+```
+
+* 取消缓存
+```python
+rdd.unpersist()
+```
+
+#### 5.rdd checkpoint
+```python
+#必须是hdfs的路径
+sc.setCheckpointDir("hdfs://hadoop-01:9000/user/hdfs/input")
+result_rdd.checkpoint()
+```
+
+#### 5.常用库
+
+##### (1) operator库中（包含了常用的函数）
+
+* 比如: add、sub等
+
+#### 6.broadcast 和 accumaltor
+
+##### (1) copy variable（默认）
+* 代码首先都是运行在driver中的
+* driver会分发rdd到各个executor
+* **task**如果需要在driver中定义的变量，则会找driver申请，driver会**拷贝**一份给task
+    * 所以不会影响driver中那个变量的值
+
+![](./imgs/core_02.png)
+
+* 示例代码
+```python
+conf  = SparkConf().setAppName("WordCount")
+sc = SparkContext(conf=conf)
+
+count=0
+def accu(x):
+    global count
+    count += 1
+    print(count)
+rdd1 = sc.parallelize(range(1,10),3)
+rdd2 = rdd1.map(accu)
+rdd2.collect()
+print(count)
+
+'''
+输出结果:
+
+1
+2
+3
+1
+2
+3
+1
+2
+3
+0
+'''
+```
+
+##### (2) broadcast变量（只读）
+* executor会会在本地缓存中查看有没有这个变量，没有会找driver申请
+* driver然后会将这个变量广播到各个worker node（一个worker node可能会有多个executor）
+* 所有broadcast**只读**，不能修改，否则会导致数据不一致
+
+![](./imgs/core_01.png)
+
+* 示例代码
+```python
+count=0
+broadcast = sc.broadcast(count)
+def accu(x):
+    a = broadcast.value
+    a+=1
+    print(a)
+rdd1 = sc.parallelize(range(1,10),3)
+rdd2 = rdd1.map(accu)
+rdd2.collect()
+print(broadcast.value)
+
+'''
+输出结果:
+1
+1
+1
+1
+1
+1
+1
+1
+1
+0
+'''
+```
+
+##### (3) accumaltor（数值）
+![](./imgs/core_03.png)
+
+* 示例代码一
+```python
+#只能是数值类型
+count=sc.accumulator(0)
+def accu(x):
+    global count
+    count+=1
+    print(count)
+rdd1 = sc.parallelize(range(1,10),3)
+rdd2 = rdd1.map(accu)
+rdd2.collect()
+print(count)
+
+'''
+输出结果:
+1
+2
+3
+1
+2
+3
+1
+2
+3
+9
+'''
+```
+
+* 示例二
+```python
+count=sc.accumulator(0)
+def accu(x):
+    global count
+    count+=1
+rdd1 = sc.parallelize(range(1,10),3)
+rdd2 = rdd1.map(accu)
+rdd2.collect()
+rdd3 =rdd2.map(lambda x: x)
+rdd3.collect()
+print(count)
+
+'''
+输出结果:
+18
+
+解释:
+因为rdd2被调用了两次
+'''
+```
+
+* 示例三
+```python
+count=sc.accumulator(0)
+def accu(x):
+    global count
+    count+=1
+rdd1 = sc.parallelize(range(1,10),3)
+rdd2 = rdd1.map(accu)
+rdd2.cache()
+rdd2.collect()
+rdd3 =rdd2.map(lambda x: x)
+rdd3.collect()
+print(count)
+
+'''
+输出结果:
+9
+
+解释:
+因为rdd2被调用了一次
+'''
+```
+
+##### (4) 适用场景
+* broadcast
+    * 需要共享的数据大
+        * 几兆，如果太大就适合使用rdd的join方式
+    * 数据需要被大部分executor使用
+    * 数据会被频繁访问
