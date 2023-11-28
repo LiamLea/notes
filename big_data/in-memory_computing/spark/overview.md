@@ -33,9 +33,11 @@
 * driver
     * 单任务管理（类似于yarn的Application Manager）
     * 代码开始都是运行在driver中的，然后driver会将rdd算子任务，分发给各个executor执行
+    * 本质就是一个executor（只不过进行整体管理）
 * Executor
     * 一个work node可以有多个executor
-    * 一个executor是一个执行器（执行一个个task）
+    * 一个executor是一个执行器（即JVM进程）（执行一个个task）
+    * 一个executor只能属于一个application
 
 ##### (1) 任务划分
 

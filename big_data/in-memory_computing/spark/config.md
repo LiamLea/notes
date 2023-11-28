@@ -7,7 +7,9 @@
 
 - [config](#config)
     - [常用配置](#常用配置)
-      - [1.提交配置](#1提交配置)
+      - [1.资源设置](#1资源设置)
+        - [(1) executor静态分配](#1-executor静态分配)
+        - [(2) executor动态分配](#2-executor动态分配)
       - [2.hadoop客户端配置](#2hadoop客户端配置)
       - [3.分区数](#3分区数)
 
@@ -18,13 +20,23 @@
 
 [参考](https://spark.apache.org/docs/latest/configuration.html)
 
-#### 1.提交配置
+#### 1.资源设置
+
+[参考](https://medium.com/analytics-vidhya/understanding-resource-allocation-configurations-for-a-spark-application-9c1307e6b5e3)
+
+##### (1) executor静态分配
 
 |配置|默认值|建议值|说明|
 |-|-|-|-|
-|--num-executors|2|work node的数量||
-|--executor-cores|1|一个executor的cpu数||
-|--executor-memory|1G|一个executor的内存||
+|--executor-cores|1|5|一个executor的cpu数|
+|--executor-memory|1G||一个executor的内存|
+|--num-executors|2||executor的数量|
+
+##### (2) executor动态分配
+|配置|默认值|建议值|说明|
+|-|-|-|-|
+|spark.dynamicAllocation.enabled|false||开启executor的动态分配|
+|spark.dynamicAllocation.schedulerBacklogTimeout|1s||如果有pending tasks持续了这么长时间，则就会申请新的executor|
 
 #### 2.hadoop客户端配置
 

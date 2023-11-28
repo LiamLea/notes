@@ -34,12 +34,18 @@
 ### 基本使用
 
 ```python
-from pyspark import SparkConf,SparkContext
+from pyspark import SparkConf
+from pyspark.sql import SparkSession
 import operator
 
 #创建SparkContext对象
 conf  = SparkConf().setAppName("WordCount")
-sc = SparkContext(conf=conf)
+
+spark  = SparkSession.builder.\
+    config(conf=conf).\
+    getOrCreate()
+
+sc = spark.sparkContext
 
 #创建RDD，指定分区数为3
 rdd = sc.parallelize([1,2,3,4,5,6,7,8,8,10], 3)
