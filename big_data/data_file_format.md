@@ -8,7 +8,7 @@
 - [data file format](#data-file-format)
     - [概述](#概述)
       - [1.两类数据文件格式](#1两类数据文件格式)
-        - [(1) row-basedv](#1-row-basedv)
+        - [(1) row-based](#1-row-based)
         - [(2) columnar storage](#2-columnar-storage)
       - [4.delta lake vs data lake](#4delta-lake-vs-data-lake)
 
@@ -20,7 +20,7 @@
 
 ![](./imgs/dff_01.png)
 
-##### (1) row-basedv
+##### (1) row-based
 * 将一行的数据存储在一起
 * 形式: **plain** text
 * 适用场景：写密集型
