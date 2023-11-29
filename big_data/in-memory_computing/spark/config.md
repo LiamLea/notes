@@ -12,6 +12,7 @@
         - [(2) executor动态分配](#2-executor动态分配)
       - [2.hadoop客户端配置](#2hadoop客户端配置)
       - [3.分区数](#3分区数)
+      - [4.性能优化](#4性能优化)
 
 <!-- /code_chunk_output -->
 
@@ -50,3 +51,10 @@
 |配置|默认值|建议值|说明|
 |-|-|-|-|
 |spark.default.parallelism|根据系统情况设置|cpu的5倍左右|用于设置task的并行数（也就是分区数），如果用户没有特别指定，使用这里的值|
+|spark.sql.shuffle.partitions|200|总的核心数的2-5倍|join或aggregation，进行数据shuffle时，使用的分区数|
+
+#### 4.性能优化
+
+|配置|默认值|建议值|说明|
+|-|-|-|-|
+|spark.sql.adaptive.enabled|true|true|程序运行时，对分区数等进行优化|

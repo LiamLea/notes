@@ -11,10 +11,11 @@
         - [(1) 确定版本](#1-确定版本)
       - [2.设置用户](#2设置用户)
       - [3.集成mysql](#3集成mysql)
-      - [3.启动服务](#3启动服务)
+      - [3.更多配置](#3更多配置)
+      - [4.启动服务](#4启动服务)
         - [(1) 启动metastore服务](#1-启动metastore服务)
         - [(2) 测试](#2-测试)
-      - [4.客户端](#4客户端)
+      - [5.客户端](#5客户端)
         - [(1) hive](#1-hive)
         - [(2) hiveserver2（常用）](#2-hiveserver2常用)
 
@@ -97,7 +98,10 @@ create database hive charset utf8mb4_general_ci;
 $HIVE_HOME/bin/schematool -dbType mysql -initSchema -verbose
 ```
 
-#### 3.启动服务
+#### 3.更多配置
+[参考](https://cwiki.apache.org/confluence/display/hive/configuration+properties)
+
+#### 4.启动服务
 
 ##### (1) 启动metastore服务
 ```shell
@@ -127,7 +131,7 @@ mysql> select * from DBS;
 #能看出数据在hdfs中存储的位置
 ```
 
-#### 4.客户端
+#### 5.客户端
 
 ##### (1) hive
 

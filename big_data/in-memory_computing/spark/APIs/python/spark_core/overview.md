@@ -11,18 +11,19 @@
       - [2.创建RDD](#2创建rdd)
         - [(1) 指定分区数](#1-指定分区数)
         - [(2) 使用序列](#2-使用序列)
-        - [(2) 从文件读取数据](#2-从文件读取数据)
-      - [3.常用Operator (算子)](#3常用operator-算子)
+        - [(3) 从文件读取数据](#3-从文件读取数据)
+      - [3.shuffle](#3shuffle)
+      - [4.常用Operator (算子)](#4常用operator-算子)
         - [(1) transformation operators](#1-transformation-operators)
         - [(2) action operators](#2-action-operators)
-      - [3.分区相关Operator](#3分区相关operator)
+      - [5.分区相关Operator](#5分区相关operator)
         - [(1) transformation operators](#1-transformation-operators-1)
         - [(2) action operators](#2-action-operators-1)
-      - [4.rdd缓存](#4rdd缓存)
-      - [5.rdd checkpoint](#5rdd-checkpoint)
-      - [5.常用库](#5常用库)
+      - [6.rdd缓存](#6rdd缓存)
+      - [7.rdd checkpoint](#7rdd-checkpoint)
+      - [8.常用库](#8常用库)
         - [(1) operator库中（包含了常用的函数）](#1-operator库中包含了常用的函数)
-      - [6.broadcast 和 accumaltor](#6broadcast-和-accumaltor)
+      - [9.broadcast 和 accumaltor](#9broadcast-和-accumaltor)
         - [(1) copy variable（默认）](#1-copy-variable默认)
         - [(2) broadcast变量（只读）](#2-broadcast变量只读)
         - [(3) accumaltor（数值）](#3-accumaltor数值)
@@ -79,7 +80,7 @@ print(rdd.glom().collect())
 rdd = sc.parallelize([1,2,3,4,5,6,7,8,8,10], 3)
 ```
 
-##### (2) 从文件读取数据
+##### (3) 从文件读取数据
 
 * textFile
     * item: 文件的一行内容 就是 列表的一个item
@@ -92,7 +93,11 @@ rdd = sc.textFile("hdfs://hadoop-01:9000/user/hdfs/input")
     * item: 二元组，元组的第一部分是文件的路径，元组的第二部分是文件的内容
     * 分区：将列表划分为一定数量的子集
 
-#### 3.常用Operator (算子)
+#### 3.shuffle
+* spark算子更加丰富，不仅仅有map和reduce
+* shuffle就是调整**各分区间的数据分布**
+
+#### 4.常用Operator (算子)
 * 算子: 分布式集合对象的API
 
 ##### (1) transformation operators
@@ -198,6 +203,7 @@ rdd = sc.textFile("hdfs://hadoop-01:9000/user/hdfs/input")
 
 * `sortBy(func: Callable[[T], S], ascending=True)`
     * 只能保证**一个分区**内的数据是有序的
+        * 因为transformation只是对各个分区单独进行操作
     * 遍历item，根据func(item)的返回值进行排序
 
 * `sortByKey(ascending=True)`
@@ -230,7 +236,7 @@ rdd = sc.textFile("hdfs://hadoop-01:9000/user/hdfs/input")
     * 有几个分区就写入几个文件（所以数据没有收集到driver中）
     * 支持写入hdfs中
 
-#### 3.分区相关Operator
+#### 5.分区相关Operator
 
 ##### (1) transformation operators
 * `mapPartitions(func: Callable[[Iterable[T]], Iterable[U]])`
@@ -249,7 +255,7 @@ rdd = sc.textFile("hdfs://hadoop-01:9000/user/hdfs/input")
 ##### (2) action operators
 * `foreach(func: Callable[[Iterable[T]], None])`
 
-#### 4.rdd缓存
+#### 6.rdd缓存
 
 * 使用内存缓存
 ```python
@@ -269,20 +275,20 @@ rdd.persist(MEMORY_AND_DISK)
 rdd.unpersist()
 ```
 
-#### 5.rdd checkpoint
+#### 7.rdd checkpoint
 ```python
 #必须是hdfs的路径
 sc.setCheckpointDir("hdfs://hadoop-01:9000/user/hdfs/input")
 result_rdd.checkpoint()
 ```
 
-#### 5.常用库
+#### 8.常用库
 
 ##### (1) operator库中（包含了常用的函数）
 
 * 比如: add、sub等
 
-#### 6.broadcast 和 accumaltor
+#### 9.broadcast 和 accumaltor
 
 ##### (1) copy variable（默认）
 * 代码首先都是运行在driver中的

@@ -89,6 +89,9 @@ ALTER TABLE <table_name> CHANGE <field> <new_field_name> <type>;
     * 可以先有数据再也表，也可以先有表，再上传文件
     ```shell
     CREATE EXTERNAL TABLE <table_name> ... LOCATION ...
+
+    #可以指定格式，比如parquet
+    CREATE EXTERNAL TABLE <table_name> ... STORED AS PARQUET LOCATION ...
     ```
     
 * 相互转换
