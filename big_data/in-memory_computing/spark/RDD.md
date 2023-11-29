@@ -20,6 +20,9 @@
       - [4.checkpoint](#4checkpoint)
       - [5.Fault tolerance](#5fault-tolerance)
         - [(1) 容错依赖以下特性实现](#1-容错依赖以下特性实现)
+      - [6.shuffle（是影响性能的关键因素）](#6shuffle是影响性能的关键因素)
+        - [(1) HashShuffleManager （旧版本）](#1-hashshufflemanager-旧版本)
+        - [(2) sortShuffleManager](#2-sortshufflemanager)
 
 <!-- /code_chunk_output -->
 
@@ -95,3 +98,13 @@
     * 保留对数聚集的一系列操作，通过对原数据集执行这一系列操作就能恢复
 * Data Replication
     * 可以跨节点拷贝数据
+
+#### 6.shuffle（是影响性能的关键因素）
+
+* shuffle就是调整**各分区间的数据分布**
+
+##### (1) HashShuffleManager （旧版本）
+![](./imgs/rdd_04.png)
+
+##### (2) sortShuffleManager
+![](./imgs/rdd_03.png)

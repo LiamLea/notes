@@ -9,9 +9,10 @@
     - [概述](#概述)
       - [1.MapReduce](#1mapreduce)
         - [(1) Map](#1-map)
-        - [(2) Reduce](#2-reduce)
-        - [(3) 举例： 词频统计](#3-举例-词频统计)
-        - [(4) 局限性](#4-局限性)
+        - [(2) shuffle](#2-shuffle)
+        - [(3) Reduce](#3-reduce)
+        - [(4) 举例： 词频统计](#4-举例-词频统计)
+        - [(5) 局限性](#5-局限性)
       - [2.MapReduce执行流程](#2mapreduce执行流程)
         - [(1) 执行流程](#1-执行流程)
         - [(2) M和R的数量 (由用户指定)](#2-m和r的数量-由用户指定)
@@ -27,36 +28,41 @@
 #### 1.MapReduce
 
 ##### (1) Map
-* 将数据**分割**为shards或splits
-* 将它们分配给工作节点，工作节点来**计算子问题的解**
+* 输入 -> lsit(key,value)
 * 编程模型: `map()函数`
 ```java
-//输入一条记录
-//  in_key一般为document的名字
-//  in_value一般为document的内容
-//生成子问题的结果，map的输出需要作为reduce函数的输入
-map(in_key,in_value) -> list(out_key, intermediate_value)
+function map(String name, String document):
+    // name: document name
+    // document: document contents
+    for each word w in document:
+        emit (w, 1)
 ```
+##### (2) shuffle
+重新放置这些(key,value)，key相同的放到同一个reduce任务中
 
-##### (2) Reduce
-* **合并**子问题的解
+##### (3) Reduce
+* 对每一个key进行聚合
 * 编程模型: `reduce()函数`
 ```java
-//map的输出需要作为reduce函数的输入
-//  out_key为map的输出结果out_key
-//  list(intermediate_value)，因为很多子问题out_key都有对应的intermediate_value，所以这里为list，要将子问题的结果合并
-reduce(out_key, list(intermediate_value)) -> list(out_value)
+function reduce(String word, Iterator partialCounts):
+    // word: a word
+    // partialCounts: a list of aggregated partial counts
+    sum = 0
+    for each pc in partialCounts:
+        sum += pc
+    emit (word, sum)
 ```
 
-##### (3) 举例： 词频统计
+##### (4) 举例： 词频统计
 ![](./imgs/mr_01.png)
 
-##### (4) 局限性
+##### (5) 局限性
 
 * 对数据的要求
     * 数据能够切分且是独立的
     * 操作必须是确定性的和幂等的
 * 数据流极其严格，不够灵活
+    * map后就必须reduce
 * 过于抽象，只有map、reduce两个函数，里面实现的内容千差万别，系统无法对其中的代码进行优化
 
 #### 2.MapReduce执行流程

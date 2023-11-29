@@ -22,6 +22,9 @@
       - [3.数据模型](#3数据模型)
         - [(1) 关系模型定义](#1-关系模型定义)
         - [(2) 三大经典数据模型](#2-三大经典数据模型)
+      - [4.OLTP vs OLAP](#4oltp-vs-olap)
+        - [(1) OLTP (online transactional processing)](#1-oltp-online-transactional-processing)
+        - [(2) OLAP (online analytical processing)](#2-olap-online-analytical-processing)
 
 <!-- /code_chunk_output -->
 
@@ -131,3 +134,12 @@ DDL + DML + DCL
 * 网状模型
     * **图**的形式组织数据
     ![](./imgs/overview_06.png)
+
+#### 4.OLTP vs OLAP
+
+##### (1) OLTP (online transactional processing)
+事务处理，就是对事务的增删改查
+
+##### (2) OLAP (online analytical processing)
+分析处理，就是对数据进行分析
+* 比如：聚合、排序等操作

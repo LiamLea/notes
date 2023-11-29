@@ -26,8 +26,7 @@
         - [(3) exists-子查询](#3-exists-子查询)
       - [5.查询结果计算和聚集](#5查询结果计算和聚集)
         - [(1) 算术运算](#1-算术运算)
-        - [(2) 聚集函数](#2-聚集函数)
-        - [(3) 分组和分组过滤](#3-分组和分组过滤)
+        - [(2) 分组和分组过滤](#2-分组和分组过滤)
       - [6.SQL实现关系代数操作](#6sql实现关系代数操作)
         - [(1) 并、交、差](#1-并-交-差)
       - [7.视图](#7视图)
@@ -38,6 +37,9 @@
         - [(2) 表约束](#2-表约束)
       - [9.动态约束（触发器）](#9动态约束触发器)
         - [(1) 举例](#1-举例)
+    - [函数](#函数)
+      - [1.Aggregate Functions (聚合函数)](#1aggregate-functions-聚合函数)
+      - [2.window functions (窗口函数)](#2window-functions-窗口函数)
 
 <!-- /code_chunk_output -->
 
@@ -341,27 +343,7 @@ From 表名1 [, 表名2 … ]
     From Student S;
     ```
 
-##### (2) 聚集函数
-
-* 聚集函数是不允许用于Where子句中的，因为
-    * 聚集函数是对集合（即多个元组）的处理
-    * where语句则是对元素（即每个元组）的处理
-
-|函数名|参数类型|
-|-|-|
-|COUNT|任意|
-|SUM|数值类型|
-|AVG|数值类型|
-|MAX|字符或数值类型|
-|MIN|字符或数值类型|
-
-* 举例
-    * 求教师的工资总额
-    ```SQL
-    Select Sum(Salary) From Teacher;
-    ```
-
-##### (3) 分组和分组过滤
+##### (2) 分组和分组过滤
 
 * 具有相同分组条件值的元组划到一个组
 
@@ -575,3 +557,44 @@ create trigger delS# after delete on Student
             delete sc where S# = :oldi.S# ;
         end;
 ```
+
+***
+
+### 函数
+
+#### 1.Aggregate Functions (聚合函数)
+
+* 聚集函数是不允许用于Where子句中的，因为
+    * 聚集函数是对集合（即多个元组）的处理
+    * where语句则是对元素（即每个元组）的处理
+
+|函数名|参数类型|
+|-|-|
+|COUNT|任意|
+|SUM|数值类型|
+|AVG|数值类型|
+|MAX|字符或数值类型|
+|MIN|字符或数值类型|
+
+* 举例
+    * 求教师的工资总额
+    ```SQL
+    Select Sum(Salary) From Teacher;
+    ```
+
+#### 2.window functions (窗口函数)
+
+* 窗口函数，与聚合函数类似，只不过作用在一部分数据上
+    * 所以称之为窗口函数
+* 聚合函数，作用在全部数据上
+
+```SQL
+<window_function> over(partition by <field1> order by <field_2>)
+```
+
+* 聚合窗口函数
+    * avg、sum、count、max、min等
+* 排序窗口函数
+    * rank、dense_rank、row_number
+* 偏移窗口函数
+    * lag、lead
