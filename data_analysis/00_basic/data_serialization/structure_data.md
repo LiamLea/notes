@@ -26,7 +26,7 @@
 * 适用场景：写密集型
 
 * 具体实现
-    * CSV (comma-separated values)
+    * **CSV** (comma-separated values)
 
 ##### (2) columnar storage
 * 将一列的数据存储在一起
@@ -43,7 +43,7 @@
 * 形式: **binary**
 * 适用场景：读取密集型（分析或历史数据）
 * 具体实现
-    * parquet
+    * **parquet**
         * metadata 也存在文件中
             * 包括数据类型，压缩方式等等，这样读取数据时就不会有歧义（而CSV就没有存储这些数据）
 
