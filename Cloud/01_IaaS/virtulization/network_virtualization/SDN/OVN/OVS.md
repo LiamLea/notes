@@ -46,6 +46,8 @@
 
 ##### (1) 查看open vswitch信息
 
+* 名称为**tap**开头的网卡一般都是**虚拟机**的网卡
+
 * 没有使用OVN时
 
 ```shell
@@ -104,6 +106,7 @@ Bridge br-tun
 ```
 
 * 使用OVN时
+
 ```shell
 $ ovs-vsctl show
 
