@@ -19,6 +19,7 @@
         - [(1) 列出LB](#1-列出lb)
     - [southbound](#southbound)
         - [(1) 数据流](#1-数据流)
+      - [1.DEBUG： 对链路进行trace（终极）](#1debug-对链路进行trace终极)
 
 <!-- /code_chunk_output -->
 
@@ -62,6 +63,8 @@
 
 ```python
 $ ovn-nbctl show
+
+#使用外部nbdb: --db=tcp:[10.172.1.132]:6641,tcp:[10.172.1.201]:6641,tcp:[10.172.1.235]:6641（参数必须接在ovn-sbctl）
 
 """
 展示了 逻辑网络和连接 （即需要创建的虚拟设备和连接）
@@ -143,6 +146,8 @@ ovn-nbctl lb-list
 ```python
 $ ovn-sbctl show
 
+#使用外部sbdb: --db=tcp:[10.172.1.132]:6642,tcp:[10.172.1.201]:6642,tcp:[10.172.1.235]:6642 （参数必须接在ovn-sbctl）
+
 """
 展示了 虚拟设备与机器的绑定关系
 一个chassis就是一个intergration bridge（用于内部连接和隧道连接，即将br-int和br-tun合并为一个br-int）
@@ -191,4 +196,18 @@ $ ovn-sbctl count-flows
 * 某个datapath的数据流
 ```shell
 $ ovn-sbctl lflow-list <datapath>
+```
+
+#### 1.DEBUG： 对链路进行trace（终极）
+```shell
+#inport： 流量的入口
+# 可以通过ovn-nbctl show查看端口
+#ip4.dst： 目标地址
+#下面的意思是，追踪流量从lrp-81b5acac-e17c-46fa-8186-db957a87a6b7端口进行，目标地址是172.16.1.231的链路，能够检查出哪里不通
+ovn-trace 'inport=="lrp-81b5acac-e17c-46fa-8186-db957a87a6b7" && ip4.dst==172.16.1.231'
+
+#结果显示（最后是drop）：
+#ingress(dp="demo-router", inport="lrp-81b5ac")
+#----------------------------------------------
+# 0. lr_in_admission: no match (implicit drop)
 ```
