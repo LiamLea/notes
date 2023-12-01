@@ -7,11 +7,13 @@
     - [概述](#概述)
       - [1.基础概念](#1基础概念)
       - [2.常用interface type](#2常用interface-type)
+      - [3.网络架构](#3网络架构)
     - [使用](#使用)
       - [1.查看信息](#1查看信息)
         - [(1) 查看open vswitch信息](#1-查看open-vswitch信息)
         - [(2) 查看某个bridge的路由信息](#2-查看某个bridge的路由信息)
         - [(3) 查看某个bridge的数据流](#3-查看某个bridge的数据流)
+      - [2.抓取某个端口的流量](#2抓取某个端口的流量)
 
 <!-- /code_chunk_output -->
 
@@ -32,10 +34,17 @@
 |-|-|
 |system (默认)|系统的网卡（即OVS外部网卡，比如：eth0），将OVS外部的网卡添加到该虚拟交换机上|
 |internal|内部网卡（当该interface名字与bridge的名字一样，叫做local interface）|
-|patch|连接线（一对），相当于veth pair|
+|patch|连接线（一对），相当于veth pair，用于**连接虚拟交换机**|
 |tap|被该bridge管理的TUN/TAP设备 |
 |vxlan|vxlan tunnel，一个endpoint一个vxlan interface|
 |genve|是一种加密协议，类似于vxlan|
+
+#### 3.网络架构
+
+* 每台机器上创建 虚拟交换机（br-int），然后通过**隧道技术（比如vxlan、geneve等）**互相连结
+    * 老版的openstack，br-int用于内部通信，br-tun连接各个机器
+* 对于外出的节点上，会创建（br-ex），br-int 通过**patch**连接到br-ex上
+* 虚拟机创建时，会在虚拟交换机上创建**tap**设备，然后将tap另一端接入到虚拟机中
 
 ***
 
@@ -186,4 +195,16 @@ Cached: ::/0 dev ens3 GW fe80::f816:3eff:fe50:9a7f SRC fe80::f816:3eff:fe22:2800
 ##### (3) 查看某个bridge的数据流
 ```shell
 $ ovs-appctl bridge/dump-flows <bridge>
+```
+
+#### 2.抓取某个端口的流量
+```shell
+#查看该机器上的端口
+ovs-vsctl show
+
+#抓取流量
+#--span 表示抓取该交换机上所有流量
+#注意：可能需要等一会，会多次执行这个命令，才会抓到包
+#注意：无法抓取 patch 端口上的流量
+ovs-tcpdump  -i interface ...
 ```
