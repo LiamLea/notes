@@ -11,7 +11,7 @@
       - [1.内置subnet](#1内置subnet)
         - [(1) default subnet (安装就存在)](#1-default-subnet-安装就存在)
         - [(2) join subnet](#2-join-subnet)
-      - [2.自定义subnet](#2自定义subnet)
+      - [2.自定义subnet（如果配置正确但未成功，重启 ovn-controller）](#2自定义subnet如果配置正确但未成功重启-ovn-controller)
       - [3.subnet ACL](#3subnet-acl)
     - [VPC (OVN中的router)](#vpc-ovn中的router)
       - [1.VPC (virtual private cloud)](#1vpc-virtual-private-cloud)
@@ -71,7 +71,7 @@ $ ip r
 100.64.0.0/16 dev ovn0 proto kernel scope link src 100.64.0.3
 ```
 
-#### 2.自定义subnet
+#### 2.自定义subnet（如果配置正确但未成功，重启 ovn-controller）
 
 * 同一个VPC下的subnet不能有重叠
 
@@ -421,6 +421,20 @@ $ kubectl-ko nbctl lr-nat-add <router> dnat_and_snat <EXTERNAL_IP> <LOGICAL_IP>
 ##### (2) 通过openstack和k8s设置（推荐）
 
 * 在openstack上设置好网络
+
+* 将namespace加入vpc
+```shell
+kubectl create ns test2
+kubetl edit vpc neutron-1c763efb-7f17-475c-b8d9-a6ea1e6d93ad
+```
+```yaml
+...
+spec:
+  namespaces:
+  - test2
+...
+```
+
 * 在k8s上创建相应的subnet
 ```yaml
 kind: Subnet

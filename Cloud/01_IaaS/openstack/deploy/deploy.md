@@ -17,9 +17,10 @@
         - [（4）网络规划](#4网络规划)
       - [4.准备好ansible部署机](#4准备好ansible部署机)
         - [（1）安装ansible所需依赖](#1安装ansible所需依赖)
-        - [（2）在虚拟环境中安装python包依赖](#2在虚拟环境中安装python包依赖)
-        - [（3）配置ansible](#3配置ansible)
-        - [（4）准备好kolla配置文件](#4准备好kolla配置文件)
+        - [(2) 通过下载包安装](#2-通过下载包安装)
+        - [(3) 在虚拟环境中安装python包依赖](#3-在虚拟环境中安装python包依赖)
+        - [(4) 配置ansible](#4-配置ansible)
+        - [(5) 准备好kolla配置文件](#5-准备好kolla配置文件)
       - [5.配置清单文件（@ansible）](#5配置清单文件ansible)
       - [6.生成和修改密码](#6生成和修改密码)
       - [7.配置：`/etc/kolla/globals.yml`](#7配置etckollaglobalsyml)
@@ -179,7 +180,15 @@ apt-get -y install python3-dev libffi-dev gcc libssl-dev python3-selinux python3
 #yum -y install python3-devel libffi-devel gcc openssl-devel python3-libselinux
 ```
 
-##### （2）在虚拟环境中安装python包依赖
+##### (2) 通过下载包安装
+```shell
+cd <dir>
+
+pip3 -r requirements.txt
+python3 setup.py install
+```
+
+##### (3) 在虚拟环境中安装python包依赖
 
 * 设置pip源（所有节点）
 ```shell
@@ -200,7 +209,7 @@ pip install 'ansible<2.10'
 pip install 'kolla-ansible == 9.*'
 ```
 
-##### （3）配置ansible
+##### (4) 配置ansible
 ```shell
 $ mkdir /etc/ansible
 $ vim /etc/ansible/ansible.cfg
@@ -211,7 +220,7 @@ pipelining=True
 forks=100
 ```
 
-##### （4）准备好kolla配置文件
+##### (5) 准备好kolla配置文件
 ```shell
 mkdir -p /etc/kolla
 cp -r /root/kolla-env/share/kolla-ansible/etc_examples/kolla/* /etc/kolla

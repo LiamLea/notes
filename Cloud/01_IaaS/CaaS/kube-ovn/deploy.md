@@ -12,12 +12,14 @@
       - [3.安装](#3安装)
     - [和openstack集成](#和openstack集成)
       - [1.前提](#1前提)
-      - [2.修改neutron和ovs配置（已安装的情况下）](#2修改neutron和ovs配置已安装的情况下)
+      - [2.版本要求](#2版本要求)
+      - [3.修改neutron和ovs配置（已安装的情况下）](#3修改neutron和ovs配置已安装的情况下)
         - [(1) 修改neutron配置](#1-修改neutron配置)
         - [(2) 修改openvswitch配置](#2-修改openvswitch配置)
         - [(3) 需要配置openstack网络](#3-需要配置openstack网络)
-      - [2.neutron和ovs配置（初始化安装）](#2neutron和ovs配置初始化安装)
-      - [3.测试](#3测试)
+      - [4.neutron和ovs配置（初始化安装）](#4neutron和ovs配置初始化安装)
+      - [5.测试](#5测试)
+        - [(1) 进一步验证](#1-进一步验证)
 
 <!-- /code_chunk_output -->
 
@@ -65,7 +67,22 @@ if [ "$DUAL_STACK" = "true" ]; then
 #### 1.前提
 * openstack neutron需要使用OVN网络插件
 
-#### 2.修改neutron和ovs配置（已安装的情况下）
+#### 2.版本要求
+ovn-controller版本要尽量一致，大版本一定要一样，否则会不兼容
+
+* 查看openstack侧ovn-controller版本
+```shell
+docker exec -it ovn_controller
+ovn-controller --version
+```
+
+* 查看kube-ovn侧ovn-controller版本
+```shell
+kubectl exec -it -n kube-system ovn-central-86b6bcff56-pwqdt -- /bin/bash
+ovn-controller --version
+```
+
+#### 3.修改neutron和ovs配置（已安装的情况下）
 
 ##### (1) 修改neutron配置
 
@@ -99,7 +116,7 @@ $ ovs-vsctl set open . external-ids:ovn-encap-ip=192.168.137.200
   * 网络
 * 重新配置
 
-#### 2.neutron和ovs配置（初始化安装）
+#### 4.neutron和ovs配置（初始化安装）
 
 * enable ovn
   * 不同版本配置有所区别，具体参考文档
@@ -119,7 +136,7 @@ ovn_nb_connection: "tcp:[192.168.137.176]:6641,tcp:[192.168.137.177]:6641,tcp:[1
 ovn_sb_connection: "tcp:[192.168.137.176]:6642,tcp:[192.168.137.177]:6642,tcp:[192.168.137.178]:6642"
 ```
 
-#### 3.测试
+#### 5.测试
 
 * 查看vpc
 ```shell
@@ -166,6 +183,8 @@ kubectl get subnet
 ```
 
 * 创建pod
+  * 如果配置正确但未成功，重启 ovn-controller
+  * 还不成功，重启机器
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -193,3 +212,12 @@ spec:
   kubectl exec -n net2  -it ubuntu /bin/bash
   ping <vm_ip>
   ```
+
+##### (1) 进一步验证
+在openstack中创建网络，查看ovn-controller日志是否有报错
+```shell
+cat /var/log/kolla/openvswitch/ovn-controller.log
+
+#比如: 下面这个日志就说明openstack侧ovn-controller和kube-ovn侧的不兼容
+#2023-12-03T08:35:51.087Z|00022|lflow|WARN|error parsing match "ip && ip4.dst == 10.172.1.54 && inport == "lrp-ee28436d-8c55-4f2c-8e08-7afee95d2ea8" && flags.loopback == 1 && flags.use_snat_zone == 1 && is_chassis_resident("cr-lrp-ee28436d-8c55-4f2c-8e08-7afee95d2ea8")": Syntax error at `flags.use_snat_zone' expecting field name.
+```
