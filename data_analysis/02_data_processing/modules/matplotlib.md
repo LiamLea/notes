@@ -20,6 +20,10 @@
 
 ### 使用
 
+```python
+import matplotlib.pyplot as plt
+```
+
 #### 1.使用pyplot
 ```python
 from matplotlib import pyplot

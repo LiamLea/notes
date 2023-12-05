@@ -89,7 +89,7 @@ conda create -n <venv> python=3.9
 
 #### 3.管理包
 
-* 列出所有包
+* 列出已安装的包
 ```shell
 conda list
 ```
