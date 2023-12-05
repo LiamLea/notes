@@ -25,6 +25,10 @@
 
 ### 使用
 
+```python
+import pandas as pd
+```
+
 #### 1.读取数据
 ```csv
 name , liyi , lier , lisan

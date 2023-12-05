@@ -1,0 +1,292 @@
+# numpy
+
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [numpy](#numpy)
+    - [使用](#使用)
+      - [1.基本数据结构: ndarray (n-dimension array)](#1基本数据结构-ndarray-n-dimension-array)
+        - [(1) shape (描述数据的维度)](#1-shape-描述数据的维度)
+        - [(2) 相关属性](#2-相关属性)
+        - [(3) 创建ndarray](#3-创建ndarray)
+        - [(4) 索引和切片](#4-索引和切片)
+        - [(5) 对ndarray进行reshape](#5-对ndarray进行reshape)
+        - [(6) 级联](#6-级联)
+        - [(7) 拆分](#7-拆分)
+      - [2.空值: nan](#2空值-nan)
+      - [3.常用聚合函数](#3常用聚合函数)
+      - [4.矩阵运算](#4矩阵运算)
+        - [(1) 基本运算](#1-基本运算)
+        - [(2) 矩阵积](#2-矩阵积)
+        - [(3) 矩阵其他运算](#3-矩阵其他运算)
+
+<!-- /code_chunk_output -->
+
+
+### 使用
+
+```python
+import numpy as np
+```
+
+#### 1.基本数据结构: ndarray (n-dimension array)
+
+* ndarray中所有元素的类型都相同
+
+##### (1) shape (描述数据的维度)
+* `shape=(4,)`
+    * 一维，有3个元素
+* `shape=(4,2)`
+    * 二维
+    * 第一维有2个一维数据
+    * 每个一维数据有3个元素
+* `shape=(5,4,2)`
+    * 三维
+    * 第一维有5个二维数据
+    * 每个二维数据中中有4个一维数据
+    * 每个一维数据中有 2个元素
+
+##### (2) 相关属性
+
+```python
+#获取shape
+n.shape
+
+#获取维度
+n.ndim
+
+#获取总的元素个数
+n.size
+
+#获取元素的类型
+n.dtype
+```
+
+##### (3) 创建ndarray
+
+* list -> ndarray
+
+```python
+#如果list中的元素类型不相同，会进行转换（优先级: str > float > int）
+n = np.array(<list>)
+```
+
+* 创建所有元素都一样的ndarray
+    * 创建元素都为1的ndarray
+    ```python
+    # arg1: 该ndarray的shape
+    # arg2: 每个元素的类型
+    # arg3: C：以行的顺序存储数据，F：以列的顺序存储数据
+    n = np.ones((3,),np.int16, "C")
+    ```
+
+    * 创建元素都为0的ndarray
+    ```python
+    n = np.zeros((3,),np.int16, "C")
+    ```
+
+    * 创建元素都为<x>的ndarray
+    ```python
+    n = np.full((3,), "aaa")
+    ```
+
+* 创建主对角线都为1的ndarray
+```python
+#可以设置偏移
+n = np.eye(6,6)
+```
+
+* 创建随机ndarray
+
+    * 在一定范围内随机
+    ```python
+    #size就是ndarray的形状
+    n = np.random.randint(1,10,size=(4,3))
+    ```
+
+    * 满足标准正太分布
+    ```python
+    n = np.random.randn(4,3)
+    ```
+
+    * 满足正太分布
+    ```python
+    #arg1: 均值
+    #arg2: 标准差
+    n = np.random.normal(100, 1,size=(3,4))
+    ```
+
+    * 0-1随机
+    ```python
+    n = np.random.random((3,4))
+    ```
+
+* 其他
+    * 创建等差数列
+    ```python
+    n = np.linspace(0,10,6)
+    #array([ 0.,  2.,  4.,  6.,  8., 10.])
+    ```
+    * arange
+    ```python
+    n = np.arange(1,10,2)
+    ```
+
+##### (4) 索引和切片
+和list的用法一样，只不过多维度
+
+```python
+#取索引为3的行，然后在结果中取索引为4的行，然后在结果中索引为1的行
+n[3][4][1]
+
+#取 索引为的3行,索引为的4列 的 索引为1的元素
+n[3,4,1]
+
+#取第一维的第索引为1-4的数据
+n[1:4]
+
+#取第一维的第索引为1,4,2的数据
+n[[1,4,2]]
+
+#取索引1-3行的0-2列
+n[1:3,0:2]
+#取索引1-3行，然后在结果中在取0-2行
+n[1:3][0:2]
+```
+
+* 倒置
+    * 对行和列做倒置
+    ```python
+    n[::-1,::-1]
+    ```
+
+##### (5) 对ndarray进行reshape
+
+* 数据量不会变量
+    * 比如将一维结构变为2维结构，不会增加和减少数据
+```python
+a = list(range(0,20))
+n = np.array(a)
+
+n.reshape(4,5)
+```
+
+* 不明确指定行或列
+```python
+#转换为4行的二维数组
+n.reshape(4,-1)
+
+#转换为4列的二维数组
+n.reshape(-1,4)
+```
+
+##### (6) 级联
+```python
+n1 = np.random.randint(1,100,(5,4,3))
+n2 = np.random.randint(1,100,(5,4,3))
+
+# axis=0表示在第一维度合并，即行合并
+# axis=1表示在第二维度合并，即列合并
+n3 = np.concatenate((n1,n2),axis=0)
+```
+
+##### (7) 拆分
+```python
+#arg1: 待拆分ndarray
+#arg2: 怎么拆分，可以指定数字（即平均拆分）
+#arg3: 在哪个维度进行拆分
+np.split(n3,2,axis=0)
+
+#或者索引列表（按照索引拆分）
+#下面是将行分为3分
+np.split(n3,[1,2],axis=0)
+```
+
+#### 2.空值: nan
+
+#### 3.常用聚合函数
+
+* 求和
+```python
+#整体求和
+np.sum(n)
+
+#对第一维度的数据求和
+# 比如：二维，就是对每列求和，最后变为一维
+np.sum(n, axis=0)
+
+#对第二维度的数据求和
+# 比如：二维，就是对每行求和，最后变为一维
+```
+
+* 排除空值求和
+```python
+np.nansum(n)
+```
+
+* 其他
+```python
+np.max(n)
+np.min(n)
+np.average(n)
+np.median(n)
+np.percentile(n,90)    #求处在90%这个水平的数
+
+#找到最大的数，返回下标（该下标为将矩阵转换为一维矩阵时的下标）
+np.argmax(n)
+np.argmin(n)
+#找出满足条件的下标
+np.argwhere(n==np.max(n))
+
+#将原来的某个元素进行三次方运算
+np.power(n,3)
+#或者
+n**3
+
+#标准差
+np.std(n)
+#方差
+np.var(n)
+```
+
+#### 4.矩阵运算
+
+##### (1) 基本运算
+```python
+n + 10
+n - 10
+n * 10
+n / 10
+n // 10 #整除
+n ** 2
+n % 2
+
+n1 + n2 #对应的元素相加
+n1 * n2 #对应的元素相乘
+```
+
+##### (2) 矩阵积
+
+* n1: (r1,c1)
+* n2: (r2,c2)
+* n1和n2能够进行线性代数的前提是: c1=r2
+* 生成的结果是一个 (r1,c2)的矩阵
+
+```python
+np.dot(n1,n2)
+```
+
+##### (3) 矩阵其他运算
+
+```python
+#矩阵逆
+np.linalg.inv(n)
+
+#矩阵行列式
+np.linalg.det(n)
+
+#矩阵的秩
+np.linalg.matrix_rank(n)
+```
