@@ -37,6 +37,7 @@
         - [(2) 设置close lid 不 suspend](#2-设置close-lid-不-suspend)
         - [(3) 关闭自动suspend](#3-关闭自动suspend)
         - [(4) 主动suspend](#4-主动suspend)
+        - [(5) 关闭鼠标自动唤醒](#5-关闭鼠标自动唤醒)
 
 <!-- /code_chunk_output -->
 
@@ -383,3 +384,25 @@ Settings -> Power
 #可以设置快捷键
 systemctl suspend
 ```
+
+##### (5) 关闭鼠标自动唤醒
+
+* 确定鼠标设备
+```shell
+grep `ls /dev/input/by-path/*-mouse |\
+    head -1 |\
+    cut -d- -f 3` /proc/acpi/wakeup |\
+    gawk '{print $1}'
+```
+
+* disable
+```shell
+#我的鼠标编号时XHC
+echo XHC > /proc/acpi/wakeup
+
+#查看
+cat /proc/acpi/wakeup
+```
+
+* 永久关闭
+  * 设置rc.local
