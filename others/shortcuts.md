@@ -22,8 +22,8 @@
 |关闭窗口|alt+f4|
 |所有应用（有搜索）|super+a|
 |打开家目录|super+h|
-|打开下载目录|super+j|
-|打开工作目录|super+k|
+|打开工作目录|super+j|
+|打开下载目录|super+k|
 |锁屏|super+L|
 |suspend|super+;|
 |下一个workspace|super+PgDn|
