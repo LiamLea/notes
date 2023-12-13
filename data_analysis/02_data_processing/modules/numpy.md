@@ -141,14 +141,14 @@ n = np.eye(6,6)
 
 * 其他
     * 创建等差数列
-    ```python
-    n = np.linspace(0,10,6)
-    #array([ 0.,  2.,  4.,  6.,  8., 10.])
-    ```
-    * arange
-    ```python
-    n = np.arange(1,10,2)
-    ```
+        ```python
+        n = np.linspace(0,10,6)
+        #array([ 0.,  2.,  4.,  6.,  8., 10.])
+        ```
+        * arange
+        ```python
+        n = np.arange(1,10,2)
+        ```
 
 ##### (4) 索引和切片
 和list的用法一样，只不过多维度
