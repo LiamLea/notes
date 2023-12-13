@@ -7,6 +7,8 @@
     - [概述](#概述)
       - [1.pandas](#1pandas)
       - [2.支持从多种格式中读取数据](#2支持从多种格式中读取数据)
+      - [3.基础概念](#3基础概念)
+        - [(1) index和columns](#1-index和columns)
     - [使用](#使用)
       - [1.Series](#1series)
         - [(1) Series的创建](#1-series的创建)
@@ -22,14 +24,49 @@
         - [(1) 创建多层索引](#1-创建多层索引)
         - [(2) index和slice](#2-index和slice)
         - [(3) 索引的堆叠](#3-索引的堆叠)
-      - [4.DataFrame进阶](#4dataframe进阶)
-        - [(1) 聚合](#1-聚合)
+      - [4.聚合](#4聚合)
+        - [(1) 常用聚合函数](#1-常用聚合函数)
+        - [(2) 分组](#2-分组)
       - [5.数据合并](#5数据合并)
         - [(1) concat](#1-concat)
         - [(2) append](#2-append)
         - [(3) merge (很重要)](#3-merge-很重要)
-      - [1.读取数据](#1读取数据)
-      - [3.使用数据](#3使用数据)
+      - [6.数据加载和写出](#6数据加载和写出)
+        - [(1) CSV数据](#1-csv数据)
+        - [(2) excel表格](#2-excel表格)
+        - [(3) mysql](#3-mysql)
+    - [数据处理](#数据处理)
+      - [1.基本处理](#1基本处理)
+        - [(1) 过滤数据](#1-过滤数据)
+        - [(2) 缺省值处理](#2-缺省值处理)
+        - [(3) 重复值处理](#3-重复值处理)
+      - [2.数据映射](#2数据映射)
+        - [(1) replace](#1-replace)
+        - [(2) map](#2-map)
+        - [(3) 更改索引](#3-更改索引)
+        - [(4) apply和applymap](#4-apply和applymap)
+        - [(5) tansform](#5-tansform)
+      - [3.异常值处理](#3异常值处理)
+        - [(1) describe 和 info (查看统计信息和数据结构)](#1-describe-和-info-查看统计信息和数据结构)
+        - [(2) drop](#2-drop)
+        - [(3) unique](#3-unique)
+        - [(4) query (按条件查询)](#4-query-按条件查询)
+        - [(5) sort](#5-sort)
+      - [4.分桶 (buckets)](#4分桶-buckets)
+      - [5.时间序列](#5时间序列)
+        - [(1) 时间戳](#1-时间戳)
+        - [(2) 索引](#2-索引)
+        - [(3) 常用方法](#3-常用方法)
+        - [(4) 时区](#4-时区)
+        - [(5) 使用](#5-使用)
+    - [plot](#plot)
+      - [1.折线图](#1折线图)
+      - [2.柱状图](#2柱状图)
+      - [3.直方图](#3直方图)
+      - [4.饼图](#4饼图)
+      - [5.散点图](#5散点图)
+      - [6.面积图](#6面积图)
+      - [7.箱形图](#7箱形图)
 
 <!-- /code_chunk_output -->
 
@@ -40,6 +77,13 @@
 
 #### 2.支持从多种格式中读取数据
 * csv（comma-separated values）
+
+#### 3.基础概念
+
+##### (1) index和columns
+
+* index是行的索引
+* columns是列的索引
 
 ***
 
@@ -234,6 +278,7 @@ df.add(s, axis=0)
 #### 3.层次化索引
 
 DataFrame和Series都可以设置多层索引
+索引的表示用元组: `(<index_1>,<index_2>,...)`
 
 ##### (1) 创建多层索引
 
@@ -299,22 +344,63 @@ df.unstack(fill_value=0)
 * 将最后一层列索引变为最后一层行索引
 ![](./imgs/pandas_02.png)
 
-#### 4.DataFrame进阶
+#### 4.聚合
 
-##### (1) 聚合
+##### (1) 常用聚合函数
+* sum()
 ```python
 #默认axis=0，对行这个方向求和，即求每列的和
 df.sum(axis=0)
+
+#求所有元素的和
+df.values.sum()
 ```
 
-* 分组
+* count()
+  * 非空的元素数量
+* max()
+* mix()
+* median()
+* mean()
+* std()
+* var()
+  * 方差
+* cov()
+  * 协方差
+  ```python
+  #第0列和第1列之间的协方差
+  df[0].cov(df[1])
+  ```
+* corr()
+  * 相关系数(0-1)
+* value_counts()
+  * 统计每个元素的出现次数（默认是按列进行统计）
+* cumsum()
+  * 累加
+* cumprod()
+  * 累乘
+* agg()
+  * 执行多种聚合操作
+
+##### (2) 分组
+
+* 使用索引分组
 ```python
 #使用第一层索引进行分组，然后再聚合
 df.groupby(level=0).sum()
 ```
 
-#### 5.数据合并
+* 使用列进行分组
+```python
+df.groupby(by='age')
+```
 
+* 查看分组情况
+```python
+df.groupby(by='age').groups
+```
+
+#### 5.数据合并
 
 ##### (1) concat
 ```python
@@ -408,35 +494,483 @@ df1.merge(df2, how='inner')
 df1.merge(df2,on=["id"],suffixes=['_df1','_df2'])
 ```
 
-#### 1.读取数据
-```csv
-name , liyi , lier , lisan
-math_score , 89, 72, 90
-sport_score , 91, 99, 100
-english_score , 88, 89, 91
+#### 6.数据加载和写出
+
+##### (1) CSV数据
+
+* 加载
+```python
+#header=[0,1]表示第1和2行 为列索引
+#index_col=[0,1]表示第1和2列 为行索引
+df = pd.read_csv(<path>, delimiter=',',header=[0,1],index_col=[0,1])
 ```
 
+* 写出
 ```python
-#默认engine为c语言，sep就不能使用正则（修改为python后可以）
-#sep要去掉空格，不然后面使用的话也需要相应的空格
-data = pandas.read_csv("<filename>", engine = "python", sep = r"\s*,\s*")
+#header=True是否保留列索引
+#index=False是否保留行索引
+df.to_csv(<path>, delimiter=',', header=True, index=False)
 ```
 
-#### 3.使用数据
+##### (2) excel表格
 
-* 读取后生成的数据结构
+* 加载
+```python
+#默认sheet_name=0，读取第一个sheet
+#names=[]，替换列名
+df = pd.read_excel('a.xlsx',sheet_name="Sheet2")
+```
 
-|name|liyi|lier|lisan|
-|-|-|-|-|
-|math_score|89|72|90|
-|sport_score|91|99|100|
-|english_score|88|89|91|
+* 写出
+```python
+#后缀名为.xlsx
+df.to_excel("a.xlsx")
+```
 
-* 使用该数据结构
+##### (3) mysql
+
+* 首先连接数据库
 
 ```python
-data["liyi"]    #获取liyi这一列，list(data["liyi"])：[89, 91, 88]
+#pip install sqlalchemy
+#pip install pymysql
 
-data.columns    #获取所有的列名，list(data.columns)：['name', 'liyi', 'lier', 'lisan']
-data.col[0]     #获取第一行数据，list(data.col[0])：['math_score', 89, 72, 90]
+from sqlalchemy import create_engine
+
+engine = create_engine(
+    "mysql+pymysql://root:cangoal@10.10.10.163:58176/blade?charset=utf8"
+)
+```
+
+* 加载
+```python
+df=pd.read_sql(
+    sql="select * from blade_client",
+    con=engine
+)
+```
+
+* 写出
+```python
+df.to_sql(
+  name="table",
+  con=engin,
+  index=False
+)
+```
+
+***
+
+### 数据处理
+
+#### 1.基本处理
+
+##### (1) 过滤数据
+```python
+#过滤不存在空值的行
+cond = df.isnull().any(axis=1)
+df[~cond]
+
+#过滤不存在空值的列
+cond = df.isnull().any()
+df[:,~cond]
+```
+
+##### (2) 缺省值处理
+
+* 两种空值
+  * None
+    * python自带的，效率低，不建议使用
+    * 在pandas等函数中，会自动将None转换为np.nan
+  * np.nan
+
+* 判断空值
+```python
+df.isnull()
+df.notnull()
+
+#找到有空值的列
+df.isnull().any()
+
+#找到有空值的行
+df.isnull().any(axis=1)
+
+#找到全为空值的列
+df.isnull().all()
+```
+
+* 删除空值
+```python
+#删除有空值的行
+#inspace=False，不覆盖原来的数据，而是拷贝一份新数据，然后进行drop
+df.dropna()
+
+#删除全为空值的行
+df.dropna(how='all')
+
+#删除有空值的列
+df.dropna(axis=1)
+```
+
+* 填充空值
+```python
+fillna(value=<value>)
+
+#使用同列的前一个值进行填充
+fillna(method="ffill")
+
+#使用同行的前一个值进行填充
+fillna(method="ffill", axis=1)
+```
+
+##### (3) 重复值处理
+
+* 判断是否有重复
+```python
+#判断是否有重复的行
+#比如第1行和第2行，重复，第1行为False，第2行为True
+df.duplicated()
+
+#判断是否有重复的行
+#从后往前比较
+#比如第1行和第2行，重复，第1行为True，第2行为Flase
+df.duplicated(keep='last')
+
+#判断是否有重复的行
+#标记所有重复的行
+#比如第1行和第2行，重复，第1行为True，第2行为True
+df.duplicated(keep=False)
+
+#判断id这列值重复的行
+df.duplicated(subset=["id"])
+```
+
+* 删除重复行
+```python
+df.drop_duplicates()
+```
+
+#### 2.数据映射
+
+##### (1) replace
+```python
+df.replace([<old_value>:<new_value>])
+```
+
+##### (2) map
+只能处理一维数据
+```python
+df['age'].map(lambda x: x*10)
+```
+
+##### (3) 更改索引
+```python
+#更改行索引名
+df.rename({<old_name>: <new_name>})
+
+#更改列索引名
+df.rename({<old_name>: <new_name>}, axis=1)
+
+#重置行索引
+df.reset_index()
+
+df.reset_index(['a','b','c'])
+```
+
+##### (4) apply和applymap
+* apply对于Series和map一样
+* apply对于DataFrame是一行或一列作为输入
+```python
+#求每一列的平均值
+df.apply(lambda x: x.mean(),axis=0)
+```
+
+* applymap对每一个元素进行map
+```python
+#每个元素*10
+df.applymap(lambda x: x*10)
+```
+
+##### (5) tansform
+与apply类似，能够执行多个函数，从而产生多列
+```python
+#对于Series
+df['age'].transform(lambda x: x*10, lambda x: x*20)
+
+#对于dataframe
+df.transform(lambda x: x.mean(),lambda x: x.sum())
+```
+
+#### 3.异常值处理
+
+##### (1) describe 和 info (查看统计信息和数据结构)
+
+* 统计信息
+```python
+#对每列的数据进行统计
+df.describe()
+
+#对结果进行转置，方便查看
+df.describe().T
+```
+
+* 标准差
+```python
+df.std()
+```
+
+* 数据结构
+```python
+df.info()
+```
+
+##### (2) drop
+```python
+#删除第一行
+df.drop([0])
+```
+
+##### (3) unique
+只能处理Series
+```python
+df['age'].unique()
+```
+
+##### (4) query (按条件查询)
+```python
+#查找符合条件的行
+df.query('age > 10')
+
+df.query('age in [20,21,23]')
+
+n=10
+df.query('age > @n')
+
+ages = [20,21,23]
+df.query('age in @ages')
+```
+
+##### (5) sort
+```python
+#按照age这列，对行进行排序
+df.sort_values(['age'])
+
+#安装行的索引进行排序
+df.sort_index()
+```
+
+#### 4.分桶 (buckets)
+
+```python
+#根据age这个列的数据 对行进行分桶
+#分为三个桶(0,20],(20,50],(50,100]
+#桶名分别为: youth,adult,old
+pd.cut(
+  df['age'],
+  bins=[0,20,50,100],
+  labels=["youth","adult","old"]
+)
+```
+
+* 等分
+```python
+#分成3等分
+pd.qcut(
+  df['age'],
+  q=3
+)
+```
+
+#### 5.时间序列
+
+##### (1) 时间戳
+
+下面生成的时间都是时间戳，只是显示格式不一样
+
+* 时刻数据
+```python
+pd.Timestamp("2023.11.12")
+#Timestamp('2023-11-12 00:00:00')
+
+#生成连续的4个时刻
+pd.date_range('2023.11.12',periods=4)
+#DatetimeIndex(['2023-11-12', '2023-11-13', '2023-11-14', '2023-11-15'], dtype='datetime64[ns]', freq='D')
+```
+
+* 时期数据
+```python
+#显示到天
+pd.Period("2023.11.12",freq="D")
+#Period('2023-11-12', 'D')
+
+#生成连续的4个时期
+pd.period_range('2023.11.12',periods=4,freq='D')
+#PeriodIndex(['2023-11-12', '2023-11-13', '2023-11-14', '2023-11-15'], dtype='period[D]')
+```
+
+##### (2) 索引
+
+```python
+#生成索引
+index = pd.date_range('2023.11.12',periods=100)
+
+#创建序列（索引为时间戳）
+ts = pd.Series(np.random.randint(0,100,len(index)),index=index)
+```
+
+* 索引和切片
+```python
+ts['2024']    #获取2024年的数据
+ts['2023-11-13':'2023-11-20']
+ts[pd.Timestamp('2024-02-18')]
+```
+
+* 属性
+```python
+ts.index
+
+ts.index.year
+ts.index.month
+ts.index.dayofweek    #星期几
+```
+
+##### (3) 常用方法
+
+* 对整体数据的时间进行偏移
+```python
+#数据的时间增加2天
+#由于索引不够，所以最后两条数据就不存在了
+ts.shift(periods=2)
+
+#数据的时间减少2天
+ts.shift(periods=-2)
+```
+
+* 按照指定频率显示数据
+```python
+#显示每隔一周的数据
+ts.asfreq(pd.tseries.offsets.Week())
+
+#显示每小时的数据
+ts.asfreq(pd.tseries.offsets.Hour())
+```
+
+* resample
+```python
+#每两天的数据做一次聚合
+ts.resample('2D').sum()
+
+df.resample('2M',on='time').sum()
+```
+
+##### (4) 时区
+* 设置时区
+```python
+ts = ts.tz_localize(tz='UTC')
+```
+
+* 时区转换
+```python
+ts.tz_convert(tz='Asia/Shanghai')
+```
+
+##### (5) 使用
+
+* 从外部导入文件
+* 将时间列变为时间戳
+```python
+df['date']=pd.to_datetime(df['date'])
+```
+* 将时间戳设为行索引
+```python
+df.set_index(keys='date', inplace=True)
+```
+
+***
+
+### plot
+
+* plot的通用参数
+```python
+#设置图的大小
+figsize=(18,18)
+```
+
+#### 1.折线图
+
+```python
+#一条折线
+#s是Series
+s.plot()
+
+#多条折线
+#x轴就是行的index，一列就是一条折线
+df = pd.DataFrame(np.random.randint(0,100,size=(6,6)),columns=['a','b','c','d','e','f'])
+df.plot()
+```
+
+* 当index足够多，间距足够小且连续时，就能画出平滑的曲线
+```python
+x = np.arange(0,2*np.pi,0.1)
+y=np.sin(x)
+s = pd.Series(data=y,index=x)
+s.plot()
+```
+
+#### 2.柱状图
+```python
+#x轴就是行的index，一列就是一个柱形
+df.plot.bar()
+
+#堆叠：在同一个柱形上进行划分
+df.plot.bar(stacked=True)
+
+#水平的
+df.plot.barh()
+```
+
+#### 3.直方图
+
+统计数据出现的次数
+* 看起来跟柱状图很像，表达的意思却截然不同
+* 对于dataframe，取其中一列
+
+```python
+#x轴是数据
+#y轴是数据出现的频次
+
+s.plot.hist()
+
+#会在直方图的基础上加一条趋势线
+s.plot.kde()
+```
+
+#### 4.饼图
+
+* 对于dataframe，取其中一列
+```python
+#autopct='%.1f%%'显示百分比
+s.plot.pie(autopct='%.1f%%')
+
+#画出dataframe的所有列
+df.plot.pie(subplots=True)
+```
+
+#### 5.散点图
+用于描述两列之间的关系
+
+```python
+df.plot.scatter(x='列名',y='列名')
+```
+
+#### 6.面积图
+跟折线图类似，只不过对区域进行了填充
+```python
+df.plot.area()
+```
+
+#### 7.箱形图
+```python
+#从上到下：最大值，处在在75%的值，中间值，处在25%的值，最小值
+df.plot.box()
 ```
