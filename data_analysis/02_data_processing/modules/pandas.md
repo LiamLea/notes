@@ -651,6 +651,8 @@ df.duplicated(subset=["id"])
 df.drop_duplicates()
 ```
 
+* 重置索引
+
 ##### (4) 将非数值类型的数据映射为数值类型
 ```python
 df['name'] = df['name'].factorize()[0]
@@ -678,7 +680,8 @@ df.rename({<old_name>: <new_name>})
 df.rename({<old_name>: <new_name>}, axis=1)
 
 #重置行索引
-df.reset_index()
+#不保留之前的索引
+df.reset_index(drop=True)
 
 df.reset_index(['a','b','c'])
 ```
