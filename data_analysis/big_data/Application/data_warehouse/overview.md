@@ -30,11 +30,6 @@
         - [(2) DW (data warehouse)](#2-dw-data-warehouse)
         - [(3) ADS (application data service)](#3-ads-application-data-service)
         - [(4) DIM (dimension)](#4-dim-dimension)
-      - [7.数仓建模举例](#7数仓建模举例)
-        - [(1) ODS](#1-ods)
-        - [(2) DW](#2-dw)
-        - [(3) ADS](#3-ads)
-        - [(4) DIM](#4-dim)
 
 <!-- /code_chunk_output -->
 
@@ -138,18 +133,38 @@
 
 #### 5.Slowly Changing Dimension (缓慢渐变维)
 
-解决维度表在缓慢发生变换的问题，比如用户修改了用户名，当数仓同步数据库数据时，这里就会发生变化
+解决表的旧记录在缓慢发生变换的问题，比如用户修改了用户名，当数仓同步数据库数据时，应该考虑这种变换
 
 ##### (1) SCD1
 直接覆盖，不维护历史的记录
 * 适用: 对错误数据的处理
 
 ##### (2) SCD2 (也称为拉链表，最常用)
-给维度记录建立一个新的版本记录，从而维护维度历史
+建立一个新的版本记录，从而维护历史
 * 通过加两个字段（生效时间，失效时间），标识这个记录在哪个 时间段内是有效的
 
+* 举例
+![](./imgs/overview_08.png)
+    * 获取新增更新表
+    ```sql
+    select * from where create_time = "2021-09-27" or update_time = "2021-09-27"
+    ```
+    * 将合并的结果放到一个临时表中
+    ```sql
+    select 
+        A.sid,A.sname,A.address,A.create_time,A.update_time,A.start_time,
+        if (A.endtime = '9999-12-31' and B.sid is not null, B.start_time, A.end_time) as end_time
+    from 原始拉链表A left join 新增更新表B on A.sid=B.sid
+    union all
+    select * from 新增更新表B;
+    ```
+    * 用该临时表 覆盖 原始拉链表（临时表是为了防止处理过程失败）
+    ```sql
+    insert overwrite 原始拉链表 select * from 临时表
+    ```
+
 ##### (3) SCD3
-在维度表中新增一列，记录当前的值
+在表中新增一列，记录当前的值
 * 缺点：会更改表结构
 
 #### 6.数仓分层
@@ -165,13 +180,15 @@
 
 ##### (2) DW (data warehouse) 
 * DWD (data warehouse detail)
-    * 主要对ODS数据层做一些数据清洗和规范化的操作，以及少量的维度退化
+    * 主要对ODS数据层做一些数据**清洗**和规范化的操作
+    * 主要操作对象是**事实表**（正常不会在这里关联其他表）
 * DWB (data warehouse base) 或 DWM (data warehouse middleware)
     * 该层会在DWD层的数据基础上，对数据进行轻度的聚合操作，生成一系列中间表，提升公共指标的复用性，以及少量的维度退化
     * 当数据有重复时，不能提前聚合
         * 比如按小时提前聚合，统计每小时内的用户，如果提前按小时提前聚合了，后面需要按天聚合，则会导致数据不准确，因为不同小时内用户可能重复
+    * 主要进行多表**关联**操作（进行维度退化）
 * DWS (data warehouse summary)
-    * 基于中间层的基础数据，整合汇总成分析某一个主题域的业务数据层
+    * 基于中间层的基础数据，**统计分析**某一个主题域的业务数据层
     * 生成宽表（即一张表中包含的业务内容比较多，即字段比较多）
     * 一般一个指标对应一个统计结果表，该表中存储的是 该指标 在不同维度下的 统计数据
 
@@ -181,26 +198,3 @@
 ##### (4) DIM (dimension)
 * 贯穿整个处理过程的，比如用户表，每一次都需要使用该表查询相关信息
 * 当维度比较多的时候会添加这一层，少的情况下，可以使用维度退化
-
-#### 7.数仓建模举例
-
-##### (1) ODS
-* 业务表有几张就在这里建几张表
-    * 业务表有哪些字段，这里与之相同
-* 建表时，按照天进行分区，这样后续可以加入增量数据
-
-##### (2) DW
-
-* DWD
-![](./imgs/overview_06.png)
-![](./imgs/overview_07.png)
-* DWM
-    * 不需要，因为数据有重复，这里不能提前聚合
-* DWS
-![](./imgs/overview_02.png)
-![](./imgs/overview_05.png)
-
-##### (3) ADS
-
-##### (4) DIM
-不需要，当前主题，压根没有维度表
