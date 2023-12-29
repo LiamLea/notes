@@ -304,7 +304,7 @@ kolla_install_type: "source"
 #openstack_tag_suffix: "{{ '' if base_distro != 'centos' or ansible_distribution_major_version == '7' else  '-centos8' }}"
 
 #  配置加速镜像源，安装docker时进行配置（下面这个地址比较慢，不用添加）
-# docker_custom_config:
+#docker_custom_config:
 #  registry-mirrors:
 #  - https://05916ee38400267c0f42c0097caab960.mirror.swr.myhuaweicloud.com
 
@@ -599,7 +599,7 @@ kolla-ansible -i ./multinode deploy
 ```shell
 openstack network create --external     --provider-physical-network physnet1     --provider-network-type flat     public1 
 openstack subnet create --no-dhcp --network public1 --subnet-range 10.172.1.0/24 --gateway 10.172.1.254 --allocation-pool start=10.172.1.50,end=10.172.1.60 public1-subnet
-openstack network create     --provider-network-type vxlan     demo-net
+openstack network create demo-net
 openstack subnet create     --network demo-net     --subnet-range 3.1.5.0/24     --gateway 3.1.5.254     --dns-nameserver 114.114.114.114     demo-subnet
 openstack router create demo-router
 openstack router add subnet demo-router demo-subnet
@@ -641,8 +641,8 @@ openstack subnet create --no-dhcp \
 
 * 创建虚拟网络
 ```shell
+#--provider-network-type vxlan，不需要指定，会根据使用的隧道自动指定
 openstack network create \
-    --provider-network-type vxlan \
     demo-net    #随便取
 ```
 

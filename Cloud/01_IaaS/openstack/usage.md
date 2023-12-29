@@ -18,6 +18,8 @@
         - [(5) 安装成功后，需要安装网卡驱动](#5-安装成功后需要安装网卡驱动)
         - [(6) 把 其他（即未识别的设备）下面 的设备都更新一下驱动](#6-把-其他即未识别的设备下面-的设备都更新一下驱动)
         - [(7) 使用注意 (上传为镜像模板后)](#7-使用注意-上传为镜像模板后)
+        - [(8) 添加磁盘](#8-添加磁盘)
+        - [(9) 添加sshd服务](#9-添加sshd服务)
       - [5.上传镜像](#5上传镜像)
       - [6.下载镜像](#6下载镜像)
     - [基本使用](#基本使用)
@@ -194,6 +196,29 @@ openstack server create \
   * 创建虚拟机时，由于volume创建时间比较长，虚拟机创建会报错
     * 等volume创建好后，用那个volume创建虚拟机
   * 网络可能有问题，将 网络适配器 禁用再启用
+
+##### (8) 添加磁盘
+
+* 搜索栏: disk manager
+
+* 列出所有磁盘，选中未初始化的磁盘进行初始化
+
+![](./imgs/usage_08.png)
+
+* 初始化后，划分分区即可使用
+
+##### (9) 添加sshd服务
+
+* 搜索栏: manage optional features
+* add a feature
+* 找到openssh server进行添加
+* 添加公钥到authorized_keys中：
+  * 修改sshd配置: `C:\ProgramData\ssh\sshd_config`
+    * `StrictModes no`
+    * 重启sshd: 在搜索栏中输入services，然后找到opensshd进行重启
+  * 将公钥添加到:
+    * `C:\ProgramData\ssh\administrators_authorized_keys`
+    * `C:\Users\lil\.ssh\authorized_keys`
 
 #### 5.上传镜像
 

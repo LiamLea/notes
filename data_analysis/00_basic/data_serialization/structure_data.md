@@ -54,7 +54,7 @@
 Feature|CSV(Comma-separated values)|JSON|Avro|ORC(Optimized Row Columnar )|Parquet|SequenceFile
 -|-|-|-|-|-|-
 Format|Text|Text|Binary|Binary|Binary|Binary
-Structure|Row-oriented|Semi-structured|Schema-based|Column-oriented|Column-oriented|Key-value pairs
+Structure|Row-oriented|Semi-structured|**Schema**-based|Column-oriented|Column-oriented|Key-value pairs
 Human Readable|Yes|Yes|No|No|No|No
 Compression|Gzip, Deflate, BZip2 (externally applied)|Gzip, Deflate, LZ4, Snappy, Zstandard (externally applied)|Snappy, Deflate, BZip2, LZ4, Zstandard (internally supported)|Snappy, Zstandard, LZO (internally supported)|Snappy, Gzip, LZO, Zstandard (internally supported)|Gzip, BZip2, LZO, Snappy, Deflate (internally supported)
 Schema Evolution|Limited|Yes|Yes|Yes|Yes|Limited

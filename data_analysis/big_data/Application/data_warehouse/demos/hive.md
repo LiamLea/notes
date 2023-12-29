@@ -1,11 +1,11 @@
-# demos
+# hive数仓
 
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [demos](#demos)
+- [hive数仓](#hive数仓)
     - [访问咨询主题看板](#访问咨询主题看板)
       - [1.建模分析](#1建模分析)
         - [(1) ODS](#1-ods)
@@ -72,13 +72,13 @@
 ##### (3) DW
 
 * DWD
-![](./imgs/overview_06.png)
-![](./imgs/overview_07.png)
+![](./imgs/demo_01.png)
+![](./imgs/demo_02.png)
 * DWM
     * 不需要，因为数据有**重复**，这里不能提前聚合
 * DWS
-![](./imgs/overview_02.png)
-![](./imgs/overview_05.png)
+![](./imgs/demo_03.png)
+![](./imgs/demo_04.png)
 
 ##### (4) ADS
 
@@ -102,9 +102,7 @@
 
 ##### (4) 内部表和外部表
 
-判断当前这份数据是否具有绝对的控制权
-* 比如ODS层的数据都从外部导入的，可以设成外部表
-* 比如DW层的数据都是自己分析出来的，可以设置为内部表
+删除外部表不删除数据，一般都使用外部表
 
 #### 3.建模操作
 
@@ -308,6 +306,8 @@ CREATE TABLE IF NOT EXISTS scrm_bi.consult_dws
 * 方式:
     * sqoop (已经淘汰)
     * airflow
+* 需要注意的问题:
+  * 特殊字符
 
 ##### (2) DWD
 * 数据流: ODS -> DWD
@@ -1241,6 +1241,8 @@ TBLPROPERTIES ('orc.compress'='SNAPPY');
 * 方式:
     * sqoop (已经淘汰)
     * airflow
+* 需要注意的问题:
+  * 特殊字符
 
 ##### (2) DWD
 * 数据流: ODS -> DWD
