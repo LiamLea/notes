@@ -29,6 +29,8 @@
         - [(3) coalesce](#3-coalesce)
         - [(4) case](#4-case)
         - [(5) nullif](#5-nullif)
+        - [(6) nvl](#6-nvl)
+        - [(7) isnull和isnotnull](#7-isnull和isnotnull)
       - [7.分桶更多操作](#7分桶更多操作)
         - [(1) 进行数据采样](#1-进行数据采样)
         - [(2) 查询优化](#2-查询优化)
@@ -40,6 +42,21 @@
         - [(1) 原始索引（已不支持）](#1-原始索引已不支持)
         - [(2) row group index](#2-row-group-index)
         - [(3) bloom filter index](#3-bloom-filter-index)
+      - [10.特殊字符的处理](#10特殊字符的处理)
+        - [(1) 对特殊字符进行处理](#1-对特殊字符进行处理)
+        - [(2) 使用特殊的文件格式](#2-使用特殊的文件格式)
+    - [优化](#优化)
+      - [1.hive的并行优化](#1hive的并行优化)
+      - [2.hive小文件合并](#2hive小文件合并)
+      - [3.矢量化查询](#3矢量化查询)
+      - [4.读取零拷贝](#4读取零拷贝)
+      - [5.数据倾斜优化](#5数据倾斜优化)
+        - [(1) 数据倾斜](#1-数据倾斜)
+        - [(2) 判断是否产生数据倾斜](#2-判断是否产生数据倾斜)
+        - [(3) group by 数据倾斜优化](#3-group-by-数据倾斜优化)
+        - [(4) join 数据倾斜优化](#4-join-数据倾斜优化)
+        - [(5) union 优化](#5-union-优化)
+        - [(6) 关联优化器(共享shuffle)](#6-关联优化器共享shuffle)
 
 <!-- /code_chunk_output -->
 
@@ -312,7 +329,7 @@ select if(username is NULL, "不知道名字", username) from users;
 返回第一字段不是NULL的数据，如果都是NULL，则返回NULL
 
 ```SQL
-#返回username不是NULL的数据，如果username和birthday都是NULL，则返回NULL
+#如果username和birthday都是NULL，则返回NULL，否则返回该条记录
 select coalesce(username, birthday) from users;
 ```
 
@@ -338,6 +355,14 @@ from users;
 #如果<a>和<b>相等则返回NULL，否则返回<a>
 nullif(<a>, <b>);
 ```
+
+##### (6) nvl
+```sql
+#如果value值为null，则返回default_value，否则返回value
+nvl(T value, T default_value)
+```
+
+##### (7) isnull和isnotnull
 
 #### 7.分桶更多操作
 
@@ -453,6 +478,8 @@ example
 #### 9.索引
 当分区和分桶受限，可以使用索引进行优化
 
+开启hive自动使用索引: `SET hive.optimize.index.filter=true`
+
 ##### (1) 原始索引（已不支持）
 可以根据某一列或某几列构建索引
 数据更新后，需要手动更新索引表
@@ -474,4 +501,171 @@ example
 * 开启（创建表时）
 ```sql
 'orc.bloom.filter.columns'='pcid'
+```
+
+#### 10.特殊字符的处理
+
+比如一个数据存在`\n`，则hive读取时，则会看成两行数据
+
+##### (1) 对特殊字符进行处理
+
+比如将`\n`转义称`\\n`
+
+##### (2) 使用特殊的文件格式
+
+比如: 使用sqoop采集数据时，可以用avro、ORC等格式存储数据，读取数据时，一个字段看成一个对象，而不是文本，即使其中有`\n`也不会影响，因为插入的时候数据是一个个对象，而不是字符串
+
+***
+
+### 优化
+
+#### 1.hive的并行优化
+
+* 并行编译
+```sql
+# hive在同一时刻只能编译一个会话中SQL, 如果有多个会话一起来执行SQL, 此时出现排队的情况, 只有当这一个会话中SQL全部编译后, 才能编译另一个会话的SQL, 导致执行效率变慢
+
+# 是否开启并行编译 设置为true 
+# 最大允许同时有多少个SQL一起编译 设置为0表示无限制
+hive.driver.parallel.compilation
+hive.driver.parallel.compilation.global.limit
+```
+
+* 并行执行
+```sql
+# 在运行一个SQL的时候, 这个SQL形成的执行计划中, 可能会被拆分为多个阶段, 当各个阶段之间没有依赖关系的时候, 可以尝试让多个阶段同时运行, 从而提升运行的效率, 这就是并行执行
+
+# 是否开启并行执行
+set hive.exec.parallel=true;
+# 最大允许并行执行的数量
+set hive.exec.parallel.thread.number=16;
+```
+
+#### 2.hive小文件合并
+
+* 小文件的影响
+  * hdfs:
+    * 每一个小文件, 都会有一份元数据
+    * 当小文件过多后, 会导致出现大量的元数据存储namenonde的内存中, 从而导致namenode内存使用率增大
+  * MR:
+    * 在运行MR的时候, 每一个文件至少是一个文件切片, 也就意味至少需要运行一个mapTask
+    * 当小文件过多后, 就会导致产生更多的mapTask, 而每一个mapTask只处理极少的数据, 导致资源被大量占用, 运行的时间都没有申请资源时间长
+
+* hive输出尽可能少的文件
+```sql
+hive.merge.mapfiles : 是否开启map端小文件合并 (适用于MR只有map没有reduce, map输出结果就是最终结果)
+hive.merge.mapredfiles : 是否开启reduce端小文件合并操作
+hive.merge.size.per.task: 合并后输出文件的最大值 ,默认是128M
+hive.merge.smallfiles.avgsize: 判断输出各个文件平均大小, 当这个大小小于设置值, 认为出现了小文件问题,需要进行合并操作
+
+/*
+
+比如说: 设置合并文件后, 输出最大值128M, 设置平均值为 50M
+	假设一个MR输出一下几个文件: 
+		 1M,10M,5M,3M,150M,80M,2M  平均值:35.xxx
+		
+		发现输出的多个文件的平均值比设定的平均值要小, 说明出现小文件的问题, 需要进行合并, 此时会合并结果为:
+		128M,123M
+
+*/
+```
+
+#### 3.矢量化查询
+* 让hive在读取数据的时候, 一批一批的读取, 默认是一条一条的读, 一条条的处理
+* 前提条件: 表的文件存储格式必须为ORC
+```sql
+set hive.vectorized.execution.enabled=true;
+```
+
+#### 4.读取零拷贝
+* 在hive读取数据的时候, 只需要读取跟SQL相关的列的数据即可, 不使用列, 不进行读取, 从而减少读取数据, 提升效率
+* 提前条件: 表的文件存储格式必须为ORC
+```sql
+set hive.exec.orc.zerocopy=true;
+```
+
+#### 5.数据倾斜优化
+
+##### (1) 数据倾斜
+
+* what
+  * 在运行过程中,有多个reduce, 每一个reduce拿到的数据不是很均匀
+  * 导致其中某一个或者某几个reduce拿到数据量远远大于其他的reduce拿到数据量, 此时认为出现了数据倾斜问题
+
+* 影响
+  * 执行效率下降(整个执行时间, 就看最后一个reduce结束时间)
+  * 由于其中某几个reduce长时间运行, 资源长期被占用, 一旦超时, YARN强制回收资源, 导致运行失败
+  * 资源利用率低
+
+##### (2) 判断是否产生数据倾斜
+
+* 查看job日志
+  * 观察是否有执行较慢的reduce
+* 
+
+##### (3) group by 数据倾斜优化
+
+* 方案一: combiner
+  * 在每个map任务中提前进行reduce，再将结果发送给reduce
+  ```sql
+  # 开启map端提前聚合操作(combiner)
+  set hive.map.aggr=true;
+  ```
+
+* 方案二: 负责均衡（大combiner）
+  * 采用两个MR来解决
+    * 第一个MR负责将数据均匀落在不同reduce上, 进行聚合统计操作, 形成一个局部的结果
+    * 在运行第二个MR读取第一个MR的局部结果, 按照相同key发往同一个reduce的方案, 完成最终聚合统计操作
+  ```sql
+  set hive.groupby.skewindata=true;
+  # 一旦使用方案二, hive不支持多列上的采用多次distinct去重操作, 一旦使用, 就会报错
+  ```
+
+##### (4) join 数据倾斜优化
+
+* 方案一: map join、bucket map join、SMB map join
+
+* 方案二: 
+  * 将那些容易产生倾斜的key的值, 从这个环境中, 排除掉, 这样自然就没有倾斜问题, 讲这些倾斜的数据单独找一个MR来处理即可
+  * 编译期解决方案:
+    * 需要提前知道哪些key会发生倾斜
+    ```sql
+    set hive.optimize.skewjoin.compiletime=true;
+
+    CREATE TABLE list_bucket_single (key STRING, value STRING)
+    -- 倾斜的字段和需要拆分的key值
+    SKEWED BY (key) ON (1,5,6)
+    --  为倾斜值创建子目录单独存放
+    [STORED AS DIRECTORIES];
+    ```
+  * 运行期解决方案:
+    * 在执行的过程中, hive会记录每一个key出现的次数, 当出现次数达到设置的阈值后, 认为这个key有倾斜的问题, 直接将这个key对应数据排除掉, 单独找一个MR来处理即可
+    ```sql
+    # 是否开启运行期倾斜解决join
+    set hive.optimize.skewjoin=true;
+    # 当key出现多少个的时候, 认为有倾斜
+    set hive.skewjoin.key=100000;
+    ```
+
+##### (5) union 优化
+
+* 此项配置减少对Union all子查询中间结果的二次读写
+* 此项配置一般和join的数据倾斜组合使用
+```sql
+set hive.optimize.union.remove=true;
+```
+
+##### (6) 关联优化器(共享shuffle)
+```properties
+配置:
+	set hive.optimize.correlation=true;
+
+说明:
+	在Hive的一些复杂关联查询中，可能同时还包含有group by等能够触发shuffle的操作，有些时候shuffle操作是可以共享的，通过关联优化器选项，可以尽量减少复杂查询中的shuffle，从而提升性能。
+	
+	
+比如: 
+	select  id,max(id)  from itcast_ods.web_chat_ems group by id;
+	union all
+	select  id,min(id)  from itcast_ods.web_chat_ems group by id;
 ```
