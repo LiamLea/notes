@@ -139,6 +139,8 @@ kubectl
 }
 ```
 
+* kubelet会根据容器运行时设置的cgroup而设置相应的cgroup（一般不需要明确指定）
+
 #### 5.设置相关服务开机自启（而不是现在就启动）
 ```shell
 systemctl restart docker
