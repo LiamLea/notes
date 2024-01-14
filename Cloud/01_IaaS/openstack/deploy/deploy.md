@@ -16,7 +16,7 @@
         - [（3）高可用：奇数台controller](#3高可用奇数台controller)
         - [（4）网络规划](#4网络规划)
       - [4.准备好ansible部署机](#4准备好ansible部署机)
-        - [（1）安装ansible所需依赖](#1安装ansible所需依赖)
+        - [(1) 安装ansible所需依赖](#1-安装ansible所需依赖)
         - [(2) 通过下载包安装](#2-通过下载包安装)
         - [(3) 在虚拟环境中安装python包依赖](#3-在虚拟环境中安装python包依赖)
         - [(4) 配置ansible](#4-配置ansible)
@@ -76,8 +76,9 @@
       - [4.网络不通，但是通过抓包能够获取ARP的包（证明二层是同的，一般是三层设置了什么策略，比如iptables）](#4网络不通但是通过抓包能够获取arp的包证明二层是同的一般是三层设置了什么策略比如iptables)
       - [5.jina2版本问题: The error was: No filter named 'service_enabled_and_mapped_to_host' found](#5jina2版本问题-the-error-was-no-filter-named-service_enabled_and_mapped_to_host-found)
     - [kolla-ansible脚本解析](#kolla-ansible脚本解析)
-      - [1.初始化机器](#1初始化机器)
-      - [2.部署](#2部署)
+      - [1.main函数](#1main函数)
+      - [2.初始化机器](#2初始化机器)
+      - [3.部署](#3部署)
 
 <!-- /code_chunk_output -->
 
@@ -165,7 +166,7 @@ options kvm_intel nested=1
 
 #### 4.准备好ansible部署机
 
-##### （1）安装ansible所需依赖
+##### (1) 安装ansible所需依赖
 
 * 设置镜像源头（所有节点）
 ```shell
@@ -281,7 +282,7 @@ keystone_admin_password: cangoal
 [具体配置](https://docs.openstack.org/kolla-ansible/xena/reference/index.html)
 [服务的详细配置](https://docs.openstack.org/train/configuration/)
 
-* 注意：当不同主机的变量不一样时（比如网卡名不一样），需要 **注释** `globals.yaml`中的配置，然后在inventory配置相应的变量
+* 注意：当不同主机的变量不一样时（比如网卡名不一样），需要 **注释** `globals.yaml`中的配置，然后在inventory配置相应的变量（因为`-e @/etc/globals.yml`优先级更高）
   * 比如：
   ```shell
   [control]
@@ -907,12 +908,22 @@ pip install --force-reinstall -v "Jinja2==3.0.2"
 
 ### kolla-ansible脚本解析
 
-#### 1.初始化机器
+#### 1.main函数
+```shell
+$ vim /root/kolla-env/bin/kolla-ansible
+
+#执行的内容
+PASSWORDS_FILE="${PASSWORDS_FILE:-${CONFIG_DIR}/passwords.yml}"
+CONFIG_OPTS="-e @${CONFIG_DIR}/globals.yml -e @${PASSWORDS_FILE} -e CONFIG_DIR=${CONFIG_DIR}"
+CMD="ansible-playbook -i $INVENTORY $CONFIG_OPTS $EXTRA_OPTS $PLAYBOOK $VERBOSITY"
+```
+
+#### 2.初始化机器
 安装初始化组件: docker等
 
 * 入口playbook: `<kolla_ansible_path>/ansible/kolla-host.yml`
 
-#### 2.部署
+#### 3.部署
 
 进行openstack部署
 * 入口playbook: `<kolla_ansible_path>/ansible/site.yml`
