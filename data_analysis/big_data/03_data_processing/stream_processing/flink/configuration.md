@@ -11,6 +11,7 @@
         - [(1) 并行度配置](#1-并行度配置)
         - [(2) task slots配置](#2-task-slots配置)
         - [(3) 运行模式（stream or batch）](#3-运行模式stream-or-batch)
+        - [(4) statebackend配置](#4-statebackend配置)
 
 <!-- /code_chunk_output -->
 
@@ -55,4 +56,13 @@ flink run ... \
 # 0: stream (default)
 # 1: batch
 env.set_runtime_mode(RuntimeExecutionMode(1))
+```
+
+##### (4) statebackend配置
+
+* 配置项
+```yaml
+#rocksdb
+state.backend.type: hashmap
+state.backend.incremental: false
 ```
