@@ -1,20 +1,27 @@
-# State & Fault Tolerance
+# State
 
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [State & Fault Tolerance](#state--fault-tolerance)
-    - [state](#state)
+- [State](#state)
+    - [state](#state-1)
       - [1. 介绍](#1-介绍)
-      - [2.Keyed State使用](#2keyed-state使用)
+      - [2.状态一致性](#2状态一致性)
+        - [(1) 状态一致级别](#1-状态一致级别)
+        - [(2) 端到端的状态一致性](#2-端到端的状态一致性)
+      - [3. 端到端精确一次的实现](#3-端到端精确一次的实现)
+        - [(1) 源算子](#1-源算子)
+        - [(2) flink](#2-flink)
+        - [(3) 输出算子](#3-输出算子)
+      - [4.Keyed State使用](#4keyed-state使用)
         - [(1) demo (以value state为例)](#1-demo-以value-state为例)
         - [(2) TTL](#2-ttl)
-      - [3.operator state使用（不常用）](#3operator-state使用不常用)
+      - [5.operator state使用（不常用）](#5operator-state使用不常用)
         - [(1) demo (以ListState为例)](#1-demo-以liststate为例)
         - [(2) BroadcastState (相当于全局状态，所有并行度共享)](#2-broadcaststate-相当于全局状态所有并行度共享)
-      - [4.state backend (状态的存储方式)](#4state-backend-状态的存储方式)
+      - [6.state backend (状态的存储方式)](#6state-backend-状态的存储方式)
         - [(1) HashMapStateBackend (默认的)](#1-hashmapstatebackend-默认的)
         - [(2) EmbeddedRocksDBStateBackend](#2-embeddedrocksdbstatebackend)
     - [Fault Tolerance](#fault-tolerance)
@@ -28,6 +35,11 @@
         - [(4) 基于barrier对齐的at least once原理](#4-基于barrier对齐的at-least-once原理)
       - [3.增量checkpoint](#3增量checkpoint)
       - [4.checkpoint使用](#4checkpoint使用)
+        - [(1) 相关配置](#1-相关配置)
+        - [(2) 从checkpoint进行恢复](#2-从checkpoint进行恢复)
+      - [5.savepoint](#5savepoint)
+        - [(1) 保存savepoint](#1-保存savepoint)
+        - [(2) 从savepoint进行恢复](#2-从savepoint进行恢复)
 
 <!-- /code_chunk_output -->
 
@@ -41,7 +53,40 @@
 
 ![](./imgs/state_01.png)
 
-#### 2.Keyed State使用
+#### 2.状态一致性
+
+##### (1) 状态一致级别
+* at most once
+* at least once
+* exactly once
+
+##### (2) 端到端的状态一致性
+数据源、流处理器（即flink）、外部存储系统，都需要状态一致
+* 如果其中一个环节无法做到状态一致，整个系统也无法做到
+
+#### 3. 端到端精确一次的实现
+
+##### (1) 源算子
+* 需要保存**偏移量**状态（即读取到了哪条数据），并且外部数据原需要支持**重置**偏移量
+    * 比如: 数据处理一半，宕机了，此处外部数据源的偏移量为99,而源算子记录的偏移量为97,则当程序重启时，源算子需要重置外部数据原的偏移量，从98开始读取
+
+##### (2) flink
+* 支持精确一次
+
+##### (3) 输出算子
+* 幂等
+* 或事务（比较复杂）
+    * 两阶段提交
+        * 第一阶段
+            * 预提交
+                * 当checkpoint完成后，新的数据到，会开启一个新的事务
+                * 将该数据发往外部系统，但不提交事务
+        * 第二阶段
+            * 提交事务（如果有失败，则回滚，然后重启读取状态，再次提交）
+                * 当本次checkpoint完成后，才提交本次事务
+                * 所以checkpoint的时间间隔 要小于 外部系统的事务超时时间
+
+#### 4.Keyed State使用
 
 * 支持以下几种类型
 
@@ -126,7 +171,7 @@ state_descriptor = ValueStateDescriptor("text state", Types.STRING())
 state_descriptor.enable_time_to_live(ttl_config)
 ```
 
-#### 3.operator state使用（不常用）
+#### 5.operator state使用（不常用）
 
 * 支持以下几种类型
     * ListState
@@ -249,13 +294,13 @@ output = color_partitioned_stream \
 
 ```
 
-#### 4.state backend (状态的存储方式)
+#### 6.state backend (状态的存储方式)
 
 ##### (1) HashMapStateBackend (默认的)
 将状态存放在TaskManager的内存中
 
 ##### (2) EmbeddedRocksDBStateBackend
-存储到RocksDB数据库中，可以持久化到磁盘
+存储到RocksDB数据库中，适用状态数据非常大，不适合放在内存中
 * 存储为序列化的字节数组，因此读写操作需要进行序列化和反序列化
 
 ***
@@ -269,9 +314,6 @@ output = color_partitioned_stream \
 ##### (2) 保存的时间点（要保证一致性）
 * 一条数据**经过了整条链路的处理**，保存**处理这条数据时**的状态
     * 而不是一条数据才处理一半就进行保存，这样无法保证一致性
-
-* 源算子，需要保存**偏移量**状态（即读取到了哪条数据），并且外部数据原需要支持**重置**偏移量
-    * 比如: 数据处理一半，宕机了，此处外部数据源的偏移量为99,而源算子记录的偏移量为97,则当程序重启时，源算子需要重置外部数据原的偏移量，从98开始读取
 
 #### 2.checkpoint实现原理
 
@@ -320,6 +362,7 @@ output = color_partitioned_stream \
 
 #### 4.checkpoint使用
 
+##### (1) 相关配置
 ```python
 from pyflink.datastream.checkpointing_mode import CheckpointingMode
 
@@ -351,4 +394,24 @@ env.get_checkpoint_config().set_tolerable_checkpoint_failure_number(2)
 
 # allow only one checkpoint to be in progress at the same time
 env.get_checkpoint_config().set_max_concurrent_checkpoints(1)
+```
+
+##### (2) 从checkpoint进行恢复
+```shell
+flink run ... -s <checkpoint_path>
+```
+
+#### 5.savepoint
+本质和checkpoint一样，只不过savepoint是由用户主动触发的
+* 每个算子指定一个uid，便于后续的恢复
+
+##### (1) 保存savepoint
+```shell
+flink stop --savepointPath <target_path> <job_id>
+#如果使用的是yarn application模式，还需要加上: -yid <application_id>
+```
+
+##### (2) 从savepoint进行恢复
+```shell
+flink run ... -s <savepoint_path>
 ```

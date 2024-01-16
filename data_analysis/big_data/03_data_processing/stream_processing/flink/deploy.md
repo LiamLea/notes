@@ -14,6 +14,7 @@
         - [(4) 提交任务](#4-提交任务)
         - [(5) 验证](#5-验证)
         - [(6) 优化：提前上传依赖到hdfs，避免每次提交上传](#6-优化提前上传依赖到hdfs避免每次提交上传)
+        - [(7) 停止任务](#7-停止任务)
       - [2.yarn session模式 （适合开发测试）](#2yarn-session模式-适合开发测试)
         - [(1) 安装python依赖包（集群所有节点）](#1-安装python依赖包集群所有节点)
         - [(2) 设置环境变量（集群机器和本地客户端）](#2-设置环境变量集群机器和本地客户端)
@@ -90,6 +91,12 @@ hadoop fs -put plugins/ /flink-dist
 ```shell
 ./flink-1.18.0/bin/flink run-application ...\
 -Dyarn.provided.lib.dirs="hdfs://hadoop-01:9000/flink-dist"
+```
+
+##### (7) 停止任务
+```shell
+flink stop <job_id> -yid <application_id>
+#上面无效，使用该命令： flink cancel <job_id> -yid <application_id>
 ```
 
 #### 2.yarn session模式 （适合开发测试）
