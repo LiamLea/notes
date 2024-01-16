@@ -188,9 +188,33 @@ source = KafkaSource.builder() \
 ds = env.from_source(source, WatermarkStrategy.no_watermarks(), "Kafka Source")
 ```
 
+* sink
+```python
+sink = KafkaSink.builder() \
+    .set_bootstrap_servers(brokers) \
+    .set_record_serializer(
+        KafkaRecordSerializationSchema.builder()
+            .set_topic("topic-name")
+            .set_value_serialization_schema(SimpleStringSchema())
+            .build()
+    ) \
+    # 设置一致性级别
+    #   如果是DeliveryGuarantee.EXACTLY_ONCE就是两阶段提交
+    #   而且必须设置setTransactionalIdPrefix(String)，即事务前缀
+    #   而且必须设置事务的超时时间 > checkpoint时间间隔
+    #   默认kafka的消费者的隔离级别是 读取未提交（所以当开启两阶段提交后，消费该kafka的隔离基本要调整为 读已提交 才能看出效果
+    .set_delivery_guarantee(DeliveryGuarantee.AT_LEAST_ONCE) \
+    .build()
+
+stream.sink_to(sink)
+```
+
 #### 3.常用转换算子
 
 [所有算子](https://nightlies.apache.org/flink/flink-docs-release-1.18/docs/dev/datastream/operators/overview/)
+* 建议
+    * 每个算子设置一个uid（方便从savepoint恢复）
+    * 每个算子设置一个name（方便查看）
 
 ##### (1) 基本
 * map
@@ -471,6 +495,8 @@ WatermarkStrategy \
 ds.assign_timestamp_and_watermarks(<watermark strategy>)\
 .window(TumblingEventTimeWindows)
 ```
+
+* 可以在源算子处就设置watermark，这样后续的都会有
 
 ##### (2) 自定义水位线策略
 * python不支持
