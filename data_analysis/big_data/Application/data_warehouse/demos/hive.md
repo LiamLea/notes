@@ -305,7 +305,7 @@ CREATE TABLE IF NOT EXISTS scrm_bi.consult_dws
 * 数据流: mysqll -> hive
 * 方式:
     * sqoop (已经淘汰)
-    * airflow
+    * DataX
 * 需要注意的问题:
   * 特殊字符
 
@@ -761,7 +761,7 @@ from itcast_ods.web_chat_ems wce join itcast_ods.web_chat_text_ems wcte
 * 数据流: hive -> mysql
 * 方式:
     * sqoop (已经淘汰)
-    * airflow
+    * DataX
 
 #### 5.增量数据处理
 
@@ -1240,7 +1240,7 @@ TBLPROPERTIES ('orc.compress'='SNAPPY');
 * 数据流: mysql -> ODS、DIM
 * 方式:
     * sqoop (已经淘汰)
-    * airflow
+    * DataX
 * 需要注意的问题:
   * 特殊字符
 
