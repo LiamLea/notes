@@ -36,6 +36,11 @@
 
 ### 概述
 
+![](./imgs/overview_09.png)
+
+* 实时数仓的ODS和DWD层都在kafka中
+* ADS层不落盘，实质上是查询ClickHouse的SQL语句
+
 #### 1.数据仓库 和 数据集市
 
 * Data Warehouse
