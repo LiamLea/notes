@@ -11,11 +11,35 @@
         - [(1) training set](#1-training-set)
         - [(2) x -f-> $\hat{y}$](#2-x--f--haty)
         - [(3) cost function](#3-cost-function)
+        - [(4) cost function vs loss function](#4-cost-function-vs-loss-function)
+        - [(5) multiple features](#5-multiple-features)
+        - [(6) vectorization](#6-vectorization)
       - [2.两类算法](#2两类算法)
         - [(1) supervised learning](#1-supervised-learning)
         - [(2) unsupervised learning](#2-unsupervised-learning)
+      - [3.normal equation (正规方程)](#3normal-equation-正规方程)
+      - [4.feature engineering (特征工程)](#4feature-engineering-特征工程)
     - [supervised learning](#supervised-learning)
       - [1.linear regression](#1linear-regression)
+        - [(1) univariate linear regression](#1-univariate-linear-regression)
+        - [(2) multiple linear regression](#2-multiple-linear-regression)
+      - [2.polynomial regression](#2polynomial-regression)
+      - [3.logistic regression](#3logistic-regression)
+        - [(1) sigmoid function (logistic function)](#1-sigmoid-function-logistic-function)
+        - [(2) decision boundary](#2-decision-boundary)
+    - [gradient descent](#gradient-descent)
+      - [1.基本概念](#1基本概念)
+        - [(1) 算法](#1-算法)
+        - [(2) learning rate](#2-learning-rate)
+        - [(3) 选择合适的learning rate](#3-选择合适的learning-rate)
+        - [(4) learning curve](#4-learning-curve)
+        - [(5) 判断梯度下降是否收敛](#5-判断梯度下降是否收敛)
+      - [2.feature scaling (特征缩放)](#2feature-scaling-特征缩放)
+        - [(1) why](#1-why)
+        - [(2) 目标](#2-目标)
+        - [(3) 常用方法](#3-常用方法)
+      - [3.分类](#3分类)
+        - [(1) batch gradient descent](#1-batch-gradient-descent)
 
 <!-- /code_chunk_output -->
 
@@ -45,10 +69,31 @@
     * 预测值
 
 ##### (3) cost function
-* 训练出的模型与真实值的偏差
+* $J(\vec w,b)$
+* 描述训练出的模型与真实值的偏差
 * 目标：使用cost function的值**最小**，即预测值与真实值偏差最小
-* 比如：squared error cost function
-    * $J(w,b) = \frac{1}{2m}\sum_{i=1}^m (f_{w,b}(x^{(i)})-y^{(i)})^2$
+
+##### (4) cost function vs loss function
+* loss function
+    * $L(f_{\vec w,b}(\vec x^{(i)}), y^{(i)})$
+    * 描述 单个训练数据的实际值与预测值 的偏差
+
+* loss function 和 cost function关系
+    * $J(\vec w,b) = \frac{1}{m}\sum_{i=1}^m L(f_{\vec w,b}(\vec x^{(i)}), y^{(i)})$
+
+##### (5) multiple features
+
+* $x_j$
+    * 第j个feature
+* n
+    * 有n个features
+* $\vec x^{(i)}$
+    * 第i个训练数据（训练数据是一个向量，因为有多个feature）
+* $x^{(i)}_j$
+    * 第i个训练数据的第j个feature
+
+##### (6) vectorization
+当有多个features时，使用向量来表示feature和paramter，进行向量计算速度更快
 
 #### 2.两类算法
 
@@ -62,11 +107,136 @@
 * anomaly detection
 * dimensionality reduction
 
+#### 3.normal equation (正规方程)
+
+#### 4.feature engineering (特征工程)
+如何选择合适的feature
+
 ***
 
 ### supervised learning
 
 #### 1.linear regression
 
+##### (1) univariate linear regression
 * 模型: $f_{w,b}(x) = wx + b$
+* 特征: x
+* 参数: w,b
+* cost function: $J(w,b)$
+    * 比如：squared error cost function
+        * $J(w,b) = \frac{1}{2m}\sum_{i=1}^m (f_{w,b}(x^{(i)})-y^{(i)})^2$
 * 目标: 寻找w,b，使用cost function值最小
+
+##### (2) multiple linear regression
+
+* 模型: $f_{\vec w,b}(\vec x) = \vec w \cdot \vec x + b = w_1x_1 + w_2x_2 + ... + w_nx_n + b$
+* 特征: $\vec x = \begin{bmatrix} x_1 & x_2 & \cdots & x_n\end{bmatrix}$
+* 参数: $\vec w = \begin{bmatrix} w_1 & w_2 & \cdots & w_n\end{bmatrix}, b$
+* cost function: $J(\vec w,b)$
+    * 比如：squared error cost function
+    * $J(\vec w,b) = \frac{1}{2m}\sum_{i=1}^m (f_{\vec w,b}(\vec x^{(i)})-y^{(i)})^2$
+
+#### 2.polynomial regression
+* 模型（比如）: $f_{w,b}(x) = w_1x + w_2x^2 b$
+* 特征: $x,x^2$
+* 参数: $w_1,w_2,b$
+* cost function: $J(w,b)$
+
+#### 3.logistic regression
+
+* 模型（比如）: $f_{\vec w,b}(\vec x) = P(y=1|\vec x;\vec w,b) = g(\vec w \cdot \vec x + b) =\frac{1}{1 + e^{-(\vec w \cdot \vec x + b)}}$
+    * 基于sigmoid function
+        * 其中$\vec w \cdot \vec x + b$可以换任意函数
+    * $P(y=1|\vec x;\vec w,b)$ 表示y=1的概率
+        * 模型的特征是$\vec x$
+        * 模型参数是$\vec w, b$
+
+* 特征: $\vec x$
+* 参数: $\vec w,b$
+* cost function: $J(\vec w,b)$
+    * 比如:
+    * $L(f_{\vec w,b}(\vec x^{(i)}), y^{(i)}) = -y^{(i)}\log (f_{\vec w,b}(\vec x^{(i)})) - (1-y^{(i)})\log (1 - f_{\vec w,b}(\vec x^{(i)}))$
+        * 通过maximum likelihood方法，找到合适的loss function
+        ![](./imgs/overview_02.png)
+        * 当$y^{(i)} = 1$时，预测的值越接近1，loss的值就越小，反之越大
+        * 当$y^{(i)} = 0$时，预测的值越接近0，loss的值就越小，反之越大
+    * $J(\vec w,b) = \frac{1}{m}\sum_{i=1}^m L(f_{\vec w,b}(\vec x^{(i)}), y^{(i)}) = -\frac{1}{m}\sum_{i=1}^m[y^{(i)}\log (f_{\vec w,b}(\vec x^{(i)})) + (1-y^{(i)})\log (1 - f_{\vec w,b}(\vec x^{(i)}))]$
+
+##### (1) sigmoid function (logistic function)
+* $g(z) = \frac{1}{1+e^{-z}}$*
+* 能够使得输出范围在 0-1 之间
+
+![](./imgs/overview_01.png)
+
+##### (2) decision boundary
+以两类为例，一类是positive class，一类是negtive class
+* 确定一个decision boundary，预测的值 >= 这个boundary，则认为是positive class
+    * 比如decision bounadry = 0.5，则$(\vec w \cdot \vec x + b) = 0$
+
+***
+
+### gradient descent
+
+#### 1.基本概念
+
+##### (1) 算法
+以该代价函数为例: $J(w,b) = \frac{1}{2m}\sum_{i=1}^m (f_{w,b}(x^{(i)})-y^{(i)})^2$
+
+* w,b随便取一个值（比如w=0,b=0）
+
+* 每次迭代
+    * $temp\_w = w - \alpha\frac{\partial}{\partial w}J(w,b)$
+        * $\alpha$ 
+            * learning rate（在0到1之间）
+        * $\frac{\partial}{\partial w}J(w,b)$
+            * 表示方向，当接近局部最小值时，绝对值就会越来越小（步长就会越来越小）
+            * 当为正数，表示值需要减小
+            * 当为负数，表示值需要增加
+    * $temp\_b = b - \alpha\frac{\partial}{\partial b}J(w,b)$
+    * w = temp_w
+    * b = temp_b
+
+* 经过多次迭代
+    * 代价函数会趋近于局部最小
+
+##### (2) learning rate
+* 范围: 0-1
+* 当过小时，步长就会更短，则更慢才能找到最小代价函数
+* 当过大时，代价函数可能不会收敛（convergence）
+
+##### (3) 选择合适的learning rate
+尝试多个范围的学习率（比如: ... 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1...），进行一定量的迭代
+* 观察一次迭代后，代价函数是否减小
+* 如果代价函数减小，尝试增加学习率
+* 如果代价函数增加，尝试减小学习率
+
+##### (4) learning curve
+代价函数和迭代次数的关系，横坐标为迭代次数，纵坐标为代价函数
+
+##### (5) 判断梯度下降是否收敛
+* learning curve
+    * 观察学习曲线是否收敛
+* automatic convergence test
+    * 如果J每一次迭代减少的数值 <= $\epsilon$，则认为梯度下降已经收敛
+        * $\epsilon$的值比较难确定
+
+#### 2.feature scaling (特征缩放)
+
+##### (1) why
+* 当特征1的范围为0-1
+* 当特征2的范围为100-500
+* 会导致 梯度下降较慢
+
+##### (2) 目标
+使特征的范围差不多在-1到1之间，超过这个范围也是可以的，重点是各个特征的范围相当，这样才能使用梯度下降算法更快
+
+##### (3) 常用方法
+
+* 除以取值范围
+* mean normalization
+* Z-score normalization
+
+#### 3.分类
+
+##### (1) batch gradient descent
+在每次迭代时使用训练集中的所有样本进行参数更新
