@@ -21,8 +21,9 @@
       - [3.常用聚合函数](#3常用聚合函数)
       - [4.矩阵运算](#4矩阵运算)
         - [(1) 基本运算](#1-基本运算)
-        - [(2) 矩阵积](#2-矩阵积)
-        - [(3) 矩阵其他运算](#3-矩阵其他运算)
+        - [(2) dot、cross、matrix multiply](#2-dot-cross-matrix-multiply)
+        - [(3) 矩阵转置（transpose）](#3-矩阵转置transpose)
+        - [(4) 矩阵其他运算](#4-矩阵其他运算)
       - [5.broadcasting (广播机制)](#5broadcasting-广播机制)
       - [6.写入文件和读取文件](#6写入文件和读取文件)
 
@@ -287,20 +288,34 @@ n1 + n2 #对应的元素相加
 n1 * n2 #对应的元素相乘
 ```
 
-##### (2) 矩阵积
+##### (2) dot、cross、matrix multiply
 
-* n1: (r1,c1)
-* n2: (r2,c2)
-* n1和n2能够进行线性代数的前提是: c1=r2
-* 生成的结果是一个 (r1,c2)的矩阵
+* dot product对象：**向量**，**输出**是一个**值**
+* matrix multiply对象：**矩阵**，**输出**是另一个**矩阵**
 
 ```python
+# dot（向量间运算）
 np.dot(n1,n2)
+
+# matrix multiply
+np.matmul(X1, X2)
 #或者
 n1@n2
+
+# cross
+np.cross(X1,X2)
 ```
 
-##### (3) 矩阵其他运算
+##### (3) 矩阵转置（transpose）
+指将一个矩阵的行和列互换得到的新矩阵
+```python
+a = np.array([[1, 2], [3, 4]])
+a.transpose(1, 0)
+或者
+a.T
+```
+
+##### (4) 矩阵其他运算
 
 ```python
 #矩阵逆

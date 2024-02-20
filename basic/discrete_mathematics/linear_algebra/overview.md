@@ -22,7 +22,7 @@
         - [(6) rank (矩阵的秩)](#6-rank-矩阵的秩)
         - [(7) 非方阵](#7-非方阵)
       - [4.product](#4product)
-        - [(1) dot product](#1-dot-product)
+        - [(1) dot product 和 matrix multiply](#1-dot-product-和-matrix-multiply)
         - [(2) cross product](#2-cross-product)
       - [5.cramer's rule求解线性方程](#5cramers-rule求解线性方程)
       - [6.change of basis (基向量变换)](#6change-of-basis-基向量变换)
@@ -174,10 +174,12 @@
 
 #### 4.product
 
-##### (1) dot product
+##### (1) dot product 和 matrix multiply
 * 和matrix multiply区分
-    * dot product对象：向量，输出是一个值
-    * matrix multiply对象：矩阵，输出是另一个矩阵
+    * dot product对象：**向量**，**输出**是一个**值**
+    * matrix multiply对象：**矩阵**，**输出**是另一个**矩阵**： $M = A \cdot B$ 
+        * 前提： A矩阵的每行和B矩阵的每列做点积（A每行的元素数 = B每列的元素数）
+        * **M的第m行，第n列的元素值 = A矩阵的第m行 $\cdot$ B矩阵的第n列**
 * $\vec v \cdot \vec w$ = (length of projected $\vec w$ on $\vec v$)(length of $\vec v$) = $\vec w \cdot \vec v$
     * 当$\vec v$和$\vec w$方向 不一致时为负数，垂直时为0
 

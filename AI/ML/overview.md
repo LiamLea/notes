@@ -23,10 +23,20 @@
       - [1.linear regression](#1linear-regression)
         - [(1) univariate linear regression](#1-univariate-linear-regression)
         - [(2) multiple linear regression](#2-multiple-linear-regression)
+        - [(3) regularized linear regression (解决overfitting的问题)](#3-regularized-linear-regression-解决overfitting的问题)
       - [2.polynomial regression](#2polynomial-regression)
       - [3.logistic regression](#3logistic-regression)
         - [(1) sigmoid function (logistic function)](#1-sigmoid-function-logistic-function)
         - [(2) decision boundary](#2-decision-boundary)
+        - [(3) regularized logistic regression (解决overfitting的问题)](#3-regularized-logistic-regression-解决overfitting的问题)
+      - [4.overfitting](#4overfitting)
+        - [(1) underfitting](#1-underfitting)
+        - [(2) just right](#2-just-right)
+        - [(3) overfitting](#3-overfitting)
+      - [5.解决overfitting](#5解决overfitting)
+        - [(1) collect more training examples](#1-collect-more-training-examples)
+        - [(2) use fewer features](#2-use-fewer-features)
+        - [(3) regularization](#3-regularization)
     - [gradient descent](#gradient-descent)
       - [1.基本概念](#1基本概念)
         - [(1) 算法](#1-算法)
@@ -110,7 +120,7 @@
 #### 3.normal equation (正规方程)
 
 #### 4.feature engineering (特征工程)
-如何选择合适的feature
+创建新的feature，通过 转换或结合 原有的feature
 
 ***
 
@@ -136,6 +146,16 @@
     * 比如：squared error cost function
     * $J(\vec w,b) = \frac{1}{2m}\sum_{i=1}^m (f_{\vec w,b}(\vec x^{(i)})-y^{(i)})^2$
 
+##### (3) regularized linear regression (解决overfitting的问题)
+* cost function: $J(w,b)$
+    * 比如: squared error cost function
+    * $J(w,b) = \frac{1}{2m}\sum_{i=1}^m (f_{w,b}(x^{(i)})-y^{(i)})^2 + \frac{\lambda}{2m}\sum_{j}^n w_j^2$
+        * n等于特征的数量
+            * 由于不知道哪些feature重要，哪些不重要，则代价函数需要考虑所有的features
+        * $\lambda$ 决定了如何平衡 fit data（代价函数的第一项） 和 避免overfitting（代价函数的第二项） 这两个目标
+            * 当$\lambda$很小时，就会overfitting
+            * 当$\lambda$很大时，就会underfitting
+
 #### 2.polynomial regression
 * 模型（比如）: $f_{w,b}(x) = w_1x + w_2x^2 b$
 * 特征: $x,x^2$
@@ -144,9 +164,10 @@
 
 #### 3.logistic regression
 
-* 模型（比如）: $f_{\vec w,b}(\vec x) = P(y=1|\vec x;\vec w,b) = g(\vec w \cdot \vec x + b) =\frac{1}{1 + e^{-(\vec w \cdot \vec x + b)}}$
-    * 基于sigmoid function
-        * 其中$\vec w \cdot \vec x + b$可以换任意函数
+* 模型（比如）: $f_{\vec w,b}(\vec x) = P(y=1|\vec x;\vec w,b) = g(z) = \frac{1}{1 + e^{-z}}$
+    * 基于sigmoid function: g(z)
+        * 比如: $z = \vec w \cdot \vec x + b$
+        * 则$f_{\vec w,b}(\vec x) = g(\vec w \cdot \vec x + b) = \frac{1}{1 + e^{-(\vec w \cdot \vec x + b)}}$
     * $P(y=1|\vec x;\vec w,b)$ 表示y=1的概率
         * 模型的特征是$\vec x$
         * 模型参数是$\vec w, b$
@@ -171,7 +192,51 @@
 ##### (2) decision boundary
 以两类为例，一类是positive class，一类是negtive class
 * 确定一个decision boundary，预测的值 >= 这个boundary，则认为是positive class
-    * 比如decision bounadry = 0.5，则$(\vec w \cdot \vec x + b) = 0$
+    * 比如decision bounadry = 0.5，则$z = 0$
+        * 如果$z = \vec w \cdot \vec x + b$，则decision boundary是一条直线
+
+##### (3) regularized logistic regression (解决overfitting的问题)
+* cost function: $J(\vec w,b)$
+    * $J(\vec w,b) = \frac{1}{m}\sum_{i=1}^m L(f_{\vec w,b}(\vec x^{(i)}), y^{(i)}) = -\frac{1}{m}\sum_{i=1}^m[y^{(i)}\log (f_{\vec w,b}(\vec x^{(i)})) + (1-y^{(i)})\log (1 - f_{\vec w,b}(\vec x^{(i)}))] + \frac{\lambda}{2m}\sum_{j}^n w_j^2$
+
+        * n等于特征的数量
+            * 由于不知道哪些feature重要，哪些不重要，则代价函数需要考虑所有的features
+        * $\lambda$ 决定了如何平衡 fit data（代价函数的第一项） 和 避免overfitting（代价函数的第二项） 这两个目标
+            * 当$\lambda$很小时，就会overfitting
+            * 当$\lambda$很大时，就会underfitting
+
+#### 4.overfitting
+
+##### (1) underfitting
+* 特点：high bias
+    * 数据不拟合，即预测值与实际值偏差较大
+
+##### (2) just right 
+
+* 特点：generalization
+    * 数据能很好的匹配样本，也能很好的预测新数据
+
+##### (3) overfitting
+* 特点：high variance
+    * 过拟合，会导致模型不稳定，即添加一个样本，会导致模型变换较大
+
+#### 5.解决overfitting
+
+##### (1) collect more training examples
+
+##### (2) use fewer features
+* feature selection
+
+##### (3) regularization
+* 降低某些feature的权重（相当于减少了feature，但又不像第二种方式一样，直接减少了feature）
+
+* 代价函数变为
+    * $J(\vec w,b) = J_{old}(\vec w,b) + \frac{\lambda}{2m}\sum_{j}^n w_j^2$
+        * n等于特征的数量
+            * 由于不知道哪些feature重要，哪些不重要，则代价函数需要考虑所有的features
+        * $\lambda$ 决定了如何平衡 fit data 和 避免overfitting 这两个目标
+            * 当$\lambda$很小时，就会overfitting
+            * 当$\lambda$很大时，就会underfitting
 
 ***
 
