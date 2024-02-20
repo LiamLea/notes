@@ -10,13 +10,15 @@
     - [Northbound](#northbound)
       - [1.基本使用](#1基本使用)
         - [(1) 列出虚拟的设备（即逻辑网络）](#1-列出虚拟的设备即逻辑网络)
-      - [2.路由器相关](#2路由器相关)
+      - [2.查看数据库条目 （重要）](#2查看数据库条目-重要)
+      - [3.路由器相关](#3路由器相关)
         - [(1) 列出路由器的路由表](#1-列出路由器的路由表)
-      - [3.NAT相关](#3nat相关)
+      - [4.NAT相关](#4nat相关)
         - [(1) 列出nat配置](#1-列出nat配置)
         - [(2) 设置nat](#2-设置nat)
-      - [4.LB相关](#4lb相关)
+      - [5.LB相关](#5lb相关)
         - [(1) 列出LB](#1-列出lb)
+      - [6.ACL相关](#6acl相关)
     - [southbound](#southbound)
         - [(1) 数据流](#1-数据流)
       - [1.DEBUG： 对链路进行trace（终极）](#1debug-对链路进行trace终极)
@@ -105,7 +107,35 @@ router 20594965-2b2e-4b01-8dc3-dd35f532a785 (neutron-6b412af2-5e61-461e-b93e-154
 
 ```
 
-#### 2.路由器相关
+#### 2.查看数据库条目 （重要）
+
+* 查看有哪些条目
+
+```shell
+ovn-nbctl --help
+
+# Database commands may reference a row in each table in the following ways:
+#   ACL:
+#     by UUID
+#     by "name"
+#   Address_Set:
+#     by UUID
+#     by "name"
+#   BFD:
+#     by UUID
+#.....
+```
+
+* 列出指定条目
+```shell
+#比如查看ACL
+ovn-nbctl list ACL
+
+#比如查看port group
+ovn-nbctl list Port_Group
+```
+
+#### 3.路由器相关
 ##### (1) 列出路由器的路由表
 ```shell
 $ ovn-nbctl lr-route-list <router>
@@ -115,7 +145,7 @@ Route Table <main>:
                 0.0.0.0/0               10.68.0.254 dst-ip
 ```
 
-#### 3.NAT相关
+#### 4.NAT相关
 
 ##### (1) 列出nat配置
 ```shell
@@ -131,11 +161,34 @@ kubectl-ko nbctl lr-nat-add <router> <type> <EXTERNAL_IP> <LOGICAL_IP>
 #<type>为snat、dnat、dnat_and_snat
 ```
 
-#### 4.LB相关
+#### 5.LB相关
 
 ##### (1) 列出LB
 ```shell
 ovn-nbctl lb-list
+```
+
+#### 6.ACL相关
+* 根据port id查询port uid
+```shell
+kubectl ko nbctl list Logical_Switch_Port
+```
+
+* 根据port uid查询port group，从而获取使用的ACL
+  * 能够看到一个port group中有哪些 ports 和 ACL
+```shell
+ovn-nbctl list Port_Group
+```
+
+* 查看ACL条目
+  * 与 port group 或 switch 关联
+```shell
+ovn-nbctl list ACL
+```
+
+* 添加ACL条目
+```shell
+acl-add {SWITCH | PORTGROUP} DIRECTION PRIORITY MATCH ACTION
 ```
 
 ***
