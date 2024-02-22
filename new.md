@@ -41,7 +41,12 @@
 - [57.格式化磁盘: `wipefs`](#57格式化磁盘-wipefs)
 - [58.`ip route`有多个路由表](#58ip-route有多个路由表)
 - [59.认证失败的原因：证书过期 或者 时间不同步](#59认证失败的原因证书过期-或者-时间不同步)
-- [60.`ls -l`格式](#60ls-l格式)
+- [60.`ls -l`格式](#60ls--l格式)
+- [61.round-off error 和 truncation error](#61round-off-error-和-truncation-error)
+  - [(1) floating point](#1-floating-point)
+  - [(2) round-off error](#2-round-off-error)
+  - [(3) Accumulation of round-off error](#3-accumulation-of-round-off-error)
+  - [(4) truncation error](#4-truncation-error)
 
 <!-- /code_chunk_output -->
 
@@ -308,3 +313,53 @@ ip route show table <table_id>
 
 #1表示硬链接数 
 ```
+
+#### 61.round-off error 和 truncation error
+
+[参考](https://docs.python.org/3/tutorial/floatingpoint.html)
+
+##### (1) floating point 
+
+Floating-point numbers are represented in computer hardware as **base 2 (binary) fractions**
+
+* 在计算中如何存储的
+![](./others/imgs/new_01.png)
+
+* 比如: `0.625`，base 2就是1/2 + 0/4 + 1/8
+* 缺陷： most decimal fractions cannot be represented exactly as binary fractions
+  * 比如 In base 2, 1/10 is the infinitely repeating fraction
+  ```python
+  x = 1.0/10
+  print(f"{x:.18f}")
+
+  #输出: 0.100000000000000006
+  ```
+
+##### (2) round-off error
+the difference between an approximation of a number used in computation and its correct (true) value is called round-off error
+
+##### (3) Accumulation of round-off error
+
+```python
+def add_and_subtract(iterations):
+    result = 1
+    
+    for i in range(iterations):
+        result += 1/3
+
+    for i in range(iterations):
+        result -= 1/3
+    return result
+
+add_and_subtract(100)
+#1.0000000000000002
+
+add_and_subtract(1000)
+#1.0000000000000064
+
+add_and_subtract(10000)
+#1.0000000000001166
+```
+
+##### (4) truncation error
+截断一个无限的小数
