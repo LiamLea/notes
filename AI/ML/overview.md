@@ -48,8 +48,10 @@
         - [(1) why](#1-why)
         - [(2) 目标](#2-目标)
         - [(3) 常用方法](#3-常用方法)
+        - [(4) 注意](#4-注意)
       - [3.分类](#3分类)
         - [(1) batch gradient descent](#1-batch-gradient-descent)
+      - [4.Adam algorithm (adaptive moment estimation)](#4adam-algorithm-adaptive-moment-estimation)
 
 <!-- /code_chunk_output -->
 
@@ -65,9 +67,15 @@
 * y
     * output变量，也叫output target
 * m
-    * 训练集的数目
+    * 没有特别标注 就是 训练集的数目
+    * $m_{train}$训练集的数目
+    * $m_{test}$测试集的数目
 * $(x^{(i)},y^{(i)})$
     * 第i个训练数据
+* $(x_{cv}^{(i)},y_{cv}^{(i)})$
+    * 第i个cross validaion集数据
+* $(x_{test}^{(i)},y_{test}^{(i)})$
+    * 第i个测试数据
 
 ##### (2) x -f-> $\hat{y}$
 * x
@@ -208,6 +216,7 @@
 #### 4.overfitting
 
 ##### (1) underfitting
+不能很好的匹配训练集
 * 特点：high bias
     * 数据不拟合，即预测值与实际值偏差较大
 
@@ -217,6 +226,7 @@
     * 数据能很好的匹配样本，也能很好的预测新数据
 
 ##### (3) overfitting
+能够很好的匹配训练集，但是不能很好的预测新的数据
 * 特点：high variance
     * 过拟合，会导致模型不稳定，即添加一个样本，会导致模型变换较大
 
@@ -300,8 +310,23 @@
 * 除以取值范围
 * mean normalization
 * Z-score normalization
+    * $Z = \frac{x - \mu}{\sigma}$
+        * standard score
+        * observed value
+        * mean of the sample
+        * standard deviation of the sample
+
+##### (4) 注意
+训练出模型后，进行数据预测，也需要对输入的数据进行缩放
 
 #### 3.分类
 
 ##### (1) batch gradient descent
 在每次迭代时使用训练集中的所有样本进行参数更新
+
+#### 4.Adam algorithm (adaptive moment estimation)
+* 自动调整learning rate
+* if $w_j$ (or b) keeps moving in same direction
+    * increase $\alpha_j$
+* if $w_j$ (or b) keeps oscillating
+    * reduce $\alpha_j$

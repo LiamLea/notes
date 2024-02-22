@@ -9,6 +9,7 @@
     - [使用](#使用)
       - [1.输入必须是matrix](#1输入必须是matrix)
       - [2.demo](#2demo)
+        - [(2) softmax优化（减轻round-off error的影响）](#2-softmax优化减轻round-off-error的影响)
 
 <!-- /code_chunk_output -->
 
@@ -62,4 +63,56 @@ X_test = np.array([
     [200,11]])   # negative example
 X_testn = norm_l(X_test)
 predictions = model.predict(X_testn)
+```
+
+##### (2) softmax优化（减轻round-off error的影响）
+
+* 未优化版
+```python
+model = Sequential(
+    [ 
+        Dense(25, activation = 'relu'),
+        Dense(15, activation = 'relu'),
+        Dense(4, activation = 'softmax')    # < softmax activation here
+    ]
+)
+model.compile(
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+    optimizer=tf.keras.optimizers.Adam(0.001),
+)
+
+model.fit(
+    X_train,y_train,
+    epochs=10
+)
+
+p_nonpreferred = model.predict(X_train)
+```
+
+* loss function会将a带入计算，而不会先计算a，因为浮点数的原因，如果先计算a会产生误差
+* 用更准确的cost function，训练出参数后，再将参数代入，生成最后的模型
+
+```python
+preferred_model = Sequential(
+    [ 
+        Dense(25, activation = 'relu'),
+        Dense(15, activation = 'relu'),
+        Dense(4, activation = 'linear')   #<-- Note
+    ]
+)
+
+#通知 loss function 输出的值没有进行normalize（比如logits）,所以最后一层需要使用linear
+preferred_model.compile(
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),  #<-- Note
+    optimizer=tf.keras.optimizers.Adam(0.001),
+)
+
+preferred_model.fit(
+    X_train,y_train,
+    epochs=10
+)
+
+#用更准确的cost function，训练出参数后，再将参数代入，生成最后的模型
+p_preferred = preferred_model.predict(X_train)
+sm_preferred = tf.nn.softmax(p_preferred).numpy()
 ```
