@@ -16,12 +16,16 @@
         - [(5) 指数](#5-指数)
         - [(6) implicit function](#6-implicit-function)
         - [(7) l'hopital's rule (罗必达法则) (利用导数求极限值)](#7-lhopitals-rule-罗必达法则-利用导数求极限值)
-      - [3.integration](#3integration)
+      - [3.Euler's number e](#3eulers-number-e)
+        - [(1) 定义](#1-定义)
+        - [(2) 特性](#2-特性)
+        - [(3) Euler's formula](#3-eulers-formula)
+      - [4.integration](#4integration)
         - [(1) 概念](#1-概念-1)
         - [(2) average of a continuous value](#2-average-of-a-continuous-value)
-      - [4.high-order derivatives](#4high-order-derivatives)
-      - [5.Tylor series](#5tylor-series)
-        - [(1) 定义](#1-定义)
+      - [5.high-order derivatives](#5high-order-derivatives)
+      - [6.Tylor series](#6tylor-series)
+        - [(1) 定义](#1-定义-1)
 
 <!-- /code_chunk_output -->
 
@@ -95,7 +99,37 @@ $\frac{d}{dx}e^x = e^x$
     * 比如，当x=0时，函数f(x)、g(x)都等于0
     * $\lim_{x \to a}\frac{f(x)}{g(x)} = \frac{\frac{df}{dx}(a)dx}{\frac{dg}{dx}(a)dx}$
 
-#### 3.integration
+#### 3.Euler's number e
+
+##### (1) 定义
+$\lim_{n \to \infty} (1 + \frac{1}{n})^n = 2.718...$
+
+##### (2) 特性
+
+* 导数是其本身
+    * $\frac{d}{dx}e^x = e^x$
+
+##### (3) Euler's formula
+* complex plane的理解
+    * 横坐标为实数轴（Re），纵坐标为虚数轴（Im）
+    * $i$ 可以理解成旋转90%
+        * 比如$1$旋转90度就是$i$，再旋转90度就是$i^2=-1$
+
+* $e^{ix}$的理解
+    * x表示的**角度**（对于单位圆也是对应的弧长）
+    * $e^{ix}$
+        * 在complex plane中，是圆周运动
+        * 本质就是**余弦运动**，随着时间t的推移，沿着实数轴的变换
+            * **实数轴表示运动幅度，虚数轴表示相**
+    * $\frac{d}{dx}e^{ix} = ie^{ix}$，即导数在任何位置都呈90度（因为i理解为旋转90度）
+    * $e^0=1$
+    * 所以只有 **单位圆** 满足要求
+    * 所以 $e^{ix} = \cos x + i\sin x$
+        * $e^{i\pi} = -1$
+
+![](./imgs/overview_02.png)
+
+#### 4.integration
 
 ##### (1) 概念
 
@@ -115,10 +149,11 @@ $\frac{d}{dx}e^x = e^x$
     * 求平均值：$\frac{\int_a^bf(x)}{\frac{b-a}{dx}}$
 * $\frac{\int_a^bf(x)dx = F(b) - F(a)}{b-a} = \frac{F(b) - F(a)}{b-a}$
 
-#### 4.high-order derivatives
+#### 5.high-order derivatives
 * 二阶的表示: $\frac{d^2f}{dx^2} = \frac{d(\frac{df}{dx})}{dx}$
+    * 意义：变化的变化
 
-#### 5.Tylor series
+#### 6.Tylor series
 
 用于求 一个函数（比如$cosin(x)$等）在 **某个点** **附近** 的 **近似值**，用**多项式**表示，因为多项式更易处理
 * series: ifinite sum
@@ -133,8 +168,8 @@ $\frac{d}{dx}e^x = e^x$
     * $\frac{dP}{dx}(a) = \frac{df}{dx}(a)$
     * $\frac{d^2P}{dx^2}(a) = \frac{d^2f}{dx^2}(a)$
     * ...
-    * 所以在a点附近，P(a)是近似于f(a)的，因为 **$P(a)=f(a)$，且后续的高阶导数也相等（即变化相等**
-        * 当泰勒多项式越多，在**radius convergence（收敛半径）**范围内的，P(x)就越无限接近f(x)
+    * 所以在a点附近，P(a)是近似于f(a)的，因为 **$P(a)=f(a)$，且后续的高阶导数也相等（即变化相等）**
+        * 当泰勒多项式越多，在 **radius convergence（收敛半径）** 范围内的，P(x)就越无限接近f(x)
 
 * 以$ln(x)$，在x=1 的泰勒展开式为例子：
 ![](./imgs/overview_01.png)

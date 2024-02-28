@@ -42,7 +42,7 @@
         - [(1) 算法](#1-算法)
         - [(2) learning rate](#2-learning-rate)
         - [(3) 选择合适的learning rate](#3-选择合适的learning-rate)
-        - [(4) learning curve](#4-learning-curve)
+        - [(4) learning curve (关于代价函数的变换曲线)](#4-learning-curve-关于代价函数的变换曲线)
         - [(5) 判断梯度下降是否收敛](#5-判断梯度下降是否收敛)
       - [2.feature scaling (特征缩放)](#2feature-scaling-特征缩放)
         - [(1) why](#1-why)
@@ -83,6 +83,7 @@
 * $f_{w,b}(x) = wx + b$
     * f 称为模型
     * w,b称为该模型的参数
+    * d: degree of the polynomial
 * $\hat{y}$
     * 预测值
 
@@ -241,12 +242,15 @@
 * 降低某些feature的权重（相当于减少了feature，但又不像第二种方式一样，直接减少了feature）
 
 * 代价函数变为
-    * $J(\vec w,b) = J_{old}(\vec w,b) + \frac{\lambda}{2m}\sum_{j}^n w_j^2$
+    * $J(\vec w,b) = J_{old}(\vec w,b) + \frac{\lambda}{2m}\sum_{1}^n w_j^2$
         * n等于特征的数量
             * 由于不知道哪些feature重要，哪些不重要，则代价函数需要考虑所有的features
+        * 当权重都为0时，值最小，所以这项目标是**减少参数**（**参数越少，拟合度越低**）
         * $\lambda$ 决定了如何平衡 fit data 和 避免overfitting 这两个目标
-            * 当$\lambda$很小时，就会overfitting
-            * 当$\lambda$很大时，就会underfitting
+            * 当$\lambda$很小时，前一项的影响更大，就会overfitting
+            * 当$\lambda$很大时，后一项的影响更大，就会underfitting
+            * 以线性回归为例
+            ![](./imgs/overview_03.png)
 
 ***
 
@@ -267,6 +271,8 @@
             * 表示方向，当接近局部最小值时，绝对值就会越来越小（步长就会越来越小）
             * 当为正数，表示值需要减小
             * 当为负数，表示值需要增加
+        * 当w是一个向量时（即有多个w时）
+            * $temp\_w_j = w_j - \alpha\frac{\partial}{\partial w_j}J(\vec w,b)$
     * $temp\_b = b - \alpha\frac{\partial}{\partial b}J(w,b)$
     * w = temp_w
     * b = temp_b
@@ -285,8 +291,8 @@
 * 如果代价函数减小，尝试增加学习率
 * 如果代价函数增加，尝试减小学习率
 
-##### (4) learning curve
-代价函数和迭代次数的关系，横坐标为迭代次数，纵坐标为代价函数
+##### (4) learning curve (关于代价函数的变换曲线)
+* 比如：代价函数和迭代次数的关系，横坐标为迭代次数，纵坐标为代价函数
 
 ##### (5) 判断梯度下降是否收敛
 * learning curve
