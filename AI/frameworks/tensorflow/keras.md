@@ -116,3 +116,14 @@ preferred_model.fit(
 p_preferred = preferred_model.predict(X_train)
 sm_preferred = tf.nn.softmax(p_preferred).numpy()
 ```
+
+* 每一层设置regulirization的$\lambda$
+```python
+model_r = Sequential(
+    [
+        Dense(120, activation = 'relu', kernel_regularizer=tf.keras.regularizers.l2(0.1), name="L1"), 
+        Dense(40, activation = 'relu', kernel_regularizer=tf.keras.regularizers.l2(0.1), name="L2"),  
+        Dense(classes, activation = 'linear', name="L3")  
+    ], name="ComplexRegularized"
+)
+```
