@@ -26,7 +26,8 @@
         - [(2) data synthesis](#2-data-synthesis)
         - [(3) transfer learning](#3-transfer-learning)
       - [5.skewed data sets](#5skewed-data-sets)
-          - [(1) 特殊的error metric](#1-特殊的error-metric)
+        - [(1) 特殊的error metric: precision/recall](#1-特殊的error-metric-precisionrecall)
+        - [(2) trade-off between precison and recall](#2-trade-off-between-precison-and-recall)
 
 <!-- /code_chunk_output -->
 
@@ -39,7 +40,7 @@
 * training set (60%)
     * 用于训练模型
 * cross validation set (validation set、development set、dev set) (20%)
-    * 用于evaluate the different model configurations you are choosing from（比如:模型使用哪种多项式，$x^2$还是$x^3$等）
+    * 调整模型的依据，根据模型在这个数聚集上的结果，决定如何优化参数等
 * test set (20%)
     * 用于估计泛化误差，评价模型的性能
 
@@ -156,4 +157,20 @@
 positive data和negative data 不均衡
 * 比如一个罕见的病，只会有0.5%的人会得，所以只要预测不会得这个病，正确率就能达到99.5% 
 
-###### (1) 特殊的error metric
+##### (1) 特殊的error metric: precision/recall
+![](./imgs/op_06.png)
+
+* $precison = \frac{true\ positives}{predicated\ positives}$
+    * 只看positive的正确率（原本看整体的正确率，但是由于negative数据更多，所以看positive的才有意义）
+    * 反映的是**判断**的准确率（即在他们认为是positive的中有多少是正确的）
+* $recall = \frac{true\ positives}{actual\ positives}$
+    * recall有信息检索的意思，在这里就表示，从positive中能检索出多少个positive
+    * 反映的是**识别率**，因为之前准确率是整体来看的，所以不需要recall，而现在只关注positive的准确率了，所以还需要关注识别率（从所有positive中能够识别出多少）
+
+##### (2) trade-off between precison and recall
+
+* 当提高了判断准确率，就会导致precision提高，recall降低
+* 当降低了判断准确率，就会导致precision降低，recall提高
+* 如何平衡precison和recall
+    * 使用F1 score
+        * $F_1{score} = \frac{\frac{1}{2}}{\frac{1}{P}+\frac{1}{R}}= 2\frac{PR}{P+R}$
