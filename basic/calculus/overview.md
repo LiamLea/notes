@@ -19,7 +19,8 @@
       - [3.Euler's number e](#3eulers-number-e)
         - [(1) 定义](#1-定义)
         - [(2) 特性](#2-特性)
-        - [(3) Euler's formula](#3-eulers-formula)
+        - [(3) complex plane的理解](#3-complex-plane的理解)
+        - [(4) Euler's formula](#4-eulers-formula)
       - [4.integration](#4integration)
         - [(1) 概念](#1-概念-1)
         - [(2) average of a continuous value](#2-average-of-a-continuous-value)
@@ -109,18 +110,25 @@ $\lim_{n \to \infty} (1 + \frac{1}{n})^n = 2.718...$
 * 导数是其本身
     * $\frac{d}{dx}e^x = e^x$
 
-##### (3) Euler's formula
-* complex plane的理解
+##### (3) complex plane的理解
+* **二维**的数字，正常理解数字是一维的（即所有的数字都可以在一条负无穷到正无穷的直线上找到）
     * 横坐标为实数轴（Re），纵坐标为虚数轴（Im）
-    * $i$ 可以理解成旋转90%
-        * 比如$1$旋转90度就是$i$，再旋转90度就是$i^2=-1$
+* **乘法**可以理解为 **旋转一定度数**，然后进行scale
+    * $z_1 * z_2$ 表示将$z_2$旋转 一定度数（$z_1$和横坐标形成的度数），然后进行scale
+    * $(\frac{\sqrt 2}{2} + i\frac{\sqrt 2}{2})^2 = i$
+        * 理解为1旋转45度，再旋转45度
+    * 乘以$i$ 表示旋转90度（所以$i^2=-1$）
+    * $x^3=1$，在complex plane中表示，1旋转3次相同的角度，还得到1，所以x有多种解（比如: $x=-\frac{1}{2} + i\frac{\sqrt 3}{2}$）
+
+##### (4) Euler's formula
 
 * $e^{ix}$的理解
-    * x表示的**角度**（对于单位圆也是对应的弧长）
-    * $e^{ix}$
-        * 在complex plane中，是圆周运动
-        * 本质就是**余弦运动**，随着时间t的推移，沿着实数轴的变换
-            * **实数轴表示运动幅度，虚数轴表示相**
+    * $e^{ix}$ 表示圆上的一点
+        * 在complex plane中，在**单位圆**上的圆周运动
+            * 某些场景下可以理解为**余弦运动**，随着时间t的推移，沿着实数轴的变换
+                * **实数轴表示运动幅度，虚数轴表示相**
+        * x表示的**弧长**（对于**单位圆**也是对应的**角度**）
+
     * $\frac{d}{dx}e^{ix} = ie^{ix}$，即导数在任何位置都呈90度（因为i理解为旋转90度）
     * $e^0=1$
     * 所以只有 **单位圆** 满足要求

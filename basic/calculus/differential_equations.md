@@ -12,6 +12,7 @@
       - [3.fourier series](#3fourier-series)
         - [(1) 基本项](#1-基本项)
         - [(2) 表示任意函数](#2-表示任意函数)
+      - [4.fourier tranformation](#4fourier-tranformation)
 
 <!-- /code_chunk_output -->
 
@@ -43,3 +44,8 @@ an equation which computes a function between various partial derivatives of a m
 * $\int_0^1f(x)d(x) = C_0$
 * $\int_0^1f(x)e^{-2\cdot 2\pi ix}d(x) = C_2$
 * 依次类推: $C_n = \int_0^1f(x)e^{n\cdot 2\pi ix}d(x)$
+
+#### 4.fourier tranformation
+
+* a function of time  -tranform-> a function of frequency
+* $F(w) = \int_{-\infty}^{\infty}f(t)\cdot e^{-iwt} dt$
