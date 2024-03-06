@@ -18,6 +18,7 @@
       - [2.配置](#2配置)
       - [3.客户端](#3客户端)
         - [（1）ctr](#1ctr)
+      - [4.镜像导入导出](#4镜像导入导出)
 
 <!-- /code_chunk_output -->
 
@@ -207,4 +208,30 @@ ctr images import <xx.tar.gz>
 ```shell
 ctr -n <ns> container ls
 ctr -n <ns> task ls
+```
+
+#### 4.镜像导入导出
+```shell
+#获取镜像列表
+ctr -n k8s.io images  ls  | awk '{print $1}' | grep -v sha256 > images.txt
+
+#docker.io的镜像，必须要加上docker.io前缀
+
+
+#使用ctr导出镜像（ctr拉取一些镜像时需要设置代理，而且对代理的性能有要求，建议使用docker）
+#拉取镜像
+#HTTPS_PROXY="http://10.10.10.250:8123"  ctr -n k8s.io images pull
+for i in `cat images.txt`; do ctr -n k8s.io images pull $i;done
+#导出镜像
+for i in `cat images.txt`; do ctr -n k8s.io images  export  ${i//\//_}.tar $i ;done
+#导入镜像
+for i in `ls|grep tar`;do ctr -n k8s.io images  import $i;done
+
+
+#使用docker导出镜像
+for i in `cat images.txt`; do docker pull $i;done
+docker save `cat images.txt  | tr '\n' ' '` -o all_images.tar
+
+#导入镜像
+for i in `echo "master-2 master-3" | tr ' ' '\n'`; do scp all_images.tar root@$i:/tmp/ && ssh root@$i "ctr -n k8s.io images  import /tmp/all_images.tar";done
 ```
