@@ -21,6 +21,7 @@
       - [3.常用聚合函数](#3常用聚合函数)
       - [4.矩阵运算](#4矩阵运算)
         - [(1) 基本运算](#1-基本运算)
+        - [(2) 两矩阵 并集 求和](#2-两矩阵-并集-求和)
         - [(2) dot、cross、matrix multiply](#2-dot-cross-matrix-multiply)
         - [(3) 矩阵转置（transpose）](#3-矩阵转置transpose)
         - [(4) 矩阵其他运算](#4-矩阵其他运算)
@@ -296,6 +297,12 @@ n % 2
 
 n1 + n2 #对应的元素相加
 n1 * n2 #对应的元素相乘
+```
+
+##### (2) 两矩阵 并集 求和
+
+```python
+sum((predictions == 1) & (y_val == 0))
 ```
 
 ##### (2) dot、cross、matrix multiply
