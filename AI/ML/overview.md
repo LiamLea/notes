@@ -315,12 +315,13 @@
 
 * 除以取值范围
 * mean normalization
+    * $x' = \frac{x - \mu}{max(x) - min(x)}$
 * Z-score normalization
     * $Z = \frac{x - \mu}{\sigma}$
-        * standard score
-        * observed value
-        * mean of the sample
-        * standard deviation of the sample
+        * Z: standard score
+        * x: observed value
+        * $\mu$: mean of the sample
+        * $\sigma$: standard deviation of the sample
 
 ##### (4) 注意
 训练出模型后，进行数据预测，也需要对输入的数据进行缩放
