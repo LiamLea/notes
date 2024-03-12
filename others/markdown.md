@@ -107,6 +107,11 @@ A<sub>2</sub>
 
 [参考](https://meta.wikimedia.org/wiki/Help:Displaying_a_formula)
 
+```math
+\text{if a = b} \\ 
+aa     
+```
+
 ## 下拉展示详情
 <details>
   <summary>The DUDE Prompt</summary>
