@@ -85,7 +85,7 @@ a<sub>b</sub>
 
 #### 3.init localhost
 
-[xx](#3init-localhost)    //.需要省略
+[xx](#3init-localhost)    //.需要省略 有括号也需要省略
 ```
 ## 插入图片
 ```
