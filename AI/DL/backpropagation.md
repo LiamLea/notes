@@ -68,13 +68,10 @@
 
 #### 1.backpropagation (计算导数的算法)
 
-* A computation graph simplifies the computation of complex derivatives by breaking them into smaller steps
-![](./imgs/overview_03.png)
-    * $\frac{\partial J}{\partial a} = \frac{\partial w}{\partial a} \frac{\partial J}{\partial w}$
-    * 其他的依次类推
-
-* 当有N个nodes和P个parameters，计算出所有的导数大概需要 N+P 个步骤，而不数N*P个步骤
-
-    * 因为 $\frac{\partial J}{\partial w}$ 和$\frac{\partial J}{\partial c}$ 都可以在 $\frac{\partial J}{\partial b}$ 基础上进行计算，不必从 $\frac{\partial J}{\partial d}$开始
-
-* 结合Adam algorithm，实现learning rate的自动调整
+* 从后往前，计算出 J关于所有参数的导数
+    * 利用chain rule，能够提高计算效率
+* 从而进行梯度下降
+* 比如：以2层neuron network为例（output的activation function为sigmoid）
+    * ![](./imgs/bp_01.png)
+    * 求各个参数的导数
+    ![](./imgs/bp_02.png)

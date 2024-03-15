@@ -46,6 +46,8 @@ do anything a human can do
     * 垂直方向：特征
     * 水平方向：样本数
     * input.shape = (n,m)
+      * 每一行 是不同样本的同一特征
+      * 每一列 是一个样本的所有特征
 * model
     * 水平方向：参数（数量为n）
     * 垂直方向：不同neuron的参数
@@ -54,3 +56,5 @@ do anything a human can do
     * 水平方向：输出结果
     * 垂直方向：不同neuron的输出结果
     * output.shape = (j,m)
+      * 每一行 是同一neuron针对不同样本的输出
+      * 每一列 是同一样本在不同neuron上的输出

@@ -12,12 +12,13 @@
       - [1.术语](#1术语)
         - [(1) layer](#1-layer)
         - [(2) activation](#2-activation)
-        - [(3) activation function](#3-activation-function)
+        - [(3) 为什么使用`非线性函数`作为activation function](#3-为什么使用非线性函数作为activation-function)
       - [2.常用activation function](#2常用activation-function)
         - [(1) linear (no activation function)](#1-linear-no-activation-function)
-        - [(2) sigmoid](#2-sigmoid)
-        - [(3) ReLU (rectified linear unit)](#3-relu-rectified-linear-unit)
-        - [(4) softmax activation](#4-softmax-activation)
+        - [(2) sigmoid (不常用)](#2-sigmoid-不常用)
+        - [(3) tanh](#3-tanh)
+        - [(4) ReLU (rectified linear unit)](#4-relu-rectified-linear-unit)
+        - [(5) softmax activation](#5-softmax-activation)
       - [3.activation function的选择](#3activation-function的选择)
         - [(1) output layer](#1-output-layer)
         - [(2) hidden layer](#2-hidden-layer)
@@ -65,11 +66,14 @@
 * 表示: 
     * $[0]$ 表示第0层，即input layer
     * $[1]$ 表示layer 1，以此类推
-    * $w_1^{[1]}$ 表示layer 1中的参数
+    * $w_1^{[1]}$ 表示layer 1中第一个neuron的参数
+
+* n-layer neuron network
+    * 表示除了input layer，有n个layer
 
 ##### (2) activation
 
-* 第l层第j个unit的**输出**: $a_j^{[l]} = g(\vec w_j^{[l]} \cdot \vec a^{[l-1]} + b_j^{[l]})$
+* 第$l$层第$j$个unit的**输出**: $a_j^{[l]} = g(\vec w_j^{[l]} \cdot \vec a^{[l-1]} + b_j^{[l]})$
     * 经过 **activation function** 产生输出
         * g表示使用的sigmoid function作为activation function
     * $\vec a^{[l-1]}$上一层所有的activation
@@ -77,30 +81,47 @@
 * layer l 所有activation（即所有unit的输出）表示：$\vec a^{[l]}$
     * input layer的activation: $\vec a^{[0]}$
 
-##### (3) activation function
+##### (3) 为什么使用`非线性函数`作为activation function
+比如使用线性函数g(z)=z作为activation function:
+* $a^{[1]} = z^{[1]} = W^{[1]}x+b^{[1]}$
+* $a^{[2]} = z^{[2]} = W^{[2]}a^{[1]}+b^{[2]} = (W^{[2]}W^{[1]})x + W^{[2]}W^{[1]}+b^{[2]}$
+* 结果变成了线性方程回归
 
 #### 2.常用activation function
 
 ##### (1) linear (no activation function)
-$g(z) = z$，相当于没有使用activation function
-* $a = g(z) = \vec w \cdot \vec x + b$
+* 比如: $g(z) = z$
+* 在hidden layer中使用linear function没有任何意义，相当于没有使用activation function
 
-##### (2) sigmoid
+##### (2) sigmoid (不常用)
 
-* 现在ReLU更常用，因为sigmoid在两端，斜率趋近于0，会导致训练效率很差
-[参考](../ML/overview.md#1-sigmoid-function-logistic-function)
+* $g(z) = \frac{1}{1+e^{-z}}$
+    * 能够使得输出范围在 0-1 之间
+* $\frac{d}{dx}g(z)=g(z)(1-g(z))$
 
-##### (3) ReLU (rectified linear unit)
+* 现在ReLU更常用，因为sigmoid在两端，**斜率趋近于0**，会导致训练效率很差
+    * 一般只用在output layer，要求输出结果在0-1之间，比如binary classfication
 
-$g(z) = max(0, z)$
+##### (3) tanh
 
-##### (4) softmax activation
+* $g(z) = tanh(x) = \frac{sinhx}{coshx} = \frac{e^x-e^{-x}}{e^x+e^{-x}}$
 
-$z_j = \vec W_j \cdot \vec X + b_j$ &ensp; $j = 1,...,N$
-$a_j = \frac{e^{z_j}}{\sum_{k=1}^{N}{e^{z_k}}} = P(y=j|\vec X)$
+* $\frac{d}{dx}g(z)=(1-(g(z))^2)$
 
-* N表示分为了N个类
-* $a_1 + ... a_N = 1$
+![](./imgs/nn_05.png)
+
+##### (4) ReLU (rectified linear unit)
+
+* $g(z) = max(0, z)$
+![](./imgs/nn_06.png)
+
+##### (5) softmax activation
+
+* 进行normalize，用于多种情况的概率分布
+    * $z_j = \vec W_j \cdot \vec X + b_j$ &ensp; $j = 1,...,N$
+    * $a_j = \frac{e^{z_j}}{\sum_{k=1}^{N}{e^{z_k}}} = P(y=j|\vec X)$
+        * N表示分为了N个类
+        * $a_1 + ... a_N = 1$
 
 #### 3.activation function的选择
 不同layer选择不同的activation function

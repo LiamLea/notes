@@ -18,15 +18,17 @@
         - [(6) 级联](#6-级联)
         - [(7) 拆分](#7-拆分)
       - [2.空值: nan](#2空值-nan)
-      - [3.常用聚合函数](#3常用聚合函数)
-      - [4.矩阵运算](#4矩阵运算)
+      - [3.写入文件和读取文件](#3写入文件和读取文件)
+    - [矩阵计算](#矩阵计算)
+      - [1.注意：矩阵计算后，产生的新数据格式 (keepdims)](#1注意矩阵计算后产生的新数据格式-keepdims)
+      - [2.常用聚合函数](#2常用聚合函数)
+      - [3.矩阵运算](#3矩阵运算)
         - [(1) 基本运算](#1-基本运算)
         - [(2) 两矩阵 并集 求和](#2-两矩阵-并集-求和)
-        - [(2) dot、cross、matrix multiply](#2-dot-cross-matrix-multiply)
-        - [(3) 矩阵转置（transpose）](#3-矩阵转置transpose)
-        - [(4) 矩阵其他运算](#4-矩阵其他运算)
-      - [5.broadcasting (广播机制)](#5broadcasting-广播机制)
-      - [6.写入文件和读取文件](#6写入文件和读取文件)
+        - [(3) outer、dot、cross、matrix multiply](#3-outer-dot-cross-matrix-multiply)
+        - [(4) 矩阵转置（transpose）](#4-矩阵转置transpose)
+        - [(5) 矩阵其他运算](#5-矩阵其他运算)
+      - [4.broadcasting (广播机制)](#4broadcasting-广播机制)
 
 <!-- /code_chunk_output -->
 
@@ -65,6 +67,10 @@ import numpy as np
     * 第一维有5个二维数据
     * 每个二维数据中中有4个一维数据
     * 每个一维数据中有 2个元素
+* 判断shape
+```python
+assert(a.shape == (5,1))
+```
 
 ##### (2) 相关属性
 
@@ -238,7 +244,59 @@ np.split(n3,[1,2],axis=0)
 
 #### 2.空值: nan
 
-#### 3.常用聚合函数
+#### 3.写入文件和读取文件
+
+```python
+#将一个ndarray写入文件
+np.save("a.npy", <ndarray>)
+
+#读取文件
+nw1 = np.load("a.npy")
+
+#将多个ndarray写入文件
+np.save("a.npz", <k1>=<ndarray1>, <k2>=<ndarray1>)
+#读取文件
+nw2 = np.load("npz")
+nw2[<k1>]
+```
+
+* 存储为txt格式
+    * 只能是一维或二维的数组
+```python
+np.savetxt("a.csv",n4,delimiter=",")
+nw4 = np.loadtxt("a.csv",delimiter=",")
+```
+
+*** 
+
+### 矩阵计算
+
+#### 1.注意：矩阵计算后，产生的新数据格式 (keepdims)
+
+* 比如
+```python
+a=np.array([[0,3,4],[2,6,4]])
+
+"""
+array([[0, 3, 4],
+       [2, 6, 4]])
+"""
+
+np.sum(a,axis=1)
+"""
+结果:
+array([ 7, 12])
+"""
+
+np.sum(a,axis=1,keepdims=True)
+"""
+结果：
+array([[ 7],
+       [12]])
+"""
+```
+
+#### 2.常用聚合函数
 
 * 求和
 ```python
@@ -283,7 +341,7 @@ np.std(n)
 np.var(n)
 ```
 
-#### 4.矩阵运算
+#### 3.矩阵运算
 
 ##### (1) 基本运算
 ```python
@@ -305,13 +363,15 @@ n1 * n2 #对应的元素相乘
 sum((predictions == 1) & (y_val == 0))
 ```
 
-##### (2) dot、cross、matrix multiply
-
+##### (3) outer、dot、cross、matrix multiply
+* outer productd对象：向量，输出一个矩阵
 * dot product对象：**向量**，**输出**是一个**值**
 * matrix multiply对象：**矩阵**，**输出**是另一个**矩阵**
 
 ```python
-# dot（向量间运算）
+# dot
+#向量间运算（两个元素都是一维数组）
+#也可以用于matrix multiply（当两个都是矩阵时）
 np.dot(n1,n2)
 
 # matrix multiply
@@ -323,7 +383,7 @@ n1@n2
 np.cross(X1,X2)
 ```
 
-##### (3) 矩阵转置（transpose）
+##### (4) 矩阵转置（transpose）
 指将一个矩阵的行和列互换得到的新矩阵
 ```python
 a = np.array([[1, 2], [3, 4]])
@@ -332,7 +392,7 @@ a.transpose(1, 0)
 a.T
 ```
 
-##### (4) 矩阵其他运算
+##### (5) 矩阵其他运算
 
 ```python
 #矩阵逆
@@ -345,31 +405,7 @@ np.linalg.det(n)
 np.linalg.matrix_rank(n)
 ```
 
-#### 5.broadcasting (广播机制)
+#### 4.broadcasting (广播机制)
 如果对两个数组实施加、减、乘、除等运算时
 * 补充缺失的维度
 * 使用已有数值进行填充
-
-#### 6.写入文件和读取文件
-
-```python
-#将一个ndarray写入文件
-np.save("a.npy", <ndarray>)
-
-#读取文件
-nw1 = np.load("a.npy")
-
-#将多个ndarray写入文件
-np.save("a.npz", <k1>=<ndarray1>, <k2>=<ndarray1>)
-#读取文件
-nw2 = np.load("npz")
-nw2[<k1>]
-```
-
-* 存储为txt格式
-    * 只能是一维或二维的数组
-```python
-np.savetxt("a.csv",n4,delimiter=",")
-nw4 = np.loadtxt("a.csv",delimiter=",")
-```
-
