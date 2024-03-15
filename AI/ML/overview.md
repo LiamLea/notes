@@ -174,8 +174,9 @@
     * $J(\vec w,b) = \frac{1}{m}\sum_{i=1}^m L(\hat y^{(i)}, y^{(i)}) = -\frac{1}{m}\sum_{i=1}^m[y^{(i)}\log (\hat y^{(i)}) + (1-y^{(i)})\log (1 - \hat y^{(i)})]$
 
 ##### (1) sigmoid function (logistic function)
-* $g(z) = \frac{1}{1+e^{-z}}$*
-* 能够使得输出范围在 0-1 之间
+* $g(z) = \frac{1}{1+e^{-z}}$
+    * 能够使得输出范围在 0-1 之间
+* $\frac{d}{dx}g(z)=g(z)(1-g(z))$
 
 ![](./imgs/overview_01.png)
 

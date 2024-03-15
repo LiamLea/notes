@@ -22,8 +22,9 @@
         - [(6) rank (矩阵的秩)](#6-rank-矩阵的秩)
         - [(7) 非方阵](#7-非方阵)
       - [4.product](#4product)
-        - [(1) dot product 和 matrix multiply](#1-dot-product-和-matrix-multiply)
-        - [(2) cross product](#2-cross-product)
+        - [(1) inner product 和 outer product](#1-inner-product-和-outer-product)
+        - [(2) dot product 和 matrix multiply](#2-dot-product-和-matrix-multiply)
+        - [(3) cross product](#3-cross-product)
       - [5.cramer's rule求解线性方程](#5cramers-rule求解线性方程)
       - [6.change of basis (基向量变换)](#6change-of-basis-基向量变换)
       - [7.eigenvectors and eigenvalues](#7eigenvectors-and-eigenvalues)
@@ -133,7 +134,7 @@
         * 二维$E=\begin{bmatrix} 1 & 0 \\0 & 1 \end{bmatrix}$
         * 三维$E=\begin{bmatrix} 1 & 0 & 0 \\0 & 1 &0 \\ 0 & 0 & 1 \end{bmatrix}$
 
-* 当det(A)=0时，A不存在逆矩阵
+* **当det(A)=0时，A不存在逆矩阵**
     * 比如二维，当det(A)=0时，代表变换后span为一条直线，这样就不存在逆变换还原向量
     * 比如三维，当det(A)=0时，代表变换后span为一个平面或一条直线，同样无法还原向量
 
@@ -146,7 +147,7 @@
 
 * rank
     * 经过**column space**的**维度**
-* $\begin{bmatrix} 2 & -2 \\1 & 1 \end{bmatrix}$
+* $\begin{bmatrix} 2 & -2 \\1 & -1 \end{bmatrix}$
     * 这个线性变换后，span为一条直线，即一维，则这个矩阵的秩为1
 * 三维矩阵线性变换后
     * span为一个平面，即二维，则秩为2
@@ -155,7 +156,7 @@
     * 行满秩: 行数 = rank
     * 列满秩: 列数 = rank
     * 如果将列看成一个向量时，当列满秩时，行列式才不为0，此时
-        * 才能求出逆矩阵，也就是方程式有解
+        * 才能求出**逆矩阵**，也就是**方程式有解**
         * 如果不满秩，行列式为0，方程式可以有无限的解 或者 无解
 
 ##### (7) 非方阵
@@ -174,8 +175,22 @@
 
 #### 4.product
 
-##### (1) dot product 和 matrix multiply
-* 和matrix multiply区分
+##### (1) inner product 和 outer product
+
+* outer product
+    * 两个向量组成一个新的矩阵
+    * $\vec u \otimes \vec v = \begin{bmatrix} u_1v_1 & u_2v_2 & \cdots & u_1v_n \\ u_2v_1 & u_2v_2 & \cdots &u_2v_n \\ \vdots & \vdots & \ddots & \vdots \\ u_mv_1 & u_mv_2 & \cdots & u_mv_n\end{bmatrix}$
+
+* inner product
+    * 向量的inner product就是dot product
+    * 矩阵的inner product比较复杂
+
+##### (2) dot product 和 matrix multiply
+* dot product可以表示
+    * 向量的inner product
+    * 矩阵的matrix multiply
+
+* dot product 和 matrix multiply区分
     * dot product对象：**向量**，**输出**是一个**值**
     * matrix multiply对象：**矩阵**，**输出**是另一个**矩阵**： $M = A \cdot B$ 
         * 前提： A矩阵的每行和B矩阵的每列做点积（A每行的元素数 = B每列的元素数）
@@ -195,7 +210,7 @@
 
     ![](./imgs/overview_02.png)
 
-##### (2) cross product
+##### (3) cross product
 * 两个二维向量叉乘，$\vec v \times \vec w$ 结果是两个向量构成的平行四边形的面积（如果$\vec v$ 在右边，则是正数）
 * 两个三维向量叉乘，产生一个新的三维向量: $\vec v \times \vec w = \vec p$
     * $\vec w$的长度是 $\vec v$和$\vec w$组成平行图的面积（即行列式的值）
