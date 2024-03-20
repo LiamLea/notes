@@ -25,10 +25,12 @@
       - [3.矩阵运算](#3矩阵运算)
         - [(1) 基本运算](#1-基本运算)
         - [(2) 两矩阵 并集 求和](#2-两矩阵-并集-求和)
+        - [(3) 普通乘法](#3-普通乘法)
         - [(3) outer、dot、cross、matrix multiply](#3-outer-dot-cross-matrix-multiply)
         - [(4) 矩阵转置（transpose）](#4-矩阵转置transpose)
         - [(5) 矩阵其他运算](#5-矩阵其他运算)
       - [4.broadcasting (广播机制)](#4broadcasting-广播机制)
+    - [常用高级索引操作](#常用高级索引操作)
 
 <!-- /code_chunk_output -->
 
@@ -363,6 +365,15 @@ n1 * n2 #对应的元素相乘
 sum((predictions == 1) & (y_val == 0))
 ```
 
+##### (3) 普通乘法
+```python
+n1 * n2
+
+#等价于
+
+np.multiple(n1,n2)
+```
+
 ##### (3) outer、dot、cross、matrix multiply
 * outer productd对象：向量，输出一个矩阵
 * dot product对象：**向量**，**输出**是一个**值**
@@ -409,3 +420,17 @@ np.linalg.matrix_rank(n)
 如果对两个数组实施加、减、乘、除等运算时
 * 补充缺失的维度
 * 使用已有数值进行填充
+
+***
+
+### 常用高级索引操作
+
+```python
+#获取>2的所有元素，返回一个vector
+n[n > 2]
+
+#返回True和False矩阵
+[n > 2] #等价于n > 2
+
+sum((predictions == 1) & (y_val == 0))
+```
