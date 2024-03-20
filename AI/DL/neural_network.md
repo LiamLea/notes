@@ -11,7 +11,7 @@
     - [概述](#概述)
       - [1.术语](#1术语)
         - [(1) layer](#1-layer)
-        - [(2) activation](#2-activation)
+        - [(2) activation (公式重要)](#2-activation-公式重要)
         - [(3) 为什么使用`非线性函数`作为activation function](#3-为什么使用非线性函数作为activation-function)
       - [2.常用activation function](#2常用activation-function)
         - [(1) linear (no activation function)](#1-linear-no-activation-function)
@@ -28,6 +28,7 @@
       - [5.layer type](#5layer-type)
         - [(1) dense (full connected) layer](#1-dense-full-connected-layer)
         - [(2) convolutional layer](#2-convolutional-layer)
+      - [6.random initialization](#6random-initialization)
 
 <!-- /code_chunk_output -->
 
@@ -67,13 +68,14 @@
     * $[0]$ 表示第0层，即input layer
     * $[1]$ 表示layer 1，以此类推
     * $w_1^{[1]}$ 表示layer 1中第一个neuron的参数
+    * $n^{[l]}$ 表示第$l$层的neuron数量（可以理解成特征）
 
 * n-layer neuron network
     * 表示除了input layer，有n个layer
 
-##### (2) activation
+##### (2) activation (公式重要)
 
-* 第$l$层第$j$个unit的**输出**: $a_j^{[l]} = g(\vec w_j^{[l]} \cdot \vec a^{[l-1]} + b_j^{[l]})$
+* 第$l$层第$j$个unit的**输出**: **$a_j^{[l]} = g(z_j^{[l]}) =g(\vec w_j^{[l]} \cdot \vec a^{[l-1]} + b_j^{[l]})$**
     * 经过 **activation function** 产生输出
         * g表示使用的sigmoid function作为activation function
     * $\vec a^{[l-1]}$上一层所有的activation
@@ -97,7 +99,7 @@
 
 * $g(z) = \frac{1}{1+e^{-z}}$
     * 能够使得输出范围在 0-1 之间
-* $\frac{d}{dx}g(z)=g(z)(1-g(z))$
+* $\frac{d}{dz}g(z)=g(z)(1-g(z))$
 
 * 现在ReLU更常用，因为sigmoid在两端，**斜率趋近于0**，会导致训练效率很差
     * 一般只用在output layer，要求输出结果在0-1之间，比如binary classfication
@@ -106,7 +108,7 @@
 
 * $g(z) = tanh(x) = \frac{sinhx}{coshx} = \frac{e^x-e^{-x}}{e^x+e^{-x}}$
 
-* $\frac{d}{dx}g(z)=(1-(g(z))^2)$
+* $\frac{d}{dz}g(z)=(1-(g(z))^2)$
 
 ![](./imgs/nn_05.png)
 
@@ -168,3 +170,10 @@
 ##### (2) convolutional layer
 * each neuron only looks at part of previous layer's outputs
 ![](./imgs/overview_02.png)
+
+#### 6.random initialization
+
+* 当参数都初始化为0（或都相同）时，同一层的neuron的参数下降的都一样，导致同一层neuron都是**等价的**，就相当于**只有一个neuron**
+    * 当都为0，还有可能导致梯度为0，即无法进行梯度下降
+* 初始化时，要小一点，因为小一点，sigmoid函数的梯度越大，即下降的越快
+    * `np.random.randn(shape) * 0.01`

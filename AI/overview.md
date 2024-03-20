@@ -13,6 +13,7 @@
       - [2.vectorization](#2vectorization)
         - [(1) 理解ndnarray和矩阵](#1-理解ndnarray和矩阵)
         - [(2) 数据结构](#2-数据结构)
+      - [3.parameters vs hyperparameters](#3parameters-vs-hyperparameters)
 
 <!-- /code_chunk_output -->
 
@@ -49,12 +50,24 @@ do anything a human can do
       * 每一行 是不同样本的同一特征
       * 每一列 是一个样本的所有特征
 * model
-    * 水平方向：参数（数量为n）
+    * 水平方向：参数（数量为上一层**特征的数量**）
     * 垂直方向：不同neuron的参数
-    * model.shape = (j,n)
-* $output = model \cdot input$
+    * model.shape = $(n^{[l]},n^{[l-1]})$
+* $output = model \cdot input$（**下一层的input** ）
     * 水平方向：输出结果
     * 垂直方向：不同neuron的输出结果
-    * output.shape = (j,m)
+    * output.shape = $(n^{[l]},m)$
       * 每一行 是同一neuron针对不同样本的输出
       * 每一列 是同一样本在不同neuron上的输出
+  
+* 相关导数的结构 都跟 数据的原始结构一样
+
+#### 3.parameters vs hyperparameters
+
+* parameters: W、b
+* hyperparameters: 
+    * learning rate alpha
+    * number of iterations of gradient descent
+    * number of hidden layers
+    * number of hidden units
+    * so on
