@@ -30,7 +30,9 @@
         - [(4) 矩阵转置（transpose）](#4-矩阵转置transpose)
         - [(5) 矩阵其他运算](#5-矩阵其他运算)
       - [4.broadcasting (广播机制)](#4broadcasting-广播机制)
-    - [常用高级索引操作](#常用高级索引操作)
+    - [常用操作](#常用操作)
+      - [1.常用索引操作（比较）](#1常用索引操作比较)
+      - [2.常用变换操作](#2常用变换操作)
 
 <!-- /code_chunk_output -->
 
@@ -423,8 +425,9 @@ np.linalg.matrix_rank(n)
 
 ***
 
-### 常用高级索引操作
+### 常用操作
 
+#### 1.常用索引操作（比较）
 ```python
 #获取>2的所有元素，返回一个vector
 n[n > 2]
@@ -433,4 +436,10 @@ n[n > 2]
 [n > 2] #等价于n > 2
 
 sum((predictions == 1) & (y_val == 0))
+```
+
+#### 2.常用变换操作
+```python
+# reshape (a,b,c,d) to (b*c*d, a)
+X_flatten = X.reshape(X.shape[0], -1).T
 ```

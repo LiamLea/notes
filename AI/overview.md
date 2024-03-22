@@ -14,6 +14,7 @@
         - [(1) 理解ndnarray和矩阵](#1-理解ndnarray和矩阵)
         - [(2) 数据结构](#2-数据结构)
       - [3.parameters vs hyperparameters](#3parameters-vs-hyperparameters)
+      - [4.对数据的预处理](#4对数据的预处理)
 
 <!-- /code_chunk_output -->
 
@@ -71,3 +72,9 @@ do anything a human can do
     * number of hidden layers
     * number of hidden units
     * so on
+
+#### 4.对数据的预处理
+
+* 搞清楚数据集的shape及其含义
+* 对数据集进行reshape
+* 进行standardize
