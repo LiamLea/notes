@@ -6,37 +6,41 @@
 <!-- code_chunk_output -->
 
 - [overview](#overview)
-    - [几何意义](#几何意义)
+    - [概述](#概述)
       - [1.vector](#1vector)
         - [(1) 线性组合](#1-线性组合)
         - [(2) span](#2-span)
         - [(3) linear dependent](#3-linear-dependent)
         - [(4) basis vector（基向量）](#4-basis-vector基向量)
       - [2.矩阵](#2矩阵)
+        - [(1) column space](#1-column-space)
+        - [(2) 寻找null space (本质就是消元)](#2-寻找null-space-本质就是消元)
+        - [(3) orthogonal matrix](#3-orthogonal-matrix)
+        - [(4) symmetric matrix](#4-symmetric-matrix)
       - [3.线性变换](#3线性变换)
         - [(1) 定义](#1-定义)
         - [(2) 以二维空间为例](#2-以二维空间为例)
         - [(3) 线性变换组合](#3-线性变换组合)
         - [(4) determinant (行列式)](#4-determinant-行列式)
-        - [(5) inverse matrices (逆矩阵)](#5-inverse-matrices-逆矩阵)
+        - [(5) inverse matrices (只有方正矩阵可逆)](#5-inverse-matrices-只有方正矩阵可逆)
         - [(6) rank (矩阵的秩)](#6-rank-矩阵的秩)
         - [(7) 非方阵](#7-非方阵)
       - [4.product](#4product)
         - [(1) inner product 和 outer product](#1-inner-product-和-outer-product)
-        - [(2) dot product 和 matrix multiply](#2-dot-product-和-matrix-multiply)
-        - [(3) cross product](#3-cross-product)
-      - [5.cramer's rule求解线性方程](#5cramers-rule求解线性方程)
-      - [6.change of basis (基向量变换)](#6change-of-basis-基向量变换)
-      - [7.eigenvectors and eigenvalues](#7eigenvectors-and-eigenvalues)
+        - [(2) dot product (vector)](#2-dot-product-vector)
+        - [(3) matrix multiply](#3-matrix-multiply)
+        - [(4) cross product](#4-cross-product)
+      - [5.eigenvectors and eigenvalues](#5eigenvectors-and-eigenvalues)
         - [(1) 特征值和特征向量](#1-特征值和特征向量)
         - [(2) eigenbasis](#2-eigenbasis)
-      - [8.vector spaces](#8vector-spaces)
-        - [(1) 以函数求导为例子](#1-以函数求导为例子)
+      - [6.singular vectors and singular values](#6singular-vectors-and-singular-values)
+        - [(1) 如何确定V和$\Sigma$](#1-如何确定v和sigma)
 
 <!-- /code_chunk_output -->
 
+### 概述
 
-### 几何意义
+线性代数的目标：解决线性方程$Ax=0$问题（A是矩阵，x是向量）
 
 #### 1.vector
 
@@ -72,6 +76,42 @@
 由vector组成
 * **一列**就是一个**vector**
 * **一行**就是一个**维度**
+
+##### (1) column space
+* column space
+    * column vectors（一个column就是一个vector）的所有线性组成 构成的span
+    * 表示，比如: C(A)=plane
+* row space
+    * row vectors（一个row就是一个vector）的所有线性组合 构成的span
+* null space (kernel)
+    * 经过线性变换后，向量变为0，即
+        * $N(A) \bot C(A^T)$
+            * A的null space 和 row space正交
+        * $N(A^T) \bot C(A)$
+        * dimension of null space = (dimenson of A) - A.rank  
+
+##### (2) 寻找null space (本质就是消元)
+* $Ax=0$
+* 进行分解: [A = CR](./Advance.md#1-a--cr)
+    * 利用消元（elimination），求出R
+* R=0的解就是null space
+    * R可以表示为 $[I\ F]$
+    * $[I\ F]\begin{bmatrix} -F \\ I \end{bmatrix} = 0$
+    * 所以解就是$\begin{bmatrix} -F \\ I \end{bmatrix}$
+
+##### (3) orthogonal matrix
+
+* 每一列的向量 都和 其他列向量 正交
+* 如果每一列都是**正交单位向量**
+    * $Q^TQ = I$
+        * 如果是方正: $QQ^T=I$
+        * 因为等于$I$，所有$Q^T=Q^{-1}$
+    * 本质就是**旋转**，所以对任何向量进行该线型变换，都不会改变该向量的长度
+
+##### (4) symmetric matrix
+* $S = S^T$
+* S的**特征向量是正交的**
+* $A^TA$ 结果是一个对称矩阵
 
 #### 3.线性变换
 
@@ -127,7 +167,7 @@
     * ![](./imgs/overview_01.png)
 * $det(\begin{bmatrix} a & b & c\\d & e & f\\g & h & i \end{bmatrix}) = a*det(\begin{bmatrix} e & f \\h & i \end{bmatrix}) - b*det(\begin{bmatrix} d & f \\g & i \end{bmatrix}) - c*det(\begin{bmatrix} d & e \\g & h \end{bmatrix})$
 
-##### (5) inverse matrices (逆矩阵)
+##### (5) inverse matrices (只有方正矩阵可逆)
 
 * 矩阵就是对向量的变换，逆矩阵就是逆变换
     * 所以$A^{-1}A=E$
@@ -140,18 +180,12 @@
 
 ##### (6) rank (矩阵的秩)
 
-* column space
-    * 所有column vectors（一个column就是一个vector）构成的span
-* null space (kernel)
-    * 比如二维，变换为一条直线，则变为0的向量集合（即该直线经过原点的垂直线）就是null space
+* **rank = row rank = column rank = #independent columns** 
+    * column rank: 线性无关的列的数量，即**column space**的**维度**
 
-* rank
-    * 经过**column space**的**维度**
-* $\begin{bmatrix} 2 & -2 \\1 & -1 \end{bmatrix}$
-    * 这个线性变换后，span为一条直线，即一维，则这个矩阵的秩为1
-* 三维矩阵线性变换后
-    * span为一个平面，即二维，则秩为2
-    * span为一条直线，即一维，则秩为1
+    * $\begin{bmatrix} 2 & -2 \\1 & -1 \end{bmatrix}$
+        * 这个线性变换后，span为一条直线，即一维，则这个矩阵的秩为1
+
 * 满秩
     * 行满秩: 行数 = rank
     * 列满秩: 列数 = rank
@@ -185,16 +219,16 @@
     * 向量的inner product就是dot product
     * 矩阵的inner product比较复杂
 
-##### (2) dot product 和 matrix multiply
+##### (2) dot product (vector)
+
+* 理解: $\vec v_1 \cdot \vec v_2$
+    * 对$\vec v_2$进行**线性变换**
+    * 或 $\vec v_2$在$\vec v_1$上的**映射**
+
 * dot product可以表示
     * 向量的inner product
     * 矩阵的matrix multiply
 
-* dot product 和 matrix multiply区分
-    * dot product对象：**向量**，**输出**是一个**值**
-    * matrix multiply对象：**矩阵**，**输出**是另一个**矩阵**： $M = A \cdot B$ 
-        * 前提： A矩阵的每行和B矩阵的每列做点积（A每行的元素数 = B每列的元素数）
-        * **M的第m行，第n列的元素值 = A矩阵的第m行 $\cdot$ B矩阵的第n列**
 * $\vec v \cdot \vec w$ = (length of projected $\vec w$ on $\vec v$)(length of $\vec v$) = $\vec w \cdot \vec v$
     * 当$\vec v$和$\vec w$方向 不一致时为负数，垂直时为0
 
@@ -205,12 +239,25 @@
     * duality: 比如存在一条斜线，该斜线的1单元记为$\vec u$，在x上的映射（也是$\vec i$在该斜线上的映射）记为$u_x$，在y上的映射（也是$\vec j$在该斜线上的映射）记为$u_y$
         * 能够得出结论：$\vec i$和$\vec j$在该斜线上的映射 = $\vec u$在x和y上的映射
     * 若该斜线上存在一个向量$\vec v = (v_x,v_y)$，$\vec v \cdot \begin{bmatrix} x \\ y \end{bmatrix}$
-
+        * 所以x在$\vec v$上的映射为$v_x$（同理y）
     * $\begin{bmatrix} x \\ y \end{bmatrix} = x\vec i + y\vec j$，求在$\vec v$上的映射，所以基向量$(\vec i, \vec j)$就变为了$\vec v = (v_x,v_y)$，所以$\begin{bmatrix} x \\ y \end{bmatrix}$在该斜线上的映射就是$xv_x + yv_y$，也就是$\begin{bmatrix} v_x & v_y \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix}$
 
     ![](./imgs/overview_02.png)
 
-##### (3) cross product
+##### (3) matrix multiply
+
+* 理解: $A \cdot B$
+    * 多个向量的**线性变换**
+        * B的每一列是一个向量，对每一个向量进行线性变换A
+    * A的每行和B的每列进行**dot product**
+
+* dot product 和 matrix multiply区分
+    * dot product对象：**向量**，**输出**是一个**值**
+    * matrix multiply对象：**矩阵**，**输出**是另一个**矩阵**： $M = A \cdot B$ 
+        * 前提： A矩阵的每行和B矩阵的每列做点积（A每行的元素数 = B每列的元素数）
+        * M的第m行，第n列的元素值 = A矩阵的第m行 $\cdot$ B矩阵的第n列
+
+##### (4) cross product
 * 两个二维向量叉乘，$\vec v \times \vec w$ 结果是两个向量构成的平行四边形的面积（如果$\vec v$ 在右边，则是正数）
 * 两个三维向量叉乘，产生一个新的三维向量: $\vec v \times \vec w = \vec p$
     * $\vec w$的长度是 $\vec v$和$\vec w$组成平行图的面积（即行列式的值）
@@ -228,36 +275,12 @@
             * 方向 在$\vec v$和$\vec w$平面的垂直线上 
             * 大小为$\vec v$和$\vec w$的面积
 
-#### 5.cramer's rule求解线性方程
-
-求解: $\begin{bmatrix} 2 & -1 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 4 \\ 2 \end{bmatrix}$
-
-* $\vec i$和y所构成的面积 = $det(\begin{bmatrix} 1 & 0 \\ 0 & y \end{bmatrix})$ = y
-* $\vec j$和x所构成的面积 = $det(\begin{bmatrix} x & 0 \\ 0 & 1 \end{bmatrix})$ = x
-
-* 经过线性变化，面积增长比列：$det(\begin{bmatrix} 2 & -1 \\ 0 & 1 \end{bmatrix})$ = 2
-* 转换后
-    * $\vec i$和y轴所构成的面积 = $det(\begin{bmatrix} 2 & 4 \\ 0 & 2 \end{bmatrix})$ = 4
-    * $\vec j$和y轴所构成的面积 = $det(\begin{bmatrix} 4 & -1 \\ 2 & 1 \end{bmatrix})$ = 6
-* 所以 y = 4/2 = 2, x = 6/2 =3
-
-#### 6.change of basis (基向量变换)
-
-* 使用新的基向量，描述 向量 和 线性变换
-* 求某个向量在该基向量中的线性变换: $A^{-1}MA$
-    * A就是将该基向量，变换为$\vec i$和$\vec j$向量
-    * M是在$\vec i$和$\vec j$向量中做的线性变换
-    * $A^{-1}$然后再变换为新的基础向量 
-
-* 比如，自定义了新的基向量$\vec m$ = (2,1)和 $\vec n$ = (-1,1)，则求(-1,2)=$-1\vec m + 2 \vec n$，经过$\begin{bmatrix} 0 & -1 \\ 1 & 0\end{bmatrix}$线性变换
-    * $\begin{bmatrix} 2 & -1 \\ 1 & 1 \end{bmatrix}^{-1}\begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix}\begin{bmatrix} 2 & -1 \\ 1 & 1 \end{bmatrix}\begin{bmatrix} -1 \\ 2 \end{bmatrix}$
-
-#### 7.eigenvectors and eigenvalues
+#### 5.eigenvectors and eigenvalues
 
 ##### (1) 特征值和特征向量
-* **特征向量**：经过线性变换，向量的span没有改变，只是进行了scale
-* scale的值就是 **特征值**
-* 比如: 进行$\begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}$线性变换，x轴的span没有改变，scale值为1,所以x轴上的所有向量都是特征向量，特征值为1
+* **特征向量**：经过线性变换，向量的**方向没有改变**，只是进行了scale
+    * scale的值就是 **特征值**
+    * 比如: 进行$\begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}$线性变换，x轴的span没有改变，scale值为1,所以x轴上的所有向量都是特征向量，特征值为1
 
 * 数学定义: $A\vec v= \lambda \vec v$
     * $\lambda$可以 $\lambda I$，I是主对角线都为1的矩阵
@@ -269,20 +292,20 @@
 ##### (2) eigenbasis
 针对某一个线性变换，使用一组特征向量作为新的基向量，如果需要计算多次进行该线性变换，使用eignebasis简化计算，因为除了主对角线上，其他地方都为0
 
-#### 8.vector spaces
+#### 6.singular vectors and singular values
+* 本质：任何的线性变换 都是 先**旋转**到基向量的位置，再进行**scale**，最后**旋转**回原来的位置
+* $AV = U\Sigma$，其中U和V每一列都是**正交单位向量**，即$U^TU=I, V^TV=I$
+    * 即$A\begin{bmatrix}\\ \vec v_1 & \cdots & \vec v_r \\ \ \end{bmatrix} = \begin{bmatrix}\\ \vec u_1 & \cdots & \vec u_r \\ \ \end{bmatrix} \begin{bmatrix}\sigma_1 \\ & \ddots \\ && \sigma_r \end{bmatrix}$
+    * **r是矩阵的rank**
+* singular values: $\sigma_1 \ge\sigma_2\ge ... \ge\sigma_r\ge 0$
 
-描述 所有具有向量这种性质 事物，比如函数
+* 所以 $A = U\Sigma V^T$，对向量进行A线性变换，也就是
+    * $V^T$: 先旋转
+    * $\Sigma$: 再scale（对角矩阵只进行scale）
+    * $U$: 再旋转回原来的位置
 
-##### (1) 以函数求导为例子
+##### (1) 如何确定V和$\Sigma$
+* $A^TA\vec v_i = \lambda_i\vec v_i =\sigma_i^2\vec v_i$
 
-* 设置基向量
-    * $b_0(x)=1$
-    * $b_1(x)=x$
-    * $b_2(x)=x^2$
-    * $b_3(x)=x^3$
-    * ...
-
-* 求导$x^3+5x^2+4x+5$
-    * 用基向量表示这个函数: $\begin{bmatrix} 5 \\ 4 \\ 5 \\ 1 \\ \vdots \end{bmatrix}$
-    * 对基向量求导: $\begin{bmatrix} 0 & 1 & 0 & 0 & \cdots \\ 0 & 0 & 2 & 0 & \cdots \\ 0 & 0 & 0 & 3 & \cdots \\ 0 & 0 & 0 & 0 & \cdots \\ \vdots & \vdots & \vdots & \vdots & \ddots \end{bmatrix}$
-    * 结果就是: $\begin{bmatrix} 0 & 1 & 0 & 0 & \cdots \\ 0 & 0 & 2 & 0 & \cdots \\ 0 & 0 & 0 & 3 & \cdots \\ 0 & 0 & 0 & 0 & \cdots \\ \vdots & \vdots & \vdots & \vdots & \ddots \end{bmatrix}\begin{bmatrix} 5 \\ 4 \\ 5 \\ 1 \\ \vdots \end{bmatrix}=\begin{bmatrix} 1*4 \\ 2*5 \\ 3*1 \\ 0 \\ \vdots \end{bmatrix}$，所以结果就是$3x^2+10x+4$
+    * $\vec v_i$是$A^TA$的特征向量，V是由$\vec v_i$组成的
+    * $\sigma_i$是$A^TA$的特征值的平方根，$\Sigma$是由$sigma$组成的
