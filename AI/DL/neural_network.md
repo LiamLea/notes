@@ -28,7 +28,10 @@
       - [5.layer type](#5layer-type)
         - [(1) dense (full connected) layer](#1-dense-full-connected-layer)
         - [(2) convolutional layer](#2-convolutional-layer)
-      - [6.random initialization](#6random-initialization)
+      - [6.initialization](#6initialization)
+        - [(1) zero initialization](#1-zero-initialization)
+        - [(2) random initialization](#2-random-initialization)
+        - [(3) He Initialization (跟Xavier类似) (减轻 vanishing/exploding gradients)](#3-he-initialization-跟xavier类似-减轻-vanishingexploding-gradients)
 
 <!-- /code_chunk_output -->
 
@@ -171,9 +174,44 @@
 * each neuron only looks at part of previous layer's outputs
 ![](./imgs/overview_02.png)
 
-#### 6.random initialization
+#### 6.initialization
 
+##### (1) zero initialization
 * 当参数都初始化为0（或都相同）时，同一层的neuron的参数下降的都一样，导致同一层neuron都是**等价的**，就相当于**只有一个neuron**
     * 当都为0，还有可能导致梯度为0，即无法进行梯度下降
+
+```python
+for l in range(1, L):
+    parameters['W' + str(l)] = np.zeros((layers_dims[l], layers_dims[l-1]))
+    parameters['b' + str(l)] = np.zeros((layers_dims[l],1))
+```
+
+##### (2) random initialization
+
 * 初始化时，要小一点，因为小一点，sigmoid函数的梯度越大，即下降的越快
     * `np.random.randn(shape) * 0.01`
+
+```python
+for l in range(1, L):
+    parameters['W' + str(l)] = np.random.randn(layers_dims[l], layers_dims[l-1])
+    parameters['b' + str(l)] = np.zeros((layers_dims[l],1))
+```
+
+##### (3) He Initialization (跟Xavier类似) (减轻 vanishing/exploding gradients)
+
+* vanishing/exploding gradients
+
+    * 当neuron network**层数过多**，可能会导致activation呈**指数级**增长/减小，导致斜率都特别大/特别小
+
+* initialization
+
+    * 对weight进行normalize，不能解决问题，但是能够使斜率的vanishing/exploding不会太快
+        * 默认平均值mean=0，方差$Var(W^{[i]})$根据activation function的类型确定
+            * 比如Relu: $Var(W^{[i]}) = \frac{2}{n^{n-1}}$
+        * $W^{[i]} = \text {np.random.randn(...)} * \sqrt {Var(W^{[i]})}$
+
+```python
+for l in range(1, L):
+    parameters['W' + str(l)] = np.random.randn(layers_dims[l],layers_dims[l-1]) * np.sqrt(2 / layers_dims[l-1])
+    parameters['b' + str(l)] = np.zeros((layers_dims[l], 1))
+```

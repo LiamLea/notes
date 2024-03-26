@@ -14,9 +14,10 @@
         - [(4) basis vector（基向量）](#4-basis-vector基向量)
       - [2.矩阵](#2矩阵)
         - [(1) column space](#1-column-space)
-        - [(2) 寻找null space (本质就是消元)](#2-寻找null-space-本质就是消元)
-        - [(3) orthogonal matrix](#3-orthogonal-matrix)
-        - [(4) symmetric matrix](#4-symmetric-matrix)
+        - [(2) null space (kernel)](#2-null-space-kernel)
+        - [(3) 寻找null space (本质就是消元)](#3-寻找null-space-本质就是消元)
+        - [(4) orthonormal matrix: Q](#4-orthonormal-matrix-q)
+        - [(5) symmetric matrix: S](#5-symmetric-matrix-s)
       - [3.线性变换](#3线性变换)
         - [(1) 定义](#1-定义)
         - [(2) 以二维空间为例](#2-以二维空间为例)
@@ -33,7 +34,7 @@
       - [5.eigenvectors and eigenvalues](#5eigenvectors-and-eigenvalues)
         - [(1) 特征值和特征向量](#1-特征值和特征向量)
         - [(2) eigenbasis](#2-eigenbasis)
-      - [6.singular vectors and singular values](#6singular-vectors-and-singular-values)
+      - [6.singular value decomposition (SVD)](#6singular-value-decomposition-svd)
         - [(1) 如何确定V和$\Sigma$](#1-如何确定v和sigma)
 
 <!-- /code_chunk_output -->
@@ -80,17 +81,24 @@
 ##### (1) column space
 * column space
     * column vectors（一个column就是一个vector）的所有线性组成 构成的span
-    * 表示，比如: C(A)=plane
+    * $C(A).dim =  rank$ (即column vectors所处的维度)
 * row space
     * row vectors（一个row就是一个vector）的所有线性组合 构成的span
-* null space (kernel)
-    * 经过线性变换后，向量变为0，即
-        * $N(A) \bot C(A^T)$
-            * A的null space 和 row space正交
-        * $N(A^T) \bot C(A)$
-        * dimension of null space = (dimenson of A) - A.rank  
+    * 表示：$C(A^T) = C(A)$
 
-##### (2) 寻找null space (本质就是消元)
+##### (2) null space (kernel)
+* 经过线性变换后，向量变为0，即
+    * $N(A) \bot C(A^T)$
+        * A的null space 和 row space正交
+    * $N(A^T) \bot C(A)$
+    * dimension of null space = (dimenson of A) - A.rank
+
+* $Ax=0$的解就是null space
+* 假设A是一个m*n矩阵，rank=r
+    * $N(A).dim = n-r$
+    * $N(A^T).dim = m -r$
+
+##### (3) 寻找null space (本质就是消元)
 * $Ax=0$
 * 进行分解: [A = CR](./Advance.md#1-a--cr)
     * 利用消元（elimination），求出R
@@ -99,16 +107,16 @@
     * $[I\ F]\begin{bmatrix} -F \\ I \end{bmatrix} = 0$
     * 所以解就是$\begin{bmatrix} -F \\ I \end{bmatrix}$
 
-##### (3) orthogonal matrix
+##### (4) orthonormal matrix: Q
 
-* 每一列的向量 都和 其他列向量 正交
-* 如果每一列都是**正交单位向量**
+* Q是**方正** 且 每一列都是**orthonormal vectors (标准正交向量)**
+    * 每一列的向量 都和 其他列向量 正交 且 与自身的点积为1
     * $Q^TQ = I$
-        * 如果是方正: $QQ^T=I$
+        * 因为是方正，所以$QQ^T=I$
         * 因为等于$I$，所有$Q^T=Q^{-1}$
-    * 本质就是**旋转**，所以对任何向量进行该线型变换，都不会改变该向量的长度
+    * 本质就是**旋转（可能还有翻转）**，所以对任何向量进行该线型变换，都不会改变该向量的长度
 
-##### (4) symmetric matrix
+##### (5) symmetric matrix: S
 * $S = S^T$
 * S的**特征向量是正交的**
 * $A^TA$ 结果是一个对称矩阵
@@ -292,12 +300,13 @@
 ##### (2) eigenbasis
 针对某一个线性变换，使用一组特征向量作为新的基向量，如果需要计算多次进行该线性变换，使用eignebasis简化计算，因为除了主对角线上，其他地方都为0
 
-#### 6.singular vectors and singular values
+#### 6.singular value decomposition (SVD)
 * 本质：任何的线性变换 都是 先**旋转**到基向量的位置，再进行**scale**，最后**旋转**回原来的位置
-* $AV = U\Sigma$，其中U和V每一列都是**正交单位向量**，即$U^TU=I, V^TV=I$
+* $AV = U\Sigma$，其中U和V都是标准正交矩阵（即$U^TU=I, V^TV=I$）
     * 即$A\begin{bmatrix}\\ \vec v_1 & \cdots & \vec v_r \\ \ \end{bmatrix} = \begin{bmatrix}\\ \vec u_1 & \cdots & \vec u_r \\ \ \end{bmatrix} \begin{bmatrix}\sigma_1 \\ & \ddots \\ && \sigma_r \end{bmatrix}$
     * **r是矩阵的rank**
-* singular values: $\sigma_1 \ge\sigma_2\ge ... \ge\sigma_r\ge 0$
+    * singular values: $\sigma_1 \ge\sigma_2\ge ... \ge\sigma_r\ge 0$
+    * singular vector: $U$ 和 $V^T$
 
 * 所以 $A = U\Sigma V^T$，对向量进行A线性变换，也就是
     * $V^T$: 先旋转
