@@ -14,6 +14,12 @@
     - [概述](#概述)
       - [1.backpropagation (计算导数的算法)](#1backpropagation-计算导数的算法)
         - [(1) 通过chain rule求导数](#1-通过chain-rule求导数)
+      - [2.regularization](#2regularization)
+        - [(1) L2 regularization](#1-l2-regularization)
+        - [(2) inverted dropout](#2-inverted-dropout)
+      - [3.graident checking (grad check)](#3graident-checking-grad-check)
+        - [(1) numerical approximation of gradient](#1-numerical-approximation-of-gradient)
+        - [(2) 算法](#2-算法)
 
 <!-- /code_chunk_output -->
 
@@ -84,3 +90,97 @@
     * $dW^{[l]} = dz^{[l]} * a^{[l-1]}$
     * $db^{[l]} = dz^{[l]}$
     * $da^{[l-1]} = dz^{[l]} * dW^{[l]}$
+
+#### 2.regularization
+
+##### (1) L2 regularization
+* $J = \frac{1}{m}\sum\limits_{i=1}^mL(\hat y^{(i)}, y^{(i)}) + \frac{\lambda}{2m}\sum\limits_{l=1}^L\Vert W^{[l]}\Vert_F^2$
+
+##### (2) inverted dropout
+
+* 将每一层的activation的输出 根据一定的概率（keep-prob） 置0
+    * 不同层设置不同的keep-prob，当某层的参数较多时，该值可以设低一点，当某层不需要regularization时，该值可以设为1
+    * **每次梯度下降迭代**，都需要随机置0
+
+        * forward propagation
+        ```python
+        # 以layer 1为例
+
+        # 0-1均匀分布
+        D1 = np.random.rand(A1.shape[0], A1.shape[1])
+
+        # 将layer 1的activation置0（有keep_prob的概率不置为0）
+        D1 = D1 < keep_prob
+        A1 = A1 * D1
+
+        # assure that the result of the cost will still have the same expected value as without drop-out
+        A1 = A1/keep_prob
+        ```
+
+        * backward propagation
+        ```python
+        # 以layer 1为例
+
+        # 需要将 同样位置的neuron（forward progation） 置为0
+        dA1 = dA1 * D1
+
+        # 需要同样 进行scale（因为一个数进行了scale，其导数也会进行相应的scale）
+        dA1 = dA1 / keep_prob
+        ```
+* 只能在训练中使用，不能在测试等数据集中使用
+
+#### 3.graident checking (grad check)
+
+* 用于debug，训练的时候不要用
+* 一般几次迭代使用一次，因为消耗性能
+* 如果代价函数使用了regularization，gradient checking也需要 
+
+##### (1) numerical approximation of gradient
+
+求导数的近似值
+
+* one-sided difference
+    * $f(x) = \frac{f(x+\epsilon) - f(x)}{\epsilon}$
+* two-sided difference (这种方法一般误差更小)
+    * $f(x) = \frac{f(x+\epsilon) - f(x-\epsilon)}{2\epsilon}$
+
+##### (2) 算法
+
+* 设置变量
+    * $\vec \theta = (W^{[1]}, b^{[1]}, ..., W^{[L]}, b^{[L]})$
+    * $\vec {d\theta} = (dW^{[1]}, db^{[1]}, ..., dW^{[L]}, db^{[L]})$
+
+* 计算近似值
+    * $d\theta_{appro}[i]= \frac{J(\theta_1,..., \theta_i + \epsilon,...) - J(\theta_1,..., \theta_i + \epsilon,...)}{2\epsilon}$
+
+* 检查
+    * $\text {difference}  = \frac{\Vert d\theta - d\theta_{appro} \Vert_2}{\Vert d\theta \Vert_2 + \Vert d\theta_{appro} \Vert_2}$
+    * 设$\epsilon = 10^{-7}$，如果
+        * difference < $10^{-7}$，大概率没什么问题
+        * 偏差越大，就越可能存在问题，需要特别关注
+
+```python
+#将参数和及导数分别放入vector中
+parameters_values, _ = dictionary_to_vector(parameters)
+grad = gradients_to_vector(gradients)
+
+num_parameters = parameters_values.shape[0]
+J_plus = np.zeros((num_parameters, 1))
+J_minus = np.zeros((num_parameters, 1))
+gradapprox = np.zeros((num_parameters, 1))
+
+for i in range(num_parameters):
+    theta_plus = np.copy(parameters_values)
+    theta_plus[i] = theta_plus[i] + epsilon
+    J_plus[i], _ = forward_propagation_n(X, Y, vector_to_dictionary(theta_plus))
+
+    theta_minus = np.copy(parameters_values)
+    theta_minus[i] = theta_minus[i] - epsilon
+    J_minus[i],_ = forward_propagation_n(X, Y, vector_to_dictionary(theta_minus))
+
+    gradapprox[i] = (J_plus[i] - J_minus[i]) / (2 * epsilon)
+
+numerator = np.linalg.norm(grad - gradapprox)
+denominator = np.linalg.norm(grad) + np.linalg.norm(gradapprox)
+difference = numerator / denominator
+```

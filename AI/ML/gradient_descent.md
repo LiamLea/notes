@@ -13,7 +13,7 @@
         - [(3) 选择合适的learning rate](#3-选择合适的learning-rate)
         - [(4) learning curve (关于代价函数的变换曲线)](#4-learning-curve-关于代价函数的变换曲线)
         - [(5) 判断梯度下降是否收敛](#5-判断梯度下降是否收敛)
-      - [2.feature scaling (特征缩放)](#2feature-scaling-特征缩放)
+      - [2.feature scaling (normalize features)](#2feature-scaling-normalize-features)
         - [(1) why](#1-why)
         - [(2) 目标](#2-目标)
         - [(3) 常用方法](#3-常用方法)
@@ -73,7 +73,7 @@
     * 如果J每一次迭代减少的数值 <= $\epsilon$，则认为梯度下降已经收敛
         * $\epsilon$的值比较难确定
 
-#### 2.feature scaling (特征缩放)
+#### 2.feature scaling (normalize features) 
 
 ##### (1) why
 * 当特征1的范围为0-1
