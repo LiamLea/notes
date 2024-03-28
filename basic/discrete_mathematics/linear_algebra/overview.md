@@ -34,6 +34,7 @@
       - [5.eigenvectors and eigenvalues](#5eigenvectors-and-eigenvalues)
         - [(1) 特征值和特征向量](#1-特征值和特征向量)
         - [(2) eigenbasis](#2-eigenbasis)
+        - [(3) 性质](#3-性质)
       - [6.singular value decomposition (SVD)](#6singular-value-decomposition-svd)
         - [(1) 如何确定V和$\Sigma$](#1-如何确定v和sigma)
 
@@ -299,6 +300,11 @@
 
 ##### (2) eigenbasis
 针对某一个线性变换，使用一组特征向量作为新的基向量，如果需要计算多次进行该线性变换，使用eignebasis简化计算，因为除了主对角线上，其他地方都为0
+
+##### (3) 性质
+
+* $A^nx = \lambda^nx$
+* $A^{-1} = \frac{1}{\lambda}x$
 
 #### 6.singular value decomposition (SVD)
 * 本质：任何的线性变换 都是 先**旋转**到基向量的位置，再进行**scale**，最后**旋转**回原来的位置

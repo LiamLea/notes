@@ -11,6 +11,8 @@
       - [2.change of basis (基向量变换)](#2change-of-basis-基向量变换)
       - [3.vector spaces](#3vector-spaces)
         - [(1) 以函数求导为例子](#1-以函数求导为例子)
+      - [4.矩阵表示](#4矩阵表示)
+        - [(1) quadratic form](#1-quadratic-form)
 
 <!-- /code_chunk_output -->
 
@@ -58,3 +60,10 @@
     * 用基向量表示这个函数: $\begin{bmatrix} 5 \\ 4 \\ 5 \\ 1 \\ \vdots \end{bmatrix}$
     * 对基向量求导: $\begin{bmatrix} 0 & 1 & 0 & 0 & \cdots \\ 0 & 0 & 2 & 0 & \cdots \\ 0 & 0 & 0 & 3 & \cdots \\ 0 & 0 & 0 & 0 & \cdots \\ \vdots & \vdots & \vdots & \vdots & \ddots \end{bmatrix}$
     * 结果就是: $\begin{bmatrix} 0 & 1 & 0 & 0 & \cdots \\ 0 & 0 & 2 & 0 & \cdots \\ 0 & 0 & 0 & 3 & \cdots \\ 0 & 0 & 0 & 0 & \cdots \\ \vdots & \vdots & \vdots & \vdots & \ddots \end{bmatrix}\begin{bmatrix} 5 \\ 4 \\ 5 \\ 1 \\ \vdots \end{bmatrix}=\begin{bmatrix} 1*4 \\ 2*5 \\ 3*1 \\ 0 \\ \vdots \end{bmatrix}$，所以结果就是$3x^2+10x+4$
+
+#### 4.矩阵表示
+
+##### (1) quadratic form
+* 以三个变量为例
+    * $X^TMX = \begin{bmatrix} x&y&z\end{bmatrix}\begin{bmatrix}a&b&c\\b&d&e\\c&e&f\end{bmatrix}\begin{bmatrix}x\\y\\z\end{bmatrix} = ax^2 + dy^2 + fz^2 + 2bxy + 2cxz + 2eyz$
+        * 注意: M是**对称**的  
