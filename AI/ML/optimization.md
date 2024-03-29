@@ -28,6 +28,9 @@
       - [5.skewed data sets](#5skewed-data-sets)
         - [(1) 特殊的error metric: precision/recall](#1-特殊的error-metric-precisionrecall)
         - [(2) trade-off between precison and recall](#2-trade-off-between-precison-and-recall)
+    - [hyperparameter tuning](#hyperparameter-tuning)
+      - [1.调整策略](#1调整策略)
+        - [(1) 随机选择参数](#1-随机选择参数)
 
 <!-- /code_chunk_output -->
 
@@ -179,3 +182,17 @@ positive data和negative data 不均衡
 * 如何平衡precison和recall
     * 使用F1 score
         * $F_1{score} = \frac{\frac{1}{2}}{\frac{1}{P}+\frac{1}{R}}= 2\frac{PR}{P+R}$
+
+***
+
+### hyperparameter tuning
+
+#### 1.调整策略
+
+* 先随机选择各个参数，看看效果，从而缩小调整范围（比如哪些参数更重要，在哪个取值范围内影响最大等）
+* 确定范围后，进行精细化调整
+
+##### (1) 随机选择参数
+* 需要选择合适的尺度
+    * 比如学习率的取值在0.0001到1之间，随机取的话90%会在0.1-1之间
+        * 所以改变尺度为log，在r在[-4,0]之间随机取整数，学习率为$10^r$
