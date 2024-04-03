@@ -91,7 +91,11 @@ p_nonpreferred = model.predict(X_train)
 
 * loss function会将a带入计算，而不会先计算a，因为浮点数的原因，如果先计算a会产生误差
 * 用更准确的cost function，训练出参数后，再将参数代入，生成最后的模型
-
+* $ \text {logit(p)}= \ln\frac{p}{1-p}$
+    * 当概率等于0.5时，logit(p) = 0
+    * 当概率小与0.5时，logit(p) < 0
+    * 当概率大于0.5时，logit(p) > 0
+    * 所以用logit score表示 未经过归一化的概率得分，分数越高，概率越高
 ```python
 preferred_model = Sequential(
     [ 
@@ -101,7 +105,8 @@ preferred_model = Sequential(
     ]
 )
 
-#通知 loss function 输出的值没有进行normalize（比如logits）,所以最后一层需要使用linear
+# logits表示最后一层raw, unnormalized的输出（还没有应用activation function）
+# 在loss function使用from_logits=True，用于表示最后的输出没有做过任何处理
 preferred_model.compile(
     loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),  #<-- Note
     optimizer=tf.keras.optimizers.Adam(0.001),
