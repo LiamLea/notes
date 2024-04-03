@@ -7,15 +7,21 @@
 
 - [fourier transform](#fourier-transform)
     - [概述](#概述)
-      - [1.sin函数](#1sin函数)
+      - [1.Euler's number e](#1eulers-number-e)
+        - [(1) 定义](#1-定义)
+        - [(2) 特性](#2-特性)
+        - [(3) complex plane的理解](#3-complex-plane的理解)
+        - [(4) Euler's formula](#4-eulers-formula)
+        - [(5) $f(x)\cdot e^{ix}$的理解](#5-fxcdot-eix的理解)
+      - [2.sin函数](#2sin函数)
         - [(1) 基础](#1-基础)
         - [(2) 常用公式](#2-常用公式)
-      - [2.以频率的形式表示sin函数](#2以频率的形式表示sin函数)
-      - [3.fourier基础](#3fourier基础)
+      - [3.以频率的形式表示sin函数](#3以频率的形式表示sin函数)
+      - [4.fourier基础](#4fourier基础)
         - [(1) 波的叠加](#1-波的叠加)
         - [(2) 求解系数](#2-求解系数)
-      - [4.fourier series](#4fourier-series)
-      - [5.fourier tranformation](#5fourier-tranformation)
+      - [5.fourier series](#5fourier-series)
+      - [6.fourier tranformation](#6fourier-tranformation)
 
 <!-- /code_chunk_output -->
 
@@ -23,7 +29,57 @@
 
 ### 概述
 
-#### 1.sin函数
+#### 1.Euler's number e
+
+##### (1) 定义
+$\lim_{n \to \infty} (1 + \frac{1}{n})^n = 2.718...$
+
+##### (2) 特性
+
+* 导数是其本身
+    * $\frac{d}{dx}e^x = e^x$
+
+##### (3) complex plane的理解
+* **二维**的数字，正常理解数字是一维的（即所有的数字都可以在一条负无穷到正无穷的直线上找到）
+    * 横坐标为实数轴（Re），纵坐标为虚数轴（Im）
+* **乘法**可以理解为 先**旋转**一定度数，然后进行**scale**
+    * $z_1 * z_2$ 表示将$z_2$旋转 一定度数（$z_1$和横坐标形成的度数），然后进行scale
+    * $(\frac{\sqrt 2}{2} + i\frac{\sqrt 2}{2})^2 = i$
+        * 理解为1旋转45度，再旋转45度
+    * 乘以$i$ 表示旋转90度（所以$i^2=-1$）
+    * $x^3=1$，在complex plane中表示，1旋转3次相同的角度，还得到1，所以x有多种解（比如: $x=-\frac{1}{2} + i\frac{\sqrt 3}{2}$）
+
+##### (4) Euler's formula
+
+* $e^{ix}$的理解
+  * 在**complex plane**上，以原点为与圆心的**圆周运动** (x可以理解成时间)
+      * amplitude: 1（当$ne^{ix}$就是n）
+      * period: $2\pi$ (时间单位)
+      * frequency: $\frac{1}{period} = \frac{1}{2\pi}$
+
+* 为什么$e^{ix}$是圆周运动
+  * $\frac{d}{dx}e^{ix} = ie^{ix}$，即导数在任何位置都呈90度（因为i理解为旋转90度）
+  * $e^0=1$
+  * 所以只有 **单位圆** 满足要求
+  * 所以 $e^{ix} = \cos x + i\sin x$
+      * $e^{i\pi} = -1$
+
+![](./imgs/ft_01.png)
+
+##### (5) $f(x)\cdot e^{ix}$的理解
+* **$f(x)$基于$e^{ix}$参照系的运动**
+  * 将$e^{ix}$作为参照系，而不是通常使用的实数坐标系
+  * 所以从实数坐标系角度看就是，$e^{ix}$和$f(x)$的**叠加**运动
+
+* 当$f(x)$也是**周期**函数，就会出现如下效果
+  * 当$f(x)$频率 > $e^{ix}$的频率
+    * ![](./imgs/ft_02.png)
+    * 所以 $\int_0^{2\pi} f(x)e^{ix} = 0$
+  * 当$f(x)$频率 = $e^{ix}$的频率
+    * ![](./imgs/ft_03.png)
+    * 所以 $\int_0^{2\pi} f(x)e^{ix} > 0 $
+
+#### 2.sin函数
 
 ##### (1) 基础
 $y=sin(kx+\varphi)$
@@ -38,7 +94,7 @@ $y=sin(kx+\varphi)$
 * cos(-x)=cosx
 
 
-#### 2.以频率的形式表示sin函数
+#### 3.以频率的形式表示sin函数
 
 $f(t) = sin(2\pi kt)$
 * frequence: 就是k，即 k clycle/s
@@ -48,7 +104,7 @@ $f(t) = sin(2\pi kt)$
     * 因为对于1/3（频率为3）是一个周期的sin函数，1肯定也是他的周期
 
 
-#### 3.fourier基础
+#### 4.fourier基础
 
 ##### (1) 波的叠加
 
@@ -75,11 +131,11 @@ $f(t) = sin(2\pi kt)$
     * 因为$e^{2\pi i (k-m)t} = 1$
 * 所以$C_m = \int_0^1f(t)e^{-2\pi imt}dt$
 
-#### 4.fourier series
+#### 5.fourier series
 
 * $f(x) = ... + C_{-2}e^{-2\cdot 2\pi ix} + C_{-1}e^{-1\cdot 2\pi ix} + C_{0}e^{0\cdot 2\pi ix} + C_{1}e^{1\cdot 2\pi ix} + C_{2}e^{2\cdot 2\pi ix} + ...$
 
-#### 5.fourier tranformation
+#### 6.fourier tranformation
 
 将时域函数，转换成频率函数，即求fourier series的系数
 * $F(w) = \int_{-\infty}^{\infty}f(t)\cdot e^{-iwt} dt$

@@ -13,6 +13,11 @@
         - [(3) standard deviation: $\sigma$](#3-standard-deviation-sigma)
         - [(3) covariance](#3-covariance)
         - [(4) correlation](#4-correlation)
+      - [2.normalization in statistic (统计学中的归一化)](#2normalization-in-statistic-统计学中的归一化)
+        - [(1) Z-score normalization](#1-z-score-normalization)
+      - [3.normalization in probability distribution (概率分布中的归一化)](#3normalization-in-probability-distribution-概率分布中的归一化)
+        - [(1) standard normalization](#1-standard-normalization)
+        - [(2) softmax](#2-softmax)
 
 <!-- /code_chunk_output -->
 
@@ -53,3 +58,21 @@
 
 * matrix correlation
   * 就是该元素的所在行和所在列的correlation
+
+#### 2.normalization in statistic (统计学中的归一化)
+
+使得数据分布符合一定要求
+
+##### (1) Z-score normalization
+* $Z = \frac{x - \mu}{\sigma}$
+
+#### 3.normalization in probability distribution (概率分布中的归一化)
+
+所有概率加起来等于1
+
+##### (1) standard normalization
+* $a_j = \frac{z_j}{\sum_{k=1}^{N}{z_k}}$
+
+##### (2) softmax
+
+* $a_j = \frac{e^{z_j}}{\sum_{k=1}^{N}{e^{z_k}}}$
