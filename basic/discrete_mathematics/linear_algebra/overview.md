@@ -36,7 +36,7 @@
         - [(2) eigenbasis](#2-eigenbasis)
         - [(3) 性质](#3-性质)
       - [6.singular value decomposition (SVD)](#6singular-value-decomposition-svd)
-        - [(1) 如何确定V和$\Sigma$](#1-如何确定v和sigma)
+        - [(1) 如何确定U、V和$\Sigma$](#1-如何确定u-v和sigma)
 
 <!-- /code_chunk_output -->
 
@@ -90,11 +90,12 @@
 ##### (2) null space (kernel)
 * 经过线性变换后，向量变为0，即
     * $N(A) \bot C(A^T)$
-        * A的null space 和 row space正交
+        * **A的null space 和 row space正交**
     * $N(A^T) \bot C(A)$
     * dimension of null space = (dimenson of A) - A.rank
 
-* $Ax=0$的解就是null space
+* **$Ax=0$的解就是null space**
+    * 因为只有null space中的向量，经过线性变换A才等于0
 * 假设A是一个m*n矩阵，rank=r
     * $N(A).dim = n-r$
     * $N(A^T).dim = m -r$
@@ -114,13 +115,26 @@
     * 每一列的向量 都和 其他列向量 正交 且 与自身的点积为1
     * $Q^TQ = I$
         * 因为是方正，所以$QQ^T=I$
-        * 因为等于$I$，所有$Q^T=Q^{-1}$
+        * 因为等于$I$，所以 $Q^T=Q^{-1}$
     * 本质就是**旋转（可能还有翻转）**，所以对任何向量进行该线型变换，都不会改变该向量的长度
 
 ##### (5) symmetric matrix: S
+
 * $S = S^T$
 * S的**特征向量是正交的**
-* $A^TA$ 结果是一个对称矩阵
+* $A^TA$ 结果是 symmetric positive definite 矩阵
+
+* $X^TSX$（X是一个向量，比如: X=[x y]）能表示所有的二次方程，而在机器学习中，代价函数几乎都是二次方程
+    * 满足以下任一个条件就是symmetric positive definite
+        * 所有特征值 > 0
+        * $X^TSX$ > 0 (X不等于0)
+        * $S=A^TA$ (A的每一列都线性无关)
+        * 所有的leading determinants > 0
+            * leading determinants表示 取矩阵的 1x1矩阵，2x2矩阵，3x3矩阵，依次类推
+        * 所有的pivots in elimination > 0
+            * 消元后的每行的第一个非0的值 > 0
+
+    * 当$f(x) = X^TSX$ 时，表示f(x)函数的形状像碗一样
 
 #### 3.线性变换
 
@@ -304,7 +318,17 @@
 ##### (3) 性质
 
 * $A^nx = \lambda^nx$
-* $A^{-1} = \frac{1}{\lambda}x$
+    * $A^{-1}x = \frac{1}{\lambda}x$
+* $A=X\Lambda X^{-1}$ (A非对称 方正矩阵)
+    * X每一列都是**A的单位特征向量**, $\Lambda$每一列都是对应的特征值
+    * 因为$AX=X\Lambda$，所以$A=X\Lambda X^{-1}$
+    * 注意：**只有方正矩阵可逆**
+    * 能够推出：
+        * $A^k=X\Lambda^k X^{-1}$
+* 特征值的和 = A对角线的数值相加
+    * 根据$A=X\Lambda X^{-1}$推出
+* 特征值的乘积 = det(A)
+    * 因为$det(A-\lambda I)=0$，所以$det(A) = det(\lambda I)$，右边等于特征值的乘积
 
 #### 6.singular value decomposition (SVD)
 * 本质：任何的线性变换 都是 先**旋转**到基向量的位置，再进行**scale**，最后**旋转**回原来的位置
@@ -319,8 +343,11 @@
     * $\Sigma$: 再scale（对角矩阵只进行scale）
     * $U$: 再旋转回原来的位置
 
-##### (1) 如何确定V和$\Sigma$
-* $A^TA\vec v_i = \lambda_i\vec v_i =\sigma_i^2\vec v_i$
+##### (1) 如何确定U、V和$\Sigma$
 
-    * $\vec v_i$是$A^TA$的特征向量，V是由$\vec v_i$组成的
-    * $\sigma_i$是$A^TA$的特征值的平方根，$\Sigma$是由$sigma$组成的
+* U是$AA^T$的特征向量
+* V是$A^TA$的特征向量
+* $\sigma_i^2$就是非0特征值 (U和V的非0的特征值相等)
+* 证明
+    * $A^TA=V\Sigma^TU^TU\Sigma V^T=V(\Sigma^T\Sigma)V^T$
+    * $AA^T=U\Sigma V^TV\Sigma^TU^T=U(\Sigma\Sigma^T)U^T$

@@ -21,7 +21,11 @@
         - [(1) 波的叠加](#1-波的叠加)
         - [(2) 求解系数](#2-求解系数)
       - [5.fourier series](#5fourier-series)
-      - [6.fourier tranformation](#6fourier-tranformation)
+      - [6.fourier transformation](#6fourier-transformation)
+      - [7.discrete fourier transformation (DFT)](#7discrete-fourier-transformation-dft)
+      - [8.fast fourier transformation (FFT)](#8fast-fourier-transformation-fft)
+        - [(1) 基于多项式的理解](#1-基于多项式的理解)
+        - [(2) 利用FFT计算DFT](#2-利用fft计算dft)
 
 <!-- /code_chunk_output -->
 
@@ -51,6 +55,8 @@ $\lim_{n \to \infty} (1 + \frac{1}{n})^n = 2.718...$
 
 ##### (4) Euler's formula
 
+* **用$e^{ix}$表示复数$\cos x + i\sin x$**
+
 * $e^{ix}$的理解
   * 在**complex plane**上，以原点为与圆心的**圆周运动** (x可以理解成时间)
       * amplitude: 1（当$ne^{ix}$就是n）
@@ -67,9 +73,11 @@ $\lim_{n \to \infty} (1 + \frac{1}{n})^n = 2.718...$
 ![](./imgs/ft_01.png)
 
 ##### (5) $f(x)\cdot e^{ix}$的理解
-* **$f(x)$基于$e^{ix}$参照系的运动**
+* **$f(x)$基于$e^{ix}$参照系的运动（即将$f(x)$变换到频域）**
   * 将$e^{ix}$作为参照系，而不是通常使用的实数坐标系
   * 所以从实数坐标系角度看就是，$e^{ix}$和$f(x)$的**叠加**运动
+    * 因为$e^{ix}$是单位圆周运动，只有方向在变，所以乘以f(x)可以看作一个叠加运动
+    * 改变$e^{ix}$的频率，能够求出f(x)各个频率的分量
 
 * 当$f(x)$也是**周期**函数，就会出现如下效果
   * 当$f(x)$频率 > $e^{ix}$的频率
@@ -81,11 +89,15 @@ $\lim_{n \to \infty} (1 + \frac{1}{n})^n = 2.718...$
 
 #### 2.sin函数
 
+理解为在单位圆上的圆周运动
+
 ##### (1) 基础
 $y=sin(kx+\varphi)$
 
+* frequence: $\frac{k}{2\pi}$
+  * 1秒转动的圈数，另x=1，$kx$就是1秒经过的弧长（在单位圆上），用 弧长/2$\pi$，就是每秒经过的圈数
 * period: $\frac{2\pi}{k}$
-* phase: $\varphi$
+* phase $\varphi$: 偏移（即**起始位置**）
 
 ##### (2) 常用公式
 
@@ -97,7 +109,7 @@ $y=sin(kx+\varphi)$
 #### 3.以频率的形式表示sin函数
 
 $f(t) = sin(2\pi kt)$
-* frequence: 就是k，即 k clycle/s
+* frequence: k clycle/s
 * period: 1 (对于所有正整数k而言)
     * $\frac{2\pi}{2\pi k} = \frac{1}{k}$
     * 因为对于1/2（频率为2）是一个周期的sin函数，1肯定也是他的周期
@@ -135,10 +147,48 @@ $f(t) = sin(2\pi kt)$
 
 * $f(x) = ... + C_{-2}e^{-2\cdot 2\pi ix} + C_{-1}e^{-1\cdot 2\pi ix} + C_{0}e^{0\cdot 2\pi ix} + C_{1}e^{1\cdot 2\pi ix} + C_{2}e^{2\cdot 2\pi ix} + ...$
 
-#### 6.fourier tranformation
+#### 6.fourier transformation
 
 将时域函数，转换成频率函数，即求fourier series的系数
 * $F(w) = \int_{-\infty}^{\infty}f(t)\cdot e^{-iwt} dt$
   * $\int_0^1f(x)d(x) = C_0$
   * $\int_0^1f(x)e^{-2\cdot 2\pi ix}d(x) = C_2$
   * 依次类推: $C_n = \int_0^1f(x)e^{n\cdot 2\pi ix}d(x)$
+
+#### 7.discrete fourier transformation (DFT)
+* 对采样点进行傅里叶变换
+* $X_k=\sum\limits_{n=0}^{N-1}x_n\cdot e^{-i2\pi \frac{k}{N}n}$
+![](./imgs/ft_04.png)
+
+* 求序列$x_n$在各个频率分量的值，用矩阵表示
+  * $\begin{bmatrix}X(\omega^0)\\X(\omega^1)\\X(\omega^2)\\\vdots\\X(\omega^{n-1})\end{bmatrix} = \begin{bmatrix}1&1&1&\dots&1\\1&\omega&\omega^2&\dots&\omega^{n-1}\\1&\omega^2&\omega^4&\dots&\omega^{2(n-1)}\\\vdots&\vdots&\vdots&\ddots&\vdots\\1&\omega^{n-1}&\omega^{2(n-1)}&\dots&\omega^{(n-1)(n-1)}\end{bmatrix}\begin{bmatrix}x_0\\x_1\\x_2\\\vdots\\x_{n-1}\end{bmatrix}$
+
+#### 8.fast fourier transformation (FFT)
+
+##### (1) 基于多项式的理解
+* 对于n次的多项式，只要确定**n+1个点**，就能确定该多项式
+  * 直接选取n个点进行计算，需要的复杂度是$O(n^2)$，因为每一个需要进行n次乘法运算，一共有n+1个点
+
+* 多与任何多项式而言，要求出n个点，只需要计算$log n$个点
+* 对于任何多项式，都可以分解成（偶数部分和奇数部分）
+  * $P(x) = P_e(x^2) + xP_o(x^2)$
+    * **一对公共部分**（$P_e$ 和 $P_o$），就能求出**两个点的值**（$P(x)$ 和 $P(-x)$）
+
+* FFT原理
+  * 对多项式拆分，直至不可拆分为止
+    * 对$P(x)$进行分解，此次迭代会进行$2^0$次分解
+    * 对$P(x^2)$进行分解，此次迭代会进行$2^1$次分解
+    * 对$P(x^4)$，此次迭代会进行$2^2$次分解
+    * ...
+    * 对$P(x^{n/2})$，此次迭代会进行$n/2$次分解
+
+  * 每迭代一次（一次迭代有多次分解），能求出的点数就会乘以2
+  ![](./imgs/ft_06.png)
+  * 所以要求出n各点，需要经过$\log n$次迭代，每次迭代需要进行n次乘法，所以一共需要$n\log n$次乘法
+
+* 举例: $P(x) = x^5 + 2x^4 - x^3 +x^2+1$
+![](./imgs/ft_05.png)
+
+##### (2) 利用FFT计算DFT
+* 将$x_n$看成多项式的系数，$(w^0,w^1,...,w^{(n-1)})$为需要找出的点
+* 利用上述算法能够快速求得相应的频率分量

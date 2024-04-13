@@ -17,6 +17,7 @@
       - [3.norm](#3norm)
         - [(1) vector norm](#1-vector-norm)
         - [(2) matrix norm](#2-matrix-norm)
+      - [4.$e^A$](#4ea)
 
 <!-- /code_chunk_output -->
 
@@ -59,9 +60,12 @@
 * 因为特征向量和特征值的关系，所以$SQ=Q\Lambda$，所以$S=Q\Lambda Q^{-1}$
 
 ##### (5) $A=X\Lambda X^{-1}$ (A非对称 方正矩阵)
-* 每一列都是**A的单位特征向量**
+* X每一列都是**A的单位特征向量**, $\Lambda$每一列都是对应的特征值
 * 因为$AX=X\Lambda$，所以$A=X\Lambda X^{-1}$
 * 注意：**只有方正矩阵可逆**
+* 能够推出：
+  * $A^k=X\Lambda^k X^{-1}$
+  * 特征值的和 = A对角线的数值相加
 
 ##### (6) $A=U\Sigma V^T$ (非方正)
 * 因为只有方正矩阵才可能，所以无法使用(5)分解，而该分解能应用所有矩阵
@@ -85,3 +89,8 @@
   * $\Vert A\Vert_1$ = `max( sum(abs(x), axis=0) )`
 * L2-norm
   * $\Vert A\Vert_2$ = largest sing. value
+
+#### 4.$e^A$
+
+根据泰勒展开
+* $e^A = E + A + \frac{A^2}{2!} + ... = \sum\limits_{k=0}^{\infty}\frac{A^k}{k!}$

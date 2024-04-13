@@ -93,7 +93,7 @@ $\frac{d}{dx}e^x = e^x$
 
 * 可以利用导数求 分母趋近于0的函数的 极限值
     * 比如，当x=0时，函数f(x)、g(x)都等于0
-    * $\lim_{x \to a}\frac{f(x)}{g(x)} = \frac{\frac{df}{dx}(a)dx}{\frac{dg}{dx}(a)dx}$
+    * $\lim\limits_{x \to a}\frac{f(x)}{g(x)} = \frac{\frac{df}{dx}(a)dx}{\frac{dg}{dx}(a)dx}$
 
 #### 3.integration
 
