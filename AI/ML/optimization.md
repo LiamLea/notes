@@ -9,8 +9,8 @@
     - [概述](#概述)
       - [1.evaluate a model](#1evaluate-a-model)
         - [(1) 划分数据集](#1-划分数据集)
-        - [(2) 计算dev set的代价函数](#2-计算dev-set的代价函数)
-        - [(3) 报告泛化误差](#3-报告泛化误差)
+        - [(2) 划分数据集复杂情况](#2-划分数据集复杂情况)
+        - [(3) opitmizing metric vs statisfying metric](#3-opitmizing-metric-vs-statisfying-metric)
       - [2.bias 和 variance](#2bias-和-variance)
         - [(1) 定义](#1-定义)
         - [(2) 选择regularization $\lambda$参数](#2-选择regularization-lambda参数)
@@ -40,24 +40,37 @@
 #### 1.evaluate a model
 
 ##### (1) 划分数据集
-* training set (60%)
+* training set
     * 用于训练模型
-* cross validation set (validation set、development set、dev set) (20%)
+* dev set (cross validation set)
     * 调整模型的依据，根据模型在这个数聚集上的结果，决定如何优化参数等
-    * 当数据特别多时，不一样要20%，1%可能就够了
-* test set (20%)
+    * 当数据特别多时，1%可能就够了
+* test set
     * 用于估计泛化误差，评价模型的性能
-    * 当数据特别多时，不一样要20%，1%可能就够了
+    * 当数据特别多时，1%可能就够了
 
 * 数据分布要均匀
     * 比如 训练集中都是专业摄影师拍的，测试集中都是随便拍照的，这就是分配不均匀
 
-##### (2) 计算dev set的代价函数
-* $J_{cv}(\vec w,b)$
-* 当有多个模型配置时，选择$J_{cv}(\vec w,b)$最小的模型配置
 
-##### (3) 报告泛化误差
-* $J_{test}(\vec w,b)$
+
+##### (2) 划分数据集复杂情况
+比如需要预测用户上传的图片是不是猫，
+* training set用网络上的图片
+* dev和test set使用用户上传的图片（较少）
+    * training set 和 dev set 来自不同的distribution
+    * 在这里使用网络上的图片没有意义，因为目标是对用户上传图片进行分类，使用网路上图片无法判断模型的性能
+* 可以将一半的用户图片，放入训练集中
+* 可以从traing set中划分出一个training-dev set，用于判断模型是否存在variance问题
+    * 排除variance问题后，如果training set error和dev set error相差较大，就证明是**data mismatch**问题导致的
+
+##### (3) opitmizing metric vs statisfying metric
+
+* opitimizing metric
+    * 即这个指标越优越好，比如准确率
+
+* statsifying meric
+    * 即这个指标满足一定阈值即可，比如运行时间
 
 #### 2.bias 和 variance
 

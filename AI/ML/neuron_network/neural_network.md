@@ -24,7 +24,7 @@
         - [(2) hidden layer](#2-hidden-layer)
       - [4.classification](#4classification)
         - [(1) multiclass](#1-multiclass)
-        - [(2) multi-label](#2-multi-label)
+        - [(2) multi-label (multi-task learning)](#2-multi-label-multi-task-learning)
       - [5.layer type](#5layer-type)
         - [(1) dense (full connected) layer](#1-dense-full-connected-layer)
         - [(2) convolutional layer](#2-convolutional-layer)
@@ -32,6 +32,7 @@
         - [(1) zero initialization](#1-zero-initialization)
         - [(2) random initialization](#2-random-initialization)
         - [(3) He Initialization (跟Xavier类似) (减轻 vanishing/exploding gradients)](#3-he-initialization-跟xavier类似-减轻-vanishingexploding-gradients)
+      - [7.end-to-end deep learning](#7end-to-end-deep-learning)
 
 <!-- /code_chunk_output -->
 
@@ -154,7 +155,7 @@
         * N是一共分为多少类别
         * 所有unit的值加起来是1
 
-##### (2) multi-label
+##### (2) multi-label (multi-task learning)
 * 说明：即结果可能属于多个类别（比如判断图片是否包含汽车、行人、信号灯等）
 * 方式：
     * output layer的activation function使用sigmoid
@@ -215,3 +216,11 @@ for l in range(1, L):
     parameters['W' + str(l)] = np.random.randn(layers_dims[l],layers_dims[l-1]) * np.sqrt(2 / layers_dims[l-1])
     parameters['b' + str(l)] = np.zeros((layers_dims[l], 1))
 ```
+
+#### 7.end-to-end deep learning
+* end-to-end: `input --model--> 所需要的output`
+    * 简单
+    * 需要大量数据，而传统的方式需要的数据少的多，但是步骤复杂
+* 传统的方式，需要可能需要多个中间步骤
+    * 比如：人脸识别 `input --model-->  识别出人脸  --人脸对比模型--> 输入是否匹配`
+    * 比如：语音识别 `input --> features --> phonemes --> words --> transcript`

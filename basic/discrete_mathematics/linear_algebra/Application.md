@@ -12,7 +12,7 @@
       - [3.vector spaces](#3vector-spaces)
         - [(1) 以函数求导为例子](#1-以函数求导为例子)
       - [4.矩阵表示](#4矩阵表示)
-        - [(1) quadratic form](#1-quadratic-form)
+        - [(1) quadratic form (对称矩阵表示)](#1-quadratic-form-对称矩阵表示)
 
 <!-- /code_chunk_output -->
 
@@ -63,7 +63,9 @@
 
 #### 4.矩阵表示
 
-##### (1) quadratic form
+##### (1) quadratic form (对称矩阵表示)
 * 以三个变量为例
     * $X^TMX = \begin{bmatrix} x&y&z\end{bmatrix}\begin{bmatrix}a&b&c\\b&d&e\\c&e&f\end{bmatrix}\begin{bmatrix}x\\y\\z\end{bmatrix} = ax^2 + dy^2 + fz^2 + 2bxy + 2cxz + 2eyz$
         * 注意: M是**对称**的  
+
+* 在机器学习中，代价函数基本都是二次方程

@@ -8,7 +8,6 @@
 - [differential equations](#differential-equations)
     - [概述](#概述)
       - [1.differential equations](#1differential-equations)
-      - [2.PDE (partial differential equations)](#2pde-partial-differential-equations)
 
 <!-- /code_chunk_output -->
 
@@ -16,12 +15,9 @@
 ### 概述
 
 #### 1.differential equations
-an equation that relates one or more unknown functions and their derivatives.
+用于描述运动（**变化速率与当前状态有关**），求某个时刻的状态
 
-#### 2.PDE (partial differential equations)
-an equation which computes a function between various partial derivatives of a multivariable function
-* partial derivatives（偏导数）
-    * 有多个维度（即变量），每个维度有自己的变化（即针对每个变量求导）
-    * 比如函数T(x,t)，x、t都是变量，则有偏导数：
-        * $\frac{\partial T}{\partial x}$
-        * $\frac{\partial T}{\partial t}$
+* $\frac{d}{dt}\begin{bmatrix}x(t)\\y(t)\end{bmatrix} = \begin{bmatrix}a&b\\c&d\end{bmatrix}\begin{bmatrix}x(t)\\y(t)\end{bmatrix}$
+
+* 因为导数跟自身有关，所以想到用e 表示x、y函数
+* $\begin{bmatrix}x(t)\\y(t)\end{bmatrix} = e^{\begin{bmatrix}a&b\\c&d\end{bmatrix}t}\begin{bmatrix}x(0)\\y(0)\end{bmatrix}$
