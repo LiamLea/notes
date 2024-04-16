@@ -18,12 +18,14 @@
         - [(2) 常用公式](#2-常用公式)
       - [3.以频率的形式表示sin函数](#3以频率的形式表示sin函数)
       - [4.fourier基础](#4fourier基础)
-        - [(1) 波的叠加](#1-波的叠加)
+        - [(1) 波的叠加 (fourier series)](#1-波的叠加-fourier-series)
         - [(2) 求解系数](#2-求解系数)
-      - [5.fourier series](#5fourier-series)
-      - [6.fourier transformation](#6fourier-transformation)
-      - [7.discrete fourier transformation (DFT)](#7discrete-fourier-transformation-dft)
-      - [8.fast fourier transformation (FFT)](#8fast-fourier-transformation-fft)
+      - [5.fourier transformation](#5fourier-transformation)
+        - [(1) 基于函数的理解](#1-基于函数的理解)
+        - [(2) 基于复平面的理解](#2-基于复平面的理解)
+        - [(3) 变换公式](#3-变换公式)
+      - [6.discrete fourier transformation (DFT)](#6discrete-fourier-transformation-dft)
+      - [7.fast fourier transformation (FFT)](#7fast-fourier-transformation-fft)
         - [(1) 基于多项式的理解](#1-基于多项式的理解)
         - [(2) 利用FFT计算DFT](#2-利用fft计算dft)
 
@@ -118,7 +120,7 @@ $f(t) = sin(2\pi kt)$
 
 #### 4.fourier基础
 
-##### (1) 波的叠加
+##### (1) 波的叠加 (fourier series)
 
 * $f(t) = \sum_{k=1}^{N}A_k\sin(2\pi kt + \varphi_k) = \sum_{k=1}^{N}(a_k\sin(2\pi kt) + b_k\cos(2\pi kt))$
 
@@ -129,11 +131,13 @@ $f(t) = sin(2\pi kt)$
     * $\sin x=\frac{e^{ix}-e^{-ix}}{2i}$
   * 所以
     * $a_n\sin nx + b_n\cos nx = a_n\frac{e^{inx}+e^{-inx}}{2} + b_n\frac{e^{inx}-e^{-inx}}{2i} = \frac{a_n-ib_n}{2}e^{inx} + \frac{a_n+ib_n}{2}e^{-inx}$
-* 根据上述推导，使用欧拉公式表示
+
+* 根据上述推导，使用欧拉公式表示（即傅里叶级数）
     * $f(t) = \sum_{k=-n}^{n}C_ke^{2\pi i kt}$
         * $C_0$是实数
         * $C_k$是复数，且$C_k$和$C_{-k}$是**共轭**的（根据上述推导）
-            * 比如$(a+ib)(cosx+isinx) + (a-ib)(cosx-isinx)=2acosx-2bsinx$
+            * 比如$(a+ib)(\cos x+i\sin x) + (a-ib)(\cos x-i\sin x)=2a\cos x-2b\sin x$
+        * 系数（复数） 包含了 **振幅** 和 **相位** 的信息
 
 ##### (2) 求解系数
 
@@ -143,11 +147,22 @@ $f(t) = sin(2\pi kt)$
     * 因为$e^{2\pi i (k-m)t} = 1$
 * 所以$C_m = \int_0^1f(t)e^{-2\pi imt}dt$
 
-#### 5.fourier series
 
-* $f(x) = ... + C_{-2}e^{-2\cdot 2\pi ix} + C_{-1}e^{-1\cdot 2\pi ix} + C_{0}e^{0\cdot 2\pi ix} + C_{1}e^{1\cdot 2\pi ix} + C_{2}e^{2\cdot 2\pi ix} + ...$
+#### 5.fourier transformation
 
-#### 6.fourier transformation
+##### (1) 基于函数的理解
+* 比如信号是一个sin函数
+  * 乘以一个不同频率的sin函数
+  ![](./imgs/ft_07.png)
+  * 乘以一个相同频率的sin函数
+  ![](./imgs/ft_08.png)
+
+* 如果信号是一个cos函数，此时乘以一个相同频率的sin函数，值还是会相互抵消，所以需要乘以一个带相位的sin函数: $\sin(x+\varphi)=\cos \varphi \sin x+\sin \varphi \cos x$
+
+##### (2) 基于复平面的理解
+* 参考: (5) $f(x)\cdot e^{ix}$的理解
+
+##### (3) 变换公式
 
 将时域函数，转换成频率函数，即求fourier series的系数
 * $F(w) = \int_{-\infty}^{\infty}f(t)\cdot e^{-iwt} dt$
@@ -155,7 +170,7 @@ $f(t) = sin(2\pi kt)$
   * $\int_0^1f(x)e^{-2\cdot 2\pi ix}d(x) = C_2$
   * 依次类推: $C_n = \int_0^1f(x)e^{n\cdot 2\pi ix}d(x)$
 
-#### 7.discrete fourier transformation (DFT)
+#### 6.discrete fourier transformation (DFT)
 * 对采样点进行傅里叶变换
 * $X_k=\sum\limits_{n=0}^{N-1}x_n\cdot e^{-i2\pi \frac{k}{N}n}$
 ![](./imgs/ft_04.png)
@@ -163,7 +178,7 @@ $f(t) = sin(2\pi kt)$
 * 求序列$x_n$在各个频率分量的值，用矩阵表示
   * $\begin{bmatrix}X(\omega^0)\\X(\omega^1)\\X(\omega^2)\\\vdots\\X(\omega^{n-1})\end{bmatrix} = \begin{bmatrix}1&1&1&\dots&1\\1&\omega&\omega^2&\dots&\omega^{n-1}\\1&\omega^2&\omega^4&\dots&\omega^{2(n-1)}\\\vdots&\vdots&\vdots&\ddots&\vdots\\1&\omega^{n-1}&\omega^{2(n-1)}&\dots&\omega^{(n-1)(n-1)}\end{bmatrix}\begin{bmatrix}x_0\\x_1\\x_2\\\vdots\\x_{n-1}\end{bmatrix}$
 
-#### 8.fast fourier transformation (FFT)
+#### 7.fast fourier transformation (FFT)
 
 ##### (1) 基于多项式的理解
 * 对于n次的多项式，只要确定**n+1个点**，就能确定该多项式
