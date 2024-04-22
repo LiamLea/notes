@@ -132,6 +132,10 @@ n = np.eye(6,6)
 
     * 在一定范围内随机
     ```python
+    #float类型
+    n = np.random.uniform(1,10,size=(5,4,3,2))
+    
+    #int类型
     #size就是ndarray的形状
     n = np.random.randint(1,10,size=(4,3))
     ```
