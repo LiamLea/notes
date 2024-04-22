@@ -84,7 +84,7 @@
 ##### (2) matrix norm
 
 * Frobenius norm
-  * $\Vert A\Vert_F = |\sum_{i,j}abs(a_{i,j})^2|^{1/2}$
+  * $\Vert A\Vert_F = (\sum_{i,j}abs(a_{i,j})^2)^{1/2}$
 * L1-norm
   * $\Vert A\Vert_1$ = `max( sum(abs(x), axis=0) )`
 * L2-norm
