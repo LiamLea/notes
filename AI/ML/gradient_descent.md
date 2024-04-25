@@ -35,10 +35,9 @@
         - [(1) 算法](#1-算法-2)
       - [4.learning rate decay](#4learning-rate-decay)
       - [5.batch normalization (normalize activations)](#5batch-normalization-normalize-activations)
-        - [(1) 算法](#1-算法-3)
-        - [(2) 在model中使用](#2-在model中使用)
-        - [(3) why](#3-why)
-        - [(4) 如果应用到测试集](#4-如果应用到测试集)
+        - [(1) why](#1-why-1)
+        - [(2) 算法](#2-算法-1)
+        - [(3) 在training和inference中使用](#3-在training和inference中使用)
 
 <!-- /code_chunk_output -->
 
@@ -331,7 +330,15 @@ for i in range(num_epochs):
 
 #### 5.batch normalization (normalize activations)
 
-##### (1) 算法
+![](./imgs/gd_03.png)
+
+##### (1) why
+* covariate shift
+    * 两种**不同数据分布** 的**输入** **输出**数据的**分布都一样**
+        * 这样就会导致，某一种数据训练出来的模型，在另一种数据上表现很差
+* batch normalization能保证每层输入的数据的分布 都**一致** 且 **合理**（即在这个分布下，代价函数比较小）
+
+##### (2) 算法
 * $\mu = \frac{1}{m}\sum_i z^{[l](i)}$
 * $\sigma^2 = \frac{1}{m}\sum_i (z^{[l](i)} - \mu)^2$
 * $z_{norm}^{[l](i)} = \frac{z^{[l](i)} - \mu}{\sqrt {\sigma^2 + \epsilon}}$
@@ -341,20 +348,12 @@ for i in range(num_epochs):
     * $\gamma$用于调整数据分布的方差，$\beta$用于调整数据的平均值
         * 这两个参数都是通过模型进行学习
 
-##### (2) 在model中使用
-* 结合 mini-batch 使用
-* 每层的参数: $W^{[l]}, \gamma^{[l]}, \beta^{[l]}$
-    * 不需要$b^{[l]}$参数了，因为计算$\tilde{z}^{[l](i)}$时，会将b的值给消掉
+##### (3) 在training和inference中使用
 
-##### (3) why
-* covariate shift
-    * 两种**不同数据分布** 的**输入** **输出**数据的**分布都一样**
-        * 这样就会导致，某一种数据训练出来的模型，在另一种数据上表现很差
-* batch normalization能保证每层输入的数据的分布 都**一致** 且 **合理**（即在这个分布下，代价函数比较小）
+* training mode:
+    * $\mu$和$\sigma$使用mini-batch计算出来
 
-##### (4) 如果应用到测试集
-
-* 因为测试集都是一个个的数据，所以无法求取平均值和方差
-* 可以使用exponentially weighted averages方式
-    * 在训练时，保留通过exponentially weighted averages计算出的平均值和方差
-    * 在后续模型测试和预测时使用
+* inference mode:
+    * $\mu$和$\sigma$ 在training中 使用 moving statics (exponentially weighted averages方式) 计算出来
+        * moving_mean = moving_mean * momentum + mean(batch) * (1 - momentum)
+        * moving_var = moving_var * momentum + var(batch) * (1 - momentum)

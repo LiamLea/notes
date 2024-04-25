@@ -29,6 +29,10 @@
         - [(2) inception module](#2-inception-module)
         - [(3) inception network v1](#3-inception-network-v1)
       - [8.MobileNet](#8mobilenet)
+        - [(1) depthwise separable convolution](#1-depthwise-separable-convolution)
+        - [(2) 计算量](#2-计算量)
+        - [(3) MobileNet v1 vs v2](#3-mobilenet-v1-vs-v2)
+      - [9.EfficientNet](#9efficientnet)
 
 <!-- /code_chunk_output -->
 
@@ -128,7 +132,9 @@
     * 因为deeper network可以理解成shallower network加上identity layer
 * 实际上，deeper network性能可能更差
     * 因为学习identity function很难
-    * 因为每层擅长学习的是非线性函数，而identity function是线性函数 
+    * 因为每层擅长学习的是非线性函数，而identity function是线性函数
+
+* 对vanishing gradient也有帮助
 
 ##### (2) residual block
 ![](./imgs/rn_01.png)
@@ -153,7 +159,7 @@
     * 需要进行的乘法量：$28*28*16*192 + 28*28*32*5*5*16=12.4m$
 
 ##### (2) inception module
-* 在一层中进行1*1, 3*3, 5*5, pool
+* 在一层中进行$1*1$, $3*3$, $5*5$, pool
 ![](./imgs/in_01.png)
 ![](./imgs/in_04.png)
 
@@ -163,3 +169,31 @@
 * 中间还有Auxiliary classifier，用作regularization
 
 #### 8.MobileNet
+
+##### (1) depthwise separable convolution
+![](./imgs/mn_01.png)
+
+* depthwise convolution
+    * filter: $f\times f\times n_c^{[l-1]}$
+        * 有$n_c^{[l-1]}$个filter，对input的每个channel使用一个filter进行convolution
+
+* pointwise convolution
+    * filter: $1\times 1\times n_c^{[l-1]} \times n_c^{[l]}$
+
+##### (2) 计算量
+
+* depthwise separable convolution 计算量为普通convolution的 $\frac{1}{n_c^{[l]}}+\frac{1}{f^2}$
+
+##### (3) MobileNet v1 vs v2
+![](./imgs/mn_02.png)
+
+* v2的改进
+    * 使用ResNet
+    * 使用expansion先扩展dimension，进行复杂计算，再使用projection缩小dimension
+        * 从而能够计算复杂的函数，且使用较少的内存
+    ![](./imgs/mn_03.png)
+
+#### 9.EfficientNet
+根据设备的资源，调整以下参数，从而使得neural network能够运行各个设备：
+* 图片的resolution (r)
+* neural network的 depth (d) 和 width (w)
