@@ -78,11 +78,11 @@
 
 ##### (4) cost function vs loss function
 * loss function
-    * $L(f_{\vec w,b}(\vec x^{(i)}), y^{(i)})$
+    * $L(\hat y^{(i)}, y^{(i)})$
     * 描述 单个训练数据的实际值与预测值 的偏差
 
 * loss function 和 cost function关系
-    * $J(\vec w,b) = \frac{1}{m}\sum_{i=1}^m L(f_{\vec w,b}(\vec x^{(i)}), y^{(i)})$
+    * $J(\vec w,b) = \frac{1}{m}\sum_{i=1}^m L(\hat y^{(i)}, y^{(i)})$
 
 ##### (5) multiple features
 
@@ -123,8 +123,8 @@
 * 特征: x
 * 参数: w,b
 * cost function: $J(w,b)$
-    * 比如：squared error cost function
-        * $J(w,b) = \frac{1}{2m}\sum_{i=1}^m (f_{w,b}(x^{(i)})-y^{(i)})^2$
+    * 使用squared error cost function:
+    * $J(w,b) = \frac{1}{2m}\sum_{i=1}^m (\hat y^{(i)}-y^{(i)})^2$
 * 目标: 寻找w,b，使用cost function值最小
 
 ##### (2) multiple linear regression
@@ -133,13 +133,13 @@
 * 特征: $\vec x = \begin{bmatrix} x_1 & x_2 & \cdots & x_n\end{bmatrix}$
 * 参数: $\vec w = \begin{bmatrix} w_1 & w_2 & \cdots & w_n\end{bmatrix}, b$
 * cost function: $J(\vec w,b)$
-    * 比如：squared error cost function
-    * $J(\vec w,b) = \frac{1}{2m}\sum_{i=1}^m (f_{\vec w,b}(\vec x^{(i)})-y^{(i)})^2$
+    * 使用squared error cost function:
+    * $J(\vec w,b) = \frac{1}{2m}\sum_{i=1}^m (\hat y^{(i)}-y^{(i)})^2$
 
 ##### (3) regularized linear regression (解决overfitting的问题)
 * cost function: $J(w,b)$
-    * 比如: squared error cost function
-    * $J(w,b) = \frac{1}{2m}\sum_{i=1}^m (f_{w,b}(x^{(i)})-y^{(i)})^2 + \frac{\lambda}{2m}\sum_{j}^n w_j^2$
+    * 使用squared error cost function
+    * $J(w,b) = \frac{1}{2m}\sum_{i=1}^m (\hat y^{(i)}-y^{(i)})^2 + \frac{\lambda}{2m}\sum_{j}^n w_j^2$
         * n等于特征的数量
             * 由于不知道哪些feature重要，哪些不重要，则代价函数需要考虑所有的features
         * $\lambda$ 决定了如何平衡 fit data（代价函数的第一项） 和 避免overfitting（代价函数的第二项） 这两个目标
@@ -165,12 +165,8 @@
 * 特征: $\vec x$
 * 参数: $\vec w,b$
 * cost function: $J(\vec w,b)$
-    * 比如:
+    * 使用Binary Cross-Entropy Loss:
     * $L(\hat y^{(i)}, y^{(i)}) = -y^{(i)}\log (\hat y^{(i)}) - (1-y^{(i)})\log (1 - \hat y^{(i)})$
-        * 通过maximum likelihood方法，找到合适的loss function
-        ![](./imgs/overview_02.png)
-        * 当$y^{(i)} = 1$时，预测的值越接近1，loss的值就越小，反之越大
-        * 当$y^{(i)} = 0$时，预测的值越接近0，loss的值就越小，反之越大
     * $J(\vec w,b) = \frac{1}{m}\sum_{i=1}^m L(\hat y^{(i)}, y^{(i)}) = -\frac{1}{m}\sum_{i=1}^m[y^{(i)}\log (\hat y^{(i)}) + (1-y^{(i)})\log (1 - \hat y^{(i)})]$
 
 ##### (1) sigmoid function (logistic function)
