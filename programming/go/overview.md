@@ -149,7 +149,7 @@ go mod init <module_name>
 go mod tidy
 
 #下载所需要的module
-go mod download
+go mod download -x
 
 #列出依赖的module
 go mod graph
