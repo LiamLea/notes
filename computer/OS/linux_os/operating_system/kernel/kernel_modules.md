@@ -27,6 +27,11 @@ linux操作系统启动时，由systemd-modules-load.service服务，加载需�
 find /lib/modules/$(uname -r) -type f -name '*.ko*'
 ```
 
+* 查看module信息
+```shell
+modinfo <module_name>
+```
+
 #### 2.永久加载指定模块
 * 查看systemd-modules-load服务
 ```shell
