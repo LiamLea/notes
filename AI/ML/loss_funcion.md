@@ -11,6 +11,7 @@
       - [2.Classification](#2classification)
         - [(1) Binary Cross-Entropy Loss (Log Loss)](#1-binary-cross-entropy-loss-log-loss)
         - [(2) Categorical Cross-Entropy Loss](#2-categorical-cross-entropy-loss)
+        - [(3) sparse Categorical Cross-Entropy Loss](#3-sparse-categorical-cross-entropy-loss)
 
 <!-- /code_chunk_output -->
 
@@ -33,3 +34,8 @@
 ##### (2) Categorical Cross-Entropy Loss
 * 有多种类别，会输出多个值，比如: [0.1, 0.8, 0.1]，对应的数据可能就是[0,1,0]
 * $L=y^{(i)}\log (\hat y^{(i)}) $
+
+##### (3) sparse Categorical Cross-Entropy Loss
+* 一个object可能会属于多个class
+* $L=\sum\limits_c y^{(i)}_c\log (\hat y^{(i)}_c) $
+  * c是第c个class
