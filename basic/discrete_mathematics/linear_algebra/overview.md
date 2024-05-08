@@ -236,7 +236,7 @@
 
 * outer product
     * 两个向量组成一个新的矩阵
-    * $\vec u \otimes \vec v = \begin{bmatrix} u_1v_1 & u_2v_2 & \cdots & u_1v_n \\ u_2v_1 & u_2v_2 & \cdots &u_2v_n \\ \vdots & \vdots & \ddots & \vdots \\ u_mv_1 & u_mv_2 & \cdots & u_mv_n\end{bmatrix}$
+    * $\vec u \otimes \vec v = \begin{bmatrix} u_1v_1 & u_1v_2 & \cdots & u_1v_n \\ u_2v_1 & u_2v_2 & \cdots &u_2v_n \\ \vdots & \vdots & \ddots & \vdots \\ u_mv_1 & u_mv_2 & \cdots & u_mv_n\end{bmatrix}$
 
 * inner product
     * 向量的inner product就是dot product

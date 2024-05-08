@@ -14,7 +14,7 @@
         - [(2) 命令模式](#2-命令模式)
       - [4.iPython使用](#4ipython使用)
         - [(1) 查看函数帮助](#1-查看函数帮助)
-        - [(2) 魔法命令](#2-魔法命令)
+        - [(2) magic commands](#2-magic-commands)
 
 <!-- /code_chunk_output -->
 
@@ -68,7 +68,9 @@ conda create -n jupyter notebook
 * 简单帮助: `<func>?`
 * 源码: `<func>??`
 
-##### (2) 魔法命令
+##### (2) magic commands
+
+[参考](https://ipython.readthedocs.io/en/stable/interactive/magics.html#)
 
 * 运行pyhon文件
     * `%run <python_file>`

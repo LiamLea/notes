@@ -22,10 +22,10 @@
 
 #### 1.face verification vs face recognition
 * face verification
-    * Confirms if a person is who they claim to be
+    * Is this the claimed person?
     * 1:1 (known person)
 * face recognition
-    * Identifies an unknown person by comparing their face to a database of known faces
+    * Who is this person?
     * 1:N (unknown person)
      
 #### 2.liveness detection
