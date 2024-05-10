@@ -34,6 +34,10 @@
         - [(2) random initialization](#2-random-initialization)
         - [(3) He Initialization (跟Xavier类似) (减轻 vanishing/exploding gradients)](#3-he-initialization-跟xavier类似-减轻-vanishingexploding-gradients)
       - [7.end-to-end deep learning](#7end-to-end-deep-learning)
+      - [8.vanishing (or exploding) gradients](#8vanishing-or-exploding-gradients)
+        - [(1) sigmoid作为activation (造成vanishing)](#1-sigmoid作为activation-造成vanishing)
+        - [(2) 不恰当的initialization (造成vanishing/exploding)](#2-不恰当的initialization-造成vanishingexploding)
+        - [(3) graident clipping (解决exploding)](#3-graident-clipping-解决exploding)
 
 <!-- /code_chunk_output -->
 
@@ -114,16 +118,18 @@
 
 * $g(z) = \frac{1}{1+e^{-z}}$
     * 能够使得输出范围在 0-1 之间
-* $\frac{d}{dz}g(z)=g(z)(1-g(z))$
+* sigmoid的导数
+    * $\frac{d}{dz}g(z)=g(z)(1-g(z))$
 
 * 现在ReLU更常用，因为sigmoid在两端，**斜率趋近于0**，会导致训练效率很差
     * 一般只用在output layer，要求输出结果在0-1之间，比如binary classfication
 
 ##### (3) tanh
 
-* $g(z) = tanh(x) = \frac{sinhx}{coshx} = \frac{e^x-e^{-x}}{e^x+e^{-x}}$
+* $g(z) = \tanh(x) = \frac{\sinh x}{\cosh x} = \frac{e^x-e^{-x}}{e^x+e^{-x}}$
 
-* $\frac{d}{dz}g(z)=(1-(g(z))^2)$
+* tanh的导数
+    * $\frac{d}{dz}g(z)=(1-(g(z))^2)$
 
 ![](./imgs/nn_05.png)
 
@@ -133,7 +139,7 @@
 ![](./imgs/nn_06.png)
 
 * 通过一段段线性函数，组合成各种复杂的非线性的函数
-![](./imgs/nn_07.png)
+    * ![](./imgs/nn_07.png)
 
 ##### (5) softmax activation
 
@@ -214,16 +220,10 @@ for l in range(1, L):
 
 ##### (3) He Initialization (跟Xavier类似) (减轻 vanishing/exploding gradients)
 
-* vanishing/exploding gradients
-
-    * 当neuron network**层数过多**，可能会导致activation呈**指数级**增长/减小，导致斜率都特别大/特别小
-
-* initialization
-
-    * 对weight进行normalize，不能解决问题，但是能够使斜率的vanishing/exploding不会太快
-        * 默认平均值mean=0，方差$Var(W^{[i]})$根据activation function的类型确定
-            * 比如Relu: $Var(W^{[i]}) = \frac{2}{n^{n-1}}$
-        * $W^{[i]} = \text {np.random.randn(...)} * \sqrt {Var(W^{[i]})}$
+* 对weight进行normalize，不能解决问题，但是能够使斜率的vanishing/exploding不会太快
+    * 默认平均值mean=0，方差$Var(W^{[i]})$根据activation function的类型确定
+        * 比如Relu: $Var(W^{[i]}) = \frac{2}{n^{n-1}}$
+    * $W^{[i]} = \text {np.random.randn(...)} * \sqrt {Var(W^{[i]})}$
 
 ```python
 for l in range(1, L):
@@ -238,3 +238,26 @@ for l in range(1, L):
 * 传统的方式，需要可能需要多个中间步骤
     * 比如：人脸识别 `input --model-->  识别出人脸  --人脸对比模型--> 输入是否匹配`
     * 比如：语音识别 `input --> features --> phonemes --> words --> transcript`
+
+#### 8.vanishing (or exploding) gradients
+
+* 当neuron network**层数过多**，导致**gradient**都特别大/特别小，导致训练会很困难
+    * 当gradient很小时，计算机就会处理成0
+
+##### (1) sigmoid作为activation (造成vanishing)
+* 当使用sigmoid作为activation function时，会存在vanishing graidents问题
+    * ![](./imgs/overview_03.png)
+    * 因为sigmoid的值在0-1之间，所以 $0<h<1$ ，所以 $h(1-h) < 1/4$
+    * **earlier layer**的gradient就会越小
+    * 所以当层数较多时，就会出现vanishing gradient
+
+##### (2) 不恰当的initialization (造成vanishing/exploding)
+![](./imgs/overview_04.png)
+* 当neuron network**层数过多**
+    * 可能会导致activation呈**指数级**增长/减小
+    * backpropa时，gradient会 特别大/特别小
+
+##### (3) graident clipping (解决exploding)
+![](./imgs/overview_05.png)
+
+* 将 斜率/k，从而降低步长
