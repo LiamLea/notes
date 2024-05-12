@@ -12,6 +12,7 @@
       - [2.notation](#2notation)
         - [(1) vocabulary](#1-vocabulary)
       - [3.RNN (recurrent neural network)](#3rnn-recurrent-neural-network)
+        - [(1) RNN cell](#1-rnn-cell)
       - [4.RNN 类型](#4rnn-类型)
       - [5.language model](#5language-model)
       - [6.GRU (gated recurrent unit)](#6gru-gated-recurrent-unit)
@@ -35,10 +36,15 @@
 
 #### 2.notation
 
-* $x^{<t>}$: 输入序列的第t个item
-* $y^{<t>}$: 输出序列的第t个item
-* $T_x$: 输入序列的长度
-* $T_y$: 输出序列的长度
+* $x^{<t>}$: 输入序列的第t个time step
+* $y^{<t>}$: 输出序列的第t个time step
+* $a^{<t>}$: 第t个cell**hidden state** (也就是activation)
+* $T_x$: input time steps size (输入序列的长度)
+* $T_y$: output time steps size (输出序列的长度)
+* $n_x$: $x^{<t>}$的长度（即vocabulary的数量）
+* $n_a$: $a^{<t>}$的长度
+    * 一个$\vec w$和一个$\vec x$产生一个a值
+    * $n_a$个$\vec w$和一个$\vec x$产生一个长度$n_a$的$\vec a$
 
 * representing words
     * 构建一个vocabulary (比如有10,000个words)
@@ -57,17 +63,23 @@
 ![](./imgs/rnn_01.png)
 
 
-* model
-    * $a^{<0>}$一般设为0
-    * $a^{<t>} = g(W_{a}[a^{<t-1>},x^{<t>}] +b_a)$
-    * $\hat y^{<t>} = g(W_{y}a^{<t>}+b_y)$
-        * 是下面两个公式的简化写法（将参数堆叠成一个更大的矩阵）
-            * $a^{<t>} = g(W_{aa}a^{<t-1>} + W_{ax}x^{<t>}+b_a)$
-            * $\hat y^{<t>} = g(W_{ya}a^{<t>}+b_y)$
-        * 注意：两个g函数不一样
+##### (1) RNN cell
+![](./imgs/rnn_12.png)
+* $a^{<0>}$一般设为0
+* $a^{<t>} = g(W_{a}[a^{<t-1>},x^{<t>}] +b_a)$
+* $\hat y^{<t>} = g(W_{y}a^{<t>}+b_y)$
+    * 是下面两个公式的简化写法（将参数堆叠成一个更大的矩阵）
+        * $a^{<t>} = g(W_{aa}a^{<t-1>} + W_{ax}x^{<t>}+b_a)$
+        * $\hat y^{<t>} = g(W_{ya}a^{<t>}+b_y)$
+    * 注意：两个g函数不一样
 
-* 特点
-    * 只考虑了之前输入的信息，未考虑之后输出的信息
+* 数据结构
+    * x: $(n_x, m, T_x)$
+    * a: $(n_a, m, T_x)$
+    * y: $(n_y, m, T_y)$
+    * $W_{ax}$: $(n_a,n_x)$
+    * $W_{aa}$: $(n_a,n_a)$
+    * $W_{ya}$: $(n_y,n_a)$
 
 #### 4.RNN 类型
 
@@ -113,11 +125,14 @@
         * 当=0时，就相当于全部忘记，即清空memory
 * 全部cell的state (在GRU中, $a^{<t>} = c^{<t>}$)
     * $c^{<t>} = \Gamma_u * \tilde{c}^{<t>} + (1-\Gamma_u) * c^{<t-1>}$
+        * $*$ 是element-wise的乘法，就相当于一个mask
         * $\Gamma_u$: how much of the candidate activation vector to incorporate into the new hidden state
         * 当=1时，表示全部注入，则会丢弃之前的状态
         * 当=0时，表示不注入，则完全保留之前的状态
 
 #### 7.LSTM (long short term memory)
+
+* LSTM uses a cell state, which is like a long-term memory, to help deal with the issue of vanishing gradients
 
 ![](./imgs/rnn_09.png)
 
@@ -128,17 +143,18 @@
     * $\Gamma_f = \sigma(W_f[a^{<t-1>}, x^{<t>}] + b_f)$
         * 使用sigmoid函数，所以输出范围 0-1
 * update gate
-    * $\Gamma_u = \sigma(W_u[a^{<t-1>}, x^{<t>}] + b_u)$
+    * $\Gamma_i = \sigma(W_i[a^{<t-1>}, x^{<t>}] + b_i)$
 * output gate
     * $\Gamma_o = \sigma(W_o[a^{<t-1>}, x^{<t>}] + b_o)$
-* 当前cell的state
+* 当前cell的state (Candidate value)
     * $\tilde{c}^{<t>} = \tanh(W_c[a^{<t-1>}, x^{<t>}] + b_c)$
 * 全部cell的state 
-    * $c^{<t>} = \Gamma_u * \tilde{c}^{<t>} + \Gamma_f * c^{<t-1>}$
-        * $\Gamma_u$: how much of the present hidden state to incorporate
+    * $c^{<t>} = \Gamma_i * \tilde{c}^{<t>} + \Gamma_f * c^{<t-1>}$
+        * $*$ 是element-wise的乘法，就相当于一个mask
+        * $\Gamma_i$: how much of the present hidden state to incorporate
         * $\Gamma_f$: how much of the previous hidden state to forget 
         * $\Gamma_o$: how much of the present hidden information to pass to the next 
-* activation
+* hidden state (activation)
     * $a^{<t>} = \Gamma_o * \tanh(c^{<t>})$
 
 #### 8.bidirectional RNN (BRNN)
