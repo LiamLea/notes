@@ -39,6 +39,8 @@
 ![](./imgs/bp_01.png)
 ![](./imgs/bp_02.png)
 
+* 除以m（样本数）是 因为上面的dW表示dL/dW，而不是dC/dW
+
 #### 2.代码实现
 
 ##### (1) initialize parameters实现
