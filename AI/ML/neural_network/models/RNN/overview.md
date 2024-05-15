@@ -101,9 +101,16 @@
 
 * 利用one to many RNN模型，根据其前面的输入，预测下一个单词（y是一个vector，用于描述vocabulary每个单词在此处出现的概率）
     * $x^{<1>}$为0
-* y是 从vocabulary中 根据概率分布 随机取一个token
+* y是 从vocabulary中 根据概率分布 进行采样（即根据概率分布随机取一个token）
 
 * $L=\sum\limits_t-y^{<t>}\log \hat y^{<t>}$
+
+* X,Y表示方式举例:
+    * X: [None, 23, 31, 55, 78]
+        * 表示$x_0$为None（表示最初的输入为0，forward prop时会编码成$\vec 0$），$x_1$为 vocabulary[23]这个token，$x_2$为 vocabulary[31]这个token，以此类推
+    * Y: X[1:] + [132]
+        * Y[0]为X[1]，Y的最后一个token为vocabulary[132]这个token
+    * forward prop时，会对X,Y列表的每个token进行one-hot编码，每个token会编码成$\begin{bmatrix} 0\\0\\ \vdots \\1 \\ \vdots\\0 \end{bmatrix}$
 
 #### 6.GRU (gated recurrent unit)
 

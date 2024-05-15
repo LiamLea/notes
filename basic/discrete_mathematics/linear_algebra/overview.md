@@ -243,27 +243,28 @@
     * 矩阵的inner product比较复杂
 
 ##### (2) dot product (vector)
-
-* 理解: $\vec v_1 \cdot \vec v_2$
-    * 对$\vec v_2$进行**线性变换**
-    * 或 $\vec v_2$在$\vec v_1$上的**映射**
-
 * dot product可以表示
     * 向量的inner product
     * 矩阵的matrix multiply
 
-* $\vec v \cdot \vec w$ = (length of projected $\vec w$ on $\vec v$)(length of $\vec v$) = $\vec w \cdot \vec v$
-    * 当$\vec v$和$\vec w$方向 不一致时为负数，垂直时为0
-
-* 可以将$\begin{bmatrix} 1 \\ 2 \end{bmatrix} \cdot \begin{bmatrix} 4 \\ 3 \end{bmatrix}$理解成，对向量进行线性变换
+* 线性理解
     * $\begin{bmatrix} 1 & 2 \end{bmatrix} \begin{bmatrix} 4 \\ 3 \end{bmatrix}=1*4+2*3=10$
 
-* 为什么映射和线性变换有关
-    * duality: 比如存在一条斜线，该斜线的1单元记为$\vec u$，在x上的映射（也是$\vec i$在该斜线上的映射）记为$u_x$，在y上的映射（也是$\vec j$在该斜线上的映射）记为$u_y$
-        * 能够得出结论：$\vec i$和$\vec j$在该斜线上的映射 = $\vec u$在x和y上的映射
-    * 若该斜线上存在一个向量$\vec v = (v_x,v_y)$，$\vec v \cdot \begin{bmatrix} x \\ y \end{bmatrix}$
-        * 所以x在$\vec v$上的映射为$v_x$（同理y）
-    * $\begin{bmatrix} x \\ y \end{bmatrix} = x\vec i + y\vec j$，求在$\vec v$上的映射，所以基向量$(\vec i, \vec j)$就变为了$\vec v = (v_x,v_y)$，所以$\begin{bmatrix} x \\ y \end{bmatrix}$在该斜线上的映射就是$xv_x + yv_y$，也就是$\begin{bmatrix} v_x & v_y \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix}$
+* 映射理解：**$\vec a\cdot\vec b= a_xb_x+a_yb_y=|\vec a||\vec b|\cos\theta$**
+    * 一个向量在另一个向量上的**映射**，并**乘以另一个向量的长度**
+    * 单位向量$\vec u=(u_x,u_y)$
+        * $|\vec u|=1$，$u_x,u_y$不等于1
+        * duality: 
+            * ($\vec i$在$\vec u$上的映射) = ($\vec u$在$\vec i$上的映射) = $u_x$
+            * ($\vec j$在$\vec u$上的映射) = ($\vec u$在$\vec j$上的映射) = $u_y$
+    * 已知向量$\vec v=(mu_x,nu_y)$
+        * 则向量$\vec x =(x,y)=x\vec i+y\vec j$在$\vec v$上的映射$xmu_x+ymu_y$
+        * 就等于$\vec v\cdot\vec x$
+    * 所以
+        * **$\vec a\cdot\vec b=|\vec a||\vec b|\cos\theta$**
+            * $\theta$为a和b之间的夹角
+            * $|\vec b|\cos\theta$为$\vec b$在$\vec a$上的映射
+            * 所以a,b方向不一致时为负数，垂直时为0
 
     ![](./imgs/overview_02.png)
 
