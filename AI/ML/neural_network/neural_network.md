@@ -258,6 +258,19 @@ for l in range(1, L):
     * backpropa时，gradient会 特别大/特别小
 
 ##### (3) graident clipping (解决exploding)
-![](./imgs/overview_05.png)
+有多中裁剪方法
 
-* 将 斜率/k，从而降低步长
+* 方法一：You will use a simple element-wise clipping procedure, in which every element of the gradient vector is clipped to fall between some range [-N, N].
+    * For example, if the N=10
+        * The range is [-10, 10]
+        * If any component of the gradient vector is greater than 10, it is set to 10.
+        * If any component of the gradient vector is less than -10, it is set to -10.
+        * If any components are between -10 and 10, they keep their original values.
+```python
+#out用于就地（in place）设置，比如下面就是将 np.clip返回值 赋值给 graident
+for gradient in [dWax, dWaa, dWya, db, dby]:
+    np.clip(gradient, -maxValue, maxValue, out = gradient)
+```
+
+* 方法二：除以一个k值（k是变化的），使得gradient满足阈值范围$\tau$
+![](./imgs/overview_05.png)
