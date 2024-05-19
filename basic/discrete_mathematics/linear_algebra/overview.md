@@ -268,6 +268,9 @@
 
     ![](./imgs/overview_02.png)
 
+* 所以$\vec a$在$\vec b$上的映射向量为: $\frac{\vec a\cdot \vec b}{|\vec b|^2}\vec b$
+    * $\vec a$在$\vec b$上的映射长度为$\frac{\vec a\cdot \vec b}{|\vec b|}$
+
 ##### (3) matrix multiply
 
 * 理解: $A \cdot B$
