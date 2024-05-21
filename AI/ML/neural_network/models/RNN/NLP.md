@@ -21,6 +21,14 @@
       - [4.debias word embeddings](#4debias-word-embeddings)
         - [(1) identify bias direction](#1-identify-bias-direction)
         - [(2) neutralize](#2-neutralize)
+        - [(3) equalization](#3-equalization)
+      - [5.beam search](#5beam-search)
+        - [(1) 优化](#1-优化)
+        - [(2) beam witdth的选择](#2-beam-witdth的选择)
+        - [(3) error analysis](#3-error-analysis)
+      - [6.blue score (bilingual evaluation understudy)](#6blue-score-bilingual-evaluation-understudy)
+      - [7.attetion model](#7attetion-model)
+        - [(1) context计算](#1-context计算)
 
 <!-- /code_chunk_output -->
 
@@ -133,3 +141,71 @@ an unsupervised non-linear dimensionality reduction technique for data explorati
 
 * 输入$e_{receptionist}$，需要清除其bias direction上的分量
 ![](./imgs/nlp_06.png)
+
+* 先求输入在bias direction上的映射
+  * $e^{bias\_component} = \frac{e\cdot g}{\Vert g\Vert_2^2} * g$
+
+* 然后减去bias direction上的分量
+  * $e^{debiased} = e - e^{bias\_component}$
+
+##### (3) equalization
+
+* 比如actor和actress只在性别维度有区别，在其他维度没有区别
+![](./imgs/nlp_08.png)
+
+#### 5.beam search
+
+* beam width = n
+* $y^{<1>}$选择 概率$P(y^{<1>}|x)$ 最高的前n个$(y^{<1>},)$
+* $y^{<2>}$选择 概率$P(y^{<1>}|x) \times P(y^{<2>}|x,y^{<1>})$ 最高的前n个$(y^{<1>},y^{<2>})$
+  * 需要计算所有pair的概率（有$n * \#vocabulary$ 对pairs）
+    * 因为一个很大的值乘以一个很小的值 可能大于 一个次大的值乘以另一个值
+* 依次类推，直到遇到终止符
+
+##### (1) 优化
+* 使用该公式计算概率（而不是整体相乘）：
+  * arg max $\frac{1}{T_y^{\alpha}}\sum\limits_{t=1}^{T_y} P(y^{<t>}|x,y^{<1>},...,y^{t-1})$
+    * 使用log方面计算机计算，不然容易出现rounding error
+    * 除以$T_y$是进行归一化，避免总是选择短的序列
+    * $\alpha$没有理论证明，但是在实践中效果更好
+
+##### (2) beam witdth的选择
+根据使用场景进行选择，在实际使用中一般设为10左右
+
+##### (3) error analysis
+* 一条数据进行比较
+  * ![](./imgs/bs_01.png)
+
+* 对所有训练数据进行判断，能够得到错误比例（RNN的错误还是beam search的错误），从而进行调整
+
+#### 6.blue score (bilingual evaluation understudy)
+
+* 基于参考（提供的翻译结果），给machine transcription打分
+
+* $p_n$ = Bleu score on n-grams only
+* combined bleu score: $BP \times \exp(\frac{1}{i}\sum\limits_{n=1}^i p_n)$
+  * BP: bervity penality，用于惩罚较短的翻译
+    * if MT_output_length > reference_output_length
+      * BP=1
+    * else
+      * BP=exp(1-reference_output_length/MT_output_length)
+  
+* $p_2$: 就是以两个相连的词为基本单元，计算分数
+![](./imgs/bls_01.png)
+
+#### 7.attetion model
+
+![](./imgs/am_01.png)
+![](./imgs/am_02.png)
+
+##### (1) context计算
+![](./imgs/am_03.png)
+
+* $c^{<t>}=\sum\limits_{t'}\alpha^{<t,t'>}a^{<t'>}$
+* $\alpha^{<t,t'>}$: 表示$y^{<t>}$对$a^{<t'>}$应该关注多少
+  * 是一个softmax函数，所以$\sum\limits_{t'}\alpha^{<t,t'>}=1$
+  * $\alpha^{<t,t'>} = \frac {\exp(e^{<t,t'>})}{\sum_{t'=1}^{T_x}exp(e^{<t,t'>})}$
+
+* $e^{<t,t'>}$
+  * 是一个dense layer
+  * ![](./imgs/am_04.png)

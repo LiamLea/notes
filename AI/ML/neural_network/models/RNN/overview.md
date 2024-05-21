@@ -15,6 +15,8 @@
         - [(1) RNN cell](#1-rnn-cell)
       - [4.RNN 类型](#4rnn-类型)
       - [5.language model](#5language-model)
+        - [(1) 基本的language model](#1-基本的language-model)
+        - [(2) conditional language model](#2-conditional-language-model)
       - [6.GRU (gated recurrent unit)](#6gru-gated-recurrent-unit)
         - [(1) GRU cell](#1-gru-cell)
       - [7.LSTM (long short term memory)](#7lstm-long-short-term-memory)
@@ -97,6 +99,7 @@
 
 #### 5.language model
 
+##### (1) 基本的language model
 ![](./imgs/rnn_06.png)
 
 * 利用one to many RNN模型，根据其前面的输入，预测下一个单词（y是一个vector，用于描述vocabulary每个单词在此处出现的概率）
@@ -111,6 +114,13 @@
     * Y: X[1:] + [132]
         * Y[0]为X[1]，Y的最后一个token为vocabulary[132]这个token
     * forward prop时，会对X,Y列表的每个token进行one-hot编码，每个token会编码成$\begin{bmatrix} 0\\0\\ \vdots \\1 \\ \vdots\\0 \end{bmatrix}$
+
+##### (2) conditional language model
+![](./imgs/rnn_13.png)
+* 绿色部分为encode，紫色部分为decode
+* 和基本的language model一样，只不过输入不一样（这里输入的是encode的内容）
+* y也不是随机选择的
+    * 对于翻译场景等：arg max $P(y^{<1>},...,y^{T_y}|x)$
 
 #### 6.GRU (gated recurrent unit)
 
