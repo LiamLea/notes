@@ -120,7 +120,7 @@ def alpaca_model(image_shape=IMG_SIZE, data_augmentation=data_augmenter()):
     """
     MobileNetV2模型，嵌套在当前模型之中
 
-    training=False表示batchnormalization使用inference mode，即保留之前的mean和var，不重新训练
+    training=False表示batchnormalization不训练alpha和gamma参数
     """
     x = base_model(x, training=False) 
     

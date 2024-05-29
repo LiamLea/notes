@@ -149,7 +149,7 @@
 
 #### 7.LSTM (long short term memory)
 
-* LSTM uses a cell state, which is like a long-term memory, to help deal with the issue of vanishing gradients
+* LSTM uses a cell state, which is like a long-term memory, to help deal with the issue of **vanishing gradients**
 
 ![](./imgs/rnn_09.png)
 
@@ -173,6 +173,8 @@
         * $\Gamma_o$: how much of the present hidden information to pass to the next 
 * hidden state (activation)
     * $a^{<t>} = \Gamma_o * \tanh(c^{<t>})$
+    * 为什么叫hidden state而不叫activation
+        * hidden state是有状态的，而activation是无状态的
 
 #### 8.bidirectional RNN (BRNN)
 ![](./imgs/rnn_10.png)

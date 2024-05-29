@@ -29,6 +29,7 @@
       - [6.blue score (bilingual evaluation understudy)](#6blue-score-bilingual-evaluation-understudy)
       - [7.attetion model](#7attetion-model)
         - [(1) context计算](#1-context计算)
+        - [(2) 基于query/key/value的理解](#2-基于querykeyvalue的理解)
 
 <!-- /code_chunk_output -->
 
@@ -36,14 +37,15 @@
 ### overview
 
 #### 1.word embedding
+* embedding: `a token` `--encode-->` `a high-dimensional vector (embedding vector)`
+  * vector的一个维度就是该token某一方面的意义（比如：词性、性别、高度等等）
+  * 数值表示程度，范围在[-1,1]
 
+* ![](./imgs/em_01.png)
+  * 这里只有3个维度
 
 ##### (1) embedding matrix: E
-
-* 添加特征，一个特征一个维度，数值[-1,1]表示 该word 具有 该特征的程度
-
 ![](./imgs/nlp_01.png)
-
 
 * embedding vector: 每个word的特征vector（即图中的一列）
   * $e_{example}$: 表示"example"的embedding vector
@@ -198,6 +200,10 @@ an unsupervised non-linear dimensionality reduction technique for data explorati
 ![](./imgs/am_01.png)
 ![](./imgs/am_02.png)
 
+* context: $c^{<t>}$
+  * 这里的$c^{<t>}$来自attention layer，作为post-attention LSTM的输入
+  * 注意与LSTM内部的cell state $c^{<t>}$进行区分
+
 ##### (1) context计算
 ![](./imgs/am_03.png)
 
@@ -209,3 +215,16 @@ an unsupervised non-linear dimensionality reduction technique for data explorati
 * $e^{<t,t'>}$
   * 是一个dense layer
   * ![](./imgs/am_04.png)
+
+##### (2) 基于query/key/value的理解
+
+* q/k/v
+  * the search engine will map your **query** (text in the search bar) against a set of **keys** (video title, description, etc.) associated with candidate videos in their database, then present you the best matched videos (**values**).
+
+* 对attention的理解
+  * q: 当前的输入 (即$s^{<t-1>}$)
+  * k: 之前输入的每个token的hidden state (即$a^{<1>},a^{<2>},...$)
+  * 通过q和k计算权重 (也称attention) (即$\alpha$)
+  * v: 之前输入的每个toekn的hidden state (这里的k和v相同，即$a^{<1>},a^{<2>},...$)
+    * 乘以权重后，就是对当前的输出的影响 
+  * 所有token的v相加 就是context (即$\text {context}^{<t>}$)

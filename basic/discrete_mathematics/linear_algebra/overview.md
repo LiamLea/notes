@@ -37,6 +37,10 @@
         - [(3) 性质](#3-性质)
       - [6.singular value decomposition (SVD)](#6singular-value-decomposition-svd)
         - [(1) 如何确定U、V和$\Sigma$](#1-如何确定u-v和sigma)
+      - [7.tensor](#7tensor)
+        - [(1) 1-d tensor (vector)](#1-1-d-tensor-vector)
+        - [(2) 2-d tensor (matrix)](#2-2-d-tensor-matrix)
+        - [(3) 3-d tensor](#3-3-d-tensor)
 
 <!-- /code_chunk_output -->
 
@@ -355,3 +359,25 @@
 * 证明
     * $A^TA=V\Sigma^TU^TU\Sigma V^T=V(\Sigma^T\Sigma)V^T$
     * $AA^T=U\Sigma V^TV\Sigma^TU^T=U(\Sigma\Sigma^T)U^T$
+
+#### 7.tensor
+
+以**三维空间**为例
+
+![](./imgs/tensor_03.png)
+
+##### (1) 1-d tensor (vector)
+* 三维空间中的vector，有3个基向量（即基分量）
+    * $\begin{bmatrix}x\\y\\z\end{bmatrix}$
+
+##### (2) 2-d tensor (matrix)
+* 因为是三维空间，所有有三个元素，且每个元素也是一个三维空间，所以一共有$3*3=9$个基向量（即基分量）
+    * ![](./imgs/tensor_02.png)
+    * ![](./imgs/tensor_01.png)
+
+* 可以理解成 平面受力问题，比如：
+    * ![](./imgs/tensor_04.png)
+    * 上面只有 xY分量上有值，表示x平面收到y方向的力
+
+##### (3) 3-d tensor
+* 因为是三维空间，所以一共 $3*3*3=27$个基向量（即基分量）
