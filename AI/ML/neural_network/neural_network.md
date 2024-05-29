@@ -148,6 +148,8 @@
     * $a_j = \frac{e^{z_j}}{\sum_{k=1}^{N}{e^{z_k}}} = P(y=j|\vec X)$
         * N表示分为了N个类
         * $a_1 + ... a_N = 1$
+* 输入称为: logits
+* 输出称为: probabilities
 
 #### 3.activation function的选择
 不同layer选择不同的activation function

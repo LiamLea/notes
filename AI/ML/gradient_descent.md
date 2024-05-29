@@ -37,7 +37,7 @@
       - [5.batch normalization (normalize activations)](#5batch-normalization-normalize-activations)
         - [(1) why](#1-why-1)
         - [(2) 算法](#2-算法-1)
-        - [(3) 在training和inference中使用](#3-在training和inference中使用)
+        - [(3) training mode和inference mode](#3-training-mode和inference-mode)
 
 <!-- /code_chunk_output -->
 
@@ -348,7 +348,7 @@ for i in range(num_epochs):
     * $\gamma$用于调整数据分布的方差，$\beta$用于调整数据的平均值
         * 这两个参数都是通过模型进行学习
 
-##### (3) 在training和inference中使用
+##### (3) training mode和inference mode
 
 * training mode:
     * $\mu$和$\sigma$使用mini-batch计算出来
@@ -357,3 +357,5 @@ for i in range(num_epochs):
     * $\mu$和$\sigma$ 在training中 使用 moving statics (exponentially weighted averages方式) 计算出来
         * moving_mean = moving_mean * momentum + mean(batch) * (1 - momentum)
         * moving_var = moving_var * momentum + var(batch) * (1 - momentum)
+
+* 所以batch normalization layer还有 **moving_mean 和 moving_var这两个参数**
