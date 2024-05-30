@@ -11,13 +11,19 @@
         - [(1) 传统模型](#1-传统模型)
         - [(2) transformers](#2-transformers)
       - [2.transform representations](#2transform-representations)
-      - [3.self-attention](#3self-attention)
+      - [3.one head attention](#3one-head-attention)
         - [(1) 与RNN attention比较](#1-与rnn-attention比较)
-        - [(2) self-attention](#2-self-attention)
+        - [(2) self-attention vs cross-attention](#2-self-attention-vs-cross-attention)
+        - [(3) self-attention](#3-self-attention)
+        - [(4) attention pattern](#4-attention-pattern)
+        - [(5) a head of attention](#5-a-head-of-attention)
+        - [(6) $W_q,W_k,W_v$ shape](#6-w_qw_kw_v-shape)
+        - [(7) context window](#7-context-window)
       - [4.multi-head attention](#4multi-head-attention)
       - [5.transformer network](#5transformer-network)
         - [(1) postional encoding](#1-postional-encoding)
         - [(2) masked multi-head attention](#2-masked-multi-head-attention)
+        - [(3) 训练技巧](#3-训练技巧)
 
 <!-- /code_chunk_output -->
 
@@ -43,7 +49,7 @@
 ![](./imgs/tm_03.png)
 ![](./imgs/tm_04.png)
 
-#### 3.self-attention
+#### 3.one head attention
 
 ##### (1) 与RNN attention比较
 [参考](../RNN/NLP.md#7attetion-model)
@@ -56,7 +62,15 @@
     * transformer计算attention-based representations
 * 本质是一样，计算当前token对其他token的attention
 
-##### (2) self-attention
+##### (2) self-attention vs cross-attention
+![](./imgs/tm_16.png)
+
+* cross-attention 与 self-attention基本一致
+    * 只不过q和k来自不同的序列
+    * 没有masking
+    ![](./imgs/tm_17.png)
+
+##### (3) self-attention
 
 ![](./imgs/tm_01.png)
 
@@ -71,6 +85,33 @@
     * $\text {Attention}(Q,K,V) = \text {softmax}(\frac{QK^T}{\sqrt {d_k}})V$
         * $\sqrt {d_k}$是防止graident exploding
 
+##### (4) attention pattern
+![](./imgs/tm_12.png)
+
+##### (5) a head of attention
+![](./imgs/tm_13.png)
+
+##### (6) $W_q,W_k,W_v$ shape
+* $W_q,W_k$: (key query space, embedding dimension)
+* $W_v$:
+    * 理论上
+        * (embedding dimension, embedding dimension)
+        * key query space小于embedding dimension
+
+    * 实际上
+        * #value params = #query params + #key params
+            * 参数量减少了，但是效果一样
+            * 理论上的$W_v$
+                * ![](./imgs/tm_14.png)
+            * 将$W_v$拆分成: $\uparrow W_v$ 和 $\downarrow W_v$
+                * ![](./imgs/tm_15.png)
+                * $\downarrow V$称为value
+                * $\uparrow V$称为output matrix
+
+##### (7) context window
+network每次能够处理的vectors数量
+* 对于gpt3: context size = 2048
+
 #### 4.multi-head attention
 
 ![](./imgs/tm_02.png)
@@ -81,6 +122,8 @@
         * $Q=K=V=X$
             * 因为这里将W参数提取出来了，而在self-attention中，q/k/v是用W参数计算出来的，本质是一样的
 
+![](./imgs/tm_18.png)
+
 #### 5.transformer network
 
 以翻译为例
@@ -90,6 +133,10 @@
 * 实际的
     * ![](./imgs/tm_06.png)
         * Add & Norm就类似于batchnormalization
+
+* blocks重复多次的目的（类似CNN）
+    * shallower blocks寻找的是low level context的关联
+    * deeper blocks寻找的是high level context的关联
 
 ##### (1) postional encoding
 * 由于transformer是并行处理的，丢失了位置信息，所以需要补充位置信息
@@ -113,4 +160,11 @@
         * 如果两者接近，从周期小的部分能够更细致的看出两者的距离
 
 ##### (2) masked multi-head attention
-* 用于训练过程中，将结果部分遮挡，进行训练（即一个训练样本，能用作多个训练样本）
+* a key feature that prevents the model from "cheating" by looking at future words in the sequence when trying to understand the current word
+    * 用于 根据前面context 预测下一个单词的 训练场景（对后面的内容进行遮挡）
+![](./imgs/tm_10.png)
+![](./imgs/tm_11.png)
+
+##### (3) 训练技巧
+* 一个训练样本，能用作多个训练样本
+![](./imgs/tm_09.png)
