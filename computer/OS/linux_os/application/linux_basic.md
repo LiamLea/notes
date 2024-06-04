@@ -27,7 +27,7 @@ card "~ /.bashrc" as b2
 lsh --> p1:调用
 lsh -> p2:调用
 p2 -> b2:调用
-b2 -> b1:调用  
+b2 -> b1:调用
 ```
 ```shell
 echo $0

@@ -233,7 +233,7 @@ ll /etc/httpd/logs/error_log
 
 stat /etc/httpd/logs/error_log
 #看Links字段
-````
+```
 
 #### 17. 截断一个 正被使用的 文件
 
