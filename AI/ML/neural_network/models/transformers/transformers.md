@@ -159,6 +159,10 @@ network每次能够处理的vectors数量
         * 从周期大的部分能看出，两者是否接近
         * 如果两者接近，从周期小的部分能够更细致的看出两者的距离
 
+* 使用sin和cos是因为 PE(pos)和PE(pos+k)之间可以通过**线性变换**的得到
+    * ![](./imgs/tm_19.png)
+    * ![](./imgs/tm_20.png)
+
 ##### (2) masked multi-head attention
 * a key feature that prevents the model from "cheating" by looking at future words in the sequence when trying to understand the current word
     * 用于 根据前面context 预测下一个单词的 训练场景（对后面的内容进行遮挡）

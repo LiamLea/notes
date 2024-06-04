@@ -47,6 +47,7 @@
   - [(2) round-off error](#2-round-off-error)
   - [(3) Accumulation of round-off error](#3-accumulation-of-round-off-error)
   - [(4) truncation error](#4-truncation-error)
+- [62.useradd一定要加`-m`](#62useradd一定要加-m)
 
 <!-- /code_chunk_output -->
 
@@ -363,3 +364,13 @@ add_and_subtract(10000)
 
 ##### (4) truncation error
 截断一个无限的小数
+
+#### 62.useradd一定要加`-m`
+这样才会创建 加目录，并创建相关文件`~/.profile`等
+
+* 已经创建好的用户，可以先删除home
+```shell
+mv /home/lil /home/lil-bak
+mkhomedir_helper lil
+mv /home/lil-bak/* /home/lil/
+```

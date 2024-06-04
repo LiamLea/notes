@@ -313,6 +313,8 @@ $ systemctl restart NetworkManager
 
 ##### (4) 命令行开启screen sharing
 
+* 必须在由图形化界面的**用户**下操作
+
 ```shell
 $ vim /etc/gdm3/custom.conf
 
@@ -330,7 +332,7 @@ Wired connection 1  00c60637-2077-3fc7-9de7-6610f1bf960a  ethernet  ens3
 # 查看是否绑定到先有的网络连接上
 # 所以网卡重新创建后（比如openstack从镜像创建虚拟机），这里需要重新配置
 $ dconf read /org/gnome/settings-daemon/plugins/sharing/vino-server/enabled-connections
-$ dconf write /org/gnome/settings-daemon/plugins/sharing/vino-server/enabled-connections "['00c60637-2077-3fc7-9de7-6610f1bf960a  ethernet']"
+$ dconf write /org/gnome/settings-daemon/plugins/sharing/vino-server/enabled-connections "['00c60637-2077-3fc7-9de7-6610f1bf960a']"
 
 #设置密码
 $ PASSWORD="passwordgoeshere"
