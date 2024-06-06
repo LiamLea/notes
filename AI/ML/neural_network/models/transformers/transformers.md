@@ -10,6 +10,7 @@
       - [1.transformers特点](#1transformers特点)
         - [(1) 传统模型](#1-传统模型)
         - [(2) transformers](#2-transformers)
+        - [(3) 与CNN的相似性](#3-与cnn的相似性)
       - [2.transform representations](#2transform-representations)
       - [3.one head attention](#3one-head-attention)
         - [(1) 与RNN attention比较](#1-与rnn-attention比较)
@@ -40,6 +41,15 @@
 
 ##### (2) transformers
 * **并行**计算每个token的 attention-based representations
+
+##### (3) 与CNN的相似性
+* 每层 在此前的基础上 寻找多个特征 (**kernels** / **heads**)
+    * shallower layers (blocks) 寻找的是low level的特征
+    * deeper layers (blocks) 寻找的是high level的特征
+
+* 并行
+    * 寻找多个特征并行
+    * 寻找一个特征（遍历 图片/序列）并行
 
 #### 2.transform representations
 
@@ -132,7 +142,12 @@ network每次能够处理的vectors数量
         * decoder中的Q来自 已经输出内容 的attetion，即需要考虑已经输出的内容
 * 实际的
     * ![](./imgs/tm_06.png)
-        * Add & Norm就类似于batchnormalization
+        * residual connections: Add & Norm
+            * 先将两个输入相加
+                * **ADD就是不断调整word的representations**
+            * 再进行batchnormalization
+        * feed forward
+            * FC layer
 
 * blocks重复多次的目的（类似CNN）
     * shallower blocks寻找的是low level context的关联
@@ -164,10 +179,52 @@ network每次能够处理的vectors数量
     * ![](./imgs/tm_20.png)
 
 ##### (2) masked multi-head attention
-* a key feature that prevents the model from "cheating" by looking at future words in the sequence when trying to understand the current word
-    * 用于 根据前面context 预测下一个单词的 训练场景（对后面的内容进行遮挡）
-![](./imgs/tm_10.png)
-![](./imgs/tm_11.png)
+* padding mask
+    * 用于截断超过最大长度的输入，和补充输入（使得输入长度都相等）
+    * 举例:
+        * 输入
+        ```
+        [["Do", "you", "know", "when", "Jane", "is", "going", "to", "visit", "Africa"], 
+        ["Jane", "visits", "Africa", "in", "September" ],
+        ["Exciting", "!"]
+        ]
+        ```
+
+        * vectorized
+        ```
+        [[ 71, 121, 4, 56, 99, 2344, 345, 1284, 15],
+        [ 56, 1285, 15, 181, 545],
+        [ 87, 600]
+        ]
+        ```
+        * padding
+        ```
+        [[ 71, 121, 4, 56, 99],
+        [ 2344, 345, 1284, 15, 0],
+        [ 56, 1285, 15, 181, 545],
+        [ 87, 600, 0, 0, 0],
+        ]
+        ```
+        * padding mask
+        ```
+        [[ 1, 1, 1, 1, 1],
+        [ 1, 1, 1, 1, 0],
+        [ 1, 1, 1, 1, 1],
+        [ 1, 1, 0, 0, 0],
+        ]
+        ```
+* look-ahead mask
+    * a key feature that prevents the model from "cheating" by looking at future words in the sequence when trying to understand the current word
+        * 用于 根据前面context 预测下一个单词的 训练场景（对后面的内容进行遮挡）
+    ![](./imgs/tm_10.png)
+    ![](./imgs/tm_11.png)
+
+* 具体实现
+    * $\text {Attention}(Q,K,V) = \text {softmax}(\frac{QK^T}{\sqrt {d_k}}+M)V$
+    ```python
+    #代码中mask的实现
+    softmax(x + (1 - mask) * -1.0e9)
+    ```
 
 ##### (3) 训练技巧
 * 一个训练样本，能用作多个训练样本
