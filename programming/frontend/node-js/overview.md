@@ -22,7 +22,8 @@
       - [3.npm命令（优先使用yarn）](#3npm命令优先使用yarn)
         - [(1) `npm run build`](#1-npm-run-build)
         - [(2) `npm install`](#2-npm-install)
-        - [(3) 一般用法](#3-一般用法)
+        - [(3) `npm start`](#3-npm-start)
+        - [(4) 一般用法](#4-一般用法)
     - [node使用](#node使用)
       - [1.运行javascript](#1运行javascript)
 
@@ -134,7 +135,10 @@ npm install <package>
 npm install -g <package>
 ```
 
-##### (3) 一般用法
+##### (3) `npm start`
+可以运行程序，不需要构建，修改代码代码也不需要重启，会自动加载（利用nodemon的能力）
+
+##### (4) 一般用法
 
 ```shell
 #安装依赖

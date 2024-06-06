@@ -84,6 +84,8 @@
 
 ##### (1) convolution (conv)
 
+用于feature extraction
+
 * $z^{[l]} = a^{[l-1]} * W_c^{[l]} + b_c^{[l]}$
     * $*$表示卷积
 * $a^{[l]} = g(z^{[l]})$
@@ -93,11 +95,17 @@
     * conv用于自动发现特定的模式
     * pool用于明确指定模式（比如max或average）
         * 能够减小计算量
+        * 会导致information loss（只关注最重要的特征，忽略更细致的特征）
+        * 所以需要对上面两个影响进行平衡，从而能够提高计算效率，并且能够捕捉到特征
 ![](./imgs/ov_02.png)
 
 ##### (3) full connected (FC)
-
-普通的层
+* 比如输入: (m,5,5,10) --reshape--> (m,250,1)
+* 则
+    * W: (neuron的数量,250)
+    * b: (neuron的数量,)
+* 输出：(m,neuron的数量,1)
+* 这里neuron的数量=250，为了恢复成图片的形状，从而继续进行convolution等
 
 #### 4.classic networks
 
@@ -123,6 +131,8 @@
 * 参数量: 138m
 
 #### 5.ResNets
+
+[参考](./demos/ResNet.md)
 
 ##### (1) degradation problem
 * 随着层数的增加，错误率先下降，之后反而会上升
