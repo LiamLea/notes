@@ -142,19 +142,29 @@ network每次能够处理的vectors数量
         * decoder中的Q来自 已经输出内容 的attetion，即需要考虑已经输出的内容
 * 实际的
     * ![](./imgs/tm_06.png)
+        * embedding layer
+            * 初始化后，需要训练
         * residual connections: Add & Norm
             * 先将两个输入相加
                 * **ADD就是不断调整word的representations**
             * 再进行batchnormalization
         * feed forward
             * FC layer
+        * decoder
+            * first multi-head  attention
+                * 使用look-ahead mask 
+            * second multi-head attention
+                * 使用padding mask
+                    * inputs序列长度和outputs序列长度不相等
+            * 重复N次，K，V都是来自**encoder的输出**，Q来自上一个block的输入
 
 * blocks重复多次的目的（类似CNN）
     * shallower blocks寻找的是low level context的关联
     * deeper blocks寻找的是high level context的关联
 
 ##### (1) postional encoding
-* 由于transformer是并行处理的，丢失了位置信息，所以需要补充位置信息
+embedding * w1 + position encoding * w2
+* w1一般为$\sqrt {dim}$, w2一般为1
 
 * how
 ![](./imgs/tm_08.png)
@@ -169,12 +179,17 @@ network每次能够处理的vectors数量
     * 唯一的
         * 只要有一个周期大于序列长度（即context长度），则一定是唯一的，因为一个周期内的值是不重复的
     * 确定的
+        * 同一个位置的encoding每次都一样
     * 可以评估出两个vector的位置距离
         * ![](./imgs/tm_07.png)
         * 从周期大的部分能看出，两者是否接近
         * 如果两者接近，从周期小的部分能够更细致的看出两者的距离
 
-* 使用sin和cos是因为 PE(pos)和PE(pos+k)之间可以通过**线性变换**的得到
+* 每个position vector的**norm都是一个常数**
+    * 原因：$\sin^2+\cos^2=1$
+    * 所以 position vector的dot product相互比较能够反映出各个位置的关联程度（因为长度都一样，所以值越大的，位置越近）
+
+* PE(pos)和PE(pos+k)之间可以通过**线性变换**的得到
     * ![](./imgs/tm_19.png)
     * ![](./imgs/tm_20.png)
 
