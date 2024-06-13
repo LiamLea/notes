@@ -18,7 +18,6 @@
       - [3.normalization in probability distribution (概率分布中的归一化)](#3normalization-in-probability-distribution-概率分布中的归一化)
         - [(1) standard normalization](#1-standard-normalization)
         - [(2) softmax](#2-softmax)
-      - [3.Bayes formula](#3bayes-formula)
 
 <!-- /code_chunk_output -->
 
@@ -77,19 +76,3 @@
 ##### (2) softmax
 
 * $a_j = \frac{e^{z_j}}{\sum_{k=1}^{N}{e^{z_k}}}$
-
-#### 3.Bayes formula
-
-* $P(H|E) = \frac{P(H)P(E|H)}{P(H)P(E|H) + P(\neg H)P(E|\neg H)} = \frac{P(H)P(E|H)}{P(E)}$
-  * P(H|E): P(hypothesis given the evidence)
-    * 表示 给某些条件下 该假设 发生的概率
-  * P(E|H): P(the evidence given hypothesis)
-    * 表示 在该假设下 这些条件 发生的概率
-
-* 理解: 求给定某些条件，某种假设成立的概率 (P(H|E))
-    * 首先求这些条件发生的总概率 (P(E))
-    * 然后求这些条件在该假设下成立的概率 (P(H)P(E|H))
-
-* 几何理解
-![](./imgs/overview_04.png)
-* 边长为1的正方形，表示概率为1
