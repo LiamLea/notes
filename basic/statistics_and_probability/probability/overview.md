@@ -1,11 +1,11 @@
-# probability theory
+# probability
 
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [probability theory](#probability-theory)
+- [probability](#probability)
     - [overview](#overview)
       - [1.coditional probability](#1coditional-probability)
         - [(1) 求A概率](#1-求a概率)
@@ -20,7 +20,6 @@
         - [(2) uniform distribution](#2-uniform-distribution)
 
 <!-- /code_chunk_output -->
-
 
 ### overview
 
@@ -69,7 +68,7 @@
 
 ##### (1) probability mass function vs probability density
 * discrete: probability mass function
-* continuous: probability density
+* continuous: probability density function
     * **面积**是事件发生的概率
 
 ![](./imgs/ov_01.png)
