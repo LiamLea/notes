@@ -1,30 +1,36 @@
-# overview
+# statistics
 
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [overview](#overview)
-    - [概述](#概述)
-      - [1.基本概念](#1基本概念)
+- [statistics](#statistics)
+    - [overview](#overview)
+      - [1.population and sample](#1population-and-sample)
+      - [2.基本统计](#2基本统计)
         - [(1) expectation (mean): $\mu$](#1-expectation-mean-mu)
         - [(2) variance (squared deviation): $\sigma^2$](#2-variance-squared-deviation-sigma2)
         - [(3) standard deviation: $\sigma$](#3-standard-deviation-sigma)
         - [(3) covariance](#3-covariance)
         - [(4) correlation](#4-correlation)
-      - [2.normalization in statistic (统计学中的归一化)](#2normalization-in-statistic-统计学中的归一化)
+      - [3.sample的基本统计](#3sample的基本统计)
+        - [(1) 为什么除以n-1](#1-为什么除以n-1)
+      - [4.normalization in statistic (统计学中的归一化)](#4normalization-in-statistic-统计学中的归一化)
         - [(1) Z-score normalization](#1-z-score-normalization)
-      - [3.normalization in probability distribution (概率分布中的归一化)](#3normalization-in-probability-distribution-概率分布中的归一化)
+      - [5.normalization in probability distribution (概率分布中的归一化)](#5normalization-in-probability-distribution-概率分布中的归一化)
         - [(1) standard normalization](#1-standard-normalization)
         - [(2) softmax](#2-softmax)
 
 <!-- /code_chunk_output -->
 
+### overview
 
-### 概述
+#### 1.population and sample
 
-#### 1.基本概念
+当无法对整体进行统计时（由于数量大、数据无法获得等），可以进行采样统计，从而反映整体的统计信息
+
+#### 2.基本统计
 
 ##### (1) expectation (mean): $\mu$
 * $E[X] = \sum_{i=1}^n x_ip_i = \frac{sum(X)}{num(X)}$
@@ -59,14 +65,30 @@
 * matrix correlation
   * 就是该元素的所在行和所在列的correlation
 
-#### 2.normalization in statistic (统计学中的归一化)
+#### 3.sample的基本统计
+
+* mean: $\overline {x}$
+* variance:
+  * biased variance: $S^2_n=\frac{1}{n}\sum_{i=1}^n(x_i-\mu)^2$
+  * unbiased variance: $S^2_{n-1}=\frac{1}{n-1}\sum_{i=1}^n(x_i-\mu)^2$
+* standard deviation
+  * biased standard deviation: $S_n$
+  * unbiased standard deviation: $S_{n-1}$
+
+##### (1) 为什么除以n-1
+* 没有明确的证明，sample时，除以n-1，方差更准确
+  * 当sample数量越多时
+    * 数据越接近population
+    * n-1影响就会越小
+
+#### 4.normalization in statistic (统计学中的归一化)
 
 使得数据分布符合一定要求
 
 ##### (1) Z-score normalization
 * $Z = \frac{x - \mu}{\sigma}$
 
-#### 3.normalization in probability distribution (概率分布中的归一化)
+#### 5.normalization in probability distribution (概率分布中的归一化)
 
 所有概率加起来等于1
 
