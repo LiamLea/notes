@@ -38,11 +38,15 @@
 
 ##### (5) whisker plot (box plot)
 ![](./imgs/overview_08.png)
+  * 前提对数据进行**排序**，然后寻找以下指标
   * min/max: 最小/最大 值
   * median: 中位数，如果是偶数序列，就是中间两个数相加/2
-  * lower quartile: median将序列划分为两部分，第一部分的median (即25%位置处的数据)
-  * upper quartile: median将序列划分为两部分，第二部分的median（即75%位置处的数据）
-  * 所以interquartile range (IQR) 有50%的数据（即处在25%-75%范围内的数据），能够体现大致的数据分布
+  * lower quartile: median将序列划分为两部分，第一部分（不包含median）的median (即25%位置处的数据)
+  * upper quartile: median将序列划分为两部分，第二部分（不包含median）的median（即75%位置处的数据）
+  * 所以box中有50%的数据（即处在25%-75%范围内的数据），能够体现大致的数据分布
+  * interquartile range (IQR) = Q3-Q1
+  * outliers < Q1 - 1.5 * IQR
+  * outliers > Q3 + 1.5 * IQR
 
 ##### (6) line graphs
 * 展示变化趋势
