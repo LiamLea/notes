@@ -18,6 +18,9 @@
       - [4.probability distribution](#4probability-distribution)
         - [(1) probability mass function vs probability density](#1-probability-mass-function-vs-probability-density)
         - [(2) uniform distribution](#2-uniform-distribution)
+      - [6.normalization in probability distribution (概率分布中的归一化)](#6normalization-in-probability-distribution-概率分布中的归一化)
+        - [(1) standard normalization](#1-standard-normalization)
+        - [(2) softmax](#2-softmax)
 
 <!-- /code_chunk_output -->
 
@@ -74,3 +77,14 @@
 ![](./imgs/ov_01.png)
 
 ##### (2) uniform distribution
+
+#### 6.normalization in probability distribution (概率分布中的归一化)
+
+所有概率加起来等于1
+
+##### (1) standard normalization
+* $a_j = \frac{z_j}{\sum_{k=1}^{N}{z_k}}$
+
+##### (2) softmax
+
+* $a_j = \frac{e^{z_j}}{\sum_{k=1}^{N}{e^{z_k}}}$
