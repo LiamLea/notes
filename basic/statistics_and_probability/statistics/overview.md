@@ -37,7 +37,7 @@
         - [(1) description of correlation](#1-description-of-correlation)
         - [(2) scatterplots](#2-scatterplots)
         - [(3) covariance](#3-covariance)
-        - [(4) correlation coefficent (相关系数)](#4-correlation-coefficent-相关系数)
+        - [(4) correlation coefficent (相关系数): r](#4-correlation-coefficent-相关系数-r)
       - [8.normalization in statistic (统计学中的归一化)](#8normalization-in-statistic-统计学中的归一化)
         - [(1) Z-score normalization](#1-z-score-normalization)
 
@@ -179,18 +179,22 @@ how many $\sigma$ away from the $\mu$
 
 ##### (3) covariance
 * $Cov(X,Y) = E[(X-E[X])(Y-E[Y])] = \frac{1}{n}\sum_{i=1}^n(x_i-\mu_x)(y_i-\mu_y)$
+  * 对于sample，除以n-1
   * 能够反映 X和Y变化的趋势**direction**（但不能反映趋势strength）：
     * 为正数时：x值越大（小），y值往往也越大（小）
     * 为负数时：x值越大，y值往往越小
     * 等于0时：y往往不随x变化
 
+* $Cov(X,Y) = E[(X-E[X])(Y-E[Y])] = E(XY)-E(X)E(Y)$
+
 ![](./imgs/st_04.png)
 
-##### (4) correlation coefficent (相关系数)
+##### (4) correlation coefficent (相关系数): r
 
 how well a **linear** model can describe the relationship between two variables
 
 * $Corr(X,Y) = \frac{Cov(X,Y)}{\sqrt {Var(X)} \sqrt {Var(Y)}} = \frac{1}{n}\sum_{i=1}^n(\frac{x_i-\mu_x}{\sigma_x})(\frac{y_i-\mu_y}{\sigma_y})$
+  * 对于sample，除以n-1
   * x dataset的Z-score和y dataset的Z-score相乘
   * 范围: **-1 ~ 1**
   * 能够反映 X和Y变化的趋势**direction**和**strength**：
