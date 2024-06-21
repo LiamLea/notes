@@ -10,11 +10,12 @@
       - [1.概念](#1概念)
         - [(1) 描述方法](#1-描述方法)
         - [(2) 特殊集合](#2-特殊集合)
+        - [(3) universal set and absolute complement](#3-universal-set-and-absolute-complement)
       - [2.集合关系](#2集合关系)
       - [3.集合运算](#3集合运算)
         - [(1) 幂 (power)](#1-幂-power)
         - [(2) 差](#2-差)
-        - [(3) 补集](#3-补集)
+        - [(3) 补集 (relative complement)](#3-补集-relative-complement)
         - [(4) 对称差](#4-对称差)
         - [(5) 后继集](#5-后继集)
       - [4.关系](#4关系)
@@ -80,6 +81,10 @@
 * 空集
 * 全集
 
+##### (3) universal set and absolute complement
+* universal set: 全集合（包含所有），记为U
+* absolute complement: $A' = U-A$
+
 #### 2.集合关系
 
 * 相等关系
@@ -96,8 +101,8 @@
 
 $A-B=\{x|x\in A\land x\notin B\}$ 
 
-##### (3) 补集
-设$A\subseteq E$,$~A=E-A=\{x|x\in E\land x\notin A\}$
+##### (3) 补集 (relative complement)
+设$A\subseteq E$,$A^C=E-A=\{x|x\in E\land x\notin A\}$
 
 ##### (4) 对称差
 $A\oplus B=(A-B)\cup(B-A)=\{x|(x\in A\land x\notin B)\lor(x\in B\land x\notin A)\}$

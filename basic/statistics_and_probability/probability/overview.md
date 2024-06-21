@@ -7,18 +7,26 @@
 
 - [probability](#probability)
     - [overview](#overview)
-      - [1.coditional probability](#1coditional-probability)
+      - [1.基础概念](#1基础概念)
+        - [(1) Venn diagram](#1-venn-diagram)
+        - [(2) 常用表示](#2-常用表示)
+      - [2.independence](#2independence)
+      - [3.coditional probability](#3coditional-probability)
         - [(1) 求A概率](#1-求a概率)
         - [(2) bayes formula](#2-bayes-formula)
-      - [2.probability using combinations](#2probability-using-combinations)
+      - [4.probability using combinations](#4probability-using-combinations)
         - [(1) permutation and combination](#1-permutation-and-combination)
         - [(2) fair probability](#2-fair-probability)
         - [(3) unfair probability](#3-unfair-probability)
-      - [3.random variables](#3random-variables)
-      - [4.probability distribution](#4probability-distribution)
+      - [5.random variables](#5random-variables)
+        - [(1) combine random variables](#1-combine-random-variables)
+        - [(2) binomial variables](#2-binomial-variables)
+      - [6.probability distribution](#6probability-distribution)
         - [(1) probability mass function vs probability density](#1-probability-mass-function-vs-probability-density)
         - [(2) uniform distribution](#2-uniform-distribution)
-      - [6.normalization in probability distribution (概率分布中的归一化)](#6normalization-in-probability-distribution-概率分布中的归一化)
+        - [(3) Bernoulli distribution](#3-bernoulli-distribution)
+        - [(3) binomial distribution](#3-binomial-distribution)
+      - [7.normalization in probability distribution (概率分布中的归一化)](#7normalization-in-probability-distribution-概率分布中的归一化)
         - [(1) standard normalization](#1-standard-normalization)
         - [(2) softmax](#2-softmax)
 
@@ -26,11 +34,32 @@
 
 ### overview
 
-#### 1.coditional probability
+#### 1.基础概念
+
+##### (1) Venn diagram
+Venn diagram不能反映依赖关系，只能反映事件是否有重叠
+
+##### (2) 常用表示
+
+* $P(A \cap B)$
+  * joint probability: 表示A和B同时发生的概率
+
+* $P(A \cup B)$
+  * 表示A或B任意一个发生的概率
+
+#### 2.independence
+
+* independence
+  * $P(A \cup B) = P(A) + P(B)$
+  * $P(A \cap B) = P(A)\cdot P(B)$
+
+* dependence
+  * $P(A \cup B) = P(A) + P(B) - P(A \cap B)$
+  * $P(A \cap B)=P(B) \cdot P(A|B) = P(A) \cdot P(B|A)$
+
+#### 3.coditional probability
 
 * $P(A \cap B)=P(B) \cdot P(A|B) = P(A) \cdot P(B|A)$
-    * 如果A和B是independent的，则
-        * $P(A \cap B) = P(A)\cdot P(B)$
 
 ##### (1) 求A概率
 * $P(A) = P(A \cap B) + P(A \cap \neg B)=P(B) \cdot P(A|B) + P(\neg B) \cdot P(A|\neg B)$
@@ -38,7 +67,7 @@
 ##### (2) bayes formula
 * $P(B) \cdot P(A|B) = P(A) \cdot P(B|A)$
 
-#### 2.probability using combinations
+#### 4.probability using combinations
 
 ##### (1) permutation and combination
 
@@ -58,16 +87,35 @@
 * 比如: heads朝上的概率为80%
 * P(k heads in n throws of coins) = $C(n,k)\times 0.8^k\times 0.2^{(n-k)} = \frac{n!}{(n-k)! \times k!}\times 0.8^k\times 0.2^{(n-k)}$
 
-#### 3.random variables
+#### 5.random variables
 
-* 即用变量（比如：X）表示各个事件，方便后续的probability distribution等研究
+* 即用变量（比如：X）表示该事件（有多种可能的结果），方便后续的probability distribution等研究
     * 比如: 
         * 抛硬币，用X表示事件：当为head，X=1，当为tail，X=0
         * 扔骰子，用X表示事件：当为1点时，X=1，当为2点时，X=2，依次类推
-* 变量分为discrete和continuous
+* random varaibles分为discrete和continuous
     * 对于连续的比如：用X表示明天降雨量
 
-#### 4.probability distribution
+##### (1) combine random variables
+* assume X,Y independent
+  * $E(X,Y)=E(X)+E(Y)$
+  * $Var(X\pm Y)=Var(X)+Var(Y)$
+
+##### (2) binomial variables
+
+* X: number of successes in **n** trials where P(success) for each trial is **p**
+* P(X=k)$=C(n,k)\cdot p^k\cdot (1-p)^{(n-k)}$
+  * X由两项组成:
+    * 每次实验的是否成功（每次实验都是independent的）
+    * 实验的次数
+    * 比如： X: number of heads from flippings coin 5 times
+
+* 10% rule of assuming independence between trials
+  * 比如：要从一个班级中选3个男生
+    * 当班级的人数很少时，不放回和放回的选，相差的概率很大
+    * 当班级的人数很多时（即 3/total<10%），不放回和放回的选，相差不大，所以可以假设不放回的选也是independent的
+
+#### 6.probability distribution
 
 ##### (1) probability mass function vs probability density
 * discrete: probability mass function
@@ -77,8 +125,24 @@
 ![](./imgs/ov_01.png)
 
 ##### (2) uniform distribution
+每种可能出现的概率相等
+![](./imgs/pd_01.png)
 
-#### 6.normalization in probability distribution (概率分布中的归一化)
+##### (3) Bernoulli distribution
+
+* $P(X) = \begin{cases} 1-p & X=0\\ p&X=1 \end{cases}$
+  * ![](./imgs/pd_02.png)
+  * $E(X)=\sum_{i=1}^n x_ip_i = 0\cdot(1-p) + 1\cdot p=p$
+  * $Var(x)=E[(X-\mu)^2]=(1-p)(0-p)^2+p(1-p)^2=p(1-p)$
+
+##### (3) binomial distribution
+discrete version of normal distribution
+* P(X=k)$=C(n,k)\cdot p^k\cdot (1-p)^{(n-k)}$
+  * ![](./imgs/pd_03.png)
+  * 平均成功的次数：$E(X)=nE(\text {number of successes one trial})=np$
+  * $Var(x)=nVar(\text {number of successes one trial})=np(1-p)$
+
+#### 7.normalization in probability distribution (概率分布中的归一化)
 
 所有概率加起来等于1
 
