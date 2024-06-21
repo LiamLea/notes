@@ -8,9 +8,8 @@
 - [statistics](#statistics)
     - [overview](#overview)
       - [1.基础概念](#1基础概念)
-        - [(1) population and sample](#1-population-and-sample)
-        - [(2) frequency 和 relative frequency](#2-frequency-和-relative-frequency)
-        - [(3) percentile](#3-percentile)
+        - [(1) frequency 和 relative frequency](#1-frequency-和-relative-frequency)
+        - [(2) percentile](#2-percentile)
       - [2.mearures of central tendency](#2mearures-of-central-tendency)
         - [(1) median](#1-median)
         - [(2) mode](#2-mode)
@@ -22,9 +21,11 @@
         - [(4) mean absolute deviation (MAD)](#4-mean-absolute-deviation-mad)
         - [(5) variance (squared deviation): $\sigma^2$](#5-variance-squared-deviation-sigma2)
         - [(6) standard deviation: $\sigma$](#6-standard-deviation-sigma)
-      - [4.sample的基本统计](#4sample的基本统计)
-        - [(1) measures](#1-measures)
+      - [4.population and sample](#4population-and-sample)
+        - [(1) sample measures](#1-sample-measures)
         - [(2) 为什么除以n-1](#2-为什么除以n-1)
+        - [(3) random sample strategies](#3-random-sample-strategies)
+        - [(4) sample bias](#4-sample-bias)
       - [5.线性变化对指标的影响](#5线性变化对指标的影响)
       - [6.Z-score](#6z-score)
         - [(1) 定义](#1-定义)
@@ -47,16 +48,12 @@
 
 #### 1.基础概念
 
-##### (1) population and sample
-
-当无法对整体进行统计时（由于数量大、数据无法获得等），可以进行采样统计，从而反映整体的统计信息
-
-##### (2) frequency 和 relative frequency
+##### (1) frequency 和 relative frequency
 * the number of times the observation has occurred/recorded **in an experiment or study**
 
 * relative frequency = frequency / total numbers of all observations
 
-##### (3) percentile
+##### (2) percentile
 * percentile: the percentage of the data that is at or below the amount in question 
 
 #### 2.mearures of central tendency
@@ -88,14 +85,18 @@
 ##### (5) variance (squared deviation): $\sigma^2$
 
 * $Var(X) = E[(X-\mu)^2] = \frac{1}{n}\sum_{i=1}^n(x_i-\mu)^2$
+* 可以推导出：
+  * $Var(X) = E[(X-\mu)^2] = E[X^2]-(E[X])^2$
 
 ##### (6) standard deviation: $\sigma$
 
 * $\sigma = \sqrt {Var(X)}$
 
-#### 4.sample的基本统计
+#### 4.population and sample
 
-##### (1) measures
+当无法对整体进行统计时（由于数量大、数据无法获得等），可以进行采样统计，从而反映整体的统计信息
+
+##### (1) sample measures
 * mean: $\overline {x}$
 * variance:
   * biased variance: $S^2_n=\frac{1}{n}\sum_{i=1}^n(x_i-\mu)^2$
@@ -109,6 +110,19 @@
   * 当sample数量越多时
     * 数据越接近population
     * n-1影响就会越小
+
+##### (3) random sample strategies
+* simple random sample
+* stratified sample
+  * 比如：大一，大二，大三，大四，每一个年级抽取一部分样本
+* clustered sample
+  * 比如：在全校，抽取几个班级的学生
+
+##### (4) sample bias 
+* voluntary bias
+* convenience bias
+* reponse bias
+* wording bias
 
 #### 5.线性变化对指标的影响
 
