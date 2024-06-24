@@ -21,20 +21,15 @@
         - [(4) mean absolute deviation (MAD)](#4-mean-absolute-deviation-mad)
         - [(5) variance (squared deviation): $\sigma^2$](#5-variance-squared-deviation-sigma2)
         - [(6) standard deviation: $\sigma$](#6-standard-deviation-sigma)
-      - [4.population and sample](#4population-and-sample)
-        - [(1) sample measures](#1-sample-measures)
-        - [(2) 为什么除以n-1](#2-为什么除以n-1)
-        - [(3) random sample strategies](#3-random-sample-strategies)
-        - [(4) sample bias](#4-sample-bias)
-      - [5.线性变化对指标的影响](#5线性变化对指标的影响)
-      - [6.Z-score](#6z-score)
+      - [4.线性变化对指标的影响](#4线性变化对指标的影响)
+      - [5.Z-score](#5z-score)
         - [(1) 定义](#1-定义)
         - [(2) normal distribution Z-table](#2-normal-distribution-z-table)
-      - [7.data disribution](#7data-disribution)
+      - [6.data disribution](#6data-disribution)
         - [(1) density curves](#1-density-curves)
         - [(2) normal distribution (Gaussian distribution)](#2-normal-distribution-gaussian-distribution)
         - [(3) standard normal  distribution](#3-standard-normal--distribution)
-      - [8.correlation](#8correlation)
+      - [7.correlation](#7correlation)
         - [(1) description of correlation](#1-description-of-correlation)
         - [(2) scatterplots](#2-scatterplots)
         - [(3) covariance](#3-covariance)
@@ -92,46 +87,14 @@
 
 * $\sigma = \sqrt {Var(X)}$
 
-#### 4.population and sample
-
-当无法对整体进行统计时（由于数量大、数据无法获得等），可以进行采样统计，从而反映整体的统计信息
-
-##### (1) sample measures
-* mean: $\overline {x}$
-* variance:
-  * biased variance: $S^2_n=\frac{1}{n}\sum_{i=1}^n(x_i-\mu)^2$
-  * unbiased variance: $S^2_{n-1}=\frac{1}{n-1}\sum_{i=1}^n(x_i-\mu)^2$
-* standard deviation
-  * biased standard deviation: $S_n$
-  * unbiased standard deviation: $S_{n-1}$
-
-##### (2) 为什么除以n-1
-* 没有明确的证明，sample时，除以n-1，方差更准确
-  * 当sample数量越多时
-    * 数据越接近population
-    * n-1影响就会越小
-
-##### (3) random sample strategies
-* simple random sample
-* stratified sample
-  * 比如：大一，大二，大三，大四，每一个年级抽取一部分样本
-* clustered sample
-  * 比如：在全校，抽取几个班级的学生
-
-##### (4) sample bias 
-* voluntary bias
-* convenience bias
-* reponse bias
-* wording bias
-
-#### 5.线性变化对指标的影响
+#### 4.线性变化对指标的影响
 
 ||median, mean|standard deviation|
 |-|-|-|
 |加减n|加减n|无影响|
 |乘除n|乘除n|乘除n|
 
-#### 6.Z-score
+#### 5.Z-score
 
 ##### (1) 定义
 how many $\sigma$ away from the $\mu$
@@ -141,7 +104,7 @@ how many $\sigma$ away from the $\mu$
 ##### (2) normal distribution Z-table
 * 查找normal distribution的[Z-table](https://www.dummies.com/article/academics-the-arts/math/statistics/how-to-use-the-z-table-147241/)，能够得到低于该Z-score区域的面积
 
-#### 7.data disribution
+#### 6.data disribution
 
 ##### (1) density curves
 * 理解density curve
@@ -173,7 +136,7 @@ how many $\sigma$ away from the $\mu$
 * $\mu = 0$
 * $\sigma = 1$
 
-#### 8.correlation
+#### 7.correlation
 
 ##### (1) description of correlation
 用于描述**两个变量**之间的关联
