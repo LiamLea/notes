@@ -20,12 +20,15 @@
         - [(3) unfair probability](#3-unfair-probability)
       - [5.random variables](#5random-variables)
         - [(1) combine random variables](#1-combine-random-variables)
-        - [(2) binomial variables](#2-binomial-variables)
+        - [(2) binomial random variables](#2-binomial-random-variables)
+        - [(3) geometric random variables](#3-geometric-random-variables)
       - [6.probability distribution](#6probability-distribution)
         - [(1) probability mass function vs probability density](#1-probability-mass-function-vs-probability-density)
         - [(2) uniform distribution](#2-uniform-distribution)
         - [(3) Bernoulli distribution](#3-bernoulli-distribution)
-        - [(3) binomial distribution](#3-binomial-distribution)
+        - [(4) binomial distribution](#4-binomial-distribution)
+        - [(5) geometric distribution](#5-geometric-distribution)
+        - [(6) Poisson distribution](#6-poisson-distribution)
       - [7.normalization in probability distribution (概率分布中的归一化)](#7normalization-in-probability-distribution-概率分布中的归一化)
         - [(1) standard normalization](#1-standard-normalization)
         - [(2) softmax](#2-softmax)
@@ -101,19 +104,20 @@ Venn diagram不能反映依赖关系，只能反映事件是否有重叠
   * $E(X,Y)=E(X)+E(Y)$
   * $Var(X\pm Y)=Var(X)+Var(Y)$
 
-##### (2) binomial variables
+##### (2) binomial random variables
 
 * X: number of successes in **n** trials where P(success) for each trial is **p**
-* P(X=k)$=C(n,k)\cdot p^k\cdot (1-p)^{(n-k)}$
-  * X由两项组成:
-    * 每次实验的是否成功（每次实验都是independent的）
-    * 实验的次数
-    * 比如： X: number of heads from flippings coin 5 times
+* $P(X=k)=C(n,k)\cdot p^k\cdot (1-p)^{(n-k)}$
+  * why called binomial: k,n
 
 * 10% rule of assuming independence between trials
   * 比如：要从一个班级中选3个男生
     * 当班级的人数很少时，不放回和放回的选，相差的概率很大
     * 当班级的人数很多时（即 3/total<10%），不放回和放回的选，相差不大，所以可以假设不放回的选也是independent的
+
+##### (3) geometric random variables
+* X: how many trails until success where P(success) for each trial is **p**
+* $P(X=k)=(1-p)^{k-1}p$
 
 #### 6.probability distribution
 
@@ -135,12 +139,28 @@ Venn diagram不能反映依赖关系，只能反映事件是否有重叠
   * $E(X)=\sum_{i=1}^n x_ip_i = 0\cdot(1-p) + 1\cdot p=p$
   * $Var(x)=E[(X-\mu)^2]=(1-p)(0-p)^2+p(1-p)^2=p(1-p)$
 
-##### (3) binomial distribution
+##### (4) binomial distribution
 discrete version of normal distribution
-* P(X=k)$=C(n,k)\cdot p^k\cdot (1-p)^{(n-k)}$
+* $P(X=k)=C(n,k)\cdot p^k\cdot (1-p)^{(n-k)}$
   * ![](./imgs/pd_03.png)
   * 平均成功的次数：$E(X)=nE(\text {number of successes one trial})=np$
   * $Var(x)=nVar(\text {number of successes one trial})=np(1-p)$
+
+##### (5) geometric distribution
+* $P(X=k)=(1-p)^{k-1}p$
+  * $E(X)=\frac{1}{p}$
+    * 推导:
+      * $E(X)=p+2p(1-p)+3p(1-p)^2+...$
+      * $(1-p)E(X)=p(1-p)+2p(1-p)^2+...$
+      * 相减： $pE(X)=p+p(1-p)+p(1-p)^2+...$
+
+##### (6) Poisson distribution
+* 已知 事件X在t时间间隔内发生的平均次数，且时间都是相互独立的：$E(X)=\lambda$
+* 转换为离散概率分布（binomial distribution）进行分析：
+  * 将时间间隔t细粒度化: 将$\frac{t}{n}, n\to\infty$看成一次实验，在这段有时间X发生一次，则认为成功（$p=\frac{\lambda}{n}$），否则认为失败
+  * 则 $P(X=k)=\lim_{n\to\infty}C(n,k)(\frac{\lambda}{n})^k(1-\frac{\lambda}{n})^{n-k}$
+
+* 根据上述公式推导得出：$P(X=k)=\frac{\lambda^k}{k!}e^{-\lambda}$
 
 #### 7.normalization in probability distribution (概率分布中的归一化)
 
