@@ -15,8 +15,12 @@
       - [2.sampling distribution](#2sampling-distribution)
         - [(1) sampling distribution of a sample propotion](#1-sampling-distribution-of-a-sample-propotion)
         - [(2) sampling distribution of a sample mean (central limit theorem)](#2-sampling-distribution-of-a-sample-mean-central-limit-theorem)
+        - [(3) 特殊情况](#3-特殊情况)
       - [3.confidence intervals](#3confidence-intervals)
-        - [(1) confidence intervals and margin of error](#1-confidence-intervals-and-margin-of-error)
+        - [(1) 前提](#1-前提)
+        - [(2) confidence intervals and margin of error](#2-confidence-intervals-and-margin-of-error)
+        - [(3) estimating a population proportion](#3-estimating-a-population-proportion)
+        - [(4) estimating a population mean](#4-estimating-a-population-mean)
 
 <!-- /code_chunk_output -->
 
@@ -57,23 +61,22 @@
 
 #### 2.sampling distribution
 
-由样本的统计数据 推测 整体的统计数据，描述推测值的分布情况
+**已知population，分析sampling distribution（即每次采样，某种统计指标可能出现的情况）**
 
 ##### (1) sampling distribution of a sample propotion
-根据 样本中某种类型的**占比**(下文中的$\hat p$) 评估 其在整体样本中的占比(下文中的$p$)
-
 * population
-  * X: number of successes in **n** trials where P(success) for each trial is **p**
+  * X: number of successes in **n** trials (在采样场景下就是n samples) where P(success) for each trial is **p**
   * $\mu_X=np$
   * $\sigma_X=\sqrt{np(1-p)}$
 * sample (样本数为：n)
   * 根据10% rule，这里每个样本都可以看作独立的
-  * **sample propotion**: propotion of number of successes to n samples
-    * $\hat p=\frac{X}{n}$
+  * **sample propotion**: propotion of the number of successes to n samples
+    * $\hat p=\frac{\text {\# of successes in a sample}}{\text {\# of samples}}=\frac{X}{n}$
 
 * sampling distribution of a sample propotion ($\hat p$)
   * $\mu_{\hat p}=\frac{\mu_X}{n}=p$
   * $\sigma_{\hat p}=\frac{\sigma_X}{n}=\sqrt{\frac{p(1-p)}{n}}$
+
   * 当p在0.5附近时，趋近于normal distributions
   * 当p较小时（比如0.1）
     * 可能distribution skewd right
@@ -86,6 +89,8 @@
     * $np \ge 10$
     * $n(1-p) \ge 10$
   * 当趋近正态分布时，可以使用正太分布的相关特性 进行评估
+  
+  ![](./imgs/ps_02.png)
 
 ##### (2) sampling distribution of a sample mean (central limit theorem)
 * 对于任意分布的数据，
@@ -103,21 +108,48 @@
     * $\mu_{\overline x}=\mu$
     * $\sigma_{\overline x}^2=\frac{\sigma^2}{n}$
 
+    ![](./imgs/ps_03.png)
+
+##### (3) 特殊情况
+* 当population是Bernoulli distribution时，$\hat p=\overline x$，所以 $\hat p$的分布 == $\overline x$ 的分布
+
 #### 3.confidence intervals
 
-##### (1) confidence intervals and margin of error
-估计$\mu$ (the mean of population) 可能所在区间
+**根据某次采样结果**，分析 $\hat p$ 或 $\overline x$ 的**sampling distribution**，**估计** $p$ 或 $\mu$ 可能所在区间
 
-* 以**95% confidence level**为例:
-* 根据sampling distribution of a sample propotion，可得 
-    * $P(\hat p \text{ is within }2\sigma_{\hat p} \text { of } p)=95\%$
-    * 所以, $P(p \text{ is within }2\sigma_{\hat p} \text { of } \hat p)=95\%$
-    * 其中，$\sigma_{\hat p}=\sqrt{\frac{p(1-p)}{n}}\approx\sqrt{\frac{\hat p(1-\hat p)}{n}}$
-    * 所以，能够通过样本计算得到 $[\hat p-2\sigma_{\hat p}\ ,\ \hat p+2\sigma_{\hat p}]$
+
+##### (1) 前提
+* random sample
+* normal distribution
+  * 比如: 对于sampling distribution of a sample propotion，需要满足:
+    * $np \ge 10$
+    * $n(1-p) \ge 10$
+* independent:
+  * 10% rule
+
+##### (2) confidence intervals and margin of error
+
+* population的指标可以使用smaple来估计
+  * $p\approx\hat p=\frac{\text{\# of successes in the sample}}{\text{\# of samples}}$
+  * $\mu\approx\overline x$
+  * $\sigma\approx S_{n-1}$
+
+* 寻找某个区间（confidence intervals），$p$ 或 $\mu$ 有一定概率（confidence level）落在该区间内
+  * 比如: **每一次sample**，$p$ 有 95\% 的机率落在 $[\hat p-2\sigma_{\hat p}\ ,\ \hat p+2\sigma_{\hat p}]$中
+    * 95%称为 **confidence level**
     * 这个区间称为 **confidence intervals**
     * $2\sigma_{\hat p}$称为 **margin of error**
-    * 所以：**每一次sample，$\mu$有 95\% (confidence level) 的机率落在 $[\hat p-2\sigma_{\hat p}\ ,\ \hat p+2\sigma_{\hat p}]$ (confidence intervals)中**
+    * 其中2称为 **critical value (Z)**
+      * 即Z-score
 
-![](./imgs/ps_01.png)
-* 每一行是一次sample
-* 每一次sampl，$\mu$有confidence level的机率落在confidence intervals的区间中
+##### (3) estimating a population proportion
+* $P(\hat p \text{ is within }2\sigma_{\hat p} \text { of } p) \Leftrightarrow P(p \text{ is within }2\sigma_{\hat p} \text { of } \hat p)$
+  * 所以问题转换为：根据此次sample，分析 $\hat p$ 的sampling distribution，寻找区间，满足 $P(p \text{ is within } \hat p\pm Z\cdot\sigma_{\hat p})=\text {confidence level}$
+
+##### (4) estimating a population mean
+* $P(\overline x \text{ is within }2\sigma_{\overline x} \text { of } \mu) \Leftrightarrow P(\mu \text{ is within }2\sigma_{\overline x} \text { of } \overline x)$
+  * 所以问题转换为：根据此次sample，分析 $\overline x$ 的sampling distribution，寻找区间，满足 $P(\mu \text{ is within } \overline x\pm Z\cdot\sigma_{\overline x})=\text {confidence level}$
+
+* ![](./imgs/ps_01.png)
+  * 每一行是一次sample
+  * 每一次sample，$\mu$有confidence level的机率落在confidence intervals的区间中
