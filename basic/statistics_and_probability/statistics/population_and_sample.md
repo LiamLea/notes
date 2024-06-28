@@ -29,6 +29,10 @@
         - [(2) P-value](#2-p-value)
         - [(3) Type I Error and Type II Error and Power](#3-type-i-error-and-type-ii-error-and-power)
         - [(4) test proportions (z statistics) vs test means (t statistics)](#4-test-proportions-z-statistics-vs-test-means-t-statistics)
+      - [6.goodness-of-fit test](#6goodness-of-fit-test)
+        - [(1) Chi-square distribution](#1-chi-square-distribution)
+        - [(2) Chi-square test](#2-chi-square-test)
+        - [(3) goodness-of-fit test](#3-goodness-of-fit-test)
 
 <!-- /code_chunk_output -->
 
@@ -238,3 +242,57 @@
 
 ![](./imgs/ps_06.png)
   * 当$n\lt 30$时，sampling distrbution of means不符合normal distribution，而是t-distribution，所以使用t statistics
+
+
+#### 6.goodness-of-fit test
+
+进行数据采样，基于某种假设的分布，判断出现这种采样分布的概率
+
+##### (1) Chi-square distribution
+* X: N(0,1)
+  * random variable X满足标准正态分布（$\mu=0,\sigma=1$）
+* Chi-square (Q): $\chi^2_k$
+  * $\chi^2_k=X_1^2+X_2^2+...+X_k^2$
+    * k表示自由度
+    * 所有X都是标准正态分布
+  
+  ![](./imgs/chi_01.png)
+  * 查询chi-table，能够得到$P(\chi^2_k > n)$
+
+##### (2) Chi-square test
+* check if two categorical variables are related or independent
+   * 比如：判断性别和政党的偏好是否有联系（参考下面的列子）
+
+* $\chi^2=\sum\limits_{i=1}^{k}\frac{(O_i-E_i)^2}{E_i}$
+  * $O_i$: observed frequency
+  * $E_i$: expected frequency
+
+* 公式推导
+  * 假设每次发生概率为p，则E(x)=np,Var(X)=np(1-p)
+  * 则$O-E: N(0,np(1-p))$
+  * 则$\frac{O-E}{E}: N(0,\frac{1-p}{np})$
+  * 则$\frac{O-E}{\sqrt E}: N(0,1-p)$，去除了n的影响，比较稳定，且更符合正态分布
+
+##### (3) goodness-of-fit test
+* 举例一
+  * 问题
+    * 石头剪刀布有三种情况，win和loss概率为1/4，tie概率为1/2
+    * 现在随机进行了24次，结果如下
+      * win: 4
+      * loss: 13
+      * tie: 7
+  * 解答
+    * $H_0$: 概率分布为上文所说
+    * $H_1$: 概率分布不为上文所说
+    * $\chi^2=(4-6)^2/6+(13-6)^2/6+(7-12)^/12=10.92$
+    * P-value: $P(\chi^2 \ge 10.92)$
+      * 查询chi-square表，其中自由度=2
+
+* 举例二
+  * 问题
+    * 判断性别和政党的偏好是否有联系
+      * ![](./imgs/chi_02.png)
+  * 解答
+    * $H_0$: 没有联系
+    * $H_1$: 有联系
+    * 基于假设，能够求出各个期望，比如E(Male and Republican) = 240 * 200/440=109

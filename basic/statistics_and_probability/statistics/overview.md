@@ -109,7 +109,7 @@ how many $\sigma$ away from the $\mu$
 ##### (1) density curves
 * 理解density curve
   * x轴: 数据的范围
-  * y轴: density (value per unit)
+  * y轴: density (value per unit ($\Delta x$) )
   * 面积: relative frequency
     * 即 某个范围的数据 占 总数据的 百分比
     * 所以整个面积是100%（或1）
@@ -122,6 +122,17 @@ how many $\sigma$ away from the $\mu$
 
 ##### (2) normal distribution (Gaussian distribution)
 * $f(x) = \frac{1}{\sigma \sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x-\mu}{\sigma})^2}$
+  * $e^{-x^2}$
+    * 用e是方便读写，可以用任意数
+    * ![](./imgs/st_07.png)
+  * $e^{-cx^2}$
+    * 乘以一个系数c就能水平拉伸（从而引入$\sigma$）
+  * $e^{-(x-c)^2}$
+    * 能够水平移动（从而引入$\mu$）
+  * $ce^{-x^2}$
+    * 在rules of exponentiation，式子前乘以一个系数也能水平拉省
+    * 为了保证面积为1，所以引入 $\sigma \sqrt{2\pi}$
+
 * 特征
   * symmetric bell shape
   * mean = median

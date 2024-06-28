@@ -14,6 +14,7 @@
         - [(1) linear least-squares regression](#1-linear-least-squares-regression)
         - [(2) R-squared (coefficient of determination)](#2-r-squared-coefficient-of-determination)
         - [(3) root-mean-square error (standard deviation of residuals)](#3-root-mean-square-error-standard-deviation-of-residuals)
+      - [3.nonlinear regression](#3nonlinear-regression)
 
 <!-- /code_chunk_output -->
 
@@ -73,3 +74,9 @@
 
 * $RMSE=\sqrt{\frac{\sum(y_i-\hat y_i)^2}{n-1}}$
     * 因为是sample，所以除以n-1
+
+#### 3.nonlinear regression
+
+* 可以对y进行非线性转换，转换后的y和x呈线性关系
+    * 这样做的好处
+        * 现有大量的统计方法都是基于linear regression的，所以转换后，能够利用这些方法
