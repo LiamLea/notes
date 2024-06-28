@@ -15,6 +15,13 @@
         - [(2) 数据结构](#2-数据结构)
       - [3.parameters vs hyperparameters](#3parameters-vs-hyperparameters)
       - [4.对数据的预处理](#4对数据的预处理)
+    - [相关概念](#相关概念)
+      - [1.MLP (Multilayer Perceptron)](#1mlp-multilayer-perceptron)
+      - [2.SVM (support vector machine)](#2svm-support-vector-machine)
+        - [(1) 基本概念](#1-基本概念)
+      - [3.restricted Boltzman machine (RBM)](#3restricted-boltzman-machine-rbm)
+      - [4.autoencoders](#4autoencoders)
+      - [5.deep belief network (DBN)](#5deep-belief-network-dbn)
 
 <!-- /code_chunk_output -->
 
@@ -78,3 +85,28 @@ do anything a human can do
 * 搞清楚数据集的shape及其含义
 * 对数据集进行reshape
 * 进行standardize
+
+***
+
+### 相关概念
+
+#### 1.MLP (Multilayer Perceptron)
+A specific type of neural network with multiple fully connected layers and non-linear activation functions, primarily used for classification and regression tasks
+
+#### 2.SVM (support vector machine)
+
+##### (1) 基本概念
+* margin
+  * the shortest distance between the observations and the threshold
+* soft margin
+  * allow misclassifications
+
+* soft margin classifier (support vector classifier)
+  * the observations on the edge and within the soft margin are called support vectors
+
+#### 3.restricted Boltzman machine (RBM)
+* restriction: no connections within a layer
+
+#### 4.autoencoders
+
+#### 5.deep belief network (DBN)
