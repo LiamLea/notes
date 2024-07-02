@@ -19,6 +19,10 @@
       - [1.MLP (Multilayer Perceptron)](#1mlp-multilayer-perceptron)
       - [2.SVM (support vector machine)](#2svm-support-vector-machine)
         - [(1) 基本概念](#1-基本概念)
+        - [(2) 目标: find the optimum hyperplane](#2-目标-find-the-optimum-hyperplane)
+        - [(3) non-linear classification: kernel trick](#3-non-linear-classification-kernel-trick)
+        - [(2) kernel](#2-kernel)
+        - [(3) redial kernel (RBF: redial basis function)](#3-redial-kernel-rbf-redial-basis-function)
       - [3.restricted Boltzman machine (RBM)](#3restricted-boltzman-machine-rbm)
       - [4.autoencoders](#4autoencoders)
       - [5.deep belief network (DBN)](#5deep-belief-network-dbn)
@@ -94,15 +98,44 @@ do anything a human can do
 A specific type of neural network with multiple fully connected layers and non-linear activation functions, primarily used for classification and regression tasks
 
 #### 2.SVM (support vector machine)
+given a set of labeld training data, SVM will find optimal hyperplane which categorized new examples (only handle two categories)
 
 ##### (1) 基本概念
-* margin
-  * the shortest distance between the observations and the threshold
-* soft margin
-  * allow misclassifications
+* hyperplane
+  * in 1d space: hyperplane is dot
+  * in 2d space: hyperplane is line
+  * in 3d space: hyperplane is surface
 
-* soft margin classifier (support vector classifier)
-  * the observations on the edge and within the soft margin are called support vectors
+* support vector
+  * the points that are closest to the hyperplane
+
+* margin
+  * the distance between the hyperplane and support vector
+
+##### (2) 目标: find the optimum hyperplane
+* maximum margin
+  * only support vectors determine hyperplance
+
+* hyperplane: $\vec W \cdot\vec X + b=0$
+  * $\vec W$ 是参数
+  * $\vec X$ 是hyperplane上的点
+
+##### (3) non-linear classification: kernel trick
+##### (2) kernel
+* $(a\times b+r)^d$
+  * a,b: two different observations in the dataset
+  * r: the coefficient of the polynomial
+  * d: the degree of the polynomial
+
+* 比如: r=1, d=2
+  * $(a\times b+1)^2=2ab+a^2b^2+1=(\sqrt 2a,a^2,1)\cdot (\sqrt 2b,b^2,1)$
+  * 则将数据点从1d映射到2d
+    * a: $(\sqrt 2a,a^2)$
+    * b: $(\sqrt 2b.b^2)$
+
+##### (3) redial kernel (RBF: redial basis function)
+* $e^{-\gamma(a-b)^2} $
+  * 根据taylor series: $e^{ab}=(a,\sqrt{\frac{1}{2!}}a^2,\sqrt{\frac{1}{3!}}a^3,...,\sqrt{\frac{1}{\infty!}}a^{\infty})\cdot (b,\sqrt{\frac{1}{2!}}b^2,\sqrt{\frac{1}{3!}}b^3,...,\sqrt{\frac{1}{\infty!}}b^{\infty})$
 
 #### 3.restricted Boltzman machine (RBM)
 * restriction: no connections within a layer

@@ -20,7 +20,7 @@
         - [(1) 概念](#1-概念-1)
         - [(2) average of a continuous value](#2-average-of-a-continuous-value)
       - [4.high-order derivatives](#4high-order-derivatives)
-      - [5.Tylor series](#5tylor-series)
+      - [5.Taylor series](#5taylor-series)
         - [(1) 定义](#1-定义)
 
 <!-- /code_chunk_output -->
@@ -119,7 +119,7 @@ $\frac{d}{dx}e^x = e^x$
 * 二阶的表示: $\frac{d^2f}{dx^2} = \frac{d(\frac{df}{dx})}{dx}$
     * 意义：变化的变化
 
-#### 5.Tylor series
+#### 5.Taylor series
 
 用于求 一个函数（比如$cosin(x)$等）在 **某个点** **附近** 的 **近似值**，用**多项式**表示，因为多项式更易处理
 * series: ifinite sum
