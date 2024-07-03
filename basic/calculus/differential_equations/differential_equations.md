@@ -11,13 +11,16 @@
       - [2.slope fields](#2slope-fields)
       - [3.approximate function curve: Euler's method](#3approximate-function-curve-eulers-method)
       - [4.separable differential equation](#4separable-differential-equation)
-        - [(1) 求解](#1-求解)
+        - [(1) solution](#1-solution)
       - [5.exponential models](#5exponential-models)
       - [6.logstic models](#6logstic-models)
         - [(1) logistic function](#1-logistic-function)
       - [7.exact differential equation](#7exact-differential-equation)
         - [(1) exact differential equation](#1-exact-differential-equation)
-        - [(2) 求解](#2-求解)
+        - [(2) solution](#2-solution)
+        - [(3) integrating factor](#3-integrating-factor)
+      - [8.homogenous differential equation](#8homogenous-differential-equation)
+        - [(1) solution](#1-solution-1)
 
 <!-- /code_chunk_output -->
 
@@ -49,7 +52,7 @@
 #### 4.separable differential equation
 * $y'=f(x)g(y)$
 
-##### (1) 求解
+##### (1) solution
 * 比如: $y'=\frac{-x}{ye^{x^2}}$，即 $\frac{dy}{dx}=\frac{-x}{ye^{x^2}}$
   * $\therefore \frac{dy}{dx}=\frac{-x}{e^{x^2}}\cdot \frac{1}{y}$
   * $\therefore ydy=\frac{-x}{e^{x^2}}dx$
@@ -92,9 +95,9 @@
   * $\frac{\partial}{\partial y}(\frac{\partial}{\partial x}\psi)=\frac{\partial^2\psi}{\partial y\partial x}=\psi_{xy}$
   * $\frac{\partial}{\partial x}(\frac{\partial}{\partial y}\psi)=\frac{\partial^2\psi}{\partial x\partial y}=\psi_{yx}$
   * 当$\psi,\frac{\partial \psi}{\partial x}, \frac{\partial \psi}{\partial y}$是连续函数的
-    * 则$\psi_{xy}=\psi_{yx}$
+    * 则 $\psi_{xy}=\psi_{yx}$
 
-##### (2) 求解
+##### (2) solution
 * $M(x,y)+N(x,y)\frac{dy}{dx}=0$
   * 当$\frac{\partial M}{\partial y}=\frac{\partial N}{\partial x}$（也可写成$M_y=N_x$），则是exact differential equation
 * 利用以下性质求解:
@@ -114,3 +117,31 @@
     * $\therefore \frac{d\psi}{dx}=0$
     * $\therefore \psi=C_2$
     * $\therefore y\sin x+x^2e^y-y=C$
+
+##### (3) integrating factor
+* $M(x,y)+N(x,y)\frac{dy}{dx}=0$
+  * 当 $M_y \neq N_x$时，可以两边乘以一个函数使得其相等
+
+* 举例: $(3xy+y^2)+(x^2+xy)y'=0$
+  * 两边乘以关于x的函数
+    * $\mu(x)(3xy+y^2)+\mu(x)(x^2+xy)y'=0$
+  * $M_y=N_x$
+    * $\mu(x)(3x+2y)=\mu'(x)(x^2+xy)+\mu(x)(2x+y)$
+  * 经过代数计算
+    * $\mu(x)=\mu'(x)x$
+    * $\frac{\mu(x)}{x}=\mu'(x)$
+    * $\frac{1}{x}dx=\frac{1}{\mu}d\mu$
+  * $\mu(x)=x$
+
+#### 8.homogenous differential equation
+
+* equation能写成这种形式：$y'=f(\frac{y}{x})$
+
+##### (1) solution
+* 举例: $y'=\frac{x+y}{x}$
+  * $y'=1+\frac{y}{x}$
+  * 另 $v=\frac{y}{x}$，则$y=xv$
+  * $v+xv'=1+v$
+  * $dv=\frac{1}{x}dx$
+  * $\int dv=\int\frac{1}{x}dx$
+  * ...
