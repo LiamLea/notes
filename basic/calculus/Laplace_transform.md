@@ -18,7 +18,7 @@
 ### overview
 
 #### 1.Laplace transform
-* $\mathscr{L}\{f(t)\}=\int_0^{\infty}e^{-st}f(t)dt$
+* $F(s)=\mathscr{L}\{f(t)\}=\int_0^{\infty}e^{-st}f(t)dt$
 
 ##### (1) Laplace table
 常见Laplace transform
@@ -65,3 +65,10 @@
         * $\mathscr{L}\{e^t\cos{t}\}=\frac{s-1}{(s-1)^2+1}$
         * $\mathscr{L}\{u_2(t)e^{t-2}\cos{(t-2)}\}=\frac{(s-1)e^{-2s}}{(s-1)^2+1}$
         * $\mathscr{L}^{-1}\{\frac{2(s-1)e^{-2s}}{s^2-2s+2}\}=u_2(t)e^{t-2}\cos{(t-2)}$
+    * $F(s)=\frac{2s+13}{s^2+5s+6}$
+        * $F(s)=\frac{9}{s+2}-\frac{7}{s+3}=9\mathscr{L}\{e^{-2t}\}-7\mathscr{L}\{e^{-3t}\}$
+        * $\mathscr{L}^{-1}\{\frac{2s+13}{s^2+5s+6}\}=9e^{-2t}-7e^{-3t}$
+    * $F(s)=\frac{\alpha}{s^2+\alpha^2}\cdot\frac{1}{s^2+2s+2}$
+        * $f(t)=\mathscr{L}^{-1}\{\frac{\alpha}{s^2+\alpha^2}\cdot\frac{1}{(s+1)^2+1}\}$
+        * $f(t)=\mathscr{L}^{-1}\{\frac{\alpha}{s^2+\alpha^2}\}*\mathscr{L}^{-1}\{\frac{1}{(s+1)^2+1}\}$
+        * $f(t)=\sin\alpha t\ * e^{-1}sint$

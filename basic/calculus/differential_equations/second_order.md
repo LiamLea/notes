@@ -12,6 +12,7 @@
         - [(1) solution](#1-solution)
       - [3.non-homogenous differential equation](#3non-homogenous-differential-equation)
         - [(1) solution (undetermined coefficients)](#1-solution-undetermined-coefficients)
+      - [4.使用Laplace transform](#4使用laplace-transform)
 
 <!-- /code_chunk_output -->
 
@@ -73,3 +74,17 @@ $a(x)y''+b(x)y'+c(y)y=d(x)$
     * 猜测$y_j=Ax^2+Bx+C$
     * 带入得 $A=-1,B=\frac{3}{2},C=-\frac{13}{8}$
   * $y=C_1e^{4x}+C_2e^{-x}-x^2+\frac{3}{2}x-\frac{13}{8}$
+
+#### 4.使用Laplace transform
+
+* 举例: $y''+5y'+6y=0,y(0)=2,y'(0)=3$
+  * $\mathscr{L}\{y''\}+\mathscr{L}\{y'\}+6\mathscr{L}\{y\}=0$
+  * $\because \mathscr{L}\{y'\}=s\mathscr{L}\{y\}-y(0)$
+  * $\therefore \mathscr{L}\{y\}=\frac{2s+13}{s^2+5s+6}$
+  * 进行inverse Laplace transform即可得到方程的解
+* 举例: $y''+y=\sin 2t,y(0)=2,y'(0)=1$
+  * Laplace transform:
+    * $s^2Y(s)-2s-1+Y(s)=\frac{2}{s^2+4}$
+  
+  * $Y(s)=\frac{2}{(s^2+4)(s^2+1)}+\frac{2s}{s^2+1}+\frac{1}{s^2+1}$
+  * 进行inverse Laplace transform即可得到方程的解
