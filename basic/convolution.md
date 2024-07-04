@@ -11,7 +11,8 @@
         - [(1) 理解](#1-理解)
         - [(2) 2D discrete convolution](#2-2d-discrete-convolution)
       - [2.continuous convolution](#2continuous-convolution)
-      - [3.fast convolution](#3fast-convolution)
+      - [3.convolution theorem](#3convolution-theorem)
+      - [4.fast convolution](#4fast-convolution)
 
 <!-- /code_chunk_output -->
 
@@ -50,11 +51,17 @@
 * 注意：在数学上，kernel需要先逆时针旋转180度，然后进行移动，将窗口内的元素 相乘并相加
 
 #### 2.continuous convolution
-* $[f*g](s)=\int_{\infty}^{-\infty}f(x)g(s-x)dx$
+* $[f*g](s)=\int_{-\infty}^{\infty}f(x)g(s-x)dx$
 
 ![](./imgs/cont_05.png)
 
-#### 3.fast convolution
+* for $f,g: [0,\infty) \rightarrow \R$
+    * $[f*g](t)=\int_{0}^{t}f(\tau)g(t-\tau)d\tau$
+
+#### 3.convolution theorem
+* $\mathscr{L}\{f*g\}(t)=F(s)G(s)$
+
+#### 4.fast convolution
 两个序列的卷积，可以看成两个多项式的相乘，利用FFT能够快速计算
 * 对于n次多项式，可以通过n+1个点确定一个多项式
 * 每个序列 通过FFT确定n+1个点，将n+1个点进行相乘
