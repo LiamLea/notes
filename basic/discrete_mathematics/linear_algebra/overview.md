@@ -185,21 +185,23 @@
         * $\begin{bmatrix} ae+cf & be+df \\ ag+ch & gb+dh \end{bmatrix}\begin{bmatrix} x \\ y \end{bmatrix}$
 
 ##### (4) determinant (行列式)
+决定方正矩阵**是否可逆**，表示为 $\text {det(A)}=|A|$
 * 用于描述**基向量**经过**线性变换**后的**空间变化程度**
     * 默认基向量空间1为，如果变换后的基向量空间为2,则称该变换的行列式为2
     * 当行列式为负数时，表示发生了翻转
 
-* $det(\begin{bmatrix} a & 0 \\0 & b \end{bmatrix}) = a*b$
-* $det(\begin{bmatrix} a & b \\c & d \end{bmatrix}) = ad - bc$
-    * ![](./imgs/overview_01.png)
-* $det(\begin{bmatrix} a & b & c\\d & e & f\\g & h & i \end{bmatrix}) = a*det(\begin{bmatrix} e & f \\h & i \end{bmatrix}) - b*det(\begin{bmatrix} d & f \\g & i \end{bmatrix}) - c*det(\begin{bmatrix} d & e \\g & h \end{bmatrix})$
+* 若A是一个$n\times n$的矩阵，$A_{ij}$是A的$(n-1)\times (n-1)$子矩阵（去除第i行和第j列）
+    * $$\begin{align}det(A)=&a_{11}det(A_{11})-a_{12}det(A_{12})\\ 
+    & +a_{13}det(A_{13})-a_{14}det(A_{14})\\ 
+    & ... + (-1)^{1+n}a_{1n}det(A_{1n})\end{align}$$
+        * $det(\begin{bmatrix} a & b \\c & d \end{bmatrix}) = ad - bc$
+            * ![](./imgs/overview_01.png)
+        * $det(\begin{bmatrix} a & b & c\\d & e & f\\g & h & i \end{bmatrix}) = a*det(\begin{bmatrix} e & f \\h & i \end{bmatrix}) - b*det(\begin{bmatrix} d & f \\g & i \end{bmatrix}) + c*det(\begin{bmatrix} d & e \\g & h \end{bmatrix})$
 
 ##### (5) inverse matrices (只有方正矩阵可逆)
 
 * 矩阵就是对向量的变换，逆矩阵就是逆变换
-    * 所以$A^{-1}A=E$
-        * 二维$E=\begin{bmatrix} 1 & 0 \\0 & 1 \end{bmatrix}$
-        * 三维$E=\begin{bmatrix} 1 & 0 & 0 \\0 & 1 &0 \\ 0 & 0 & 1 \end{bmatrix}$
+    * 所以$A^{-1}A=I$
 
 * **当det(A)=0时，A不存在逆矩阵**
     * 比如二维，当det(A)=0时，代表变换后span为一条直线，这样就不存在逆变换还原向量
@@ -289,22 +291,16 @@
         * M的第m行，第n列的元素值 = A矩阵的第m行 $\cdot$ B矩阵的第n列
 
 ##### (4) cross product
-* 两个二维向量叉乘，$\vec v \times \vec w$ 结果是两个向量构成的平行四边形的面积（如果$\vec v$ 在右边，则是正数）
-* 两个三维向量叉乘，产生一个新的三维向量: $\vec v \times \vec w = \vec p$
-    * $\vec w$的长度是 $\vec v$和$\vec w$组成平行图的面积（即行列式的值）
-    * $\vec p$的方向是 经过原点 与$\vec v$和$\vec w$所在平面垂直
+* **$\vec a\times\vec b=\begin{bmatrix}a_1\\a_2\\a_3\end{bmatrix}\times\begin{bmatrix}b_1\\b_2\\b_3\end{bmatrix}=\begin{bmatrix}a_2b_3-a_3b_2\\a_3b_1-a_1b_3\\a_1b_2-a_2b_1\end{bmatrix}=|\vec a||\vec b|\sin\theta\ \vec n$**
+    * $|\vec a||\vec b|\sin\theta$是 $\vec a$和$\vec b$形成的平行四边形的面积（即行列式的值）
+    * $\vec n$是单位向量，用于描述方向（使用右手法则）：与$\vec a$和$\vec b$形成的平面**垂直**
         * 右手法则:
-            * 食指表示$\vec v$
-            * 中指表示$\vec w$
-            * 大拇指的方向就是$\vec p$的方向
-* 从三维向量的叉乘计算 -> 几何意义
-    * $\vec v \times \vec w = det(\begin{bmatrix} \vec i & v_1 & w_1 \\ \vec j & v_2 & v_2 \\ \vec k & v_3 & w_3 \end{bmatrix})= \vec p \cdot \begin{bmatrix} \vec i \\ \vec j \\ \vec k \end{bmatrix}$
-        * 存在$\vec p$使得该等式成立
-        * $det(\begin{bmatrix} \vec i & v_1 & w_1 \\ \vec j & v_2 & v_2 \\ \vec k & v_3 & w_3 \end{bmatrix})$ = ($\vec v$和$\vec w$的面积) * ($\begin{bmatrix} \vec i \\ \vec j \\ \vec k \end{bmatrix}$在 $\vec v$和$\vec w$平面的垂直线上 的映射) 
-        * $\vec p \cdot \begin{bmatrix} \vec i \\ \vec j \\ \vec k \end{bmatrix}$ = ($\begin{bmatrix} \vec i \\ \vec j \\ \vec k \end{bmatrix}$在$\vec p$上的映射) * ($\vec p$的长度)
-        * 所以$\vec p$
-            * 方向 在$\vec v$和$\vec w$平面的垂直线上 
-            * 大小为$\vec v$和$\vec w$的面积
+            * 食指表示$\vec a$
+            * 中指表示$\vec b$
+            * 大拇指的方向就是新向量的方向
+    * $\vec a,\vec b\in R^3$
+    * 二维向量叉乘：标量
+        * $\vec v \times \vec w$ 结果是两个向量构成的平行四边形的面积（如果$\vec v$ 在坐标轴种的位置在右边，则是正数）
 
 #### 5.eigenvectors and eigenvalues
 
