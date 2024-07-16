@@ -32,6 +32,7 @@
       - [7.Jacobian](#7jacobian)
         - [(1) Jacobian matrix](#1-jacobian-matrix)
         - [(2) Jacobian determinant](#2-jacobian-determinant)
+        - [(3) 应用: Change of Variables](#3-应用-change-of-variables)
 
 <!-- /code_chunk_output -->
 
@@ -44,6 +45,16 @@
 ![](./imgs/mc_01.png)
 
 * 越密集，表示越陡峭（即斜率的绝对值越大）
+* The gradient is **perpendicular** to contour lines
+    * 简单理解：
+        * 因为coutour line与该点的graident是垂直的，所以coutour line的值不会改变（因为同一条countour line值都是相等的）
+    * 推导:
+        * $f(x,y)=C$
+            * $\nabla f=\begin{bmatrix} \frac{\partial f}{\partial x}\\\\\frac{\partial f}{\partial y}\end{bmatrix}$
+            * tangent vector: $\begin{bmatrix} dx\\ dy\end{bmatrix}$
+        * $\frac{f}{dx}=\frac{\partial f}{\partial x}+\frac{\partial f}{\partial y}\frac{dy}{dx}=0$
+            * $\therefore \nabla f\cdot \text {tangent vector}=0$
+
 
 ##### (2) vector field
 ![](./imgs/mc_02.png)
@@ -68,7 +79,7 @@
         * 以$f(x,y)$为例，$\nabla f(x,y)$表示，怎么沿着x,y方向行走，才能到达最高点
 
 ##### (3) why gradient is the direction of steepest ascent
-* $\underset{||vec v=1||}{\max}\vec v \cdot \nabla f(\vec a)$
+* $\underset{||\vec v=1||}{\max}\vec v \cdot \nabla f(\vec a)$
     * $\because \vec a\cdot\vec b=|\vec a||\vec b|\cos\theta$
     * 所以当$\vec v$和$\nabla f(\vec a)$方向一致时，值最大
 
@@ -190,3 +201,14 @@ $\Delta f\equiv 0$
 ##### (2) Jacobian determinant
 * (x,y)在很小范围内变化，函数变换后，该很小范围的空间变化程度（参考matrix determinant）
     * ![](./imgs/mc_05.png)
+
+##### (3) 应用: Change of Variables
+
+transform coordinates from one system to another
+* 若
+    * $S=\int\int_D24x^2+12y^2dxdy$
+    * $x=X_1(u,v)=\frac{u}{4}$
+    * $y=X_2(u,v)=\frac{v}{3}$
+
+* 则
+    * $\int\int_Df(x,y)dA=\int\int_Rf(X_1(u,v),X_2(u,v))|J(\vec X)|dudv = \int\int_R\frac{u^2}{8}+\frac{v^2}{9}dudv$

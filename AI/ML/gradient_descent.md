@@ -25,6 +25,7 @@
       - [4.mini-batch](#4mini-batch)
         - [(1) mini-batch size](#1-mini-batch-size)
         - [(2) 代码](#2-代码)
+      - [5.local minimal problem](#5local-minimal-problem)
     - [optimization](#optimization)
       - [1.gradient descent momentum](#1gradient-descent-momentum)
         - [(1) exponentially weighted averages](#1-exponentially-weighted-averages)
@@ -251,6 +252,11 @@ for i in range(num_epochs):
         # Update parameters
         parameters = update_parameters(parameters, grads)
 ```
+
+#### 5.local minimal problem
+
+in a high dimensional space most of the stationary points are saddle points rather than local minima
+For that reason, some random slight kicks would suffice to get out of the stationary point continue the search for a better optimum
 
 ***
 
