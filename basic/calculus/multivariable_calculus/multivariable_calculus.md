@@ -6,6 +6,7 @@
 <!-- code_chunk_output -->
 
 - [multivariable calculus](#multivariable-calculus)
+    - [符号规范](#符号规范)
     - [overview](#overview)
       - [1.理解multivariable](#1理解multivariable)
         - [(1) contour plots](#1-contour-plots)
@@ -36,6 +37,14 @@
 
 <!-- /code_chunk_output -->
 
+### 符号规范
+
+* $S$: surface
+* $R$: Region in a plane (or space)，比如一个surface在xy平面上的映射可以用R表示
+* $s$: arc length，用于parameterize curves $\vec r$
+* $r$: 一般用$\vec r$描述一个curve
+
+***
 
 ### overview
 
