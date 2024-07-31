@@ -12,13 +12,18 @@
         - [(2) span](#2-span)
         - [(3) linear dependent](#3-linear-dependent)
         - [(4) basis vector（基向量）](#4-basis-vector基向量)
-      - [2.矩阵](#2矩阵)
+      - [2.subspace](#2subspace)
+        - [(1) subspace of $R^n$](#1-subspace-of-rn)
+        - [(2) basis of subspace](#2-basis-of-subspace)
+      - [3.矩阵](#3矩阵)
         - [(1) column space](#1-column-space)
         - [(2) null space (kernel)](#2-null-space-kernel)
-        - [(3) 寻找null space (本质就是消元)](#3-寻找null-space-本质就是消元)
-        - [(4) orthonormal matrix: Q](#4-orthonormal-matrix-q)
-        - [(5) symmetric matrix: S](#5-symmetric-matrix-s)
-      - [3.线性变换](#3线性变换)
+        - [(3) column space 和  null space的关系](#3-column-space-和--null-space的关系)
+        - [(4) 寻找null space](#4-寻找null-space)
+      - [4.特殊矩阵](#4特殊矩阵)
+        - [(1) orthonormal matrix: Q](#1-orthonormal-matrix-q)
+        - [(2) symmetric matrix: S](#2-symmetric-matrix-s)
+      - [5.线性变换](#5线性变换)
         - [(1) 定义](#1-定义)
         - [(2) 以二维空间为例](#2-以二维空间为例)
         - [(3) 线性变换组合](#3-线性变换组合)
@@ -26,18 +31,7 @@
         - [(5) inverse matrices (只有方正矩阵可逆)](#5-inverse-matrices-只有方正矩阵可逆)
         - [(6) rank (矩阵的秩)](#6-rank-矩阵的秩)
         - [(7) 非方阵](#7-非方阵)
-      - [4.product](#4product)
-        - [(1) inner product 和 outer product](#1-inner-product-和-outer-product)
-        - [(2) dot product (vector)](#2-dot-product-vector)
-        - [(3) matrix multiply](#3-matrix-multiply)
-        - [(4) cross product](#4-cross-product)
-      - [5.eigenvectors and eigenvalues](#5eigenvectors-and-eigenvalues)
-        - [(1) 特征值和特征向量](#1-特征值和特征向量)
-        - [(2) eigenbasis](#2-eigenbasis)
-        - [(3) 性质](#3-性质)
-      - [6.singular value decomposition (SVD)](#6singular-value-decomposition-svd)
-        - [(1) 如何确定U、V和$\Sigma$](#1-如何确定u-v和sigma)
-      - [7.tensor](#7tensor)
+      - [6.tensor](#6tensor)
         - [(1) 1-d tensor (vector)](#1-1-d-tensor-vector)
         - [(2) 2-d tensor (matrix)](#2-2-d-tensor-matrix)
         - [(3) 3-d tensor](#3-3-d-tensor)
@@ -78,42 +72,69 @@
     * $\vec j$ = (0,1,0)
     * $\vec k$ = (0,0,1)
 
-#### 2.矩阵
-由vector组成
+#### 2.subspace
+
+##### (1) subspace of $R^n$
+* if V is subspace of $R^n$，则V is subset of $R^n$，且需要满足下述条件:  
+    * $\vec 0$ in V
+    * closed under addition
+        * if $\vec x$ in v, then $c\vec x$ in V
+    * closed under multiplication
+        * if $\vec a, \vec b$ in V, then $\vec a+\vec b$ in V
+
+* 举例:
+    * $V=\{\begin{bmatrix} 0\\0\\0\end{bmatrix}\}$
+        * V is subspace of $R^3$
+    * $S=\{\begin{bmatrix} x_1\\x_2\end{bmatrix}\in R^2 | x_1\ge0\}$
+        * S is not subspace of $R^2$
+    * $V=\text {span}(\vec v_1,\vec v_2,...)$
+        * 任意向量的span都是subspace
+
+##### (2) basis of subspace
+basis is minimum set of vectors than spans the subspace
+* $V=\text {span}(\vec v_1,\vec v_2,..., \vec v_n)$
+    * if $\{\vec v_1,\vec v_2,..., \vec v_n\}$ is linearly independent
+    * then $S=\{\vec v_1,\vec v_2,..., \vec v_n\}$, S is a basis for V
+
+#### 3.矩阵
+A是一个$m\times n$的矩阵，由vector组成
 * **一列**就是一个**vector**
 * **一行**就是一个**维度**
 
 ##### (1) column space
-* column space
-    * column vectors（一个column就是一个vector）的所有线性组成 构成的span
-    * $C(A).dim =  rank$ (即column vectors所处的维度)
-* row space
+* column space： $C(A)$
+    * $C(A)=\text {span}(\vec v1,\vec v2,...,\vec v_n)$
+        * column vectors（一个column就是一个vector）的所有线性组成 构成的span
+    * 另一种表述: $C(A)={A\vec x|\vec x\in R^n}$
+* row space: $C(A^T)$
     * row vectors（一个row就是一个vector）的所有线性组合 构成的span
-    * 表示：$C(A^T) = C(A)$
+* $C(A^T) = C(A)$
 
 ##### (2) null space (kernel)
-* 经过线性变换后，向量变为0，即
-    * $N(A) \bot C(A^T)$
-        * **A的null space 和 row space正交**
-    * $N(A^T) \bot C(A)$
-    * dimension of null space = (dimenson of A) - A.rank
+null space of A: $N(A)=\{\vec x\in R^n|A\vec x=\vec 0\}$
+* null space中的向量经过线性变化后为0
+* $A\vec x=x_1\vec v_1+x_2\vec v_2+...+x_n\vec v_n=0$
+    * 即**A的null space 和 row space正交**: $N(A) \bot C(A^T)$
+    * 当$\vec v_1,\vec v_2,...,\vec v_n$ 是linearly independent，则N(A)只有$\vec 0$这一个
 
-* **$Ax=0$的解就是null space**
-    * 因为只有null space中的向量，经过线性变换A才等于0
-* 假设A是一个m*n矩阵，rank=r
+##### (3) column space 和  null space的关系
+* 当$\vec v_1,\vec v_2,...,\vec v_n$ 是linearly independent时，
+    * N(A)只有一个，即$\vec 0$
+    * 所以可以通过求A的null space，判断其column vector是否linearly independent
+
+* 假设A是一个m*n矩阵，rank=r，N(A).dim表示需要多少basis vector才能构成该null space
     * $N(A).dim = n-r$
     * $N(A^T).dim = m -r$
 
-##### (3) 寻找null space (本质就是消元)
-* $Ax=0$
-* 进行分解: [A = CR](./Advance.md#1-a--cr)
-    * 利用消元（elimination），求出R
-* R=0的解就是null space
-    * R可以表示为 $[I\ F]$
-    * $[I\ F]\begin{bmatrix} -F \\ I \end{bmatrix} = 0$
-    * 所以解就是$\begin{bmatrix} -F \\ I \end{bmatrix}$
+##### (4) 寻找null space
 
-##### (4) orthonormal matrix: Q
+求解$A\vec x=\vec 0$
+* $N(A)=N(rref(A))$
+    * rref: reduced row echelon form，利用消元（elimination）简化计算
+
+#### 4.特殊矩阵
+
+##### (1) orthonormal matrix: Q
 
 * Q是**方正** 且 每一列都是**orthonormal vectors (标准正交向量)**
     * 每一列的向量 都和 其他列向量 正交 且 与自身的点积为1
@@ -122,7 +143,7 @@
         * 因为等于$I$，所以 $Q^T=Q^{-1}$
     * 本质就是**旋转（可能还有翻转）**，所以对任何向量进行该线型变换，都不会改变该向量的长度
 
-##### (5) symmetric matrix: S
+##### (2) symmetric matrix: S
 
 * $S = S^T$
 * S的**特征向量是正交的**
@@ -140,7 +161,7 @@
 
     * 当$f(x) = X^TSX$ 时，表示f(x)函数的形状像碗一样
 
-#### 3.线性变换
+#### 5.线性变换
 
 ##### (1) 定义
 
@@ -236,127 +257,8 @@
             * 线性变换: $\begin{bmatrix} 1 & -2 \end{bmatrix}$
             * 变换后的 $\vec v' = 4\vec i + 3\vec j = 4\begin{bmatrix} 1 \end{bmatrix} + 3\begin{bmatrix} -2 \end{bmatrix} = [-2]$
 
-#### 4.product
 
-##### (1) inner product 和 outer product
-
-* outer product
-    * 两个向量组成一个新的矩阵
-    * $\vec u \otimes \vec v = \begin{bmatrix} u_1v_1 & u_1v_2 & \cdots & u_1v_n \\ u_2v_1 & u_2v_2 & \cdots &u_2v_n \\ \vdots & \vdots & \ddots & \vdots \\ u_mv_1 & u_mv_2 & \cdots & u_mv_n\end{bmatrix}$
-
-* inner product
-    * 向量的inner product就是dot product
-    * 矩阵的inner product比较复杂
-
-##### (2) dot product (vector)
-* dot product可以表示
-    * 向量的inner product
-    * 矩阵的matrix multiply
-
-* 线性理解
-    * $\begin{bmatrix} 1 & 2 \end{bmatrix} \begin{bmatrix} 4 \\ 3 \end{bmatrix}=1*4+2*3=10$
-
-* 映射理解：**$\vec a\cdot\vec b= a_xb_x+a_yb_y=|\vec a||\vec b|\cos\theta$**
-    * 一个向量在另一个向量上的**映射**，并**乘以另一个向量的长度**
-    * 单位向量$\vec u=(u_x,u_y)$
-        * $|\vec u|=1$，$u_x,u_y$不等于1
-        * duality: 
-            * ($\vec i$在$\vec u$上的映射) = ($\vec u$在$\vec i$上的映射) = $u_x$
-            * ($\vec j$在$\vec u$上的映射) = ($\vec u$在$\vec j$上的映射) = $u_y$
-    * 已知向量$\vec v=(mu_x,nu_y)$
-        * 则向量$\vec x =(x,y)=x\vec i+y\vec j$在$\vec v$上的映射$xmu_x+ymu_y$
-        * 就等于$\vec v\cdot\vec x$
-    * 所以
-        * **$\vec a\cdot\vec b=|\vec a||\vec b|\cos\theta$**
-            * $\theta$为a和b之间的夹角
-            * $|\vec b|\cos\theta$为$\vec b$在$\vec a$上的映射
-            * 所以a,b方向不一致时为负数，垂直时为0
-
-    ![](./imgs/overview_02.png)
-
-* 所以$\vec a$在$\vec b$上的映射向量为: $\frac{\vec a\cdot \vec b}{|\vec b|^2}\vec b$
-    * $\vec a$在$\vec b$上的映射长度为$\frac{\vec a\cdot \vec b}{|\vec b|}$
-
-##### (3) matrix multiply
-
-* 理解: $A \cdot B$
-    * 多个向量的**线性变换**
-        * B的每一列是一个向量，对每一个向量进行线性变换A
-    * A的每行和B的每列进行**dot product**
-
-* dot product 和 matrix multiply区分
-    * dot product对象：**向量**，**输出**是一个**值**
-    * matrix multiply对象：**矩阵**，**输出**是另一个**矩阵**： $M = A \cdot B$ 
-        * 前提： A矩阵的每行和B矩阵的每列做点积（A每行的元素数 = B每列的元素数）
-        * M的第m行，第n列的元素值 = A矩阵的第m行 $\cdot$ B矩阵的第n列
-
-##### (4) cross product
-* **$\vec a\times\vec b=\begin{bmatrix}a_1\\a_2\\a_3\end{bmatrix}\times\begin{bmatrix}b_1\\b_2\\b_3\end{bmatrix}=\begin{bmatrix}a_2b_3-a_3b_2\\a_3b_1-a_1b_3\\a_1b_2-a_2b_1\end{bmatrix}=|\vec a||\vec b|\sin\theta\ \vec n$**
-    * $|\vec a||\vec b|\sin\theta$是 $\vec a$和$\vec b$形成的平行四边形的面积（即行列式的值）
-    * $\vec n$是单位向量，用于描述方向（使用右手法则）：与$\vec a$和$\vec b$形成的平面**垂直**
-        * 右手法则:
-            * 食指表示$\vec a$
-            * 中指表示$\vec b$
-            * 大拇指的方向就是新向量的方向
-    * $\vec a,\vec b\in R^3$
-    * 二维向量叉乘：标量
-        * $\vec v \times \vec w$ 结果是两个向量构成的平行四边形的面积（如果$\vec v$ 在坐标轴种的位置在右边，则是正数）
-
-#### 5.eigenvectors and eigenvalues
-
-##### (1) 特征值和特征向量
-* **特征向量**：经过线性变换，向量的**方向没有改变**，只是进行了scale
-    * scale的值就是 **特征值**
-    * 比如: 进行$\begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}$线性变换，x轴的span没有改变，scale值为1,所以x轴上的所有向量都是特征向量，特征值为1
-
-* 数学定义: $A\vec v= \lambda \vec v$
-    * $\lambda$可以 $\lambda I$，I是主对角线都为1的矩阵
-    * 所以$(A-\lambda I)\vec v= 0$
-    * 所以$det(A-\lambda I)=0$
-
-* 不是所有的线性变换都有特征值和特征向量的
-
-##### (2) eigenbasis
-针对某一个线性变换，使用一组特征向量作为新的基向量，如果需要计算多次进行该线性变换，使用eignebasis简化计算，因为除了主对角线上，其他地方都为0
-
-##### (3) 性质
-
-* $A^nx = \lambda^nx$
-    * $A^{-1}x = \frac{1}{\lambda}x$
-* $A=X\Lambda X^{-1}$ (A非对称 方正矩阵)
-    * X每一列都是**A的单位特征向量**, $\Lambda$每一列都是对应的特征值
-    * 因为$AX=X\Lambda$，所以$A=X\Lambda X^{-1}$
-    * 注意：**只有方正矩阵可逆**
-    * 能够推出：
-        * $A^k=X\Lambda^k X^{-1}$
-* 特征值的和 = A对角线的数值相加
-    * 根据$A=X\Lambda X^{-1}$推出
-* 特征值的乘积 = det(A)
-    * 因为$det(A-\lambda I)=0$，所以$det(A) = det(\lambda I)$，右边等于特征值的乘积
-
-#### 6.singular value decomposition (SVD)
-* 本质：任何的线性变换 都是 先**旋转**到基向量的位置，再进行**scale**，最后**旋转**回原来的位置
-* $AV = U\Sigma$，其中U和V都是标准正交矩阵（即$U^TU=I, V^TV=I$）
-    * 即$A\begin{bmatrix}\\ \vec v_1 & \cdots & \vec v_r \\ \ \end{bmatrix} = \begin{bmatrix}\\ \vec u_1 & \cdots & \vec u_r \\ \ \end{bmatrix} \begin{bmatrix}\sigma_1 \\ & \ddots \\ && \sigma_r \end{bmatrix}$
-    * **r是矩阵的rank**
-    * singular values: $\sigma_1 \ge\sigma_2\ge ... \ge\sigma_r\ge 0$
-    * singular vector: $U$ 和 $V^T$
-
-* 所以 $A = U\Sigma V^T$，对向量进行A线性变换，也就是
-    * $V^T$: 先旋转
-    * $\Sigma$: 再scale（对角矩阵只进行scale）
-    * $U$: 再旋转回原来的位置
-
-##### (1) 如何确定U、V和$\Sigma$
-
-* U是$AA^T$的特征向量
-* V是$A^TA$的特征向量
-* $\sigma_i^2$就是非0特征值 (U和V的非0的特征值相等)
-* 证明
-    * $A^TA=V\Sigma^TU^TU\Sigma V^T=V(\Sigma^T\Sigma)V^T$
-    * $AA^T=U\Sigma V^TV\Sigma^TU^T=U(\Sigma\Sigma^T)U^T$
-
-#### 7.tensor
+#### 6.tensor
 
 以**三维空间**为例
 
@@ -377,3 +279,4 @@
 
 ##### (3) 3-d tensor
 * 因为是三维空间，所以一共 $3*3*3=27$个基向量（即基分量）
+
