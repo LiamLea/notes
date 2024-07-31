@@ -61,7 +61,7 @@
         * $f(x,y)=C$
             * $\nabla f=\begin{bmatrix} \frac{\partial f}{\partial x}\\\\\frac{\partial f}{\partial y}\end{bmatrix}$
             * tangent vector: $\begin{bmatrix} dx\\ dy\end{bmatrix}$
-        * $\frac{f}{dx}=\frac{\partial f}{\partial x}+\frac{\partial f}{\partial y}\frac{dy}{dx}=0$
+        * $\frac{df}{dx}=\frac{\partial f}{\partial x}+\frac{\partial f}{\partial y}\frac{dy}{dx}=0$
             * $\therefore \nabla f\cdot \text {tangent vector}=0$
 
 

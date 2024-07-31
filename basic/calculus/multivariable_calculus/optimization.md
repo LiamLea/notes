@@ -52,12 +52,15 @@
     * 取到最大值时，$g(x,y)$与$f(x,y)$ countour line相切
         * 所以需要找到相切点，然后再找出最大值
     * 由于gradient和coutour line垂直，所以在相切点，函数g和函数f的gradient方向一样，大小不等 
-        * $\lambda$不能为0
+        * multiplier: $\lambda$不能为0
 
 ##### (2) Lagranian
 上述式子的简化，方便计算机计算
-* $\mathcal{L}(x,y,\lambda)=g(x,y)-\lambda(g(x,y)-b)$
+* $\mathcal{L}(x,y,\lambda)=f(x,y)-\lambda(g(x,y)-b)$
 * $\nabla \mathcal{L}=\vec 0$
+    * 等价于:
+        * $\nabla f(x,y)=\lambda \nabla g(x,y)$
+        * $g(x,y)=b$
     * 先需要找到相切点，然后再找出
         * 最大值 的相切点：$(x^*,y^*,\lambda^*)$
         * 最大值：$M^*=f(x^*,y^*)$
