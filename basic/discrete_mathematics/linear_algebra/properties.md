@@ -12,15 +12,13 @@
         - [(2) dot product (vector)](#2-dot-product-vector)
         - [(3) matrix multiply](#3-matrix-multiply)
         - [(4) cross product](#4-cross-product)
+        - [(5) dot product vs cross product](#5-dot-product-vs-cross-product)
       - [2.eigenvectors and eigenvalues](#2eigenvectors-and-eigenvalues)
         - [(1) 特征值和特征向量](#1-特征值和特征向量)
         - [(2) eigenbasis](#2-eigenbasis)
         - [(3) 性质](#3-性质)
       - [3.singular value decomposition (SVD)](#3singular-value-decomposition-svd)
         - [(1) 如何确定U、V和$\Sigma$](#1-如何确定u-v和sigma)
-      - [4.hyperplane and norm vector](#4hyperplane-and-norm-vector)
-        - [(1) 概念](#1-概念)
-        - [(2) 性质](#2-性质)
 
 <!-- /code_chunk_output -->
 
@@ -93,6 +91,12 @@
     * 二维向量叉乘：标量
         * $\vec v \times \vec w$ 结果是两个向量构成的平行四边形的面积（如果$\vec v$ 在坐标轴种的位置在右边，则是正数）
 
+##### (5) dot product vs cross product
+* dot product
+    * 描述两个向量，同向的程度: $\frac{\vec a\cdot\vec b}{||\vec a||\ ||\vec b||}$
+* cross product
+    * 描述两个向量，垂直的程度: $\frac{\vec a\times\vec b}{||\vec a||\ ||\vec b||}$
+
 #### 2.eigenvectors and eigenvalues
 
 ##### (1) 特征值和特征向量
@@ -146,23 +150,3 @@
 * 证明
     * $A^TA=V\Sigma^TU^TU\Sigma V^T=V(\Sigma^T\Sigma)V^T$
     * $AA^T=U\Sigma V^TV\Sigma^TU^T=U(\Sigma\Sigma^T)U^T$
-
-#### 4.hyperplane and norm vector
-* in 1d space: hyperplane is dot
-* in 2d space: hyperplane is line
-* in 3d space: hyperplane is surface
-
-##### (1) 概念
-* $R^n$ vector space
-    * 若 $a_1x_1+a_2x_2+...+a_nx_n=b$
-        * 这就是一个hyperplane 
-    * 则存在norm vector: $\vec n=(a_1,a_2,...,a_n)$
-    * 证明:
-        * 若u和w两点在平面上（注意$\vec u,\vec w$不在平面上，$\vec u-\vec w$在平面上）
-        * 则$\vec n\cdot\vec u-\vec n\cdot\vec w=b-b=0$
-
-##### (2) 性质
-* 若v是hyperplane上的一点，则
-    * unit normal vector: $\frac{\vec n}{||\vec n||}$
-    * $\frac{\vec n}{||\vec n||}\cdot\vec v = \frac{|b|}{||\vec n||}$
-        * 表示$\vec v$在normal vector方向上的映射（即原点到hyperplane的距离）
