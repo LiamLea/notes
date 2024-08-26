@@ -31,25 +31,43 @@
         - [(3) dimension of a subspace](#3-dimension-of-a-subspace)
         - [(4) column space 和  null space的关系](#4-column-space-和--null-space的关系)
         - [(5) 寻找null space](#5-寻找null-space)
-      - [7.特殊矩阵](#7特殊矩阵)
-        - [(1) orthonormal matrix: Q](#1-orthonormal-matrix-q)
-        - [(2) symmetric matrix: S](#2-symmetric-matrix-s)
-      - [8.transformation](#8transformation)
+      - [7.transformation](#7transformation)
         - [(1) image of transformation](#1-image-of-transformation)
         - [(2) preimage](#2-preimage)
-      - [9.linear transformation](#9linear-transformation)
+      - [8.linear transformation](#8linear-transformation)
         - [(1) 定义](#1-定义)
         - [(2) 以二维空间为例](#2-以二维空间为例)
         - [(3) 线性变换组合](#3-线性变换组合)
         - [(4) rank (矩阵的秩)](#4-rank-矩阵的秩)
         - [(5) 非方阵](#5-非方阵)
-      - [10.inverse matrices (只有方正矩阵可逆)](#10inverse-matrices-只有方正矩阵可逆)
-      - [11.determinant (行列式)](#11determinant-行列式)
+        - [(6) change of basis](#6-change-of-basis)
+      - [9.inverse matrices (只有方正矩阵可逆)](#9inverse-matrices-只有方正矩阵可逆)
+      - [10.determinant (行列式)](#10determinant-行列式)
         - [(1) 定义](#1-定义-1)
         - [(2) 与行的关系](#2-与行的关系)
         - [(3) upper triangular determinant](#3-upper-triangular-determinant)
         - [(4) 计算determinant的简单方法](#4-计算determinant的简单方法)
-      - [12.tensor](#12tensor)
+      - [11.transpose](#11transpose)
+        - [(1) transpose of a vector](#1-transpose-of-a-vector)
+        - [(2) if A linearly indepently, then $A^TA$ is invertiable](#2-if-a-linearly-indepently-then-ata-is-invertiable)
+      - [12.orthogonal complements](#12orthogonal-complements)
+        - [(1) definition](#1-definition)
+        - [(2) $dim(V)+dim(V^\bot)=n$](#2-dimvdimvbotn)
+        - [(3) $V$和$V^\bot$的basis vector是$R^n$的basis vector](#3-v和vbot的basis-vector是rn的basis-vector)
+        - [(4) $A\vec x=\vec b$](#4-avec-xvec-b)
+      - [13.orthogonal projections](#13orthogonal-projections)
+        - [(1) projection](#1-projection)
+        - [(2) $||\vec x-\text {Proj}_{V}\vec x||\le||\vec x-\vec v|| \ (\vec v \in V)$](#2-vec-x-text-proj_vvec-xlevec-x-vec-v--vec-v-in-v)
+        - [(3) least squares approximation](#3-least-squares-approximation)
+      - [14.orthonormal basis](#14orthonormal-basis)
+        - [(1) definition](#1-definition-1)
+        - [(2) properties](#2-properties)
+        - [(3) $\text {Proj}_{V} \vec x=AA^T\vec x=(\vec x\cdot\vec v_1)\vec v_1+(\vec x\cdot\vec v_2)\vec v_2+...+(\vec x\cdot\vec v_k)\vec v_k$](#3-text-proj_v-vec-xaatvec-xvec-xcdotvec-v_1vec-v_1vec-xcdotvec-v_2vec-v_2vec-xcdotvec-v_kvec-v_k)
+        - [(4) Gram-Schmidt process](#4-gram-schmidt-process)
+      - [15.特殊矩阵](#15特殊矩阵)
+        - [(1) orthonormal matrix: Q](#1-orthonormal-matrix-q)
+        - [(2) symmetric matrix: S (特征向量是正交的)](#2-symmetric-matrix-s-特征向量是正交的)
+      - [16.tensor](#16tensor)
         - [(1) 1-d tensor (vector)](#1-1-d-tensor-vector)
         - [(2) 2-d tensor (matrix)](#2-2-d-tensor-matrix)
         - [(3) 3-d tensor](#3-3-d-tensor)
@@ -177,6 +195,7 @@ basis is minimum set of vectors than spans the subspace
 * $A\vec x=\vec b$
     * 经过rref: $[rref(A)|\vec b']$
     * 解: $\vec b'+N(A)$
+    * [参考](#12orthogonal-complements) 
 
 #### 6.矩阵
 A是一个$m\times n$的矩阵，由vector组成
@@ -195,9 +214,12 @@ A是一个$m\times n$的矩阵，由vector组成
 ##### (2) null space (kernel)
 null space of A: $N(A)=\{\vec x\in R^n|A\vec x=\vec 0\}$
 * null space中的向量经过线性变化后为0
-* $A\vec x=x_1\vec v_1+x_2\vec v_2+...+x_n\vec v_n=0$
-    * 即**A的null space 和 row space正交**: $N(A) \bot C(A^T)$
-    * 当$\vec v_1,\vec v_2,...,\vec v_n$ 是linearly independent，则N(A)只有$\vec 0$这一个
+* **$N(A)=(C(A^T))^{\bot}$**
+    * N(A) is **orthogonal complement** of the rowspace of A
+    * 证明:
+        * $A\vec x=\vec 0$
+            * 其中$A=\begin{bmatrix} \vec r_1^T\\\vec r_2^T\\ \vdots \\\vec r_n^T \end{bmatrix}$
+        * $\therefore \vec r_1\cdot\vec x=0, \vec r_2\cdot\vec x=0,...,\vec r_n\cdot\vec x=0$
 
 ##### (3) dimension of a subspace
 * dimension of a  subspace = \# of elements in a basis for the subspace
@@ -218,36 +240,7 @@ null space of A: $N(A)=\{\vec x\in R^n|A\vec x=\vec 0\}$
 * $N(A)=N(rref(A))$
     * rref: reduced row echelon form，利用消元（elimination）简化计算
 
-#### 7.特殊矩阵
-
-##### (1) orthonormal matrix: Q
-
-* Q是**方正** 且 每一列都是**orthonormal vectors (标准正交向量)**
-    * 每一列的向量 都和 其他列向量 正交 且 与自身的点积为1
-    * $Q^TQ = I$
-        * 因为是方正，所以$QQ^T=I$
-        * 因为等于$I$，所以 $Q^T=Q^{-1}$
-    * 本质就是**旋转（可能还有翻转）**，所以对任何向量进行该线型变换，都不会改变该向量的长度
-
-##### (2) symmetric matrix: S
-
-* $S = S^T$
-* S的**特征向量是正交的**
-* $A^TA$ 结果是 symmetric positive definite 矩阵
-
-* $X^TSX$（X是一个向量，比如: X=[x y]）能表示所有的二次方程，而在机器学习中，代价函数几乎都是二次方程
-    * 满足以下任一个条件就是symmetric positive definite
-        * 所有特征值 > 0
-        * $X^TSX$ > 0 (X不等于0)
-        * $S=A^TA$ (A的每一列都线性无关)
-        * 所有的leading determinants > 0
-            * leading determinants表示 取矩阵的 1x1矩阵，2x2矩阵，3x3矩阵，依次类推
-        * 所有的pivots in elimination > 0
-            * 消元后的每行的第一个非0的值 > 0
-
-    * 当$f(x) = X^TSX$ 时，表示f(x)函数的形状像碗一样
-
-#### 8.transformation
+#### 7.transformation
 
 存在transformation T: $R^n \rightarrow R^m$
 * $R^n$称为domain: 原先数据所在的域（注意不是范围）
@@ -266,7 +259,7 @@ null space of A: $N(A)=\{\vec x\in R^n|A\vec x=\vec 0\}$
 
 * $T(T^{-1}(S))\subseteq S$
 
-#### 9.linear transformation
+#### 8.linear transformation
 
 ##### (1) 定义
 
@@ -339,7 +332,18 @@ null space of A: $N(A)=\{\vec x\in R^n|A\vec x=\vec 0\}$
             * 线性变换: $\begin{bmatrix} 1 & -2 \end{bmatrix}$
             * 变换后的 $\vec v' = 4\vec i + 3\vec j = 4\begin{bmatrix} 1 \end{bmatrix} + 3\begin{bmatrix} -2 \end{bmatrix} = [-2]$
 
-#### 10.inverse matrices (只有方正矩阵可逆)
+##### (6) change of basis
+* 向量
+    * basis乘以相应的coordinates进行相加
+    * 默认是standard basis（即相互正交的基向量）
+* 特定的basis和standard basis相互转换
+    * $B[\vec v]_B=\vec v$
+        * B表示basis矩阵
+        * $[\vec v]_B$表示以B为basis的coordinates
+* 对standard basis下的向量做线性变换A
+    * 对non-standard basis下的向量，则做如下的线性变换：$A=B^{-1}AB$
+
+#### 9.inverse matrices (只有方正矩阵可逆)
 
 * 矩阵就是对向量的变换，逆矩阵就是逆变换
     * 所以$A^{-1}A=I$
@@ -356,7 +360,7 @@ null space of A: $N(A)=\{\vec x\in R^n|A\vec x=\vec 0\}$
     * 比如三维，当det(A)=0时，代表变换后span为一个平面或一条直线，同样无法还原向量
 
 
-#### 11.determinant (行列式)
+#### 10.determinant (行列式)
 
 ##### (1) 定义
 决定方正矩阵**是否可逆**，表示为 $\text {det(A)}=|A|$
@@ -394,7 +398,129 @@ null space of A: $N(A)=\{\vec x\in R^n|A\vec x=\vec 0\}$
 * 进行row operation (不影响determinant)，将矩阵转变为upper triangular
 * 计算upper triangular determinant
 
-#### 12.tensor
+#### 11.transpose
+
+* $|A|=|A^T|$
+* $(AB)^T=B^TA^T$
+* $(A+B)^T=A^T+B^T$
+* $(A^T)^{-1}=(A^{-1})^T$
+
+##### (1) transpose of a vector
+* $\vec v\cdot\vec w=\vec v^T\vec w$
+    * 将向量的点积 转换成 矩阵的乘法
+* $(A\vec x)\cdot \vec y=\vec x\cdot(A^T\vec y)$
+
+##### (2) if A linearly indepently, then $A^TA$ is invertiable
+
+#### 12.orthogonal complements
+
+##### (1) definition
+* V: some subspace of $R^n$
+* orthogonal complements of V:
+    * $V^{\bot}=\{\vec x\in R^n | \vec x\cdot\vec v=0 \text { for every } \vec v\in V\}$
+
+##### (2) $dim(V)+dim(V^\bot)=n$
+* if V is some subspace of $R^n$, then $dim(V)+dim(V^\bot)=n$
+    * if $A^T$ is m*n,
+        * $rank(A)+dim(N(A^T))=n$
+        * 则 $dim(C(A))+dim(N(A^T))=n$
+        * 则 $dim(C(A))+dim((C(A))^\bot)=n$
+
+##### (3) $V$和$V^\bot$的basis vector是$R^n$的basis vector
+* $V\cap V^\bot=\{\vec 0\}$
+* $\vec a=\vec v+\vec x$
+    * $\vec a$: any vector in $R^n$
+    * $\vec v\in V$
+    * $\vec x\in V^\bot$
+* $||\vec a||^2=||\vec v||^2+||\vec x||^2$
+
+##### (4) $A\vec x=\vec b$
+* $\vec x=\vec r_0+\vec n_0$
+    * $\vec r_0\in C(A^T)$
+    * $\vec n_0\in N(A)$
+* 结论
+    * $\vec b\in C(A)$，则存在唯一的 $\vec r_0\in C(A^T)$ 是方程的$A\vec x=\vec b$的一个解，
+    * 其他解的为$\vec x=\vec r_0+\vec n_0$
+    * $r_0$是**最小的解**
+    * 因为
+        * $A\vec x=\vec b$的解和$A\vec x=\vec 0$的解平行
+        * $C(A^T)$与他们垂直，所以$A\vec x=\vec b$的解，能够表示为$\vec r_0+\vec n_0$
+        ![](./imgs/overview_05.png)
+
+#### 13.orthogonal projections
+
+##### (1) projection
+* $\vec x=\vec v+\vec w=\text {Proj}_{V} \vec x+\text {Proj}_{V^T}\vec x$
+    * $\vec v\in V$
+    * $\vec w\in V^{\bot}$
+* projection是线性变换
+
+##### (2) $||\vec x-\text {Proj}_{V}\vec x||\le||\vec x-\vec v|| \ (\vec v \in V)$
+
+##### (3) least squares approximation
+* 当$A\vec x=\vec b$没有解时，则需要找到结果最接近的解$\vec x^*$
+    * 即minimize $||\vec b-A\vec x^*||$
+* 当$A\vec x^*=\text {Proj}_{C(A)}\vec b$时，最接近
+
+* example
+![](./imgs/overview_06.png)
+
+#### 14.orthonormal basis
+
+##### (1) definition
+* $B={\vec v_1,\vec v_2,...,\vec v_k}$ is the orthonormal basis for subspace V
+    * $\vec v_i\cdot\vec v_j=\begin{cases} 0 & i\ne j\\1 & i=j \end{cases}$ 
+
+* if $\vec x\in V$，则
+    * $[\vec x]_B=\begin{bmatrix} \vec v_1\cdot\vec x\\\vec v_2\cdot\vec x\\\vdots\\\vec v_k\cdot\vec x\end{bmatrix}$
+
+##### (2) properties
+
+* if A is  $n\times k$ matrix and is the orthonormal basis
+    * 则 $A^TA=I_k$
+* if A is  $n\times n$ matrix and is the orthonormal basis
+    * 则 $A^T=A^{-1}$
+        * $A^TA=I_n$
+        * 因为线性无关，所以是可逆的，所以$A^{-1}A=I_n$
+
+##### (3) $\text {Proj}_{V} \vec x=AA^T\vec x=(\vec x\cdot\vec v_1)\vec v_1+(\vec x\cdot\vec v_2)\vec v_2+...+(\vec x\cdot\vec v_k)\vec v_k$
+* A是subspace V的orthonormal basis matrix
+* $\{\vec v_1,\vec v_2,...,\vec v_k\}$ 是subspace V的orthonormal basis
+
+##### (4) Gram-Schmidt process
+* 将subspace V的basis $\{\vec v_1,\vec v_2,...,\vec v_k\}$ 转变成 orthonormal basis $\{\vec u_1,\vec u_2,...,\vec u_k\}$
+    * $y_k=\vec v_k-\text {Proj}_{V_{k-1}} \vec v_k$
+    * $u_k=\frac{\vec y_k}{||\vec y_k||}$
+
+#### 15.特殊矩阵
+
+##### (1) orthonormal matrix: Q
+
+* Q是**方正** 且 每一列都是**orthonormal vectors (标准正交向量)**
+    * 每一列的向量 都和 其他列向量 正交 且 与自身的点积为1
+    * **$Q^TQ = I$**
+        * 因为是方正，所以$QQ^T=I$
+        * 因为等于$I$，所以 $Q^T=Q^{-1}$
+    * 本质就是**旋转（可能还有翻转）**，所以对任何向量进行该线型变换，都不会改变该向量的长度
+
+##### (2) symmetric matrix: S (特征向量是正交的)
+
+* **$S = S^T$**
+* $A^TA$ 结果是 symmetric positive definite 矩阵
+
+* $X^TSX$（X是一个向量，比如: X=[x y]）能表示所有的二次方程，而在机器学习中，代价函数几乎都是二次方程
+    * 满足以下任一个条件就是symmetric positive definite
+        * 所有特征值 > 0
+        * $X^TSX$ > 0 (X不等于0)
+        * $S=A^TA$ (A的每一列都线性无关)
+        * 所有的leading determinants > 0
+            * leading determinants表示 取矩阵的 1x1矩阵，2x2矩阵，3x3矩阵，依次类推
+        * 所有的pivots in elimination > 0
+            * 消元后的每行的第一个非0的值 > 0
+
+    * 当$f(x) = X^TSX$ 时，表示f(x)函数的形状像碗一样
+
+#### 16.tensor
 
 以**三维空间**为例
 
