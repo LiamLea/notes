@@ -17,8 +17,10 @@
         - [(1) 特征值和特征向量](#1-特征值和特征向量)
         - [(2) eigenbasis](#2-eigenbasis)
         - [(3) 性质](#3-性质)
-      - [3.singular value decomposition (SVD)](#3singular-value-decomposition-svd)
-        - [(1) 如何确定U、V和$\Sigma$](#1-如何确定u-v和sigma)
+      - [3.norm](#3norm)
+        - [(1) vector norm](#1-vector-norm)
+        - [(2) matrix norm](#2-matrix-norm)
+      - [4.$e^A$](#4ea)
 
 <!-- /code_chunk_output -->
 
@@ -105,10 +107,11 @@
     * 比如: 进行$\begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}$线性变换，x轴的span没有改变，scale值为1,所以x轴上的所有向量都是特征向量，特征值为1
 
 * 数学定义: $A\vec v= \lambda \vec v$
-    * $\lambda$可以 $\lambda I$，I是主对角线都为1的矩阵
+    * $\lambda\vec v$可以写成 $\lambda I\vec v$
     * 所以$(A-\lambda I)\vec v= 0$
-    * 所以$det(A-\lambda I)=0$
-
+    * 要使方程有解 所以$det(A-\lambda I)=0$
+    * 从而求出特征值
+    * 将某个特侦值带入 $(A-\lambda I)\vec v= 0$，从而求出与该特征值关联的特征向量空间$E_{\lambda}$
 * 不是所有的线性变换都有特征值和特征向量的
 
 ##### (2) eigenbasis
@@ -129,24 +132,26 @@
 * 特征值的乘积 = det(A)
     * 因为$det(A-\lambda I)=0$，所以$det(A) = det(\lambda I)$，右边等于特征值的乘积
 
-#### 3.singular value decomposition (SVD)
-* 本质：任何的线性变换 都是 先**旋转**到基向量的位置，再进行**scale**，最后**旋转**回原来的位置
-* $AV = U\Sigma$，其中U和V都是标准正交矩阵（即$U^TU=I, V^TV=I$）
-    * 即$A\begin{bmatrix}\\ \vec v_1 & \cdots & \vec v_r \\ \ \end{bmatrix} = \begin{bmatrix}\\ \vec u_1 & \cdots & \vec u_r \\ \ \end{bmatrix} \begin{bmatrix}\sigma_1 \\ & \ddots \\ && \sigma_r \end{bmatrix}$
-    * **r是矩阵的rank**
-    * singular values: $\sigma_1 \ge\sigma_2\ge ... \ge\sigma_r\ge 0$
-    * singular vector: $U$ 和 $V^T$
+#### 3.norm
 
-* 所以 $A = U\Sigma V^T$，对向量进行A线性变换，也就是
-    * $V^T$: 先旋转
-    * $\Sigma$: 再scale（对角矩阵只进行scale）
-    * $U$: 再旋转回原来的位置
+##### (1) vector norm
+* Lp-norm: $\Vert \vec x \Vert_p = (\sum\limits_{i=1}^{n}|x_i|)^{1/p}$
+    * L1-norm (Manhatten distance)
+      * $\Vert \vec x\Vert_1 = \sum\limits_{i=1}^{n}|x_1|$
+    * L2-norm (Euclidean distance)
+      * $\Vert \vec x\Vert_2 = (\sum\limits_{i=1}^{n}|x_1|^2)^{1/2}$
+* $\infty$-norm: $\Vert \vec x \Vert_{\infty} = \underset{i}{max}|x_i|$
 
-##### (1) 如何确定U、V和$\Sigma$
+##### (2) matrix norm
 
-* U是$AA^T$的特征向量
-* V是$A^TA$的特征向量
-* $\sigma_i^2$就是非0特征值 (U和V的非0的特征值相等)
-* 证明
-    * $A^TA=V\Sigma^TU^TU\Sigma V^T=V(\Sigma^T\Sigma)V^T$
-    * $AA^T=U\Sigma V^TV\Sigma^TU^T=U(\Sigma\Sigma^T)U^T$
+* Frobenius norm
+  * $\Vert A\Vert_F = (\sum_{i,j}abs(a_{i,j})^2)^{1/2}$
+* L1-norm
+  * $\Vert A\Vert_1$ = `max( sum(abs(x), axis=0) )`
+* L2-norm
+  * $\Vert A\Vert_2$ = largest sing. value
+
+#### 4.$e^A$
+
+根据泰勒展开
+* $e^A = E + A + \frac{A^2}{2!} + ... = \sum\limits_{k=0}^{\infty}\frac{A^k}{k!}$
