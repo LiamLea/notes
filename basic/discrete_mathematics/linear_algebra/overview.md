@@ -67,6 +67,9 @@
       - [15.特殊矩阵](#15特殊矩阵)
         - [(1) orthonormal matrix: Q](#1-orthonormal-matrix-q)
         - [(2) symmetric matrix: S (特征向量是正交的)](#2-symmetric-matrix-s-特征向量是正交的)
+        - [(3) quadratic form: $X^TSX$ (能表示所有的 二次方程)](#3-quadratic-form-xtsx-能表示所有的-二次方程)
+        - [(4) symmetric positive definite: $S_{++}$](#4-symmetric-positive-definite-s_)
+        - [(5) symmetric positive semidefinite: $S_{+}$](#5-symmetric-positive-semidefinite-s_)
       - [16.tensor](#16tensor)
         - [(1) 1-d tensor (vector)](#1-1-d-tensor-vector)
         - [(2) 2-d tensor (matrix)](#2-2-d-tensor-matrix)
@@ -508,17 +511,35 @@ null space of A: $N(A)=\{\vec x\in R^n|A\vec x=\vec 0\}$
 * **$S = S^T$**
 * $A^TA$ 结果是 symmetric positive definite 矩阵
 
-* $X^TSX$（X是一个向量，比如: X=[x y]）能表示所有的二次方程，而在机器学习中，代价函数几乎都是二次方程
-    * 满足以下任一个条件就是symmetric positive definite
-        * 所有特征值 > 0
-        * $X^TSX$ > 0 (X不等于0)
-        * $S=A^TA$ (A的每一列都线性无关)
-        * 所有的leading determinants > 0
-            * leading determinants表示 取矩阵的 1x1矩阵，2x2矩阵，3x3矩阵，依次类推
-        * 所有的pivots in elimination > 0
-            * 消元后的每行的第一个非0的值 > 0
+##### (3) quadratic form: $X^TSX$ (能表示所有的 二次方程)
+* quadratic form:
+    * unary: $q(x)=ax^2$
+    * binary: $q(x,y)=ax^2+bxy+cy^2$
+    * ternary: $q(x,y,z)=ax^2+bxy+cy^2+dyz+ez^2+fxz$
+* 使用matrix形式表示quadratic form
+    * $A=\begin{bmatrix}a&b\\c&d\end{bmatrix}$
+    * $X=\begin{bmatrix}x\\y\end{bmatrix}$
+    * $q_A(x,y)=X^TAX=ax^2+(b+c)xy+dy^2$
+    * 可以用symmetric matix表示: 
+        * $S=\begin{bmatrix}a&\frac{b+c}{2}\\\frac{b+c}{2}&d\end{bmatrix}$
+        * $q_A(x,y)=X^TSX$        
 
-    * 当$f(x) = X^TSX$ 时，表示f(x)函数的形状像碗一样
+##### (4) symmetric positive definite: $S_{++}$
+
+* $X^TSX>0$ for all non-zero vectors X 
+* S满足以下任一个条件就是symmetric positive definite
+    * 所有特征值 > 0
+    * $X^TSX$ > 0 (X不等于0)
+    * $S=A^TA$ (A的每一列都线性无关)
+    * 所有的leading determinants > 0
+        * leading determinants表示 取矩阵的 1x1矩阵，2x2矩阵，3x3矩阵，依次类推
+    * 所有的pivots in elimination > 0
+        * 消元后的每行的第一个非0的值 > 0
+* if A is positive definite
+    * then $A^T$ and $A^{-1}$ is also positive definite
+
+##### (5) symmetric positive semidefinite: $S_{+}$
+* $X^TSX\ge 0$ for any vectors X 
 
 #### 16.tensor
 
