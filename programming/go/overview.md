@@ -17,7 +17,7 @@
       - [1.查看和修改环境变量](#1查看和修改环境变量)
       - [2.模块管理](#2模块管理)
       - [3.module使用](#3module使用)
-    - [项目包结构](#项目包结构)
+    - [项目包结构 （重要）](#项目包结构-重要)
 
 <!-- /code_chunk_output -->
 
@@ -157,7 +157,7 @@ go mod graph
 
 ***
 
-### 项目包结构
+### 项目包结构 （重要）
 
 [参考](https://github.com/golang-standards/project-layout)
 

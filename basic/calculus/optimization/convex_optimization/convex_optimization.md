@@ -15,6 +15,7 @@
         - [(5) affine set, convex set, convex cone](#5-affine-set-convex-set-convex-cone)
         - [(6) hyperplane and halfspace (convex)](#6-hyperplane-and-halfspace-convex)
         - [(7) other convex sets](#7-other-convex-sets)
+        - [(8) positive semidefinite cone](#8-positive-semidefinite-cone)
       - [2.operation that perserves convexity](#2operation-that-perserves-convexity)
       - [3.generalized inequality (广义不等式)](#3generalized-inequality-广义不等式)
 
@@ -94,6 +95,23 @@
 * ellipsoids
     * $\{x|(x-x_c)^TP^{-1}(x-x_c)\le 1\}$
         * 其中 $P\in S^n_{++}$
+* polyhedron
+    * is intersection of finite number of halfspaces and hyperplanes
+    ![](./imgs/co_07.png)
+
+##### (8) positive semidefinite cone
+
+* set of symmetric $n\times n$ matrices
+    * $S^n=\{X\in R^{n\times n}| X=X^T\}$
+* set of symmetric positive semidefinite matrices
+    * $S^n_{+}=\{X\in S^n| X\succeq 0\}$
+    * $S^n_{+}$ is convex cone, proof:
+        * if $A, B\in S^n_{+}, \theta_1,\theta_2\ge 0$,
+        * then $X^T(\theta_1A+\theta_2B)X\ge 0$
+        * so $\theta_1A+\theta_2B\in S^n_{+}$
+* set of symmetric positive definite matrices
+    * $S^n_{++}=\{X\in S^n| X\succ 0\}$
+        * $S^n_{++}$ is convex set
 
 #### 2.operation that perserves convexity
 

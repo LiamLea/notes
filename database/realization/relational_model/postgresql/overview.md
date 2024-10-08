@@ -15,6 +15,7 @@
       - [1.登录postgres](#1登录postgres)
       - [2.创建操作](#2创建操作)
       - [3.查询](#3查询)
+        - [(1) list users and roles](#1-list-users-and-roles)
       - [4.授权](#4授权)
 
 <!-- /code_chunk_output -->
@@ -70,10 +71,48 @@ create database <DATABASSE>;
   \d *.*        #显示所有table、view等，及其里面的内容
 ```
 
+##### (1) list users and roles
+```sql
+SELECT * FROM pg_user;
+SELECT * FROM pg_roles;
+``` 
+
 #### 4.授权
 **注意**：当导入表时，没有用指定用户的身份导入，权限可能有问题
-```shell
-su - postgres
-psql xx           #进入某个数据库
-grant all on all tables in schema public to xx      #这里xx为指定用户
+
+```sql
+CREATE DATABASE test_db;
+
+\c test_db;
+
+CREATE USER migrator WITH PASSWORD 'pw123';
+alter schema public owner to migrator;
+
+CREATE ROLE Write_Read;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO Write_Read;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO Write_Read;
+GRANT SELECT, Usage ON ALL SEQUENCES IN SCHEMA public TO Write_Read;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO Write_Read;
+
+CREATE ROLE Only_Read;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO Only_Read;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO Only_Read;
+
+CREATE USER dbUserA WITH PASSWORD 'pw123';
+GRANT Write_Read TO dbUserA;
+
+CREATE USER dbUserB WITH PASSWORD 'pw123';
+GRANT Only_Read TO dbUserB;
+
+
+
+
+
+
+CREATE ROLE DDL_Change;
+GRANT CREATE,USAGE ON SCHEMA public TO DDL_Change;
+GRANT ALTER,DROP ON ALL TABLES IN SCHEMA public TO DDL_Change;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT CREATE,USAGE ON SCHEMA TO DDL_Change; 
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALTER,DROP ON TABLES TO DDL_Change; 
+GRANT DDL_Change TO migrator;
 ```

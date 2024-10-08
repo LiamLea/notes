@@ -8,8 +8,9 @@
       - [1. 功能: 路由流量](#1-功能-路由流量)
     - [使用](#使用)
       - [1.清单文件](#1清单文件)
-        - [（1）destination设置](#1destination设置)
-        - [（2）路由http流量](#2路由http流量)
+        - [(1) match rule](#1-match-rule)
+        - [(2) destination设置](#2-destination设置)
+        - [(3) 路由http流量](#3-路由http流量)
 
 <!-- /code_chunk_output -->
 
@@ -57,7 +58,11 @@ spec:
   tls: []
 ```
 
-##### （1）destination设置
+##### (1) match rule
+* 可以根据source pods的labels进行匹配流量
+  * `sourceLabels`
+
+##### (2) destination设置
 * 即指定路由到envoy的哪个cluster: `<DIRECTION>|<PORT>|<SUBSET>|<SERVICE_FDQN>`
   * `<DIRECTION>: outbound`，因为对于当前服务，访问其他cluster是出站流量
   * `<PORT>: 指定的port（若未设置则使用service使用的port）`
@@ -72,7 +77,7 @@ spec:
     subset: v2
 ```
 
-##### （2）路由http流量
+##### (3) 路由http流量
 
 * 匹配http流量
 

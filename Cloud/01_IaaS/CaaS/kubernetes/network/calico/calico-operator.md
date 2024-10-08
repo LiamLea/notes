@@ -46,6 +46,8 @@ spec:
 
 * 有些配置在这里改不会生效，需要修改其他文件（比如切换隧道模式，要修改ippool）
 
+* cross subnet:
+  * It only applies overlay networking (encapsulation) between nodes that are in different subnets, reducing the need for IP address translation
 
 ```yaml
 apiVersion: operator.tigera.io/v1
