@@ -21,6 +21,8 @@
 
 ### 概述
 
+https://kubernetes.io/docs/concepts/extend-kubernetes/
+
 #### 1.custom resource
 自定义资源，是对kubernetes API的一种扩展（相当于**添加新的api**）
 定义数据格式，描述应用信息

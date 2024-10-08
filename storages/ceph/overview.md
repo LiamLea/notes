@@ -13,12 +13,7 @@
         - [（4）librados](#4librados)
         - [（5）RADOSGW](#5radosgw)
       - [3.RADOS组件](#3rados组件)
-        - [（1）ceph-osd（object storage device）](#1ceph-osdobject-storage-device)
-        - [（2）ceph-mon（monitor）](#2ceph-monmonitor)
       - [4.其他基础组件](#4其他基础组件)
-        - [（1）ceph-mgr（manager）](#1ceph-mgrmanager)
-        - [（2）ceph-mds（metadata server）](#2ceph-mdsmetadata-server)
-        - [（3）RGW（rados gateway）](#3rgwrados-gateway)
       - [4.目录规划](#4目录规划)
       - [5.strong replication consistency](#5strong-replication-consistency)
     - [RADOS](#rados)
@@ -278,7 +273,7 @@ ceph osd pool application enable {pool-name} {application-name}
 |backfill_toofull|磁盘容量快满了，导致没法backfill（可以调整osd的权重平衡所有osd的存储或者backfill_ratio提高阈值|
 |stale|pg的状态没有更新，处于一种未知状态|osd集中的primary osd没有向mon汇报pg的状态</br>或者其他osd向mon汇报primary osd宕机了|
 |inconsistent|对象和其副本之间的数据不一致||
-|incomplete|副本数不足||
+|incomplete|a placement group is missing information about writes that may have occurred, or does not have any healthy copies.||
 |down（严重）|there are no valid copies of the PGs on any active OSDs||
 |inactive（严重）|不能处理对pg的请求|
 

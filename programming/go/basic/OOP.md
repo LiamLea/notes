@@ -84,7 +84,7 @@ func main() {
 interface是一种**类型**，用于**抽象方法**，只要该类实现了里面定义的所有抽象方法，则该类就是该interface类型
 ```go
 type AnimalIF interface {
-  Sleep(int)    //Sleep这个函数需要传入一个int类型的参数
+  Sleep(int) int //Sleep这个函数需要传入一个int类型的参数，返回一个int类型的值
   GetColor()
   GetType()
 }

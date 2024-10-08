@@ -145,7 +145,7 @@
 
 ##### （1）自动识别协议（当没有指定协议时，默认自动识别）（不建议开启）
 * 注意：
-  * server first protocol与此种方式不兼容，所以必须明确指定协议（比如：TCP、Mysql等）
+  * server first protocol与此种方式不兼容，所以必须明确指定协议（比如：Mysql等）
   * 不建议开启
     * 原因：可能会把http协议检测成http2，导致流量不通
     * 关闭后，没有指定的默认都是tcp协议
@@ -213,12 +213,10 @@
 * `app: <app>`
 * `version: <version>`
 
-#####（5）service port使用的协议是server first protocol，必须明确指定协议（比如：TCP）
+##### （5）service port使用的协议是server first protocol，必须明确指定协议（比如：TCP）
 
-#####（6）不能设置` hostNetwork: true`
+##### （6）不能设置` hostNetwork: true`
 * 自动注入sidecar会忽略这种pod
-
-
 
 #### 3.对service的要求
 

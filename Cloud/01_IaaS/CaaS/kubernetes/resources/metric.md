@@ -128,7 +128,7 @@ seriesQuery: '{__name__=~"^container_.*_total",container!="POD",namespace!="",po
 #filters会对匹配出来的再进行一次过滤
 seriesFilters:
   - isNot: "^container_.*_seconds_total"
-````
+```
 
 * association（关联）
 将prometheus metrics和k8s resources关联（比如某个指标是描述某个pod的，就需要通过在这里实现关联）

@@ -8,6 +8,10 @@
       - [1.master核心组件](#1master核心组件)
       - [2.node核心组件](#2node核心组件)
       - [3.创建和删除pod时，各组件交互过程](#3创建和删除pod时各组件交互过程)
+        - [(1) two web hooks](#1-two-web-hooks)
+        - [(2) 创建deployment](#2-创建deployment)
+        - [(3) 创建pod时](#3-创建pod时)
+        - [(4) 删除pod时](#4-删除pod时)
       - [4.存储组件（一般放在master上，非常重要）](#4存储组件一般放在master上非常重要)
       - [5.核心附件](#5核心附件)
         - [（1）coredns](#1coredns)
@@ -55,7 +59,14 @@ master/node架构，master一般设为3个（高可用）
 kube-proxy会修改该kube-proxy所在节点的iptables规则
 
 #### 3.创建和删除pod时，各组件交互过程
-（1）创建pod时
+
+##### (1) two web hooks
+![](./imgs/overview_04.png)
+
+##### (2) 创建deployment
+![](./imgs/overview_03.jpg)
+
+##### (3) 创建pod时
 
 ![](./imgs/overview_01.png)
 * 提交Pod spec到API server
@@ -70,7 +81,7 @@ kube-proxy会修改该kube-proxy所在节点的iptables规则
 * API server将容器的状态存储到etcd中
 * 写入成功后，API server会告诉kubelet
 
-（2）删除pod时
+##### (4) 删除pod时
 
 ![](./imgs/overview_02.jpg)
 
