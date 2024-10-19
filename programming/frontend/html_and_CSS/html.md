@@ -114,6 +114,11 @@ function alertMe() {
 
 #### 4.link css and js to html
 
+* recommend to put a script at the bottom of the body because js will be ran when html is loaded and if put the js in the beginning this may take long time to load html
+
+* note: the order of loading js is import
+  * if they have the same variable then the later will override the former
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -128,7 +133,9 @@ function alertMe() {
   <body>
     <!-- ... -->
 
-    <!-- link js file to the html -->
+    <!-- 
+      link js file to the html 
+    -->
     <script src="js/scripts.js"></script>
     
   </body>

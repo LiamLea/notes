@@ -9,15 +9,16 @@
     - [Overview](#overview)
       - [1.CSS selector](#1css-selector)
       - [2.precedence](#2precedence)
-      - [3.box model](#3box-model)
+    - [Layout](#layout)
+      - [1.box model](#1box-model)
         - [(1) box type](#1-box-type)
         - [(2) related properties](#2-related-properties)
         - [(3) display type](#3-display-type)
-      - [4.responsive design](#4responsive-design)
+      - [2.responsive design](#2responsive-design)
         - [(1) mobile-first vs desktop-first](#1-mobile-first-vs-desktop-first)
         - [(2) breakpoints and media queries](#2-breakpoints-and-media-queries)
-      - [5.flexbox](#5flexbox)
-      - [6.grid](#6grid)
+      - [3.flexbox](#3flexbox)
+      - [4.grid](#4grid)
 
 <!-- /code_chunk_output -->
 
@@ -75,7 +76,11 @@ p {
 }
 ```
 
-#### 3.box model
+***
+
+### Layout
+
+#### 1.box model
 
 * describes how much space an HTML element occupies
 
@@ -105,7 +110,7 @@ p {
 * inline
 * inline block
 
-#### 4.responsive design
+#### 2.responsive design
 
 ##### (1) mobile-first vs desktop-first
 
@@ -127,7 +132,7 @@ p {
 }
 ```
 
-#### 5.flexbox
+#### 3.flexbox
 [visual cheatsheet](https://flexbox.malven.co/)
 
 * flex container
@@ -139,7 +144,7 @@ p {
 
 ![](./imgs/css_05.png)
 
-#### 6.grid
+#### 4.grid
 
 [visual cheatsheet](https://grid.malven.co/)
 

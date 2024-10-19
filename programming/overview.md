@@ -9,6 +9,7 @@
     - [概述](#概述)
       - [1.global static variable vs local static variable](#1global-static-variable-vs-local-static-variable)
       - [2.类、抽象类、接口](#2类-抽象类-接口)
+      - [3.MVC](#3mvc)
 
 <!-- /code_chunk_output -->
 
@@ -28,3 +29,6 @@
 * 类 是 对对象的抽象
 * 抽象类 是 对类的抽象
 * 接口 是 对行为的抽象
+
+#### 3.MVC
+![](./imgs/pg_01.png)

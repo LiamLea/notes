@@ -15,7 +15,10 @@
       - [1.安装nodejs](#1安装nodejs)
         - [2.nvm能够管理不同版本的nodejs](#2nvm能够管理不同版本的nodejs)
     - [配置文件](#配置文件)
-      - [1.`package.json`](#1packagejson)
+      - [1.generate `package.json`](#1generate-packagejson)
+        - [(1) init](#1-init)
+        - [(2) add dev dependencies](#2-add-dev-dependencies)
+      - [2.`package.json`](#2packagejson)
     - [npm和yarn使用](#npm和yarn使用)
       - [1.yarn和npm区别](#1yarn和npm区别)
       - [2.安装yarn](#2安装yarn)
@@ -85,7 +88,30 @@ nvm use <version>
 
 ### 配置文件
 
-#### 1.`package.json`
+#### 1.generate `package.json`
+
+##### (1) init
+```shell
+yarn init -y
+```
+
+##### (2) add dev dependencies
+* what you need to build the application to the point where then it can run
+```shell
+yarn add -D <packge_name>
+```
+* example:
+  * add typescript
+  ```shell
+  yarn add -D typescript
+  ```
+  * use typescript compiler
+  ```shell
+  yarn tsc --help
+  ```
+
+
+#### 2.`package.json`
 ```json
 {
   //定义command，当执行 npm run command1 时，就会执行 ls /tmp/命令
