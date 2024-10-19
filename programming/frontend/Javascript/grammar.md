@@ -13,6 +13,9 @@
       - [3.loop](#3loop)
       - [4.function](#4function)
       - [5.built-in utility methods](#5built-in-utility-methods)
+    - [OOP](#oop)
+      - [1.definition](#1definition)
+        - [(1) private method](#1-private-method)
 
 <!-- /code_chunk_output -->
 
@@ -65,3 +68,26 @@ const function1 = function() {
 ```
 
 #### 5.built-in utility methods
+
+***
+
+### OOP
+
+#### 1.definition
+
+```js
+class A {
+  method-1 () {};
+}
+```
+
+##### (1) private method
+```js
+class A {
+  /*
+  * private method: method-2
+  * call: this.#method-2()
+  */
+  #method-2 () {};
+}
+```
