@@ -17,6 +17,7 @@
         - [(2) rate limiting](#2-rate-limiting)
         - [(3) web application firewall](#3-web-application-firewall)
         - [(4) anycast network diffusion](#4-anycast-network-diffusion)
+        - [(5) SYN cookies](#5-syn-cookies)
 
 <!-- /code_chunk_output -->
 
@@ -42,6 +43,7 @@ distributed denial-of-service attack
 ##### (2) protocol attacks
 * 利用3层或4层协议的弱点
 * 比如：SYN flood
+  * In the case of a SYN-ACK packet, B will reply with a RST (reset) packet, telling the server that no connection was initiated.
 ![](./imgs/ddos_03.png)
 
 ##### (3) volumetric attacks
@@ -70,3 +72,7 @@ distributed denial-of-service attack
 ##### (3) web application firewall
 
 ##### (4) anycast network diffusion
+
+##### (5) SYN cookies
+The advantage of SYN cookies is that the server doesn’t have to create and **store a TCB** upon reception of the SYN segment.
+![](./imgs/ddos_05.png)
