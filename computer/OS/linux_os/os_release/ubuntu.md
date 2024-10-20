@@ -38,6 +38,7 @@
         - [(3) 关闭自动suspend](#3-关闭自动suspend)
         - [(4) 主动suspend](#4-主动suspend)
         - [(5) 关闭鼠标自动唤醒](#5-关闭鼠标自动唤醒)
+      - [7.添加分辨率](#7添加分辨率)
 
 <!-- /code_chunk_output -->
 
@@ -408,3 +409,29 @@ cat /proc/acpi/wakeup
 
 * 永久关闭
   * 设置rc.local
+
+#### 7.添加分辨率
+
+* get the name of the device display
+
+```shell
+xrandr
+```
+![](./imgs/ubuntu_01.png)
+
+* calculate VESA CVT mode lines by given resolution:
+
+```shell
+cvt 1600 900
+```
+![](./imgs/ubuntu_02.png)
+
+* add modeline
+```shell
+sudo xrandr --newmode "1600x900_60.00"  118.25  1600 1696 1856 2112  900 903 908 934 -hsync +vsync
+```
+
+* add the new created mode for your display device
+```shell
+sudo xrandr --addmode eDP-1 "1600x900_60.00"
+```
