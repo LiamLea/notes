@@ -13,12 +13,18 @@
         - [(1) terraform block](#1-terraform-block)
         - [(2) backend block](#2-backend-block)
       - [3.Configuration Main Components](#3configuration-main-components)
-        - [(1) terraform](#1-terraform)
+        - [(1) provider](#1-provider)
         - [(2) resource](#2-resource)
+      - [3.Modules](#3modules)
+      - [4.State](#4state)
+        - [(1) basic](#1-basic)
+        - [(2) format](#2-format)
 
 <!-- /code_chunk_output -->
 
 ### Overview
+
+![](./imgs/tf_01.png)
 
 #### 1.Quick start
 
@@ -45,7 +51,7 @@ terraform {
   }
 }
 
-# configure provider (i.g. the target, the secret and etc.)
+# configure provider (e.g. the target, the secret and etc.)
 provider "docker" {}
 
 /*
@@ -76,7 +82,7 @@ resource "docker_container" "nginx" {
 
 - common configuration
 
-```hcl
+```tf
 terraform {
   # Specifies which version of the Terraform CLI is allowed to run the configuration
   required_version = ">= 1.3.9"
@@ -95,11 +101,11 @@ terraform {
 
 #### 3.Configuration Main Components
 
-##### (1) terraform
+##### (1) provider
 
 - Child modules receive their provider configurations from the root module
 
-```hcl
+```tf
 # default configuration
 # "google" is a provider plugin name which must be defined in the required_providers
 provider "google" {
@@ -115,7 +121,7 @@ provider "google" {
 
 ##### (2) resource
 
-```hcl
+```tf
 # create an instance of a resource type
 #   different providers provide different resources
 resource <resource_type> <instance_name> {}
@@ -123,7 +129,7 @@ resource <resource_type> <instance_name> {}
 
 - meta arguments
 
-```hcl
+```tf
 resource <resource_type> <instance_name> {
   # this will affect the running order of tasks
   depends_on = []
@@ -148,10 +154,38 @@ resource <resource_type> <instance_name> {
   provider = <provider>
 
   /*
-    i.g. create_before_destroy = <bool>
+    e.g. create_before_destroy = <bool>
         By default, when Terraform must change a resource argument that cannot be updated in-place due to remote API limitations,
         Terraform will instead destroy the existing object and then create a new replacement object with the new configured arguments.
   */
   lifecycle = <lifecycle>
 }
 ```
+
+#### 3.Modules
+
+to reuse resource configurations
+
+```tf
+# load modules e.g.
+module "consul" {
+  # if not specify repo, use the default modules repo (Terraform Registry)
+  source  = "hashicorp/consul/aws"
+
+  version = "0.0.5"
+
+  # other arguments are the inputs of the module (the inputs are the varaibles of the module)
+  servers = 3
+}
+```
+
+#### 4.State
+
+to map real world resources to your configuration
+
+##### (1) basic
+
+- default local storage: `terraform.tfstate`
+- Prior to any operation, Terraform does a refresh to update the state with the real infrastructure
+
+##### (2) format
