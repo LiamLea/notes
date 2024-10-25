@@ -15,6 +15,7 @@
         - [（2）基于token](#2基于token)
         - [（3）对比](#3对比)
       - [3.toekn广泛使用的格式：JWT（json web token）](#3toekn广泛使用的格式jwtjson-web-token)
+      - [4\.id token vs access token](#4id-token-vs-access-token)
     - [概述](#概述)
       - [1.spring security](#1spring-security)
         - [（1）what](#1what)
@@ -72,7 +73,6 @@
     * 对称加密：在授权服务和资源服务都设置好对称密钥
   ![](./imgs/overview_02.png)
 
-
 ##### （3）对比
 
 ||session-based|token-based|
@@ -88,9 +88,26 @@
 * token格式: `<header>.<payload>.<signature>`
   * `<header>`: token的头信息
   * `<payload>`: token所携带的信息（原始数据进行了encode）
+    * sub
+      * the unique identifier for a user
+    * aud
+      * audience: identifies the recipients that the JWT is intended for. This can be a specific application, a set of applications, or the general public
+      * The authorization server can then use the "aud" claim to verify the validity of the JWT
+    * iss
+      * issuer: identiy provider
   * `<signature>`: token的签名，用于验证token的来源
+    * the receiver will use the public key to validate the JWT which is signed by the private key of the issuer
 * 存储在客户端，一般在请求头中使用：`Authorization: <token_type> <token>`
   * `<token_type>`: token的类型，最常见的是 Bearer
+
+#### 4\.id token vs access token
+* id token is used for authentication
+* access token is used to access resources
+* for example:
+  * first, a user goes to OIDC to get the id token
+  * second, the user uses the id token to login in AWS and assumes some roles (i.e. claim some privileges)
+  * then, aws return a access token (access key id, secret access key) to the user
+  * then, the user can access aws with the access token
 
 ***
 
