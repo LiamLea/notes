@@ -6,7 +6,7 @@
 - [Authentication（认证）](#authentication认证)
     - [概述](#概述)
       - [1.两类用户](#1两类用户)
-      - [2.特点](#2特点)
+      - [2.serviceaccount principle (to mount the corresponding token)](#2serviceaccount-principle-to-mount-the-corresponding-token)
       - [3.使用serviceaccount](#3使用serviceaccount)
         - [（1）创建serviceaccount](#1创建serviceaccount)
         - [（2）指定pod使用哪个账号](#2指定pod使用哪个账号)
@@ -27,11 +27,23 @@
 |normal user|用户访问使用的账号|k8s没有相应的资源来管理normal user（即不能通过相关api创建user）|需要 用k8s的CA签署的证书（CN=用户名或者O=组名）进行认证|
 |serviceaccount|内部服务访问使用的账号|可用用过k8s资源管理|通过token（存放在secret中）进行认证|
 
-#### 2.特点
-* 每个namespace中都有一个默认的Secret资源，存储的是token，用于认证
-* 该名称空间内的pod都会挂载该Secret，从而能够通过apiServer的认证
-* ServiceAccount可以绑定docker-registry类型的secrets
-从而可以指定使用其他仓库
+#### 2.serviceaccount principle (to mount the corresponding token)
+* every namespace has
+  * a serviceaccount: `default`
+  * get **token** method:
+    * old (deorecated):
+      * a secret correlated with the default serivceaccount: `default-token-xxxx`
+      * the secret includes: 
+        * **token** (the most important)
+        * namespace
+        * ca
+    * new:
+      * **kubelet** uses [TokenRequest API](https://kubernetes.io/docs/reference/kubernetes-api/authentication-resources/token-request-v1/) to request a **temporary token** for a given service account and then update it
+
+* when a pod starts, it will mount `token, namespace and ca` on the specific directory (`/var/run/secrets/kubernetes.io/serviceaccount/`) 
+  * why this directory?
+    * it is **conventional** so that when developers develop a app running in the pod they know how to find the token  
+* the app running in the pod can access k8s api with the token
 
 #### 3.使用serviceaccount
 ##### （1）创建serviceaccount
