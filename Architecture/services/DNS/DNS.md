@@ -184,3 +184,9 @@ dig <SERVER>
     +search         #利用/etc/resolv.conf中的search参数，默认不使用
     -t <TYPE>       #查询指定记录
 ```
+
+* list all records
+   * since around 2019, most public DNS servers have stopped answering most DNS ANY queries usefully.
+```shell
+dig <domain_name> any
+```

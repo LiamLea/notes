@@ -9,6 +9,7 @@
       - [1.Quick start](#1quick-start)
         - [(1) Install Terraform](#1-install-terraform)
         - [(2) Write Configuration](#2-write-configuration)
+        - [(3) run the task](#3-run-the-task)
       - [2.Configuration Achitecture](#2configuration-achitecture)
         - [(1) terraform block](#1-terraform-block)
         - [(2) backend block](#2-backend-block)
@@ -16,9 +17,18 @@
         - [(1) provider](#1-provider)
         - [(2) resource](#2-resource)
       - [3.Modules](#3modules)
+        - [(1) load a module](#1-load-a-module)
+        - [(2) write a module](#2-write-a-module)
+        - [(3) load a module](#3-load-a-module)
       - [4.State](#4state)
         - [(1) basic](#1-basic)
         - [(2) format](#2-format)
+      - [5.Other Blocks](#5other-blocks)
+        - [(1) local](#1-local)
+    - [Client](#client)
+      - [1.Basic Usage](#1basic-usage)
+        - [(1) working directory](#1-working-directory)
+        - [(2) `terraform plan`](#2-terraform-plan)
 
 <!-- /code_chunk_output -->
 
@@ -74,6 +84,23 @@ resource "docker_container" "nginx" {
 
 ```
 
+##### (3) run the task
+
+* init directory
+```shell
+terraform init
+```
+
+* check the changes
+```shell
+terraform plan
+```
+
+* apply
+```shell
+terraform apply
+```
+
 #### 2.Configuration Achitecture
 
 ##### (1) terraform block
@@ -122,15 +149,15 @@ provider "google" {
 ##### (2) resource
 
 ```tf
-# create an instance of a resource type
+# create a resource of a resource type
 #   different providers provide different resources
-resource <resource_type> <instance_name> {}
+resource <resource_type> <resource_name> {}
 ```
 
 - meta arguments
 
 ```tf
-resource <resource_type> <instance_name> {
+resource <resource_type> <resource_name> {
   # this will affect the running order of tasks
   depends_on = []
 
@@ -164,6 +191,7 @@ resource <resource_type> <instance_name> {
 
 #### 3.Modules
 
+##### (1) load a module
 to reuse resource configurations
 
 ```tf
@@ -179,6 +207,68 @@ module "consul" {
 }
 ```
 
+##### (2) write a module
+[reference](https://github.com/hashicorp/learn-terraform-modules-create/tree/main)
+
+* a typical structure
+```shell
+<module_name>/
+    ├── LICENSE
+    ├── README.md
+    ├── main.tf
+    ├── variables.tf  # define input
+    ├── outputs.tf
+
+# None of these files are required
+```
+
+* `./modules/test/main.tf`
+  * modules will inherit `provider` but not `required_providers`
+  * so the best practice is to specify `required_providers` or it will use the default
+
+```tf
+terraform {
+  # specify provider and its version
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~> 3.0.1"
+    }
+  }
+}
+
+/*
+  then write tasks
+*/
+resource "docker_image" "nginx_2" {
+  name         = "nginx"
+  keep_locally = false
+}
+
+resource "docker_container" "nginx_2" {
+  image = docker_image.nginx_2.image_id
+  name  = "tutorial_2"
+
+  ports {
+    internal = 80
+    external = 8004
+  }
+}
+```
+
+##### (3) load a module
+```tf
+module "docker" {
+  # if not specify repo, use the default modules repo (Terraform Registry)
+  source  = "./modules/test"
+}
+```
+
+* init
+```shell
+terraform init
+```
+
 #### 4.State
 
 to map real world resources to your configuration
@@ -189,3 +279,70 @@ to map real world resources to your configuration
 - Prior to any operation, Terraform does a refresh to update the state with the real infrastructure
 
 ##### (2) format
+```json
+{
+    "version": 4,
+    "terraform_version": "1.9.8",
+    "serial": 4,
+    "lineage": "d7020112-262e-90a0-8537-1a727c2617e0",
+    "outputs": {},
+    "resources": [
+        {
+            "mode": "managed",
+            "type": <resource_type>,
+            "name": <resource_name>,
+            "provider": <provider>,
+            "instances": []
+        }
+    ],
+    "check_results": null
+}
+```
+
+#### 5.Other Blocks
+
+##### (1) local
+* Declaring a Local Value
+```tf
+locals {
+  service_name = "forum"
+  owner        = "Community Team"
+}
+```
+
+* using a local value
+```tf
+resource "aws_instance" "example" {
+  # ...
+
+  tags = local.common_tags
+}
+```
+
+***
+
+### Client
+
+#### 1.Basic Usage
+
+```shell
+terraform
+
+-chir=<path>    #specify the working directory, or you will need to "cd" the directory 
+```
+
+##### (1) working directory
+includes:
+* Terraform configuration files
+* `.terraform/`
+  * store cached plugins and modules
+* `terraform.tfstate` or `terraform.tfstate.d`
+  * store state data
+
+##### (2) `terraform plan`
+* read state 
+  * reads the current state of any already-existing remote objects (won't override the content of the state file)
+  * `--refresh=false`
+    * won't read the state of remote objects and instead use the state in the statefile
+* compare 
+  * compares the current configuration to the readed state
