@@ -11,7 +11,11 @@
         - [(2) credentials](#2-credentials)
         - [(3) API](#3-api)
         - [(4) external credentials](#4-external-credentials)
-      - [2.IRSA (IAM role for serviceaccount)](#2irsa-iam-role-for-serviceaccount)
+      - [2.role](#2role)
+        - [(1) trust policy](#1-trust-policy)
+        - [(2) permission policy](#2-permission-policy)
+    - [IRSA (IAM role for serviceaccount)](#irsa-iam-role-for-serviceaccount)
+      - [1.Usage](#1usage)
         - [(1) install pod identity webhook](#1-install-pod-identity-webhook)
         - [(2) create an OIDC provider](#2-create-an-oidc-provider)
         - [(3) create a role](#3-create-a-role)
@@ -69,7 +73,79 @@ credential_process = <shell_command>
 }
 ```
 
-#### 2.IRSA (IAM role for serviceaccount)
+#### 2.role
+
+##### (1) trust policy
+* specify which **principal** can assume this role
+  * account
+  ```json
+  // does not limit permissions to only the root user of the account
+  "Principal": { "AWS": "arn:aws:iam::123456789012:root" }
+  ```
+  * username
+  ```json
+  "Principal": {
+    "AWS": [
+      "arn:aws:iam::AWS-account-ID:user/user-name-1", 
+      "arn:aws:iam::AWS-account-ID:user/user-name-2"
+    ]
+  }
+  ```
+  * role
+  ```json
+  "Principal": { "AWS": "arn:aws:iam::AWS-account-ID:role/role-name" }
+  ```
+  * service
+  * session
+  * ...
+
+* example
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::562055475000:user/semaphore"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+```
+
+##### (2) permission policy
+* define permissions for specific services and resources
+* a permission policy can **attach** to role, user and etc.
+
+* example
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject",
+                "s3:ListBucket"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::aigle-blog-test-website",
+                "arn:aws:s3:::aigle-blog-test-website/*"
+            ]
+        }
+    ]
+}
+```
+
+***
+
+### IRSA (IAM role for serviceaccount)
+
+#### 1.Usage
 
 ##### (1) install pod identity webhook
 * insatll [aws pod identity weebhook](https://github.com/aws/amazon-eks-pod-identity-webhook)

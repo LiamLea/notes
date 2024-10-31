@@ -116,3 +116,64 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT CREATE,USAGE ON SCHEMA TO DDL_Ch
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALTER,DROP ON TABLES TO DDL_Change; 
 GRANT DDL_Change TO migrator;
 ```
+
+* example
+
+```SQL
+CREATE DATABASE aiops;
+\c aiops
+
+-- Revoke the CREATE privilege and only grant it to necessary roles later.
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+
+-- create base role and grant privileges later
+CREATE ROLE aiops_readonly WITH NOLOGIN;
+CREATE ROLE aiops_readwrite WITH NOLOGIN;
+
+/*
+  create developer user
+*/
+CREATE USER aiops_developers;
+-- log all SQL statements executed by the user
+ALTER ROLE aiops_developers SET log_statement TO ‘all’;
+-- use an IAM policy for IAM database access for the user
+GRANT rds_iam TO aiops_developers;
+GRANT aiops_readonly to aiops_developers;
+
+/*
+  create sre_dba user
+*/
+CREATE USER sre_dba WITH CREATEROLE;
+-- mod logs all ddl statements, plus data-modifying statements
+ALTER ROLE sre_dba SET log_statement TO ‘mod’;
+-- use an IAM policy for IAM database access for the user
+GRANT rds_iam TO sre_dba WITH ADMIN OPTION;
+-- WITH ADMIN OPTION: the sre_dba can assign this role to others
+GRANT aiops_readwrite TO sre_dba WITH ADMIN OPTION;
+GRANT aiops_readonly TO sre_dba WITH ADMIN OPTION;
+
+/*
+  create migrator user
+*/
+CREATE USER aiops_migrator;
+-- log all SQL statements executed by the user
+ALTER ROLE aiops_migrator SET log_statement TO ‘all’;
+-- use an IAM policy for IAM database access for the user
+GRANT rds_iam TO aiops_migrator;
+-- Grant the revoked CREATE privilege
+GRANT CREATE on SCHEMA public to aiops_migrator;
+
+/*
+  grant privileges
+  use the migrator to create tables which is owned by the migrator so the migrator has all privileges of all tables
+*/
+-- switch role
+SET ROLE aiops_migrator;
+
+-- grant read privileges of the tables created by the migrator to readonly user
+ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT SELECT ON TABLES TO aiops_readonly;
+ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO aiops_readonly;
+-- grant read and write privileges of the tables created by the migrator to readwrite user
+ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO aiops_readwrite;
+ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO aiops_readwrite;
+```
