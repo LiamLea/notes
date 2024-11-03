@@ -12,8 +12,9 @@
         - [(3) API](#3-api)
         - [(4) external credentials](#4-external-credentials)
       - [2.role](#2role)
-        - [(1) trust policy](#1-trust-policy)
-        - [(2) permission policy](#2-permission-policy)
+        - [(1) assume a role](#1-assume-a-role)
+        - [(2) trust policy](#2-trust-policy)
+        - [(3) permission policy](#3-permission-policy)
     - [IRSA (IAM role for serviceaccount)](#irsa-iam-role-for-serviceaccount)
       - [1.Usage](#1usage)
         - [(1) install pod identity webhook](#1-install-pod-identity-webhook)
@@ -75,7 +76,13 @@ credential_process = <shell_command>
 
 #### 2.role
 
-##### (1) trust policy
+##### (1) assume a role
+* when you assume a role, it provides you with **temporary** security credentials for your role session
+* can give AWS access to users who already have identities defined outside of AWS
+
+##### (2) trust policy
+[policy grammar](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_grammar.html)
+
 * specify which **principal** can assume this role
   * account
   ```json
@@ -107,7 +114,7 @@ credential_process = <shell_command>
         {
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::562055475000:user/semaphore"
+                "AWS": "arn:aws:iam::123456789012:user/test"
             },
             "Action": "sts:AssumeRole"
         }
@@ -115,7 +122,9 @@ credential_process = <shell_command>
 }
 ```
 
-##### (2) permission policy
+##### (3) permission policy
+[policy grammar](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_grammar.html)
+
 * define permissions for specific services and resources
 * a permission policy can **attach** to role, user and etc.
 
@@ -133,8 +142,8 @@ credential_process = <shell_command>
             ],
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:s3:::aigle-blog-test-website",
-                "arn:aws:s3:::aigle-blog-test-website/*"
+                "arn:aws:s3:::aiops-test-website",
+                "arn:aws:s3:::aiops-test-website/*"
             ]
         }
     ]
