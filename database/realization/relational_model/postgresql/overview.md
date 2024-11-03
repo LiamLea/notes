@@ -135,7 +135,7 @@ CREATE ROLE aiops_readwrite WITH NOLOGIN;
 */
 CREATE USER aiops_developers;
 -- log all SQL statements executed by the user
-ALTER ROLE aiops_developers SET log_statement TO ‘all’;
+ALTER ROLE aiops_developers SET log_statement TO 'all';
 -- use an IAM policy for IAM database access for the user
 GRANT rds_iam TO aiops_developers;
 GRANT aiops_readonly to aiops_developers;
@@ -145,7 +145,7 @@ GRANT aiops_readonly to aiops_developers;
 */
 CREATE USER sre_dba WITH CREATEROLE;
 -- mod logs all ddl statements, plus data-modifying statements
-ALTER ROLE sre_dba SET log_statement TO ‘mod’;
+ALTER ROLE sre_dba SET log_statement TO 'mod';
 -- use an IAM policy for IAM database access for the user
 GRANT rds_iam TO sre_dba WITH ADMIN OPTION;
 -- WITH ADMIN OPTION: the sre_dba can assign this role to others
@@ -157,7 +157,7 @@ GRANT aiops_readonly TO sre_dba WITH ADMIN OPTION;
 */
 CREATE USER aiops_migrator;
 -- log all SQL statements executed by the user
-ALTER ROLE aiops_migrator SET log_statement TO ‘all’;
+ALTER ROLE aiops_migrator SET log_statement TO 'all';
 -- use an IAM policy for IAM database access for the user
 GRANT rds_iam TO aiops_migrator;
 -- Grant the revoked CREATE privilege
