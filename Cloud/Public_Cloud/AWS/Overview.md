@@ -11,6 +11,7 @@
         - [(2) AZ](#2-az)
       - [2.point of presence (PoP)](#2point-of-presence-pop)
         - [(1) Edge location](#1-edge-location)
+      - [3.Traffic](#3traffic)
     - [Basic](#basic)
       - [1.Concepts](#1concepts)
         - [(1) Amazon Resource Names (ARNs)](#1-amazon-resource-names-arns)
@@ -60,6 +61,9 @@ an intermediate location (datacenter or collection of hardware) between an AWS r
         -   quickly reach AWS resources in other regions by reaching the cloest AWS network node first and then transmitting data in AWS network
     -   off-ramp:
         -   CDN
+
+#### 3.Traffic
+![](./imgs/ov_02.png)
 
 ---
 

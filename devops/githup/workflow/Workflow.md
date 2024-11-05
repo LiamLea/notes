@@ -13,12 +13,16 @@
     - [Jobs](#jobs)
       - [1.steps (actions)](#1steps-actions)
         - [(1) default variables](#1-default-variables)
-      - [2.outputs](#2outputs)
-        - [(1) job outpots](#1-job-outpots)
+        - [(2) common actions](#2-common-actions)
+      - [2.basic features](#2basic-features)
+        - [(1) secrets](#1-secrets)
+        - [(2) environment](#2-environment)
+      - [3.outputs](#3outputs)
+        - [(1) job outputs](#1-job-outputs)
         - [(2) step outputs](#2-step-outputs)
-      - [3.conditions](#3conditions)
-      - [4.dependency](#4dependency)
-      - [5.context](#5context)
+      - [4.conditions](#4conditions)
+      - [5.dependency](#5dependency)
+      - [6.context](#6context)
 
 <!-- /code_chunk_output -->
 
@@ -46,6 +50,10 @@ on:                     # set which condition will trigger the workflow
     - master            # pushing something to master will trigger
 
   workflow_dispatch:    # To enable a workflow to be triggered manually
+    inputs: 
+      PR_number:
+        description: 'pull request number'
+        required: true
 
   issues:
     types:
@@ -82,21 +90,44 @@ steps:
   run: sudo ././github/workflows/test.sh
 ```
 
-* use actions
-  * [more actions](https://github.com/actions)
-```yaml
-steps:
-- uses: actions/checkout@v4
-- uses: actions/setup-python@v2
-```
-
 ##### (1) default variables
 
 [more variables](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables)
 
-#### 2.outputs
+##### (2) common actions
+[more actions](https://github.com/actions)
 
-##### (1) job outpots
+* checkout
+```yaml
+# This action checks-out your repository under $GITHUB_WORKSPACE, so your workflow can access it
+- uses: actions/checkout@v4
+```
+
+* install python
+```yaml
+- uses: actions/setup-python@v2
+```
+
+* debug (can ssh to the runner to debug)
+```yaml
+- name: Setup tmate session
+  if: ${{ failure() }}
+  uses: mxschmitt/action-tmate@v3
+```
+
+#### 2.basic features
+
+##### (1) secrets
+* set secrets which can be used by `${secrets.<secret_name>}`
+
+##### (2) environment
+* set the environment for a job
+  * can set secrets which can be used in the env
+  * can set reviewers for the job to run
+
+#### 3.outputs
+
+##### (1) job outputs
 ```yaml
 outputs:
   random-number:
@@ -122,7 +153,7 @@ runs:
 
 ```
 
-#### 3.conditions
+#### 4.conditions
 ```yaml
 jobs:
   production-deploy:
@@ -136,7 +167,7 @@ jobs:
       - run: npm install -g bats
 ```
 
-#### 4.dependency
+#### 5.dependency
 ```yaml
 jobs:
   job1:
@@ -146,7 +177,7 @@ jobs:
     needs: [job1, job2]
 ```
 
-#### 5.context
+#### 6.context
 
 [ref](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/accessing-contextual-information-about-workflow-runs)
 

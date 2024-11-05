@@ -13,7 +13,6 @@
         - [（3）nfs](#3nfs)
         - [（4）PersistentVolumeClaim](#4persistentvolumeclaim)
         - [（5）ConfigMap（挂载时需要特别注意）](#5configmap挂载时需要特别注意)
-        - [（6）Secret](#6secret)
       - [3.pvc](#3pvc)
       - [4.pv（是集群级别的资源，不属于某个名称空间，所有名称都可以用）](#4pv是集群级别的资源不属于某个名称空间所有名称都可以用)
         - [（1）与pvc关系](#1与pvc关系)
@@ -36,9 +35,6 @@
       - [5.ConfigMap的使用](#5configmap的使用)
         - [（1）创建ConfigMap资源](#1创建configmap资源)
         - [（2）将ConfigMap中的配置注入pod](#2将configmap中的配置注入pod)
-      - [6.Secret的使用](#6secret的使用)
-        - [（1）创建Secret资源](#1创建secret资源)
-        - [（2）查看某个secret的具体内容](#2查看某个secret的具体内容)
       - [7.动态pv（以nfs为例）](#7动态pv以nfs为例)
         - [（1）项目地址](#1项目地址)
         - [（2）存储信息](#2存储信息)
@@ -88,19 +84,6 @@
   比如，configMap中一个键值对为 aa=bb，则会在容器内的挂载目录下生成名为aa的文件，文件的内容为bb
 </br>
 * configmap通过volume方式挂载到容器内后，修改configmap，容器内的挂载内容也会更新（**例外**：当挂载时使用了subPath时，容器内挂载的内容不会自动更新）
-
-##### （6）Secret
-* 与ConfigMap类似，只不过ConfigMap是明文的，Secret是加密的
-* 有三类Secret：
-  * docker-registry				
-  用于设置私有仓库的账号密码
-  * generic
-  * tls			
-  用于存放证书和私钥
-```shell
-#一般通过命令生成相应配置文件模板或者直接创建
-kubectl create secret 类型 ... --dry-run -o yaml
-```
 
 #### 3.pvc
 
@@ -397,24 +380,6 @@ spec:
 #注意：挂载configMap后
 #键名就是文件名
 #键值就是文件的内容
-```
-
-#### 6.Secret的使用
-##### （1）创建Secret资源
-```shell
-kubectl create secret 类型 名字
-          --from-file=文件路径        #文件名就是键，文件内容就是值
-          --from-file=xx=文件路径     #xx就是键，文件内容就是值
-          --from-literal=xx1=xx2     #xx1就是键，xx2就是值
-```
-##### （2）查看某个secret的具体内容
-* 获取secret的数据
-```shell
-kubectl get secret xx -o yaml
-```
-* 解码数据
-```shell
-echo 数据 | base64 --decode
 ```
 
 #### 7.动态pv（以nfs为例）
