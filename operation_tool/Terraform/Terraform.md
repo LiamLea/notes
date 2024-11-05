@@ -23,6 +23,7 @@
       - [4.State](#4state)
         - [(1) basic](#1-basic)
         - [(2) format](#2-format)
+        - [(3) check drift (configuration changed outside of the Terraform workflow)](#3-check-drift-configuration-changed-outside-of-the-terraform-workflow)
       - [5.Other Blocks](#5other-blocks)
         - [(1) local](#1-local)
     - [Client](#client)
@@ -148,6 +149,8 @@ provider "google" {
 
 ##### (2) resource
 
+* The resource type and name must be **unique** within a module
+
 ```tf
 # create a resource of a resource type
 #   different providers provide different resources
@@ -271,7 +274,12 @@ terraform init
 
 #### 4.State
 
-to map real world resources to your configuration
+* store the **mapping** between configuration and real infrastructure for **comparing** the differences between configuration and read infrastructure
+  * e.g. there are a resouce and a real infrastructure
+    * if they have a mapping in the state file, then 
+      * will modify the infrastructure according to the configuration
+    * if they don't have a mapping in the state file, then
+      * will delete the infrastructure and create a new infrastructure
 
 ##### (1) basic
 
@@ -297,6 +305,11 @@ to map real world resources to your configuration
     ],
     "check_results": null
 }
+```
+
+##### (3) check drift (configuration changed outside of the Terraform workflow)
+```shell
+terraform plan --refresh-only
 ```
 
 #### 5.Other Blocks
@@ -340,9 +353,9 @@ includes:
   * store state data
 
 ##### (2) `terraform plan`
-* read state 
-  * reads the current state of any already-existing remote objects (won't override the content of the state file)
-  * `--refresh=false`
-    * won't read the state of remote objects and instead use the state in the statefile
+* refresh
+  * compare the current state of real infrastructure with the state file
+
 * compare 
-  * compares the current configuration to the readed state
+  * update your state file **in-memory** to reflect the actual configuration of your infrastructure
+  * compare the current configuration with the actual configuration of your infrastructure
