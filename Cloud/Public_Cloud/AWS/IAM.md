@@ -161,10 +161,30 @@ credential_process = <shell_command>
 
 ##### (2) create an OIDC provider
 
+* OIDC discovery for [self-hosted k8s](https://github.com/aws/amazon-eks-pod-identity-webhook/blob/master/SELF_HOSTED_SETUP.md):
+  * k8s will use private key sign serviceaccount token
+    ```shell
+    # k8s private key used to sign serviceaccount token
+    --service-account-signing-key-file string
+
+    # k8s public key used to validate serviceaccout token
+    --service-account-key-file strings
+    ```
+  * AWS needs to store the k8s's public key in S3, then use public key to authenticate request to make sure it comes from the k8s
+    ```shell
+    # store openid related config
+    s3://$S3_BUCKET/.well-known/openid-configuration
+
+    # store k8s public key
+    s3://$S3_BUCKET/keys.json
+    ```
+    
 * Create an OIDC provider in IAM for your cluster
+  * configure OIDC discovery endpoint (i.e. S3 endpoint)
 
 ##### (3) create a role
-* Create an IAM role for an serviceaccount
+* Create an IAM role and trust policy for an serviceaccount
+  * define which role can assume this role
 ```json
 {
  "Version": "2012-10-17",
@@ -191,6 +211,8 @@ credential_process = <shell_command>
 ```
 
 ##### (4) create the serviceaccount
+* create a specific serviceaccount according to the conditions set in the previous step
+  * because only a qualified serviceaccount which meet the conditions set in the role can assume that role
 ```yaml
 apiVersion: v1
 kind: ServiceAccount

@@ -39,6 +39,7 @@
 
 * common SSO
     * OIDC (openid connect)
+    * SAML (Security Assertion Markup Language)
 
 ##### (4) FIM（federated identity management）
 比如可以用微信账号登录百度、美团等其他平台
