@@ -32,19 +32,17 @@ ssh -L <listening_port>:<target_host>:<target_port> <ssh_user>@<ssh_host>
 ```shell
 $ vim ~/.ssh/config
 
-Host shared-k8s-test-*
-  HostName shared-k8s-test
+Host custom-name
+  HostName ssh-host
   User <user>
   IdentityFile <key_path>
-
-Host shared-k8s-test-cluster-forward
-  LocalForward 9443 test.com:443
+  LocalForward 9443 target-host:443
 ```
 
 * to listen at 9443 tcp
 ```shell
 # set up the ssh connection (i.e. build the tunnel) and then will listen at 9443 tcp
-ssh shared-k8s-test-cluster-forward
+ssh custom-name
 ```
 
 * check port

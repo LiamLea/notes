@@ -125,6 +125,10 @@ credential_process = <shell_command>
 ##### (3) permission policy
 [policy grammar](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_grammar.html)
 
+* define whcih role this user can assume
+  * so if a AWS user wants to assume a role, it needs to 
+    * set corresponding permission policy for the user
+    * set corresponding trust policy for that role
 * define permissions for specific services and resources
 * a permission policy can **attach** to role, user and etc.
 
