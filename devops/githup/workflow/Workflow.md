@@ -149,6 +149,7 @@ runs:
 - name: Get color
   env:
     SELECTED_COLOR: ${{ steps.color-selector.outputs.SELECTED_COLOR }}
+    STD_OUTPUT: ${{ steps.color-selector.outputs.stdout }}
   run: echo "The selected color is $SELECTED_COLOR"
 
 ```

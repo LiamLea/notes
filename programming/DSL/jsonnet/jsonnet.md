@@ -6,7 +6,9 @@
 
 - [jsonnet](#jsonnet)
     - [Overview](#overview)
-      - [1.jsonnet-bundler](#1jsonnet-bundler)
+      - [1.jsonnet](#1jsonnet)
+        - [(1) convert to yaml](#1-convert-to-yaml)
+      - [2.jsonnet-bundler](#2jsonnet-bundler)
     - [Grammar](#grammar)
       - [1.Syntax](#1syntax)
         - [(1) Variables](#1-variables)
@@ -14,6 +16,7 @@
         - [(3) Operation](#3-operation)
         - [(4) Function](#4-function)
         - [(5) Array and Object](#5-array-and-object)
+        - [(6) Object-Orientation](#6-object-orientation)
       - [2.Imports](#2imports)
 
 <!-- /code_chunk_output -->
@@ -21,7 +24,26 @@
 
 ### Overview
 
-#### 1.jsonnet-bundler
+#### 1.jsonnet
+```shell
+jsonnet -J <lib_dir> <jsonnet_file>
+```
+
+##### (1) convert to yaml
+
+```shell
+mkdir -p manifests
+
+# jsonnet -J <lib_dir> -m manifests <jsonnet_file>
+#   output relative file path: e.g. manifests/alertmanager-alertmanager
+# {}: represent each item from input pipe, i.e. relative file path
+jsonnet -J <lib_dir> -m manifests <jsonnet_file> | xargs -I{} sh -c 'cat {} | gojsontoyaml > {}.yaml'
+
+# Make sure to remove json files
+find manifests -type f ! -name '*.yaml' -delete
+```
+
+#### 2.jsonnet-bundler
 
 * generate dependency `jsonfile.json`
 ```shell
@@ -30,10 +52,16 @@ jb init
 
 * install modules
 ```shell
+# Install new dependencies. Existing ones are silently skipped
 jb install https://github.com/anguslees/kustomize-libsonnet
 ```
 
-* demo: import a module
+* update modules
+```shell
+jb update
+```
+
+* demo: import the installed module
 ```jsonnet
 local kustomize = import 'kustomize-libsonnet/kustomize.libsonnet';
 
@@ -58,6 +86,8 @@ kustomize.namePrefix('staging-')(my_resource)
 * Fields that happen to be valid identifiers have no quotes
     * `'Tom Collins'` is invalid identifier
     * `Manhattan` is valid indentifier
+* fields, defined with `::`, which do not appear in generated JSON
+
 ```jsonnet
 /* A C-style comment. */
 # A Python-style comment.
@@ -66,7 +96,7 @@ kustomize.namePrefix('staging-')(my_resource)
     'Tom Collins': {
       ingredients: [
         { kind: "Farmer's Gin", qty: 1.5 },
-        { kind: 'Lemon', qty: 1 },
+        { kind: 'Lemon', qty:: 1 },
       ],
       garnish: 'Maraschino Cherry',
       served: 'Tall',
@@ -121,8 +151,7 @@ kustomize.namePrefix('staging-')(my_resource)
           "qty": 1.5
         },
         {
-          "kind": "Lemon",
-          "qty": 1
+          "kind": "Lemon"
         }
       ],
       "served": "Tall"
@@ -431,6 +460,41 @@ local arr = std.range(5, 8);
       "f6": true,
       "f8": true
     }
+  }
+}
+```
+
+##### (6) Object-Orientation
+
+* merges two objects: `+`
+    * `self`: a reference to the current object
+    * `super`: access fields on a base object
+* fields, defined with `::`, which do not appear in generated JSON
+
+```jsonnet
+local Base = {
+  f: 2,
+  g: self.f + 100,
+  z:: "haha"
+};
+
+{
+  Derived: Base + {
+    f: 5,
+    old_f: super.f,
+    old_g: super.g,
+  },
+}
+```
+
+* output
+```json
+{
+  "Derived": {
+    "f": 5,
+    "g": 105,
+    "old_f": 2,
+    "old_g": 105
   }
 }
 ```
