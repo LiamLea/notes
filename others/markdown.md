@@ -24,7 +24,6 @@
   - [表格](#表格)
   - [区块](#区块)
   - [画图](#画图)
-  - [画序列图](#画序列图)
 
 <!-- /code_chunk_output -->
 
@@ -119,6 +118,24 @@ aa
 Hello ChatGPT.
 
 </details>
+
+<details>
+  <summary>Click me</summary>
+  
+  ### Heading
+  1. Foo
+  2. Bar
+     * Baz
+     * Qux
+
+  ### Some Javascript
+  ```js
+  function logSomething(something) {
+    console.log('Something', something);
+  }
+  ```
+</details>
+
 
 # 高级用法
 ## 列表
