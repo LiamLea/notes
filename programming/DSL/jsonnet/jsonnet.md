@@ -8,7 +8,9 @@
     - [Overview](#overview)
       - [1.jsonnet](#1jsonnet)
         - [(1) convert to yaml](#1-convert-to-yaml)
+        - [(2) combine multiple jsonnet](#2-combine-multiple-jsonnet)
       - [2.jsonnet-bundler](#2jsonnet-bundler)
+      - [3.standard library](#3standard-library)
     - [Grammar](#grammar)
       - [1.Syntax](#1syntax)
         - [(1) Variables](#1-variables)
@@ -17,7 +19,11 @@
         - [(4) Function](#4-function)
         - [(5) Array and Object](#5-array-and-object)
         - [(6) Object-Orientation](#6-object-orientation)
+        - [(7) override](#7-override)
       - [2.Imports](#2imports)
+      - [3.Top-level arguments](#3top-level-arguments)
+      - [4.debug](#4debug)
+      - [5.modify anything (at the top level)](#5modify-anything-at-the-top-level)
 
 <!-- /code_chunk_output -->
 
@@ -41,6 +47,28 @@ jsonnet -J <lib_dir> -m manifests <jsonnet_file> | xargs -I{} sh -c 'cat {} | go
 
 # Make sure to remove json files
 find manifests -type f ! -name '*.yaml' -delete
+```
+
+##### (2) combine multiple jsonnet
+```jsonnet
+{
+  k1: "v1",
+  k2: {
+    aa: "bb",
+  }
+}
+
+{
+  k2: "v2",
+}
+```
+
+* output
+```json
+{
+  "k1": "v1",
+  "k2": "v2"
+}
 ```
 
 #### 2.jsonnet-bundler
@@ -72,6 +100,32 @@ local my_resource = {
 };
 
 kustomize.namePrefix('staging-')(my_resource)
+```
+
+#### 3.standard library
+
+[Ref](https://jsonnet.org/ref/stdlib.html)
+
+```jsonnet
+{
+  standard_lib:
+    std.join(' ', std.split('foo/bar', '/')),
+  len: [
+    std.length('hello'),
+    std.length([1, 2, 3]),
+  ],
+}
+```
+
+* output
+```json
+{
+  "len": [
+    5,
+    3
+  ],
+  "standard_lib": "foo bar"
+}
 ```
 
 ***
@@ -499,6 +553,38 @@ local Base = {
 }
 ```
 
+##### (7) override
+
+* The `+:` field syntax for overriding deeply nested fields
+
+```jsonnet
+local Base = {
+  f: 2,
+  g: self.f + 100,
+};
+
+local WrapperBase = {
+  Base: Base,
+};
+
+{
+  WrapperDerived: {
+    Base+: { f: 5 },
+  },
+}
+```
+
+* output
+```json
+{
+  "WrapperDerived": {
+    "Base": {
+      "f": 5
+    }
+  }
+}
+```
+
 #### 2.Imports
 
 * Files designed for import by convention end with `.libsonnet`
@@ -564,6 +650,125 @@ local martinis = import 'martinis.libsonnet';
       }
     ],
     "served": "Straight Up"
+  }
+}
+```
+
+#### 3.Top-level arguments
+
+the whole config is written as a function
+
+* `a.jsonnet`
+
+```jsonnet
+function(prefix, brunch=false) {
+
+  [if brunch then prefix + 'Bloody Mary']: {
+    ingredients: [
+      { kind: 'Vodka', qty: 1.5 },
+    ],
+  },
+}
+```
+
+* render the jsonnet
+  * jsonnet command
+  ```shell
+  jsonnet --tla-str prefix="Happy Hour " \
+          --tla-code brunch=true a.jsonnet
+  ```
+
+  * import
+  ```shell
+  local mya=import 'a.jsonnet';
+  mya("Happer Hour", true)
+  ```
+
+* output
+```json
+{
+  "Happer HourBloody Mary": {
+    "ingredients": [
+      {
+        "kind": "Vodka",
+        "qty": 1.5
+      }
+    ]
+  }
+}
+```
+
+#### 4.debug
+
+* origin
+```jsonnet
+local Person(name='Alice') = {
+  name: name,
+  welcome: 'Hello ' + name + '!',
+};
+{
+  person1: Person(),
+  person2: Person('Bob'),
+}
+```
+
+* debug
+  * `std.trace(<to_err>, <return>)`
+  * can output various formats, e.g.
+    * `std.toString(...)`
+    * `std.manifestJson(...)`
+    * `std.manifestYamlDoc(...)`
+  * cannot output **hidden fields**
+    * so can use method1, when hidden fields are called, it will print the value
+
+```jsonnet
+local Person(name='Alice') = {
+  name: name,
+  welcome: 'Hello ' + name + '!',
+};
+{
+  // method-1:
+  person1: std.trace('\n'+std.manifestJson(Person()), Person()),
+  person2: Person('Bob'),
+  // method-2
+  debug: std.trace('\n'+std.manifestJson(self.person1), ""),
+}
+```
+
+* output
+  * json
+  ```json
+  {
+    "person1": {
+        "name": "Alice",
+        "welcome": "Hello Alice!"
+    },
+    "person2": {
+        "name": "Bob",
+        "welcome": "Hello Bob!"
+    }
+  }
+  ```
+  * err
+  ```
+  TRACE: /Users/liamlea/Workspace/the-plant/repos/terraform/k8s/shared-test/addons/prometheus/temp.jsonnet:6 
+  {
+      "name": "Alice",
+      "welcome": "Hello Alice!"
+  }
+  ```
+
+#### 5.modify anything (at the top level)
+
+* example (kube-prometheus: values.jsonnet)
+```jsonnet
+//...
+
+{
+  'kubernetes-prometheusRule'+: {
+    spec+: {
+      groups: [item for item in kp.kubernetesControlPlane.prometheusRule.spec.groups if item['name'] != 'kubernetes-system-scheduler' && item['name'] != 'kubernetes-system-controller-manager']
+    }
   }
 }
 ```

@@ -16,15 +16,12 @@
       - [3.Configuration Main Components](#3configuration-main-components)
         - [(1) provider](#1-provider)
         - [(2) resource](#2-resource)
-      - [3.Modules](#3modules)
-        - [(1) load a module](#1-load-a-module)
-        - [(2) write a module](#2-write-a-module)
-        - [(3) load a module](#3-load-a-module)
-      - [4.State](#4state)
+      - [3.State](#3state)
         - [(1) basic](#1-basic)
         - [(2) format](#2-format)
         - [(3) check drift (configuration changed outside of the Terraform workflow)](#3-check-drift-configuration-changed-outside-of-the-terraform-workflow)
-      - [5.Other Blocks](#5other-blocks)
+        - [(4) how does terraform identify resources uniquely](#4-how-does-terraform-identify-resources-uniquely)
+      - [4.Other Blocks](#4other-blocks)
         - [(1) local](#1-local)
     - [Client](#client)
       - [1.Basic Usage](#1basic-usage)
@@ -192,87 +189,7 @@ resource <resource_type> <resource_name> {
 }
 ```
 
-#### 3.Modules
-
-##### (1) load a module
-to reuse resource configurations
-
-```tf
-# load modules e.g.
-module "consul" {
-  # if not specify repo, use the default modules repo (Terraform Registry)
-  source  = "hashicorp/consul/aws"
-
-  version = "0.0.5"
-
-  # other arguments are the inputs of the module (the inputs are the varaibles of the module)
-  servers = 3
-}
-```
-
-##### (2) write a module
-[reference](https://github.com/hashicorp/learn-terraform-modules-create/tree/main)
-
-* a typical structure
-```shell
-<module_name>/
-    ├── LICENSE
-    ├── README.md
-    ├── main.tf
-    ├── variables.tf  # define input
-    ├── outputs.tf
-
-# None of these files are required
-```
-
-* `./modules/test/main.tf`
-  * modules will inherit `provider` but not `required_providers`
-  * so the best practice is to specify `required_providers` or it will use the default
-
-```tf
-terraform {
-  # specify provider and its version
-  required_providers {
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "~> 3.0.1"
-    }
-  }
-}
-
-/*
-  then write tasks
-*/
-resource "docker_image" "nginx_2" {
-  name         = "nginx"
-  keep_locally = false
-}
-
-resource "docker_container" "nginx_2" {
-  image = docker_image.nginx_2.image_id
-  name  = "tutorial_2"
-
-  ports {
-    internal = 80
-    external = 8004
-  }
-}
-```
-
-##### (3) load a module
-```tf
-module "docker" {
-  # if not specify repo, use the default modules repo (Terraform Registry)
-  source  = "./modules/test"
-}
-```
-
-* init
-```shell
-terraform init
-```
-
-#### 4.State
+#### 3.State
 
 * store the **mapping** between configuration and real infrastructure for **comparing** the differences between configuration and read infrastructure
   * e.g. there are a resouce and a real infrastructure
@@ -312,7 +229,14 @@ terraform init
 terraform plan --refresh-only
 ```
 
-#### 5.Other Blocks
+##### (4) how does terraform identify resources uniquely
+
+* for resources created by `module`
+  * `<module_instance_name>.<resource_type>.<resource_name>`
+* for resources directly created by `resource`
+  * `<resource_type>.<resource_name>`
+
+#### 4.Other Blocks
 
 ##### (1) local
 * Declaring a Local Value
