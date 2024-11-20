@@ -23,6 +23,7 @@
       - [8.new和make](#8new和make)
       - [9.反射:`reflect` (本质: 根据字符串获取对象)](#9反射reflect-本质-根据字符串获取对象)
       - [10.范型和interface{}](#10范型和interface)
+      - [11.exported (private)](#11exported-private)
 
 <!-- /code_chunk_output -->
 
@@ -250,3 +251,25 @@ reflect.ValueOf(xx)   //获取对象的值
     }
     ```
 
+#### 11.exported (private)
+
+* a name is exported if it **begins with a capital letter**
+* When importing a package, you can refer only to its **exported** names. Any "unexported" names are not accessible from outside the package.
+  * so other packages cannot access unexported names , for example: `json.Marshal` cannot work with unexported fields
+
+* error code 
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+func main() {
+	fmt.Println(math.pi)
+}
+
+//output:
+//  ./prog.go:9:19: undefined: math.pi
+```

@@ -29,6 +29,16 @@
         - [（3）`<aggregation>_over_time()`](#3aggregation_over_time)
     - [使用](#使用)
       - [1.常用语句](#1常用语句)
+      - [2.cpu related](#2cpu-related)
+        - [(1) cpu usage per container](#1-cpu-usage-per-container)
+        - [(2) cpu usage / requests](#2-cpu-usage--requests)
+        - [(3) cpu usage every 5 minutes in a day](#3-cpu-usage-every-5-minutes-in-a-day)
+        - [(4) 95% cpu usage of every container in a day](#4-95-cpu-usage-of-every-container-in-a-day)
+      - [3.memory related](#3memory-related)
+        - [(1) memory usage per container](#1-memory-usage-per-container)
+        - [(2) memory usage / requests](#2-memory-usage--requests)
+        - [(3) memory usage in an hour](#3-memory-usage-in-an-hour)
+        - [(4) max memory usage in a day](#4-max-memory-usage-in-a-day)
 
 <!-- /code_chunk_output -->
 
@@ -194,4 +204,48 @@ last_over_time(range-vector): the most recent point value in specified interval.
 count({instance=~".+"})by(instance)
 
 {instance="192.168.41.167:9100"}
+```
+
+#### 2.cpu related
+##### (1) cpu usage per container
+
+```
+sum by (cluster, namespace, pod, container) (irate(container_cpu_usage_seconds_total[5m]))
+```
+
+##### (2) cpu usage / requests
+
+```
+sum by (cluster, namespace, pod, container) (irate(container_cpu_usage_seconds_total[5m])) / sum by (cluster, namespace, pod, container) (kube_pod_container_resource_requests{resource="cpu"})
+```
+
+##### (3) cpu usage every 5 minutes in a day
+```
+sum by (cluster, namespace, pod, container) (irate(container_cpu_usage_seconds_total[5m]))[1d:5m]
+```
+
+##### (4) 95% cpu usage of every container in a day
+```
+quantile_over_time(0.95, sum by (cluster, namespace, pod, container) (irate(container_cpu_usage_seconds_total[5m]))[1d:5m])
+```
+
+#### 3.memory related
+##### (1) memory usage per container
+```
+sum by (cluster, namespace, pod, container) (container_memory_working_set_bytes)
+```
+
+##### (2) memory usage / requests
+```
+sum by (cluster, namespace, pod, container) (container_memory_working_set_bytes) / sum by (cluster, namespace, pod, container) (kube_pod_container_resource_requests{resource="memory"})
+```
+
+##### (3) memory usage in an hour
+```
+sum by (cluster, namespace, pod, container) (container_memory_working_set_bytes)[5m]
+```
+
+##### (4) max memory usage in a day
+```
+max_over_time(sum by (cluster, namespace, pod, container) (container_memory_working_set_bytes)[1d:5m])
 ```
