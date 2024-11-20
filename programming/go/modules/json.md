@@ -7,14 +7,16 @@
 - [json](#json)
     - [使用](#使用)
       - [1.struct 和 json 互转](#1struct-和-json-互转)
-        - [（1）struct -> json](#1struct-json)
-        - [（2）json -> struct](#2json-struct)
+        - [（1）struct -> json](#1struct---json)
+        - [（2）json -> struct](#2json---struct)
       - [2.map 和 json 互转](#2map-和-json-互转)
 
 <!-- /code_chunk_output -->
 
 
 ### 使用
+
+* only work with **exported** fields
 
 #### 1.struct 和 json 互转
 
