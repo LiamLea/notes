@@ -1,10 +1,10 @@
-# Dockerfile
+# Build
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 <!-- code_chunk_output -->
 
-- [Dockerfile](#dockerfile)
-    - [基础概念](#基础概念)
+- [Build](#build)
+    - [Dockerfile](#dockerfile)
       - [1.`docker build PATH`](#1docker-build-path)
       - [2.基本语法](#2基本语法)
       - [4.变量的使用](#4变量的使用)
@@ -13,10 +13,13 @@
       - [2.相关操作](#2相关操作)
         - [（1）清除缓存](#1清除缓存)
         - [（2）docker run](#2docker-run)
+    - [Buildx](#buildx)
+      - [1. concepts](#1-concepts)
+      - [2.build for multiple platforms](#2build-for-multiple-platforms)
 
 <!-- /code_chunk_output -->
 
-### 基础概念
+### Dockerfile
 
 #### 1.`docker build PATH`
 * PATH指定目录
@@ -109,3 +112,34 @@ SHELL ["cmd","arg1","arg2",...]         #设置默认的上帝进程
 ##### （2）docker run
 * 可以在ENV设置环境变量，也可以再docker run -e 设置环境变量，
 * 可以设置启动容器后自动执行之前上传的脚本，引用环境变量，就可以实现定制化配置
+
+***
+
+### Buildx
+
+#### 1. concepts
+* builders and its nodes
+  * Each builder has one or more nodes associated with it
+```shell
+# list all builders
+docker context ls
+
+# list all builders and its nodes
+docker buildx ls
+```
+
+#### 2.build for multiple platforms
+
+run on the linux host
+
+* register QEMU
+```shell
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+```
+```shell
+docker buildx create --name mybuilder --driver docker-container --use
+docker buildx inspect --bootstrap
+```
+```shell
+docker buildx build --platform=linux/arm64,linux/amd64,linux/amd64/v2,linux/riscv64,linux/ppc64le,linux/s390x,linux/386,linux/mips64le,linux/mips64,linux/arm/v7,linux/arm/v6 .
+```

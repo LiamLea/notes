@@ -27,8 +27,8 @@
         - [（1）常用函数](#1常用函数)
         - [（2）速率相关](#2速率相关)
         - [（3）`<aggregation>_over_time()`](#3aggregation_over_time)
-    - [使用](#使用)
-      - [1.常用语句](#1常用语句)
+    - [Usage](#usage)
+      - [1.merge two metrics](#1merge-two-metrics)
       - [2.cpu related](#2cpu-related)
         - [(1) cpu usage per container](#1-cpu-usage-per-container)
         - [(2) cpu usage / requests](#2-cpu-usage--requests)
@@ -39,6 +39,8 @@
         - [(2) memory usage / requests](#2-memory-usage--requests)
         - [(3) memory usage in an hour](#3-memory-usage-in-an-hour)
         - [(4) max memory usage in a day](#4-max-memory-usage-in-a-day)
+      - [3.list all values of a label](#3list-all-values-of-a-label)
+      - [4.query deployment usage](#4query-deployment-usage)
 
 <!-- /code_chunk_output -->
 
@@ -197,14 +199,22 @@ last_over_time(range-vector): the most recent point value in specified interval.
 
 ***
 
-### 使用
+### Usage
 
-#### 1.常用语句
-```shell
-count({instance=~".+"})by(instance)
+#### 1.merge two metrics
 
-{instance="192.168.41.167:9100"}
 ```
+kube_replicaset_owner * on(replicaset,namespace)  group_right(owner_kind,owner_name) label_replace(kube_pod_info{created_by_kind="ReplicaSet"}, "replicaset", "$1", "created_by_name", "(.*)")
+```
+
+* `*` 
+  * the value of metrc1 X the value of metric2
+* `on(replicaset,namespace)` 
+  * these labels must identiy metric1 **uniquely**
+* `group_right(owner_kind,owner_name)`
+  * merge metric1's `owner_kind,owner_name` to metric2 when `metric2.(replicaset,namespace) == metric1.(replicaset,namespace)`
+* label_replace
+  * change metric2's label name
 
 #### 2.cpu related
 ##### (1) cpu usage per container
@@ -248,4 +258,20 @@ sum by (cluster, namespace, pod, container) (container_memory_working_set_bytes)
 ##### (4) max memory usage in a day
 ```
 max_over_time(sum by (cluster, namespace, pod, container) (container_memory_working_set_bytes)[1d:5m])
+```
+
+#### 3.list all values of a label
+```
+count by (created_by_kind) (kube_pod_info)
+```
+
+#### 4.query deployment usage
+
+```
+quantile_over_time(0.95, sum by (cluster, namespace, owner_kind,owner_name, container) (irate(((kube_replicaset_owner * on(replicaset,namespace)  group_right(owner_kind,owner_name) label_replace(kube_pod_info{created_by_kind="ReplicaSet"}, "replicaset", "$1", "created_by_name", "(.*)")) * on(pod,namespace) group_right(owner_kind,owner_name) container_cpu_usage_seconds_total)[5m:30s]))[24h:5m])
+```
+
+
+```
+sum by (cluster, namespace, owner_kind, owner_name, container,resource) ((kube_replicaset_owner * on(replicaset,namespace)  group_right(owner_kind,owner_name) label_replace(kube_pod_info{created_by_kind="ReplicaSet"}, "replicaset", "$1", "created_by_name", "(.*)")) * on(pod,namespace) group_right(owner_kind,owner_name) kube_pod_container_resource_requests{resource="cpu"})
 ```

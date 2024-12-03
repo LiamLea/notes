@@ -12,8 +12,8 @@
       - [1.基本使用](#1基本使用)
         - [（1）开启一个协程：`go`](#1开启一个协程go)
         - [（2）退出一个协程](#2退出一个协程)
-      - [2.协程安全的计数器：`WaitGroup`](#2协程安全的计数器waitgroup)
-      - [3.协程间的通信：channel](#3协程间的通信channel)
+      - [2.协程安全的计数器：`WaitGroup` (i.e. global variable)](#2协程安全的计数器waitgroup-ie-global-variable)
+      - [3.协程间的通信：channel (i.e. shared memory)](#3协程间的通信channel-ie-shared-memory)
         - [（1）创建和关闭channel](#1创建和关闭channel)
         - [（2）在channel中生产和消费](#2在channel中生产和消费)
         - [（3）利用`range`读取channel数据](#3利用range读取channel数据)
@@ -73,7 +73,7 @@ func main() {
 runtime.Goexit()
 ```
 
-#### 2.协程安全的计数器：`WaitGroup`
+#### 2.协程安全的计数器：`WaitGroup` (i.e. global variable)
 WaitGroup其实就是一个加锁的计数器
 * 初始化一个计数器：`var wg sync.WaitGroup`，wg的初始值为0
 * 每次执行`wg.Done()`时，wg的值会`-1`
@@ -98,7 +98,7 @@ func main() {
 }
 ```
 
-#### 3.协程间的通信：channel
+#### 3.协程间的通信：channel (i.e. shared memory)
 
 channel是有**类型的**，每个channel只能传输特定类型的数据
 
