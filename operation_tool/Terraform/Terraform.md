@@ -27,6 +27,7 @@
       - [1.Basic Usage](#1basic-usage)
         - [(1) working directory](#1-working-directory)
         - [(2) `terraform plan`](#2-terraform-plan)
+        - [(3) `terraform apply`](#3-terraform-apply)
 
 <!-- /code_chunk_output -->
 
@@ -283,3 +284,8 @@ includes:
 * compare 
   * update your state file **in-memory** to reflect the actual configuration of your infrastructure
   * compare the current configuration with the actual configuration of your infrastructure
+
+##### (3) `terraform apply`
+```shell
+-target
+```
