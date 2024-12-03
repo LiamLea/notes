@@ -69,17 +69,17 @@ ls ./_output/dockerized/bin/linux/
 ```shell
 $ cat Dockerfile
 
-FROM golang:1.23.1
-RUN go install github.com/go-delve/delve/cmd/dlv@v1.23.1
+FROM golang:1.22.0
+RUN go install github.com/go-delve/delve/cmd/dlv@v1.22.0
 
 ENTRYPOINT ["/go/bin/dlv", "--listen=0.0.0.0:2345", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "--"]
 
-$ docker build -t liamlea/dlv:1.23.1
+$ docker build -t liamlea/dlv:1.22.0
 ```
 
 * build k8s image
 ```shell
-export KUBE_SCHEDULER_BASE_IMAGE="liamlea/dlv:1.23.1"
+export KUBE_SCHEDULER_BASE_IMAGE="liamlea/dlv:1.22.0"
 make release-images DBG=1
 ```
 
