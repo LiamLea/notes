@@ -136,10 +136,23 @@ run on the linux host
 ```shell
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 ```
+
+* enable VPN and buildx container set network host mode
+  * because buildkit run in the container which may need to access docker hub (`FROM ...`)
+  * while buildkit cannot set proxy
+
+* create builder using docker-container driver
 ```shell
-docker buildx create --name mybuilder --driver docker-container --use
+docker buildx create --name mybuilder --driver docker-container --use --driver-opt network=host
+
 docker buildx inspect --bootstrap
 ```
+
+* build and push
 ```shell
-docker buildx build --platform=linux/arm64,linux/amd64,linux/amd64/v2,linux/riscv64,linux/ppc64le,linux/s390x,linux/386,linux/mips64le,linux/mips64,linux/arm/v7,linux/arm/v6 .
+# login registry
+docker login
+
+# build and load: --load
+docker buildx build --push --platform=linux/amd64,linux/arm64 -t <image:tag> .
 ```
