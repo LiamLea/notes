@@ -38,6 +38,7 @@
     - [(2) nohup](#2-nohup)
     - [(3)对于正在前台运行的进程: ctrl+z 和 bg](#3对于正在前台运行的进程-ctrlz-和-bg)
     - [(4) 获取后台进程的STDOUT](#4-获取后台进程的stdout)
+  - [24.array and index (array cannot export)](#24array-and-index-array-cannot-export)
 
 <!-- /code_chunk_output -->
 
@@ -360,4 +361,11 @@ call close(2)
 call open("/tmp/d.txt", 0101, 0600)
 
 quit
+```
+
+#### 24.array and index (array cannot export)
+```shell
+#!/bin/bash
+KUBE_SERVER_PLATFORMS=(linux/amd64 linux/arm64 darwin/amd64)
+echo "${KUBE_SERVER_PLATFORMS[*]}"
 ```
