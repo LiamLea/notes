@@ -74,9 +74,23 @@ RUN go install github.com/go-delve/delve/cmd/dlv@v1.22.0
 
 ENTRYPOINT ["/go/bin/dlv", "--listen=0.0.0.0:2345", "--headless=true", "--api-version=2", "--accept-multiclient", "exec", "--"]
 
-$ docker build -t liamlea/dlv:1.22.0
+$ docker buildx build --push --platform=linux/amd64,linux/arm64,linux/s390x,linux/ppc64le -t liamlea/dlv:1.22.0 .
 ```
 
+* check base image
+```shell
+$ cat ./build/common.sh
+
+...
+readonly KUBE_GORUNNER_IMAGE="${KUBE_GORUNNER_IMAGE:-$KUBE_BASE_IMAGE_REGISTRY/go-runner:$__default_go_runner_version}"
+readonly KUBE_APISERVER_BASE_IMAGE="${KUBE_APISERVER_BASE_IMAGE:-$KUBE_GORUNNER_IMAGE}"
+readonly KUBE_CONTROLLER_MANAGER_BASE_IMAGE="${KUBE_CONTROLLER_MANAGER_BASE_IMAGE:-$KUBE_GORUNNER_IMAGE}"
+readonly KUBE_SCHEDULER_BASE_IMAGE="${KUBE_SCHEDULER_BASE_IMAGE:-$KUBE_GORUNNER_IMAGE}"
+readonly KUBE_PROXY_BASE_IMAGE="${KUBE_PROXY_BASE_IMAGE:-$KUBE_BASE_IMAGE_REGISTRY/distroless-iptables:$__default_distroless_iptables_version}"
+readonly KUBECTL_BASE_IMAGE="${KUBECTL_BASE_IMAGE:-$KUBE_GORUNNER_IMAGE}"
+...
+
+```
 * build k8s image
 ```shell
 export KUBE_SCHEDULER_BASE_IMAGE="liamlea/dlv:1.22.0"

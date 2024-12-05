@@ -154,5 +154,5 @@ docker buildx inspect --bootstrap
 docker login
 
 # build and load: --load
-docker buildx build --push --platform=linux/amd64,linux/arm64 -t <image:tag> .
+docker buildx build --push --platform=linux/amd64,linux/arm64,linux/s390x,linux/ppc64le -t <image:tag> .
 ```
