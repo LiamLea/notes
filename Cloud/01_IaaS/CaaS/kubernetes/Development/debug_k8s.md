@@ -121,19 +121,17 @@ docker images
 ##### (3) modify manifests
 ```shell
 $ sudo -i
-$ vi /etc/kubernetes/manifests/kube-scheduler.yaml
 
-# modfiy image:
-#   registry.k8s.io/kube-scheduler-arm64:v1.31.3-5_b73931a601729e-dirty
-# delete startupProbe, livenessProbe
+# apt-get update; apt-get insatll vim
+$ vi /etc/kubernetes/manifests/kube-scheduler.yaml
 ```
 * modfiy image
-    * `registry.k8s.io/kube-scheduler-arm64:v1.31.3-5_b73931a601729e-dirty`
+    * e.g. `registry.k8s.io/kube-scheduler-arm64:v1.31.3-5_b73931a601729e-dirty`
 * change `command` to `args`
     * command in pod corresponds to entrypoint in container
     * args in pod corresponds to command in container
 * change executable file path at `args[0]`
-    * `/usr/local/bin/kube-scheduler`
+    * e.g. `/usr/local/bin/kube-scheduler`
 * delete `startupProbe`, `livenessProbe`
 
 ##### (4) expose ports
