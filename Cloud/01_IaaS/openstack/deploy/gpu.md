@@ -16,7 +16,7 @@
       - [5.修改nova的配置](#5修改nova的配置)
         - [(1) 使用kolla-ansible](#1-使用kolla-ansible)
       - [6.创建flavor](#6创建flavor)
-      - [7.创建虚拟机测试](#7创建虚拟机测试)
+      - [7.创建虚拟机测试 (at least two gpus)](#7创建虚拟机测试-at-least-two-gpus)
         - [(1) 镜像配置（很重要）](#1-镜像配置很重要)
         - [(2) 用该镜像和flavor创建虚拟机](#2-用该镜像和flavor创建虚拟机)
 
@@ -150,7 +150,9 @@ test
 openstack flavor create --vcpus 8 --ram 16384 --disk 50 gpu/8c/16g --property "pci_passthrough:alias"="geforce-gtx:1"
 ```
 
-#### 7.创建虚拟机测试
+#### 7.创建虚拟机测试 (at least two gpus)
+
+if you have only single gpu and make it passthrough, which will lead to shutdown
 
 ##### (1) 镜像配置（很重要）
 * 需要设置如下属性，因为NVIDIA drivers do not work in instances with KVM hypervisor signatures

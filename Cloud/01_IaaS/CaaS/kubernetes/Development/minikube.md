@@ -25,8 +25,10 @@
 ##### (1) create cluster
 * create a cluster and profile
 ```shell
-minikube start -p <profile>
+# docker runtime has problem
+minikube start -c containerd 
 
+-p <profile>
 --insecure-registry=[]
 --image-repository=''
 --kubernetes-version=''

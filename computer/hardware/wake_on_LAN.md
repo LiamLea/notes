@@ -94,6 +94,7 @@ wakeonlan <interface_mac>
 
 #### 1.进入BIOS开启recovery ac
 
+PCH configuration -> PCH devices
 * 比如
 ![](./imgs/wol_03.png)
 
