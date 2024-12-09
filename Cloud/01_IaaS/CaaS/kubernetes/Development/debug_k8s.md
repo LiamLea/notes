@@ -14,6 +14,7 @@
         - [(2) load the builded image](#2-load-the-builded-image)
         - [(3) modify manifests](#3-modify-manifests)
         - [(4) expose ports](#4-expose-ports)
+        - [(4) delete `kubernetes/vendor`](#4-delete-kubernetesvendor)
 
 <!-- /code_chunk_output -->
 
@@ -103,8 +104,9 @@ ls ./_output/release-images
 #### 2.debug
 
 ##### (1) start a cluster
-```shel
-minikube start
+```shell
+# docker runtime has problem 
+minikube start -c containerd
 
 minikube status
 ```
@@ -115,14 +117,15 @@ minikube image load _output/release-images/arm64/kube-scheduler.tar
 
 minikube ssh
 
-docker images
+sudo -i
+crictl images
 ```
 
 ##### (3) modify manifests
 ```shell
 $ sudo -i
 
-# apt-get update; apt-get insatll vim
+# apt-get update; apt-get install vim -y
 $ vi /etc/kubernetes/manifests/kube-scheduler.yaml
 ```
 * modfiy image
@@ -140,3 +143,9 @@ kubectl expose pod/kube-scheduler-minikube -n kube-system --type=NodePort --port
 
 minikube  service kube-scheduler-minikube -n kube-system
 ```
+
+##### (4) delete `kubernetes/vendor`
+* delete `kubernetes/vendor`
+    * this was generated when build k8s 
+    * it will step into vendor when I use goland to open k8s source code and i follow the code, which makes breakpoint useless
+* restart goland after delete
