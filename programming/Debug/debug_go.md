@@ -1,17 +1,24 @@
-# Debug
+# Debug GO
 
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Debug](#debug)
+- [Debug GO](#debug-go)
     - [Delve](#delve)
       - [1.start delve server](#1start-delve-server)
         - [(1) debug source code](#1-debug-source-code)
         - [(2) debug compiled code](#2-debug-compiled-code)
         - [(3) debug a running process](#3-debug-a-running-process)
       - [2.Configure IDE](#2configure-ide)
+    - [debug import](#debug-import)
+      - [1.Why](#1why)
+      - [2.How](#2how)
+        - [(1) how does import work](#1-how-does-import-work)
+        - [(2) how to analyze](#2-how-to-analyze)
+    - [debug using stack](#debug-using-stack)
+      - [1.pay attention to stack trace and gorutines](#1pay-attention-to-stack-trace-and-gorutines)
 
 <!-- /code_chunk_output -->
 
@@ -65,3 +72,42 @@ dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient attach <
     * edit configurations -> add "go remote"
 * local debug:
     * run -> Attach to Process
+
+***
+
+### debug import
+
+#### 1.Why
+
+* importing packages will do initialization
+
+#### 2.How
+
+##### (1) how does import work
+* imports will run do the following:
+    * define `const`, `var`, `func`, ...
+        * which may exec corresponding functions, e.g. `var a = myfunc()`
+    * exec `init()`
+* multiple imports will do **only one** import
+
+##### (2) how to analyze
+
+* **determine** which package you want to analyze (e.g. `"k8s.io/apiserver/pkg/util/feature"`)
+
+* **locate** the package and **find usages** of the packages
+![](./imgs/dg_01.png)
+
+* get all codes which use the package and jump into one usage
+
+* **Structure** show package structure and check if the package has **initialization**:
+    * `f init()`
+    * `v ...` (variable)
+
+![](./imgs/dg_02.png)
+
+***
+
+### debug using stack
+
+#### 1.pay attention to stack trace and gorutines
+![](./imgs/dg_03.png)

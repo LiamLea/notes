@@ -146,6 +146,6 @@ minikube  service kube-scheduler-minikube -n kube-system
 
 ##### (4) delete `kubernetes/vendor`
 * delete `kubernetes/vendor`
-    * this was generated when build k8s 
-    * it will step into vendor when I use goland to open k8s source code and i follow the code, which makes breakpoint useless
+    * It's used for running tests to prevent a bunch of test flakes ([ref](https://github.com/kubernetes/kubernetes/issues/120114#issuecomment-1689174922))
+    * It will step into vendor when I use goland to open k8s source code and i follow the code, which makes breakpoint useless
 * restart goland after delete
