@@ -75,7 +75,10 @@ import (
 
 ##### (1) init function
 
+* there may be multiple init() functions which will be executed in order
+
 ```go
+func init() {}
 func init() {}
 ```
 

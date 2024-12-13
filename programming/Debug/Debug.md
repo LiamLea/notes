@@ -9,6 +9,8 @@
     - [Overview](#overview)
       - [1.compile-time vs runtime](#1compile-time-vs-runtime)
       - [2.Package-Level Variables (go)](#2package-level-variables-go)
+      - [3.watch Package-Level Variables](#3watch-package-level-variables)
+      - [4.pay attention to stack trace and gorutines](#4pay-attention-to-stack-trace-and-gorutines)
 
 <!-- /code_chunk_output -->
 
@@ -52,3 +54,9 @@
         b = testinit()
     }
     ```
+
+#### 3.watch Package-Level Variables
+e.g. `"k8s.io/apiserver/pkg/util/version".DefaultComponentGlobalsRegistry`
+
+#### 4.pay attention to stack trace and gorutines
+![](./imgs/dg_03.png)

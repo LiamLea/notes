@@ -17,8 +17,6 @@
       - [2.How](#2how)
         - [(1) how does import work](#1-how-does-import-work)
         - [(2) how to analyze](#2-how-to-analyze)
-    - [debug using stack](#debug-using-stack)
-      - [1.pay attention to stack trace and gorutines](#1pay-attention-to-stack-trace-and-gorutines)
 
 <!-- /code_chunk_output -->
 
@@ -104,10 +102,3 @@ dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient attach <
     * `v ...` (variable)
 
 ![](./imgs/dg_02.png)
-
-***
-
-### debug using stack
-
-#### 1.pay attention to stack trace and gorutines
-![](./imgs/dg_03.png)
