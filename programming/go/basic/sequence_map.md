@@ -68,6 +68,9 @@ a := [3][2]string {
 
 ##### （2）基本使用
 ```go
+// declare and intilize an empty slice
+es := []int{}
+
 //声明并初始化
 var <VARIABLE> []<TYPE>
 s1 := []int{1,2,3,4,5}
@@ -110,6 +113,9 @@ copy(s1, s2)   //将s2 copy到 s1
 ##### （2）基本使用
 要初始化或者使用make
 ```go
+// declare and initialize an empty map
+em := map[string]string{}
+
 //使用make初始化
 m1 := make(map[<key_type>]<value_type>)   //如果容量不够，会自动扩容（最好给出合适的长度：make(map[<key_type>]<value_type>, <length>) ，这样避免扩容，提高效率）
 

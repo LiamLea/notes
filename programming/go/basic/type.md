@@ -21,6 +21,7 @@
       - [4.type determination](#4type-determination)
         - [(1) type assertions](#1-type-assertions)
         - [(2) type switches](#2-type-switches)
+      - [5.`reflect.TypeOf`](#5reflecttypeof)
 
 <!-- /code_chunk_output -->
 
@@ -175,4 +176,51 @@ func main() {
 	do("hello")
 	do(true)
 }
+```
+
+#### 5.`reflect.TypeOf`
+
+```go
+func main() {
+	type test struct{}
+	var v1 test
+
+	t := reflect.TypeOf(v1)
+
+	fmt.Println(t.Kind())
+	fmt.Println(t.String())
+	fmt.Println(t.Name())
+}
+
+/* output:
+struct
+main.test
+test
+*/
+```
+
+```go
+func main() {
+	type test struct{}
+	var v1 *test
+
+	t := reflect.TypeOf(v1)
+
+	fmt.Println(t.Kind())
+	fmt.Println(t.String())
+	fmt.Println(t.Name())
+	t = t.Elem()
+	fmt.Println(t.Kind())
+	fmt.Println(t.String())
+	fmt.Println(t.Name())
+}
+
+/* output:
+ptr
+*main.test
+
+struct
+main.test
+test
+*/
 ```
