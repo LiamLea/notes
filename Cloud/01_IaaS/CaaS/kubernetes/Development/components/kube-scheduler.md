@@ -27,24 +27,24 @@ command := app.NewSchedulerCommand()
 ```go
 cmd := &cobra.Command{
         // define prerun function
-		PersistentPreRunE: func(*cobra.Command, []string) error {
-			return opts.ComponentGlobalsRegistry.Set()
-		},
+        PersistentPreRunE: func(*cobra.Command, []string) error {
+            return opts.ComponentGlobalsRegistry.Set()
+        },
 
         // define run function (core)
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCommand(cmd, opts, registryOptions...)
-		},
+        RunE: func(cmd *cobra.Command, args []string) error {
+            return runCommand(cmd, opts, registryOptions...)
+        },
 
         // define args
-		Args: func(cmd *cobra.Command, args []string) error {
-			for _, arg := range args {
-				if len(arg) > 0 {
-					return fmt.Errorf("%q does not take any arguments, got %q", cmd.CommandPath(), args)
-				}
-			}
-			return nil
-		},
+        Args: func(cmd *cobra.Command, args []string) error {
+            for _, arg := range args {
+                if len(arg) > 0 {
+                    return fmt.Errorf("%q does not take any arguments, got %q", cmd.CommandPath(), args)
+                }
+            }
+            return nil
+        },
 
         //...
 }
@@ -115,34 +115,37 @@ cc, sched, err := Setup(ctx, opts, registryOptions...)
 ```go
 // set defaults using scheme defaultFunc
 cfg, err := latest.Default()
+
+// componentConfig is the config of the current component(e.g. kubeScheduler) 
 opts.ComponentConfig = cfg
 
-// set command config
-//   create client, InformerFactory, DynInformerFactory
+// set command config, including
+//   common config: client, InformerFactory, DynInformerFactory, 
+//   ComponentConfig
 c, err := opts.Config(ctx)
 
 // make the config completed
 //   grant apiserver authrization to it
-cc := c.Complete()
 
+// set up the scheduler
 sched, err := scheduler.New(ctx,
-		cc.Client,
-		cc.InformerFactory,
-		cc.DynInformerFactory,
-		recorderFactory,
-		scheduler.WithComponentConfigVersion(cc.ComponentConfig.TypeMeta.APIVersion),
-		scheduler.WithKubeConfig(cc.KubeConfig),
-		scheduler.WithProfiles(cc.ComponentConfig.Profiles...),
-		scheduler.WithPercentageOfNodesToScore(cc.ComponentConfig.PercentageOfNodesToScore),
-		scheduler.WithFrameworkOutOfTreeRegistry(outOfTreeRegistry),
-		scheduler.WithPodMaxBackoffSeconds(cc.ComponentConfig.PodMaxBackoffSeconds),
-		scheduler.WithPodInitialBackoffSeconds(cc.ComponentConfig.PodInitialBackoffSeconds),
-		scheduler.WithPodMaxInUnschedulablePodsDuration(cc.PodMaxInUnschedulablePodsDuration),
-		scheduler.WithExtenders(cc.ComponentConfig.Extenders...),
-		scheduler.WithParallelism(cc.ComponentConfig.Parallelism),
-		scheduler.WithBuildFrameworkCapturer(func(profile kubeschedulerconfig.KubeSchedulerProfile) {
-			// Profiles are processed during Framework instantiation to set default plugins and configurations. Capturing them for logging
-			completedProfiles = append(completedProfiles, profile)
-		}),
-	)
+        cc.Client,
+        cc.InformerFactory,
+        cc.DynInformerFactory,
+        recorderFactory,
+        scheduler.WithComponentConfigVersion(cc.ComponentConfig.TypeMeta.APIVersion),
+        scheduler.WithKubeConfig(cc.KubeConfig),
+        scheduler.WithProfiles(cc.ComponentConfig.Profiles...),
+        scheduler.WithPercentageOfNodesToScore(cc.ComponentConfig.PercentageOfNodesToScore),
+        scheduler.WithFrameworkOutOfTreeRegistry(outOfTreeRegistry),
+        scheduler.WithPodMaxBackoffSeconds(cc.ComponentConfig.PodMaxBackoffSeconds),
+        scheduler.WithPodInitialBackoffSeconds(cc.ComponentConfig.PodInitialBackoffSeconds),
+        scheduler.WithPodMaxInUnschedulablePodsDuration(cc.PodMaxInUnschedulablePodsDuration),
+        scheduler.WithExtenders(cc.ComponentConfig.Extenders...),
+        scheduler.WithParallelism(cc.ComponentConfig.Parallelism),
+        scheduler.WithBuildFrameworkCapturer(func(profile kubeschedulerconfig.KubeSchedulerProfile) {
+            // Profiles are processed during Framework instantiation to set default plugins and configurations. Capturing them for logging
+            completedProfiles = append(completedProfiles, profile)
+        }),
+    )
 ```

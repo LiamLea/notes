@@ -32,6 +32,7 @@
 ### scheme
 
 * every package has its own **scheme** and **shcemeBuilder** which is used to build its own scheme
+* define when **import**
 
 #### 1.what is scheme
 
@@ -307,6 +308,7 @@ func init() {
 
 * **apiserver** creates a feature gate
 * **other** components **register** their related features to the apiserver featuregate
+* define when **import**
 
 #### 1.define FeatureGates
 
