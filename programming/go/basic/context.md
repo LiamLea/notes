@@ -9,13 +9,45 @@
     - [overview](#overview)
       - [1.basic](#1basic)
         - [(1) introduction](#1-introduction)
-        - [（2）`Background()`和`TODO()`](#2background和todo)
-        - [（3）withCancel、withDeadline、withTimeout、withValue](#3withcancel-withdeadline-withtimeout-withvalue)
+        - [(2) `Background()`和`TODO()`](#2-background和todo)
+        - [(3) withCancel、withDeadline、withTimeout、withValue](#3-withcancel-withdeadline-withtimeout-withvalue)
 
 <!-- /code_chunk_output -->
 
 
 ### overview
+
+* ![](./imgs/ctx_01.png)
+  * embed points to the cotext's parent
+
+* tree-like hierarchy
+  * `with<Function>(<parent_context>)` will create a **new child context**
+  * If the parent’s context is canceled, the child sees the cancellation
+  * if you cancel the child context (or it times out), this does not affect the parent
+* passed between different functions
+* `cancelCtx` has a channel which used to receive signal to cancel context
+  * other implements of context don't have a channel (i.e. Done() is nil)
+  * you can do what you want to do when you receive a signal from the channel
+* `Background()` and `TODO()` are `emptyCtx`, which can't cancel or do other things and their context interfaces are all nil
+  ```go
+  type emptyCtx struct{}
+
+  func (emptyCtx) Deadline() (deadline time.Time, ok bool) {
+    return
+  }
+
+  func (emptyCtx) Done() <-chan struct{} {
+    return nil
+  }
+
+  func (emptyCtx) Err() error {
+    return nil
+  }
+
+  func (emptyCtx) Value(key any) any {
+    return nil
+  }
+  ```
 
 #### 1.basic
 
@@ -26,7 +58,7 @@ The context is used to allow cancellation of requests, and potentially things li
 type Context interface {
   Deadline()(deadline time.Time, ok bool)
 
-  //when a context is canceled，the Done() channel will get the cancel signal
+  // when a context is canceled，the Done() channel will get the cancel signal
   Done() <-chan struct{}  
 
   Err() error
@@ -36,8 +68,8 @@ type Context interface {
 * Context type is used to carry deadlines,cancellation signals and other request-scoped values accross goroutines
 * when a Context is canceled,all Contexts derived from it are also canceled(means Done() channel will get a cancel signal)
 
-##### （2）`Background()`和`TODO()`
-这两个函数返回的是**empty** Context
+##### (2) `Background()`和`TODO()`
+这两个函数返回的是**empty** Context, so can't cancel the them
 
 * `Background()`
   * 返回一个context，主要用于main函数等，作为最顶层的Context（即根Context）
@@ -73,9 +105,10 @@ func queryDatabase(ctx context.Context) (string, error) {
 
 ```
 
-##### （3）withCancel、withDeadline、withTimeout、withValue
+##### (3) withCancel、withDeadline、withTimeout、withValue
 ```go
-//返回 Context 和 CancelFunc函数（用于取消当前context）
+// used to send signal to Done() channel actively
+// 返回 Context 和 CancelFunc函数（用于取消当前context）
 func withCancel(parent Context) (Context, CancelFunc)
 
 //设置一个超时时间（具体的时间点），即到了这个时间点，会触发CancelFunc()函数
