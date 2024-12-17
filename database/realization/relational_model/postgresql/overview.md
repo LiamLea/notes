@@ -17,6 +17,9 @@
       - [3.查询](#3查询)
         - [(1) list users and roles](#1-list-users-and-roles)
       - [4.授权](#4授权)
+      - [5.check roles and privileges](#5check-roles-and-privileges)
+        - [(1) check user and role](#1-check-user-and-role)
+        - [(2) check privileges of a role](#2-check-privileges-of-a-role)
 
 <!-- /code_chunk_output -->
 
@@ -177,3 +180,23 @@ ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT USAGE, S
 ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO aiops_readwrite;
 ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO aiops_readwrite;
 ```
+
+#### 5.check roles and privileges
+
+##### (1) check user and role
+
+* connect pgsql -> Server Objects -> roles
+  * icon with a hat is a role, otherwise is a user
+
+##### (2) check privileges of a role
+* `<database>` -> information_schema -> views
+  * `role_table_grants`
+    * check permissions of every role on every table
+  * `role_usage_grants`
+    * check permissions of every role on every sequence (public/sequences)
+* `<database>` -> pg_catalog -> tables
+  * `pg_default_acl`
+    * check default privileges of an database
+* `<database>` -> pg_catalog -> views
+  * `pg_tables`
+    * check the owner of every table
