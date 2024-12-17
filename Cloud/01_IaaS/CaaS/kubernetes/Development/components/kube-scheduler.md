@@ -10,8 +10,9 @@
       - [1.build command and do some initialization](#1build-command-and-do-some-initialization)
         - [(1) register component](#1-register-component)
       - [2.run command](#2run-command)
-      - [3.runs the scheduler](#3runs-the-scheduler)
+      - [3.run the scheduler](#3run-the-scheduler)
         - [(1) setup a scheduler](#1-setup-a-scheduler)
+        - [(2) run basic services](#2-run-basic-services)
 
 <!-- /code_chunk_output -->
 
@@ -102,7 +103,7 @@ c.initCompleteCmd(args)
             },
     ```
 
-#### 3.runs the scheduler
+#### 3.run the scheduler
 
 ##### (1) setup a scheduler
 
@@ -120,12 +121,13 @@ cfg, err := latest.Default()
 opts.ComponentConfig = cfg
 
 // set command config, including
-//   common config: client, InformerFactory, DynInformerFactory, 
+//   common config: client, EventBroadcaster, InformerFactory, DynInformerFactory
 //   ComponentConfig
 c, err := opts.Config(ctx)
 
 // make the config completed
 //   grant apiserver authrization to it
+cc := c.Complete()
 
 // set up the scheduler
 sched, err := scheduler.New(ctx,
@@ -148,4 +150,46 @@ sched, err := scheduler.New(ctx,
             completedProfiles = append(completedProfiles, profile)
         }),
     )
+```
+
+##### (2) run basic services
+
+```go
+// Start events processing pipeline.
+cc.EventBroadcaster.StartRecordingToSink(ctx.Done())
+defer cc.EventBroadcaster.Shutdown()
+
+// Start up the healthz server.
+
+
+// start informerss
+startInformersAndWaitForSync := func(ctx context.Context) {
+    // Start all informers.
+    cc.InformerFactory.Start(ctx.Done())
+    // DynInformerFactory can be nil in tests.
+    if cc.DynInformerFactory != nil {
+        cc.DynInformerFactory.Start(ctx.Done())
+    }
+
+    // Wait for all caches to sync before scheduling.
+    cc.InformerFactory.WaitForCacheSync(ctx.Done())
+    // DynInformerFactory can be nil in tests.
+    if cc.DynInformerFactory != nil {
+        cc.DynInformerFactory.WaitForCacheSync(ctx.Done())
+    }
+
+    // Wait for all handlers to sync (all items in the initial list delivered) before scheduling.
+    if err := sched.WaitForHandlersSync(ctx); err != nil {
+        logger.Error(err, "waiting for handlers to sync")
+    }
+
+    close(handlerSyncReadyCh)
+    logger.V(3).Info("Handlers synced")
+}
+if !cc.ComponentConfig.DelayCacheUntilActive || cc.LeaderElection == nil {
+    startInformersAndWaitForSync(ctx)
+}
+
+// start scheduler
+sched.Run(ctx)
 ```

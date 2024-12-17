@@ -21,6 +21,12 @@
       - [1.define FeatureGates](#1define-featuregates)
         - [(1) new FeatureGates in apiserver](#1-new-featuregates-in-apiserver)
         - [(2) register features to FeatureGates](#2-register-features-to-featuregates)
+    - [Event](#event)
+      - [1.EventBroadcaster (receive events from the component)](#1eventbroadcaster-receive-events-from-the-component)
+        - [(1) what](#1-what)
+        - [(2) create a new event Broadcaster](#2-create-a-new-event-broadcaster)
+      - [2.watchers](#2watchers)
+      - [3.recordToSink (write events to apiserver)](#3recordtosink-write-events-to-apiserver)
 
 <!-- /code_chunk_output -->
 
@@ -149,18 +155,18 @@ func convertFieldLabel(label, value string) (string, string, error) {
 * e.g. scheduler package
 ```go
 func RegisterDefaults(scheme *runtime.Scheme) error {
-	scheme.AddTypeDefaultingFunc(&v1.DefaultPreemptionArgs{}, func(obj interface{}) { SetObjectDefaults_DefaultPreemptionArgs(obj.(*v1.DefaultPreemptionArgs)) })
-	scheme.AddTypeDefaultingFunc(&v1.InterPodAffinityArgs{}, func(obj interface{}) { SetObjectDefaults_InterPodAffinityArgs(obj.(*v1.InterPodAffinityArgs)) })
-	scheme.AddTypeDefaultingFunc(&v1.KubeSchedulerConfiguration{}, func(obj interface{}) {
-		SetObjectDefaults_KubeSchedulerConfiguration(obj.(*v1.KubeSchedulerConfiguration))
-	})
-	scheme.AddTypeDefaultingFunc(&v1.NodeResourcesBalancedAllocationArgs{}, func(obj interface{}) {
-		SetObjectDefaults_NodeResourcesBalancedAllocationArgs(obj.(*v1.NodeResourcesBalancedAllocationArgs))
-	})
-	scheme.AddTypeDefaultingFunc(&v1.NodeResourcesFitArgs{}, func(obj interface{}) { SetObjectDefaults_NodeResourcesFitArgs(obj.(*v1.NodeResourcesFitArgs)) })
-	scheme.AddTypeDefaultingFunc(&v1.PodTopologySpreadArgs{}, func(obj interface{}) { SetObjectDefaults_PodTopologySpreadArgs(obj.(*v1.PodTopologySpreadArgs)) })
-	scheme.AddTypeDefaultingFunc(&v1.VolumeBindingArgs{}, func(obj interface{}) { SetObjectDefaults_VolumeBindingArgs(obj.(*v1.VolumeBindingArgs)) })
-	return nil
+    scheme.AddTypeDefaultingFunc(&v1.DefaultPreemptionArgs{}, func(obj interface{}) { SetObjectDefaults_DefaultPreemptionArgs(obj.(*v1.DefaultPreemptionArgs)) })
+    scheme.AddTypeDefaultingFunc(&v1.InterPodAffinityArgs{}, func(obj interface{}) { SetObjectDefaults_InterPodAffinityArgs(obj.(*v1.InterPodAffinityArgs)) })
+    scheme.AddTypeDefaultingFunc(&v1.KubeSchedulerConfiguration{}, func(obj interface{}) {
+        SetObjectDefaults_KubeSchedulerConfiguration(obj.(*v1.KubeSchedulerConfiguration))
+    })
+    scheme.AddTypeDefaultingFunc(&v1.NodeResourcesBalancedAllocationArgs{}, func(obj interface{}) {
+        SetObjectDefaults_NodeResourcesBalancedAllocationArgs(obj.(*v1.NodeResourcesBalancedAllocationArgs))
+    })
+    scheme.AddTypeDefaultingFunc(&v1.NodeResourcesFitArgs{}, func(obj interface{}) { SetObjectDefaults_NodeResourcesFitArgs(obj.(*v1.NodeResourcesFitArgs)) })
+    scheme.AddTypeDefaultingFunc(&v1.PodTopologySpreadArgs{}, func(obj interface{}) { SetObjectDefaults_PodTopologySpreadArgs(obj.(*v1.PodTopologySpreadArgs)) })
+    scheme.AddTypeDefaultingFunc(&v1.VolumeBindingArgs{}, func(obj interface{}) { SetObjectDefaults_VolumeBindingArgs(obj.(*v1.VolumeBindingArgs)) })
+    return nil
 }
 ```
 
@@ -282,12 +288,12 @@ func (s *Scheme) AddKnownTypeWithName(gvk schema.GroupVersionKind, obj Object) {
     //...
     
     s.AddGeneratedConversionFunc(obj, obj, func(a, b interface{}, scope conversion.Scope) error {
-			// copy a to b
-			reflect.ValueOf(a).MethodByName("DeepCopyInto").Call([]reflect.Value{reflect.ValueOf(b)})
-			// clear TypeMeta to match legacy reflective conversion
-			b.(Object).GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{})
-			return nil
-		});
+            // copy a to b
+            reflect.ValueOf(a).MethodByName("DeepCopyInto").Call([]reflect.Value{reflect.ValueOf(b)})
+            // clear TypeMeta to match legacy reflective conversion
+            b.(Object).GetObjectKind().SetGroupVersionKind(schema.GroupVersionKind{})
+            return nil
+        });
 }
 ```
 
@@ -295,10 +301,10 @@ func (s *Scheme) AddKnownTypeWithName(gvk schema.GroupVersionKind, obj Object) {
     * `import "k8s.io/kubernetes/pkg/scheduler/apis/config/v1"`
 ```go
 func init() {
-	// We only register manually written functions here. The registration of the
-	// generated functions takes place in the generated files. The separation
-	// makes the code compile even when the generated files are missing.
-	localSchemeBuilder.Register(addDefaultingFuncs)
+    // We only register manually written functions here. The registration of the
+    // generated functions takes place in the generated files. The separation
+    // makes the code compile even when the generated files are missing.
+    localSchemeBuilder.Register(addDefaultingFuncs)
 }
 ```
 
@@ -319,15 +325,15 @@ func init() {
 
 ```go
 var (
-	// DefaultMutableFeatureGate is a mutable version of DefaultFeatureGate.
-	// Only top-level commands/options setup and the k8s.io/component-base/featuregate/testing package should make use of this.
-	// Tests that need to modify feature gates for the duration of their test should use:
-	//   featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.<FeatureName>, <value>)
-	DefaultMutableFeatureGate featuregate.MutableVersionedFeatureGate = featuregate.NewFeatureGate()
+    // DefaultMutableFeatureGate is a mutable version of DefaultFeatureGate.
+    // Only top-level commands/options setup and the k8s.io/component-base/featuregate/testing package should make use of this.
+    // Tests that need to modify feature gates for the duration of their test should use:
+    //   featuregatetesting.SetFeatureGateDuringTest(t, utilfeature.DefaultFeatureGate, features.<FeatureName>, <value>)
+    DefaultMutableFeatureGate featuregate.MutableVersionedFeatureGate = featuregate.NewFeatureGate()
 
-	// DefaultFeatureGate is a shared global FeatureGate.
-	// Top-level commands/options setup that needs to modify this feature gate should use DefaultMutableFeatureGate.
-	DefaultFeatureGate featuregate.FeatureGate = DefaultMutableFeatureGate
+    // DefaultFeatureGate is a shared global FeatureGate.
+    // Top-level commands/options setup that needs to modify this feature gate should use DefaultMutableFeatureGate.
+    DefaultFeatureGate featuregate.FeatureGate = DefaultMutableFeatureGate
 )
 ```
 
@@ -340,8 +346,8 @@ import (
     utilfeature "k8s.io/apiserver/pkg/util/feature"
 )
 func init() {
-	runtime.Must(utilfeature.DefaultMutableFeatureGate.Add(defaultKubernetesFeatureGates))
-	runtime.Must(utilfeature.DefaultMutableFeatureGate.AddVersioned(defaultVersionedKubernetesFeatureGates))
+    runtime.Must(utilfeature.DefaultMutableFeatureGate.Add(defaultKubernetesFeatureGates))
+    runtime.Must(utilfeature.DefaultMutableFeatureGate.AddVersioned(defaultVersionedKubernetesFeatureGates))
 }
 ```
 
@@ -349,9 +355,200 @@ func init() {
 ```go
 var defaultKubernetesFeatureGates = map[featuregate.Feature]featuregate.FeatureSpec{
 
-	AnonymousAuthConfigurableEndpoints: {Default: false, PreRelease: featuregate.Alpha},
+    AnonymousAuthConfigurableEndpoints: {Default: false, PreRelease: featuregate.Alpha},
 
-	AggregatedDiscoveryEndpoint: {Default: true, PreRelease: featuregate.GA, LockToDefault: true}, // remove in 1.33
+    AggregatedDiscoveryEndpoint: {Default: true, PreRelease: featuregate.GA, LockToDefault: true}, // remove in 1.33
 
+}
+```
+
+***
+
+### Event
+
+![](./imgs/event_01.png)
+
+#### 1.EventBroadcaster (receive events from the component)
+
+##### (1) what
+* get events from `incoming` channel in a loop
+* distribute events to watchers: `m.distribute(event)`
+
+##### (2) create a new event Broadcaster
+* start a loop goroutine to **reveive** events and **distribute** these events to **broadcatser watchers**
+
+```go
+func NewBroadcaster(queueLength int, fullChannelBehavior FullChannelBehavior) *Broadcaster {
+    m := &Broadcaster{
+        watchers:            map[int64]*broadcasterWatcher{},
+        incoming:            make(chan Event, incomingQueueLength),
+        stopped:             make(chan struct{}),
+        watchQueueLength:    queueLength,
+        fullChannelBehavior: fullChannelBehavior,
+    }
+    m.distributing.Add(1)
+
+    // start a loop goroutine
+    go m.loop()
+    
+    return m
+}
+```
+
+```go
+// loop receives from m.incoming and distributes to all watchers.
+func (m *Broadcaster) loop() {
+    // Deliberately not catching crashes here. Yes, bring down the process if there's a
+    // bug in watch.Broadcaster.
+    for event := range m.incoming {
+        if event.Type == internalRunFunctionMarker {
+            event.Object.(functionFakeRuntimeObject)()
+            continue
+        }
+        m.distribute(event)
+    }
+    m.closeAll()
+    m.distributing.Done()
+}
+```
+
+* blockQueue was used to wait for the function to be done
+    * events are not able to be pushed into the channel util the function being done
+```go
+func (m *Broadcaster) blockQueue(f func()) {
+    m.incomingBlock.Lock()
+    defer m.incomingBlock.Unlock()
+    select {
+    case <-m.stopped:
+        return
+    default:
+    }
+    var wg sync.WaitGroup
+    wg.Add(1)
+    m.incoming <- Event{
+        Type: internalRunFunctionMarker,
+        Object: functionFakeRuntimeObject(func() {
+            defer wg.Done()
+            f()
+        }),
+    }
+    wg.Wait()
+}
+```
+
+#### 2.watchers
+```go
+func (e *eventBroadcasterImpl) startRecordingEvents(ctx context.Context) error {
+    eventHandler := func(obj runtime.Object) {
+        event, ok := obj.(*eventsv1.Event)
+        if !ok {
+            klog.FromContext(ctx).Error(nil, "unexpected type, expected eventsv1.Event")
+            return
+        }
+        e.recordToSink(ctx, event, clock.RealClock{})
+    }
+    stopWatcher, err := e.StartEventWatcher(eventHandler)
+    if err != nil {
+        return err
+    }
+    go func() {
+        <-ctx.Done()
+        stopWatcher()
+    }()
+    return nil
+}
+```
+```go
+func (e *eventBroadcasterImpl) StartEventWatcher(eventHandler func(event runtime.Object)) (func(), error) {
+    // add watchers to EventBroadcaster
+    watcher, err := e.Watch()
+    if err != nil {
+        return nil, err
+    }
+
+    // start watchers
+    go func() {
+        defer utilruntime.HandleCrash()
+        for {
+            watchEvent, ok := <-watcher.ResultChan()
+            if !ok {
+                return
+            }
+            eventHandler(watchEvent.Object)
+        }
+    }()
+    return watcher.Stop, nil
+}
+```
+* add watchers to EventBroadcaster
+```go
+func (m *Broadcaster) Watch() (Interface, error) {
+    var w *broadcasterWatcher
+    m.blockQueue(func() {
+        id := m.nextWatcher
+        m.nextWatcher++
+        w = &broadcasterWatcher{
+            result:  make(chan Event, m.watchQueueLength),
+            stopped: make(chan struct{}),
+            id:      id,
+            m:       m,
+        }
+        m.watchers[id] = w
+    })
+    if w == nil {
+        return nil, fmt.Errorf("broadcaster already stopped")
+    }
+    return w, nil
+}
+```
+
+#### 3.recordToSink (write events to apiserver)
+
+```go
+func (e *eventBroadcasterImpl) startRecordingEvents(ctx context.Context) error {
+    //...
+    e.recordToSink(ctx, event, clock.RealClock{})
+    //...
+}
+```
+
+```go
+func (e *eventBroadcasterImpl) recordToSink(ctx context.Context, event *eventsv1.Event, clock clock.Clock) {
+    //...
+    e.attemptRecording(ctx, evToRecord)
+    //...
+}
+```
+```go
+func (e *eventBroadcasterImpl) attemptRecording(ctx context.Context, event *eventsv1.Event) {
+    tries := 0
+    for {
+        if _, retry := recordEvent(ctx, e.sink, event); !retry {
+            return
+        }
+        //...
+    }
+}
+```
+```go
+func recordEvent(ctx context.Context, sink EventSink, event *eventsv1.Event) (*eventsv1.Event, bool) {
+    //...
+    newEvent, err = sink.Create(ctx, event)
+    //...
+}
+```
+```go
+// staging/src/k8s.io/client-go/gentype/type.go
+
+func (c *Client[T]) Create(ctx context.Context, obj T, opts metav1.CreateOptions) (T, error) {
+    result := c.newObject()
+    err := c.client.Post().
+        NamespaceIfScoped(c.namespace, c.namespace != "").
+        Resource(c.resource).
+        VersionedParams(&opts, c.parameterCodec).
+        Body(obj).
+        Do(ctx).
+        Into(result)
+    return result, err
 }
 ```

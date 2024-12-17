@@ -58,7 +58,7 @@ The context is used to allow cancellation of requests, and potentially things li
 type Context interface {
   Deadline()(deadline time.Time, ok bool)
 
-  // when a context is canceled，the Done() channel will get the cancel signal
+  // return a channel which is used to receive cancel signal
   Done() <-chan struct{}  
 
   Err() error

@@ -11,6 +11,7 @@
       - [2.Package-Level Variables (go)](#2package-level-variables-go)
       - [3.watch Package-Level Variables](#3watch-package-level-variables)
       - [4.pay attention to stack trace and gorutines](#4pay-attention-to-stack-trace-and-gorutines)
+      - [5. skip breakpoints when using reflection (unless step into)](#5-skip-breakpoints-when-using-reflection-unless-step-into)
 
 <!-- /code_chunk_output -->
 
@@ -60,3 +61,12 @@ e.g. `"k8s.io/apiserver/pkg/util/version".DefaultComponentGlobalsRegistry`
 
 #### 4.pay attention to stack trace and gorutines
 ![](./imgs/dg_03.png)
+
+#### 5. skip breakpoints when using reflection (unless step into)
+* e.g.
+    * call func using reflection
+        ```go
+        event.Object.(func())()
+        ```
+    * `event.Object` is a func
+    * if i set breakpoints in the func, it will skip these breakpoints if i **step into** `event.Object.(func())()`
