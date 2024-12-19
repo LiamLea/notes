@@ -12,6 +12,7 @@
       - [3.watch Package-Level Variables](#3watch-package-level-variables)
       - [4.pay attention to stack trace and gorutines](#4pay-attention-to-stack-trace-and-gorutines)
       - [5. skip breakpoints when using reflection (unless step into)](#5-skip-breakpoints-when-using-reflection-unless-step-into)
+      - [6.set breakpoints for goroutine](#6set-breakpoints-for-goroutine)
 
 <!-- /code_chunk_output -->
 
@@ -70,3 +71,14 @@ e.g. `"k8s.io/apiserver/pkg/util/version".DefaultComponentGlobalsRegistry`
         ```
     * `event.Object` is a func
     * if i set breakpoints in the func, it will skip these breakpoints if i **step into** `event.Object.(func())()`
+
+#### 6.set breakpoints for goroutine
+
+* must also set breakpoints at the entrypoint of the function
+    ```go
+    go func() {
+        defer f.wg.Done()
+        informer.Run(stopCh) //set breakpoints here not working
+    }()
+    ```
+    * you must also set breakpoints at `func Run(...)`

@@ -22,7 +22,7 @@
       - [7.定义一个新的类型：type](#7定义一个新的类型type)
       - [8.new和make](#8new和make)
       - [9.反射:`reflect` (本质: 根据字符串获取对象)](#9反射reflect-本质-根据字符串获取对象)
-      - [10.范型和interface{}](#10范型和interface)
+      - [10.generics vs interfaces](#10generics-vs-interfaces)
       - [11.exported (private)](#11exported-private)
 
 <!-- /code_chunk_output -->
@@ -238,18 +238,33 @@ reflect.TypeOf(xx)    //获取对象的类型等信息
 reflect.ValueOf(xx)   //获取对象的值
 ```
 
-#### 10.范型和interface{}
-* interface{} 类型不能比较大小
-* 范型是对interface{}的扩展： 能使得其支持具体类型的操作
-  * 比如支持比较大小的操作
-    ```go
-    func compare[T constraints.Ordered](a, b T) {
-        // works
-        if a > b {
-            fmt.Printf("%v is bigger than %v", a, b)
-        }
-    }
-    ```
+#### 10.generics vs interfaces
+* generics
+  * When you need to write **type-safe** code that works with **multiple types** without duplicating code, and the type is known at **compile time**
+```go
+package main
+
+import (
+	"fmt"
+	"golang.org/x/exp/constraints"
+)
+
+// Sum is a generic function that only works with numeric types
+// The constraint restricts T to types that are numeric (int, float64, etc.)
+func Sum[T constraints.Integer | constraints.Float](a T, b T) T {
+	return a + b
+}
+
+func main() {
+	// Works with integer types
+	resultInt := Sum(10, 20)
+	fmt.Println("Sum of integers:", resultInt) // Output: 30
+
+	// Works with float64 types
+	resultFloat := Sum(3.14, 2.86)
+	fmt.Println("Sum of floats:", resultFloat) // Output: 6.00
+}
+```
 
 #### 11.exported (private)
 

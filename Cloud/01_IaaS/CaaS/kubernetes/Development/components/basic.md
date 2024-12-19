@@ -22,7 +22,7 @@
         - [(1) new FeatureGates in apiserver](#1-new-featuregates-in-apiserver)
         - [(2) register features to FeatureGates](#2-register-features-to-featuregates)
     - [Event](#event)
-      - [1.EventBroadcaster (receive events from the component)](#1eventbroadcaster-receive-events-from-the-component)
+      - [1.EventBroadcaster (receive events from the component itself)](#1eventbroadcaster-receive-events-from-the-component-itself)
         - [(1) what](#1-what)
         - [(2) create a new event Broadcaster](#2-create-a-new-event-broadcaster)
       - [2.watchers](#2watchers)
@@ -368,7 +368,7 @@ var defaultKubernetesFeatureGates = map[featuregate.Feature]featuregate.FeatureS
 
 ![](./imgs/event_01.png)
 
-#### 1.EventBroadcaster (receive events from the component)
+#### 1.EventBroadcaster (receive events from the component itself)
 
 ##### (1) what
 * get events from `incoming` channel in a loop
