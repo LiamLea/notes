@@ -171,7 +171,7 @@ startInformersAndWaitForSync := func(ctx context.Context) {
         cc.DynInformerFactory.Start(ctx.Done())
     }
 
-    // Wait for all caches to sync before scheduling.
+    // WaitForCacheSync blocks until all started informers' caches were synced
     cc.InformerFactory.WaitForCacheSync(ctx.Done())
     // DynInformerFactory can be nil in tests.
     if cc.DynInformerFactory != nil {
