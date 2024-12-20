@@ -12,7 +12,6 @@
       - [3.Watch](#3watch)
         - [(1) how watch](#1-how-watch)
         - [(2) watch output](#2-watch-output)
-        - [(3) watch resync](#3-watch-resync)
       - [4.listWatch](#4listwatch)
 
 <!-- /code_chunk_output -->
@@ -175,12 +174,6 @@ case sw.result <- Event{
     * BOOKMARK
         * Bookmarks are intended to let the client know that the server has sent the client all events up to the resourceVersion specified in the Bookmark event. This is to make sure that if the watch on the client side fails or the channel closes (after timeout), the client can resume the watch from resourceVersion last returned in the Bookmark event. It's more like a **checkpoint** event in the absence of real mutating events like Added, Modified, Deleted
     * ERROR
-
-##### (3) watch resync
-* resync
-    * 就是将cache中的events重新放入队列，让controller重新处理
-    * why
-        * Imagine a controller that manages pods and ensures each pod is assigned to a specific network security group. An event (like Update or Add) will trigger the controller to handle the assignment of the security group. However, if a pod is manually modified outside of Kubernetes (e.g., by an external system), no event is generated, and the controller will be unaware of the change. A periodic resync allows the controller to recheck all pods, catch discrepancies, and ensure the security group assignments are correct.
 
 #### 4.listWatch
 * `staging/src/k8s.io/client-go/gentype/type.go`
