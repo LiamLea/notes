@@ -18,9 +18,6 @@
         - [(4) Field and Label Selectors](#4-field-and-label-selectors)
         - [(5) API Error Handling](#5-api-error-handling)
         - [(6) Miscellaneous Utils](#6-miscellaneous-utils)
-      - [3.client-go](#3client-go)
-        - [(1) client](#1-client)
-        - [(2) informer](#2-informer)
 
 <!-- /code_chunk_output -->
 
@@ -154,49 +151,3 @@ if !errors.IsNotFound(err) {
 * pkg: `apimachinery/pkg/util`
     * `util/wait`: eases the task of waiting for resources to appear or to be gone, with retries and proper backoff/jitter implementation
     * `util/yaml`: unmarshal YAML or convert it into JSON
-
-#### 3.client-go
-
-Clientset, Informers, Cache, Scheme, Discovery,
-
-##### (1) client
-
-![](./imgs/ov_03.png)
-
-* RestClient
-    * 是最基础的客户端，它基于HTTP请求进行了封装
-* ClientSet
-    * 基于RestClient的封装，是多个客户端的集合
-    * 在操作资源对象时，需要指定Group和Version
-    * 不支持自定义资源定义（CRDs）
-* DynamicClient
-    * 可以对任何资源进行RESTful操作，包括CRD
-    * 返回的对象是一个map[string]interface{}
-    * 将Resource（例如PodList）转换为unstructured类型
-* DiscoveryClient
-    * 用于发现 API Server 支持的资源组、资源版本和资源信息
-
-##### (2) informer
-![](./imgs/ov_04.png)
-
-* informer
-    * 负责监听Kubernetes API资源对象的变化，如创建、更新、删除等操作
-    * 并将这些变化通知给indexer进行索引和**缓存**
-* indexer
-    * 将API对象进行索引，以便在需要时快速地访问它们
-    * 可以维护一个特定资源的本地缓存，例如pod、namespace等。这种方法省去了每次get pod都要访问api-server的过程，从而减小了api-server的压力
-* lister
-    * 对indexer的封装，提供了一种简单的方式来获取已经索引的对象列表
-
-* resync vs relist
-    * resync
-        * 就是将cache中的events重新放入队列，让controller重新处理
-        * why
-            * Imagine a controller that manages pods and ensures each pod is assigned to a specific network security group. An event (like Update or Add) will trigger the controller to handle the assignment of the security group. However, if a pod is manually modified outside of Kubernetes (e.g., by an external system), no event is generated, and the controller will be unaware of the change. A periodic resync allows the controller to recheck all pods, catch discrepancies, and ensure the security group assignments are correct.
-
-    * relist
-        * 重新调用api server获取缓存
-        * why
-            * Watch Connection Loss, Watch Expiration, Missed Events
-
-    * A resync is different than a relist. The resync plays back all the events held in the informer cache. A relist hits the API server to re-get all the data.
