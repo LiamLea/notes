@@ -129,7 +129,11 @@ c, err := opts.Config(ctx)
 //   grant apiserver authrization to it
 cc := c.Complete()
 
-// set up the scheduler and complement some configs (such as add informers to informer factory)
+/*
+set up the scheduler and complement some configs, such as 
+    * add informers to informer factory
+    * add eventhandlers
+*/
 sched, err := scheduler.New(ctx,
         cc.Client,
         cc.InformerFactory,

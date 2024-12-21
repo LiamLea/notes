@@ -195,7 +195,16 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
         ```
 
 ##### (7) processor (EventHandler)
-* sharedProcessor has a collection of processorListener and can distribute a notification object to its listeners
+* every informer has a **processor** which has listeners
+* controller(reconcile) will distribute notification objects to its listeners
+* how
+    * controller (reflector) distribute notificaiton objects to processor's listeners
+    * listen add notification objects to addCh
+    * if nextCh is not **full**:
+        * get notification objects from **unbounded buffer** to nextCh
+    * otherwise:
+        * pop notification objects from addCh and write it to **unbounded buffer**
+    * receive notification objects from nextCh and call processor's eventhandlers
 
 #### 2.define informers
 
@@ -332,18 +341,18 @@ type DeltaFIFO struct {
 ##### (1) delta
 ```go
 const (
-	Added   DeltaType = "Added"
-	Updated DeltaType = "Updated"
-	Deleted DeltaType = "Deleted"
-	// Replaced is emitted when we encountered watch errors and had to do a
-	// relist. We don't know if the replaced object has changed.
-	//
-	// NOTE: Previous versions of DeltaFIFO would use Sync for Replace events
-	// as well. Hence, Replaced is only emitted when the option
-	// EmitDeltaTypeReplaced is true.
-	Replaced DeltaType = "Replaced"
-	// Sync is for synthetic events during a periodic resync.
-	Sync DeltaType = "Sync"
+    Added   DeltaType = "Added"
+    Updated DeltaType = "Updated"
+    Deleted DeltaType = "Deleted"
+    // Replaced is emitted when we encountered watch errors and had to do a
+    // relist. We don't know if the replaced object has changed.
+    //
+    // NOTE: Previous versions of DeltaFIFO would use Sync for Replace events
+    // as well. Hence, Replaced is only emitted when the option
+    // EmitDeltaTypeReplaced is true.
+    Replaced DeltaType = "Replaced"
+    // Sync is for synthetic events during a periodic resync.
+    Sync DeltaType = "Sync"
 )
 ```
 * e.g. delta: add a pod 
@@ -356,10 +365,7 @@ const (
 
 ##### (2) resync
 
-trigger the **event handlers** again
-
-* resync to ensure the informer's cache is up-to-date
-    * informer could potentially miss events due to network or processing issues
+* trigger the **event handlers** again (ensure the process of every event in case of process interruption)
     * if `resyncPeriod=0`, don't sync
     * only sync knownObjects
 ```go
@@ -482,7 +488,7 @@ func (r *Reflector) Run(stopCh <-chan struct{}) {
 
 * pop object from delta FIFO queue to 
     * its informer's indexer store
-    * eventhandler
+    * sharedIndexInformer eventhandler
         * distribute it to processor's listeners
 ```go
 func processDeltas(
@@ -524,30 +530,146 @@ func processDeltas(
 ```go
 // Conforms to ResourceEventHandler
 func (s *sharedIndexInformer) OnAdd(obj interface{}, isInInitialList bool) {
-	// Invocation of this function is locked under s.blockDeltas, so it is
-	// save to distribute the notification
-	s.cacheMutationDetector.AddObject(obj)
-	s.processor.distribute(addNotification{newObj: obj, isInInitialList: isInInitialList}, false)
+    // Invocation of this function is locked under s.blockDeltas, so it is
+    // save to distribute the notification
+    s.cacheMutationDetector.AddObject(obj)
+    s.processor.distribute(addNotification{newObj: obj, isInInitialList: isInInitialList}, false)
 }
 ```
 ```go
 func (p *sharedProcessor) distribute(obj interface{}, sync bool) {
-	p.listenersLock.RLock()
-	defer p.listenersLock.RUnlock()
+    p.listenersLock.RLock()
+    defer p.listenersLock.RUnlock()
 
-	for listener, isSyncing := range p.listeners {
-		switch {
-		case !sync:
-			// non-sync messages are delivered to every listener
-			listener.add(obj)
-		case isSyncing:
-			// sync messages are delivered to every syncing listener
-			listener.add(obj)
-		default:
-			// skipping a sync obj for a non-syncing listener
-		}
-	}
+    for listener, isSyncing := range p.listeners {
+        switch {
+        case !sync:
+            // non-sync messages are delivered to every listener
+            listener.add(obj)
+        case isSyncing:
+            // sync messages are delivered to every syncing listener
+            listener.add(obj)
+        default:
+            // skipping a sync obj for a non-syncing listener
+        }
+    }
 }
 ```
 
 ##### (2) start informer's processor
+```go
+func (p *sharedProcessor) run(stopCh <-chan struct{}) {
+    func() {
+        p.listenersLock.RLock()
+        defer p.listenersLock.RUnlock()
+        for listener := range p.listeners {
+            p.wg.Start(listener.run)
+            p.wg.Start(listener.pop)
+        }
+        p.listenersStarted = true
+    }()
+    <-stopCh
+
+    p.listenersLock.Lock()
+    defer p.listenersLock.Unlock()
+    for listener := range p.listeners {
+        close(listener.addCh) // Tell .pop() to stop. .pop() will tell .run() to stop
+    }
+
+    // Wipe out list of listeners since they are now closed
+    // (processorListener cannot be re-used)
+    p.listeners = nil
+
+    // Reset to false since no listeners are running
+    p.listenersStarted = false
+
+    p.wg.Wait() // Wait for all .pop() and .run() to stop
+}
+```
+
+* notification object -> lisenter -> addCh
+```go
+listener.add(obj)
+```
+```go
+func (p *processorListener) add(notification interface{}) {
+    if a, ok := notification.(addNotification); ok && a.isInInitialList {
+        p.syncTracker.Start()
+    }
+    p.addCh <- notification
+}
+```
+
+* addCh -> nextCh
+    * if nextCh is not **full**:
+        * get notification objects from **unbounded buffer** to nextCh
+    * otherwise:
+        * pop notification objects from addCh and write it to **unbounded buffer**
+```go
+p.wg.Start(listener.pop)
+```
+```go
+func (p *processorListener) pop() {
+    defer utilruntime.HandleCrash()
+    defer close(p.nextCh) // Tell .run() to stop
+
+    var nextCh chan<- interface{}
+    var notification interface{}
+    for {
+        select {
+        case nextCh <- notification:
+            // Notification dispatched
+            var ok bool
+            notification, ok = p.pendingNotifications.ReadOne()
+            if !ok { // Nothing to pop
+                nextCh = nil // Disable this select case
+            }
+        case notificationToAdd, ok := <-p.addCh:
+            if !ok {
+                return
+            }
+            if notification == nil { // No notification to pop (and pendingNotifications is empty)
+                // Optimize the case - skip adding to pendingNotifications
+                notification = notificationToAdd
+                nextCh = p.nextCh
+            } else { // There is already a notification waiting to be dispatched
+                p.pendingNotifications.WriteOne(notificationToAdd)
+            }
+        }
+    }
+}
+```
+* nextCh -> processor's eventhandlers
+    * every component has its own eventhandlers
+        * e.g. kube-scheduler: `pkg/scheduler/eventhandlers.go:func addAllEventHandlers`
+```go
+p.wg.Start(listener.run)
+```
+```go
+func (p *processorListener) run() {
+    // this call blocks until the channel is closed.  When a panic happens during the notification
+    // we will catch it, **the offending item will be skipped!**, and after a short delay (one second)
+    // the next notification will be attempted.  This is usually better than the alternative of never
+    // delivering again.
+    stopCh := make(chan struct{})
+    wait.Until(func() {
+        for next := range p.nextCh {
+            switch notification := next.(type) {
+            case updateNotification:
+                p.handler.OnUpdate(notification.oldObj, notification.newObj)
+            case addNotification:
+                p.handler.OnAdd(notification.newObj, notification.isInInitialList)
+                if notification.isInInitialList {
+                    p.syncTracker.Finished()
+                }
+            case deleteNotification:
+                p.handler.OnDelete(notification.oldObj)
+            default:
+                utilruntime.HandleError(fmt.Errorf("unrecognized notification: %T", next))
+            }
+        }
+        // the only way to get here is if the p.nextCh is empty and closed
+        close(stopCh)
+    }, 1*time.Second, stopCh)
+}
+```
