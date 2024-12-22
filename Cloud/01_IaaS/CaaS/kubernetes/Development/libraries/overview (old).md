@@ -59,6 +59,10 @@ $ kubectl get --raw /api | python -m json.tool
 
 #### 2.library
 
+* `k8s.io/apimachinery`
+    * brings lower-level building blocks and common API functionality like serialization, type conversion, or error handling
+        *  lower-level data structures: apiVersion, kind, name, uid, ownerReferences, creationTimestamp    
+
 * `k8s.io/api`
     * defines Go structs for the Kubernetes Objects
         * higher-level types like Deployments, Secrets, or Pods
@@ -66,10 +70,6 @@ $ kubectl get --raw /api | python -m json.tool
         * Huge - 1000+ structs describing Kubernetes API objects.
         * Simple - almost no algorithms, only "dumb" data structures.
         * Useful - its data types are used by clients, servers, controllers, etc.
-
-* `k8s.io/apimachinery`
-    * brings lower-level building blocks and common API functionality like serialization, type conversion, or error handling
-        *  lower-level data structures: apiVersion, kind, name, uid, ownerReferences, creationTimestamp    
 
 * `client-go`
     * dependencies:
