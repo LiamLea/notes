@@ -121,18 +121,19 @@ spec:
 
   * type 1
     ```yaml
-    - secretKey: key1
-      remoteRef:
+    - remoteRef:
         key: all-keys-example-secret
+      # the key name in the k8s secret
+      secretKey: key1
     ```
-    * content of `secret-to-be-created` secret
-    ```yaml
-    key1: | 
-      {
-      "username":"name",
-      "surname":"great-surname"
-      }
-    ```
+    * content of `secret-to-be-created` k8s secret
+      ```yaml
+      key1: | 
+        {
+        "username":"name",
+        "surname":"great-surname"
+        }
+      ```
 
   * type 2
     ```yaml
@@ -141,7 +142,7 @@ spec:
         key: all-keys-example-secret  
     ```
     * content of `secret-to-be-created` secret
-    ```yaml
-    username: "name"
-    surname: "great-surname"
-    ```
+      ```yaml
+      username: "name"
+      surname: "great-surname"
+      ```
