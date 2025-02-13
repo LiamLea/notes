@@ -5,7 +5,12 @@
 
 - [DNS](#dns)
     - [概述](#概述)
-      - [1.域名结构](#1域名结构)
+      - [1.DNS Architecture](#1dns-architecture)
+        - [(1) DNS namespace](#1-dns-namespace)
+        - [(2) DNS Zone](#2-dns-zone)
+        - [(3) Zones host records](#3-zones-host-records)
+        - [(4) Nameservers Host Zones](#4-nameservers-host-zones)
+        - [(5) NS Records Link Nameservers to Zones](#5-ns-records-link-nameservers-to-zones)
       - [2.基础概念](#2基础概念)
         - [（1）stub resolver（存根解析器）](#1stub-resolver存根解析器)
         - [（2）recursive DNS server（cacheing DNS server，递归DNS）](#2recursive-dns-servercacheing-dns-server递归dns)
@@ -31,8 +36,48 @@
 
 ### 概述
 
-#### 1.域名结构
 ![](./imgs/dns_01.png)
+
+#### 1.DNS Architecture
+
+```
+DNS Namespace:
+.
+├── com
+│   ├── example
+│   │   ├── www
+│   │   ├── mail
+│   │   └── sub (delegated to another zone)
+│   └── another-example
+├── org
+└── net
+
+DNS Zones:
+1. Root Zone (`.`)
+2. TLD(Top-Level Domain Zone) (`com`)
+3. Zone for `example.com` (manages `example.com`, `www.example.com`, `mail.example.com`)
+4. Zone for `sub.example.com` (delegated, managed separately)
+```
+
+![](./imgs/dns_02.png)
+
+##### (1) DNS namespace
+* the entire hierarchical structure of all domain names
+
+##### (2) DNS Zone
+a portion of the DNS namespace
+* Zones Divide the Namespace
+* Zones Are Administrative Units
+
+##### (3) Zones host records
+* A Zone hosts all the records of a specific domain (e.g. `example.com`)
+* to a find record is to find a zone
+
+##### (4) Nameservers Host Zones
+* `example.com. IN NS ns1.example.com.`
+  * indicates which DNS server(s) are authoritative for the zone that contains records for `example.com`
+
+##### (5) NS Records Link Nameservers to Zones
 
 #### 2.基础概念
 ![](./imgs/dns_01.gif)

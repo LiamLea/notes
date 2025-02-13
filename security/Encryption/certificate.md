@@ -11,7 +11,10 @@
     - [（5）CSR请求（certificate signature request）](#5csr请求certificate-signature-request)
   - [2.SSL和TLS区别：](#2ssl和tls区别)
   - [3.命名规范](#3命名规范)
-  - [5.x509 v3证书可以支持多个域名](#5x509-v3证书可以支持多个域名)
+  - [4.x509 v3证书可以支持多个域名](#4x509-v3证书可以支持多个域名)
+  - [5.challege types (when sign certs by some authroties)](#5challege-types-when-sign-certs-by-some-authroties)
+    - [(1) HTTP-01 challenge](#1-http-01-challenge)
+    - [(2) DNS-01 challenge](#2-dns-01-challenge)
 - [openssl](#openssl)
   - [1.openssl实现私有ca](#1openssl实现私有ca)
   - [2.openssl利用已有ca，生成数字证书（即对其他公钥进行签名）](#2openssl利用已有ca生成数字证书即对其他公钥进行签名)
@@ -24,6 +27,7 @@
   - [3.查看jks中的证书](#3查看jks中的证书)
   - [4.生成jks的脚本](#4生成jks的脚本)
   - [5.从jks中提取pem格式证书的脚本](#5从jks中提取pem格式证书的脚本)
+  - [6.check certificates of a server](#6check-certificates-of-a-server)
 - [pkcs12](#pkcs12)
   - [1.概述](#1概述)
   - [2.使用](#2使用)
@@ -71,9 +75,26 @@ ca机构根据CSR请求对相应公钥进行签名
 * 请求的后缀一般为：`.csr`
 * 经过base64 encode后的密钥：`.pem`
 
-#### 5.x509 v3证书可以支持多个域名
+#### 4.x509 v3证书可以支持多个域名
 SAN：Subject Alternative Name
 SAN 是 SSL 标准 x509 中定义的一个扩展。使用了 SAN 字段的 SSL 证书，可以扩展此证书支持的域名，使得一个证书可以支持多个不同域名的解析
+
+#### 5.challege types (when sign certs by some authroties)
+
+to validate that you control the domain names in that certificate using "challenges", as defined by the **ACME** (Automatic Certificate Management Environment) standard
+* [ref](https://letsencrypt.org/docs/challenge-types/)
+
+##### (1) HTTP-01 challenge
+
+* cerificate authroties sent you a token
+* you put the token in your web web server: `http://<YOUR_DOMAIN>/.well-known/acme-challenge/<TOKEN>`
+  * The HTTP-01 challenge can only be done on port 80
+* then you tell the authority it is ready
+* the authority will try to get the token
+
+##### (2) DNS-01 challenge
+* to prove that you control the DNS for your domain name by putting a specific value in a TXT record under that domain name
+* It also allows you to issue wildcard certificates, which HTTP-01 challenge can't support
 
 ***
 
@@ -216,6 +237,72 @@ openssl pkcs12 -in $outputFolder/cert_and_key.p12 -nodes -nocerts -out $outputFo
 
 echo "Generating CARoot.pem"
 keytool -exportcert -alias $alias -keystore $keyStore -rfc -file $outputFolder/CARoot.pem -storepass $passwor
+```
+
+#### 6.check certificates of a server
+```shell
+$  openssl s_client -connect baidu.
+
+...
+
+# Certificate Chain (s: subject, i: issuer, a: algorithm and key, v: validity)
+---
+Certificate chain
+ 0 s:C=CN, ST=北京市, O=BeiJing Baidu Netcom Science Technology Co., Ltd, CN=www.baidu.cn
+   i:C=US, O=DigiCert Inc, CN=DigiCert Secure Site Pro CN CA G3
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Jan 30 00:00:00 2024 GMT; NotAfter: Mar  1 23:59:59 2025 GMT
+ 1 s:C=US, O=DigiCert Inc, CN=DigiCert Secure Site Pro CN CA G3
+   i:C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert Global Root CA
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Mar 13 12:00:48 2020 GMT; NotAfter: Mar 13 12:00:48 2030 GMT
+---
+
+# Certificate Details
+Server certificate
+-----BEGIN CERTIFICATE-----
+...
+-----END CERTIFICATE-----
+
+# Verification
+subject=C=CN, ST=北京市, O=BeiJing Baidu Netcom Science Technology Co., Ltd, CN=www.baidu.cn
+issuer=C=US, O=DigiCert Inc, CN=DigiCert Secure Site Pro CN CA G3
+---
+No client certificate CA names sent
+Peer signing digest: SHA512
+Peer signature type: RSA
+Server Temp Key: ECDH, prime256v1, 256 bits
+---
+SSL handshake has read 3843 bytes and written 446 bytes
+Verification: OK
+
+# SSL/TLS Session
+---
+New, TLSv1.2, Cipher is ECDHE-RSA-AES128-GCM-SHA256
+Protocol: TLSv1.2
+Server public key is 2048 bit
+Secure Renegotiation IS supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+SSL-Session:
+    Protocol  : TLSv1.2
+    Cipher    : ECDHE-RSA-AES128-GCM-SHA256
+    Session-ID: 24AD8EDF928B6AF8AA4B144235643660C40DAF49E033E8AF0822E81EB36F62D6
+    Session-ID-ctx: 
+    Master-Key: 24D65DE64A838938555835E58EAFCA8C2E0891478EFBD4996E676A7875155DE837040E5DFDA3FDF22E8AD6B9A85A45D0
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 72000 (seconds)
+    TLS session ticket:
+    ...
+    Start Time: 1739413354
+    Timeout   : 7200 (sec)
+    Verify return code: 0 (ok)
+    Extended master secret: no
+---
+closed
 ```
 
 ***

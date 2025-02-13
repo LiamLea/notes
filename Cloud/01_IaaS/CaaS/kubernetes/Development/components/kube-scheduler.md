@@ -6,16 +6,16 @@
 <!-- code_chunk_output -->
 
 - [kube-scheduler](#kube-scheduler)
-    - [run kube-scheduler](#run-kube-scheduler)
-      - [1.setup a scheduler](#1setup-a-scheduler)
-      - [2.run basic services](#2run-basic-services)
+    - [setup a scheduler](#setup-a-scheduler)
+      - [1.new scheduler](#1new-scheduler)
+        - [(1) config](#1-config)
+    - [run scheduler](#run-scheduler)
+      - [1.run basic services](#1run-basic-services)
 
 <!-- /code_chunk_output -->
 
 
-### run kube-scheduler
-
-#### 1.setup a scheduler
+### setup a scheduler
 
 * Setup creates a completed config and a scheduler based on the command args and options
 
@@ -66,7 +66,47 @@ sched, err := scheduler.New(ctx,
     )
 ```
 
-#### 2.run basic services
+#### 1.new scheduler
+
+##### (1) config
+
+* Options
+    * General command-line arguments or configuration settings passed to the Kubernetes scheduler
+    * Options has **all** the params needed to run a Scheduler
+    ![](./imgs/ks_01.png)
+* schedulerOptions
+    * global configuration options for schedulers
+        * kube-scheduler may have multiple shedulers and the default is default-scheduler
+* KubeSchedulerProfile
+    * a specific configuration option for a specific sheduler
+    * SchedulerName is the name of the scheduler associated to this profile.
+	* If SchedulerName matches with the pod's "spec.schedulerName", then the pod is scheduled with this profile.
+
+
+```go
+func New(ctx context.Context,
+    client clientset.Interface,
+    informerFactory informers.SharedInformerFactory,
+    dynInformerFactory dynamicinformer.DynamicSharedInformerFactory,
+    recorderFactory profile.RecorderFactory,
+    opts ...Option) (*Scheduler, error) {
+    
+
+    // set default options
+    options := defaultSchedulerOptions
+
+    // set custom options
+    for _, opt := range opts {
+        opt(&options)
+    }
+}
+```
+
+***
+
+### run scheduler
+
+#### 1.run basic services
 
 ```go
 // Start events processing pipeline.

@@ -7,6 +7,8 @@
 
 - [FeatureGates](#featuregates)
     - [Overview](#overview)
+      - [1.feature gate structure](#1feature-gate-structure)
+    - [define](#define)
       - [1.define FeatureGates](#1define-featuregates)
         - [(1) new FeatureGates in apiserver](#1-new-featuregates-in-apiserver)
         - [(2) register features to FeatureGates](#2-register-features-to-featuregates)
@@ -15,6 +17,45 @@
 
 
 ### Overview
+[reference](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/#feature-gates)
+
+* featureGate is used to enable or disable unstable features (alpha/beta)
+    * alpha features are usually disabled by default
+    * beta features are usually enabled by default
+    * stable features cannot be disabled
+
+#### 1.feature gate structure
+```go
+type featureGate struct {
+    featureGateName string
+
+    special map[Feature]func(map[Feature]VersionedSpecs, map[Feature]bool, bool, *version.Version)
+
+    // lock guards writes to all below fields (so when add features to a featureGate will get the lock and then write)
+    lock sync.Mutex
+
+    // known holds a map[Feature]FeatureSpec
+    known atomic.Value
+    // enabled holds a map[Feature]bool
+    enabled atomic.Value
+    // enabledRaw holds a raw map[string]bool of the parsed flag.
+    // It keeps the original values of "special" features like "all alpha gates",
+    // while enabled keeps the values of all resolved features.
+    enabledRaw atomic.Value
+
+    // closed is set to true when AddFlag is called, and prevents subsequent calls to Add features to this featureGate
+    closed bool
+    
+    // queriedFeatures stores all the features that have been queried through the Enabled interface.
+    // It is reset when SetEmulationVersion is called.
+    queriedFeatures  atomic.Value
+    emulationVersion atomic.Pointer[version.Version]
+}
+```
+
+***
+
+### define
 
 * **apiserver** creates a feature gate
 * **other** components **register** their related features to the apiserver featuregate
