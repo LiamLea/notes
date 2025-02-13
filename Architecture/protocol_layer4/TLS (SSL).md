@@ -20,6 +20,7 @@
       - [1.解析TLS流量](#1解析tls流量)
         - [（1）利用ssl-key-log解析](#1利用ssl-key-log解析)
         - [（2）利用private key（不通用）](#2利用private-key不通用)
+    - [Certificate](#certificate)
 
 <!-- /code_chunk_output -->
 
@@ -143,3 +144,9 @@ We can only decrypt TLS/SSL packet data if RSA keys are used to encrypt the data
 ```shell
 ssldump -i eth0 -dnq -k <server.key> port 443
 ```
+
+***
+
+### Certificate
+
+[ref](../../security/Encryption/certificate.md)

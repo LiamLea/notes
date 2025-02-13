@@ -200,3 +200,97 @@ ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT USAGE, S
 * `<database>` -> pg_catalog -> views
   * `pg_tables`
     * check the owner of every table
+
+
+```sql
+-- Revoke the CREATE privilege and only grant it to necessary roles later.
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+
+-- create base role and grant privileges later
+CREATE ROLE boost_readonly WITH NOLOGIN;
+CREATE ROLE boost_readwrite WITH NOLOGIN;
+
+/*
+  create migrator user
+*/
+CREATE USER boost_migrator;
+-- log all SQL statements executed by the user
+ALTER ROLE boost_migrator SET log_statement TO 'all';
+-- use an IAM policy for IAM database access for the user
+GRANT rds_iam TO boost_migrator;
+-- Grant the revoked CREATE privilege
+GRANT CREATE on SCHEMA public to boost_migrator;
+
+ALTER SCHEMA public OWNER to boost_migrator;
+
+-- grant read privileges of the tables created by the migrator to readonly user
+ALTER DEFAULT PRIVILEGES FOR ROLE boost_migrator IN SCHEMA public GRANT SELECT ON TABLES TO boost_readonly;
+ALTER DEFAULT PRIVILEGES FOR ROLE boost_migrator IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO boost_readonly;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO boost_readonly;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO boost_readonly;
+
+-- grant read and write privileges of the tables created by the migrator to readwrite user
+ALTER DEFAULT PRIVILEGES FOR ROLE boost_migrator IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO boost_readwrite;
+ALTER DEFAULT PRIVILEGES FOR ROLE boost_migrator IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO boost_readwrite;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO boost_readwrite;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO boost_readwrite;
+```
+
+```sql
+ALTER DEFAULT PRIVILEGES FOR ROLE boost_migrator IN SCHEMA public GRANT SELECT ON TABLES TO boost_readonly;
+ALTER DEFAULT PRIVILEGES FOR ROLE boost_migrator IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO boost_readonly;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO boost;
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO boost;
+```
+
+```sql
+CREATE USER boost;
+GRANT CREATE on SCHEMA public to boost;
+
+DO
+$$
+DECLARE
+    idx RECORD;
+BEGIN
+    FOR idx IN
+        SELECT schemaname, indexname
+        FROM pg_indexes
+        WHERE schemaname NOT IN ('pg_catalog', 'information_schema') -- Exclude system schemas
+    LOOP
+        EXECUTE format('ALTER INDEX %I.%I OWNER TO boost;', idx.schemaname, idx.indexname);
+    END LOOP;
+END
+$$;
+
+DO
+$$
+DECLARE
+    tbl RECORD;
+BEGIN
+    FOR tbl IN
+        SELECT schemaname, tablename
+        FROM pg_tables
+        WHERE schemaname NOT IN ('pg_catalog', 'information_schema') -- Exclude system schemas
+    LOOP
+        EXECUTE format('ALTER TABLE %I.%I OWNER TO boost;', tbl.schemaname, tbl.tablename);
+    END LOOP;
+END
+$$;
+
+DO
+$$
+DECLARE
+    seq RECORD;
+BEGIN
+    FOR seq IN
+        SELECT schemaname, sequencename
+        FROM pg_sequences
+        WHERE schemaname NOT IN ('pg_catalog', 'information_schema') -- Exclude system schemas
+    LOOP
+        EXECUTE format('ALTER SEQUENCE %I.%I OWNER TO boost;', seq.schemaname, seq.sequencename);
+    END LOOP;
+END
+$$;
+```

@@ -64,6 +64,7 @@ use external secrets, such as get db passwords from aws secret manager
 
 * also can create a cluster-wide secret store: `kind: ClusterSecretStore`
 
+* example-1
 ```yaml
 apiVersion: external-secrets.io/v1beta1
 kind: SecretStore
@@ -82,6 +83,33 @@ spec:
           secretAccessKeySecretRef:
             name: awssm-secret
             key: secret-access-key
+```
+
+* example-2
+```yaml
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: aiops-prod
+  namespace: prod-aiops
+spec:
+  provider:
+    aws:
+      service: SecretsManager
+      region: ap-northeast-1
+      auth:
+        jwt:
+          serviceAccountRef:
+            name: secret-manager
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eks.amazonaws.com/audience: amazonaws.com
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456:role/aiops-prod-secret-manager-ro
+  name: secret-manager
+  namespace: prod-aiops
 ```
 
 ##### (3) get the secret
