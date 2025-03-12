@@ -1,21 +1,12 @@
-# IAM (Identity and Access Management)
+# IRSA (IAM role for serviceaccount)
+
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [IAM (Identity and Access Management)](#iam-identity-and-access-management)
+- [IRSA (IAM role for serviceaccount)](#irsa-iam-role-for-serviceaccount)
     - [Overview](#overview)
-      - [1.basic](#1basic)
-        - [(1) concepts](#1-concepts)
-        - [(2) credentials](#2-credentials)
-        - [(3) API](#3-api)
-        - [(4) external credentials](#4-external-credentials)
-      - [2.role](#2role)
-        - [(1) assume a role](#1-assume-a-role)
-        - [(2) trust policy](#2-trust-policy)
-        - [(3) permission policy](#3-permission-policy)
-    - [IRSA (IAM role for serviceaccount)](#irsa-iam-role-for-serviceaccount)
       - [1.Usage](#1usage)
         - [(1) install pod identity webhook](#1-install-pod-identity-webhook)
         - [(2) create an OIDC provider](#2-create-an-oidc-provider)
@@ -25,138 +16,8 @@
 
 <!-- /code_chunk_output -->
 
+
 ### Overview
-
-#### 1.basic 
-
-##### (1) concepts
-
-* Account ID
-    * when logging in with a non-root user account
-
-##### (2) credentials
-
-* access key
-    * enable access key id and secret access key for the AWS API
-
-* username/password
-    * use account id and password for web login
-
-* temperary Credentials
-    * access key id
-    * secret access key
-    * session token
-
-##### (3) API
-
-* first need to sign request
-    * use access key id and secret access key to get token
-    * add `Authrization: <token>` to the header of a request
-
-##### (4) external credentials
-
-* `~/.aws/config`
-
-```
-[profile developer]
-credential_process = <shell_command>
-```
-
-* Expected output from the Credentials program
-
-```json
-{
-    "Version": 1,
-    "AccessKeyId": "an AWS access key",
-    "SecretAccessKey": "your AWS secret access key",
-    "SessionToken": "the AWS session token for temporary credentials",
-    "Expiration": "ISO8601 timestamp when the credentials expire"
-}
-```
-
-#### 2.role
-
-##### (1) assume a role
-* when you assume a role, it provides you with **temporary** security credentials for your role session
-* can give AWS access to users who already have identities defined outside of AWS
-
-##### (2) trust policy
-[policy grammar](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_grammar.html)
-
-* specify which **principal** can assume this role
-  * account
-  ```json
-  // does not limit permissions to only the root user of the account
-  "Principal": { "AWS": "arn:aws:iam::123456789012:root" }
-  ```
-  * username
-  ```json
-  "Principal": {
-    "AWS": [
-      "arn:aws:iam::AWS-account-ID:user/user-name-1", 
-      "arn:aws:iam::AWS-account-ID:user/user-name-2"
-    ]
-  }
-  ```
-  * role
-  ```json
-  "Principal": { "AWS": "arn:aws:iam::AWS-account-ID:role/role-name" }
-  ```
-  * service
-  * session
-  * ...
-
-* example
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::123456789012:user/test"
-            },
-            "Action": "sts:AssumeRole"
-        }
-    ]
-}
-```
-
-##### (3) permission policy
-[policy grammar](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_grammar.html)
-
-* define whcih role this user can assume
-  * so if a AWS user wants to assume a role, it needs to 
-    * set corresponding permission policy for the user
-    * set corresponding trust policy for that role
-* define permissions for specific services and resources
-* a permission policy can **attach** to role, user and etc.
-
-* example
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": [
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:DeleteObject",
-                "s3:ListBucket"
-            ],
-            "Effect": "Allow",
-            "Resource": [
-                "arn:aws:s3:::aiops-test-website",
-                "arn:aws:s3:::aiops-test-website/*"
-            ]
-        }
-    ]
-}
-```
-
-***
-
-### IRSA (IAM role for serviceaccount)
 
 #### 1.Usage
 

@@ -92,17 +92,17 @@ func main() {
 const a int
 
 const n = 11
-
+```
+```go
 const (
   n1 = 3.1415
   n2 = 4
-  n3    //如果n3没有指定值，则n3 = n2 = 4
+  n3          //n3 = 4, if a constant declaration omits a value, it takes the previous constant's value
 )
 
 const (
-  n4 = iota   //在第n行，iota = n-1，所以这里n4 = 0
-  n5          //n5 = iota = 1
-  n3    //如果n3没有指定值，则n3 = n2 = 4
+  n4 = iota   // n4=0 because n4 is the first iota
+  n5          // n5=1 because n5 = iota and n5 is the second iota
 )
 ```
 

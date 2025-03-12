@@ -9,6 +9,8 @@
     - [setup a scheduler](#setup-a-scheduler)
       - [1.new scheduler](#1new-scheduler)
         - [(1) config](#1-config)
+        - [(2) plugins](#2-plugins)
+        - [(3) register metrics](#3-register-metrics)
     - [run scheduler](#run-scheduler)
       - [1.run basic services](#1run-basic-services)
 
@@ -100,6 +102,32 @@ func New(ctx context.Context,
         opt(&options)
     }
 }
+```
+
+##### (2) plugins
+
+* in-tree plugins: `pkg/scheduler/framework/plugins`
+* some [out-of-tree plugins](https://github.com/kubernetes-sigs/scheduler-plugins) implemented by large companies
+
+```go
+// load default plugins
+registry := frameworkplugins.NewInTreeRegistry()
+
+// load custom plugins
+if err := registry.Merge(options.frameworkOutOfTreeRegistry); err != nil {
+    return nil, err
+}
+```
+
+##### (3) register metrics
+* define metrics
+```go
+metrics.Register()
+```
+
+* The metrics will be updated or incremented at relevant points in the scheduler code, e.g.
+```go
+scheduleAttempts.WithLabelValues(result, profile).Inc()
 ```
 
 ***
