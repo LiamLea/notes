@@ -91,6 +91,9 @@
 
 ***
 
+* allow `.*` to match newline: `match = re.search(pattern, text, re.DOTALL)` 
+  * or `resource_pattern = re.compile("\n  # (\S*) will be .*?", re.DOTALL)`
+
 ### 函数
 **匹配对象,需要用其group()方法才能获取匹配内容**
 ```python

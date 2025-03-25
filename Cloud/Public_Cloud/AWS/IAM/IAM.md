@@ -11,6 +11,7 @@
         - [(2) credentials](#2-credentials)
         - [(3) API](#3-api)
         - [(4) external credentials](#4-external-credentials)
+        - [(5) `:q~/.aws/credentials` vs `~/.aws/config`](#5-qawscredentials-vs-awsconfig)
       - [2.role](#2role)
         - [(1) assume a role](#1-assume-a-role)
         - [(2) trust policy](#2-trust-policy)
@@ -68,11 +69,44 @@ credential_process = <shell_command>
 }
 ```
 
+##### (5) `:q~/.aws/credentials` vs `~/.aws/config`
+
+* they all have multiple profiles
+* `~/.aws/credentials` Stores **access credentials** (Access Key, Secret Key, and Session Token)
+* `~/.aws/config` Stores AWS CLI configurations (region, output format, IAM roles, etc.)
+
 #### 2.role
 
 ##### (1) assume a role
 * when you assume a role, it provides you with **temporary** security credentials for your role session
 * can give AWS access to users who already have identities defined outside of AWS
+
+* default profile (`~/.aws/credentials`) contains valid credentials:
+```ini
+[default]
+aws_access_key_id = AKIAEXAMPLE123
+aws_secret_access_key = abcdefghijklmnopqrstuvwxyz1234567890
+```
+
+* `~/.aws/config`
+    * use credentials from default profile to assume the IAM role `MyRole`
+```ini
+[default]
+region = us-east-1
+output = json
+
+[profile my-profile]
+region = ap-northeast-1
+output = yaml
+role_arn = arn:aws:iam::123456789012:role/MyRole
+source_profile = default
+```
+
+* use the profile
+```shell
+aws s3 ls --profile my-profile
+aws sts get-caller-identity --profile my-profile
+```
 
 ##### (2) trust policy
 [policy grammar](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_grammar.html)
