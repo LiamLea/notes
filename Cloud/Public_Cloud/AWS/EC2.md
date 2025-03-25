@@ -7,10 +7,11 @@
 
 - [EC2](#ec2)
     - [Overview](#overview)
-      - [1.IMDS (Instance Metadata Service)](#1imds-instance-metadata-service)
+      - [1.EC2 features](#1ec2-features)
+      - [2.IMDS (Instance Metadata Service)](#2imds-instance-metadata-service)
         - [(1) why](#1-why)
         - [(2) access IMDS](#2-access-imds)
-      - [2.Auto Scaling Group](#2auto-scaling-group)
+      - [3.Auto Scaling Group](#3auto-scaling-group)
         - [(1) refresh](#1-refresh)
 
 <!-- /code_chunk_output -->
@@ -20,7 +21,10 @@
 
 [REF](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Instances.html)
 
-#### 1.IMDS (Instance Metadata Service)
+#### 1.EC2 features
+* every EC2 has a **IAM role** attached to it
+
+#### 2.IMDS (Instance Metadata Service)
 
 ##### (1) why
 * access instance metadata from a **running instance** or **containers** running in the instance
@@ -32,7 +36,7 @@
 ##### (2) access IMDS
 [ref](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html) 
 
-#### 2.Auto Scaling Group
+#### 3.Auto Scaling Group
 
 ##### (1) refresh
 

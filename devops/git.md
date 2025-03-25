@@ -32,6 +32,8 @@
         - [（2）添加需要迁移到的库](#2添加需要迁移到的库)
         - [（3）pull其他分支](#3pull其他分支)
         - [（4）push指定分支到新的库](#4push指定分支到新的库)
+      - [7.git merge](#7git-merge)
+      - [8.git rebase](#8git-rebase)
 
 <!-- /code_chunk_output -->
 
@@ -283,4 +285,21 @@ git checkout -b <branch_name> origin/<branch_name>
 ```shell
 #这里的<branch_name>需要是已经pull的分支，参考上一步骤
 git push <new_name> <branch_name>:<branch_name>
+```
+
+#### 7.git merge
+* generate new commits and add to the target branch
+
+* recover to the original state when in the merge process
+```shell
+git merge --abort
+```
+
+#### 8.git rebase
+
+* change the base of the current branch
+* NOTE: commit hash will change
+
+```shell
+git pull --rebase
 ```
