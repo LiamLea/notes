@@ -20,6 +20,47 @@
 
 ![](./imgs/event_01.png)
 
+```go
+type recorderImpl struct {
+	scheme              *runtime.Scheme
+	reportingController string
+	reportingInstance   string
+	*watch.Broadcaster
+	clock clock.Clock
+}
+
+func (recorder *recorderImpl) Eventf(regarding runtime.Object, related runtime.Object, eventtype, reason, action, note string, args ...interface{}) {
+	recorder.eventf(klog.Background(), regarding, related, eventtype, reason, action, note, args...)
+}
+
+func (recorder *recorderImpl) eventf(logger klog.Logger, regarding runtime.Object, related runtime.Object, eventtype, reason, action, note string, args ...interface{}) {
+	timestamp := metav1.MicroTime{Time: time.Now()}
+	message := fmt.Sprintf(note, args...)
+	refRegarding, err := reference.GetReference(recorder.scheme, regarding)
+	if err != nil {
+		logger.Error(err, "Could not construct reference, will not report event", "object", regarding, "eventType", eventtype, "reason", reason, "message", message)
+		return
+	}
+
+	var refRelated *v1.ObjectReference
+	if related != nil {
+		refRelated, err = reference.GetReference(recorder.scheme, related)
+		if err != nil {
+			logger.V(9).Info("Could not construct reference", "object", related, "err", err)
+		}
+	}
+	if !util.ValidateEventType(eventtype) {
+		logger.Error(nil, "Unsupported event type", "eventType", eventtype)
+		return
+	}
+	event := recorder.makeEvent(refRegarding, refRelated, timestamp, eventtype, reason, message, recorder.reportingController, recorder.reportingInstance, action)
+	go func() {
+		defer utilruntime.HandleCrash()
+		recorder.Action(watch.Added, event)
+	}()
+}
+```
+
 #### 1.EventBroadcaster (receive events from the component itself)
 
 ##### (1) what
