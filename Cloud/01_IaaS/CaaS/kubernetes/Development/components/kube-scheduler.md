@@ -7,10 +7,12 @@
 
 - [kube-scheduler](#kube-scheduler)
     - [setup a scheduler](#setup-a-scheduler)
-      - [1.new scheduler](#1new-scheduler)
+      - [1.Prepation](#1prepation)
         - [(1) config](#1-config)
         - [(2) plugins](#2-plugins)
         - [(3) register metrics](#3-register-metrics)
+      - [2.build frameworks](#2build-frameworks)
+      - [3.setup scheduling queue](#3setup-scheduling-queue)
     - [run scheduler](#run-scheduler)
       - [1.run basic services](#1run-basic-services)
 
@@ -68,7 +70,7 @@ sched, err := scheduler.New(ctx,
     )
 ```
 
-#### 1.new scheduler
+#### 1.Prepation
 
 ##### (1) config
 
@@ -82,7 +84,7 @@ sched, err := scheduler.New(ctx,
 * KubeSchedulerProfile
     * a specific configuration option for a specific sheduler
     * SchedulerName is the name of the scheduler associated to this profile.
-	* If SchedulerName matches with the pod's "spec.schedulerName", then the pod is scheduled with this profile.
+    * If SchedulerName matches with the pod's "spec.schedulerName", then the pod is scheduled with this profile.
 
 
 ```go
@@ -128,6 +130,99 @@ metrics.Register()
 * The metrics will be updated or incremented at relevant points in the scheduler code, e.g.
 ```go
 scheduleAttempts.WithLabelValues(result, profile).Inc()
+```
+
+#### 2.build frameworks
+
+* [extension points](https://kubernetes.io/docs/concepts/scheduling-eviction/scheduling-framework/): 
+    * a well-defined location in the scheduling framework where you can run specific plugins
+
+* Framework is an interface defining methods to run various plugins
+```go
+// Framework manages the set of plugins in use by the scheduling framework.
+// Configured plugins are called at specified points in a scheduling context.
+type Framework interface {
+    // some run methods in the Handle interface
+    Handle
+
+    QueueSortFunc() LessFunc
+
+    RunPreFilterPlugins(ctx context.Context, state *CycleState, pod *v1.Pod) (*PreFilterResult, *Status, sets.Set[string])
+
+    RunPostFilterPlugins(ctx context.Context, state *CycleState, pod *v1.Pod, filteredNodeStatusMap NodeToStatusMap) (*PostFilterResult, *Status)
+
+    RunPreBindPlugins(ctx context.Context, state *CycleState, pod *v1.Pod, nodeName string) *Status
+
+    RunBindPlugins(ctx context.Context, state *CycleState, pod *v1.Pod, nodeName string) *Status
+
+    RunPostBindPlugins(ctx context.Context, state *CycleState, pod *v1.Pod, nodeName string)
+
+    // ...
+}
+```
+
+* NewMap builds the frameworks given by the configuration, indexed by profile name
+    * e.g. ![](./imgs/ks_02.png)
+```go
+profiles, err := profile.NewMap(ctx, options.profiles, registry, recorderFactory,
+    frameworkruntime.WithComponentConfigVersion(options.componentConfigVersion),
+    frameworkruntime.WithClientSet(client),
+    frameworkruntime.WithKubeConfig(options.kubeConfig),
+    frameworkruntime.WithInformerFactory(informerFactory),
+    frameworkruntime.WithResourceClaimCache(resourceClaimCache),
+    frameworkruntime.WithSnapshotSharedLister(snapshot),
+    frameworkruntime.WithCaptureProfile(frameworkruntime.CaptureProfile(options.frameworkCapturer)),
+    frameworkruntime.WithParallelism(int(options.parallelism)),
+    frameworkruntime.WithExtenders(extenders),
+    frameworkruntime.WithMetricsRecorder(metricsRecorder),
+    frameworkruntime.WithWaitingPods(waitingPods),
+)
+```
+
+```go
+func NewMap(ctx context.Context, cfgs []config.KubeSchedulerProfile, r frameworkruntime.Registry, recorderFact RecorderFactory,
+    opts ...frameworkruntime.Option) (Map, error) {
+    m := make(Map)
+    v := cfgValidator{m: m}
+
+    for _, cfg := range cfgs {
+        p, err := newProfile(ctx, cfg, r, recorderFact, opts...)
+        if err != nil {
+            return nil, fmt.Errorf("creating profile for scheduler name %s: %v", cfg.SchedulerName, err)
+        }
+        if err := v.validate(cfg, p); err != nil {
+            return nil, err
+        }
+        m[cfg.SchedulerName] = p
+    }
+    return m, nil
+}
+```
+
+```go
+func newProfile(ctx context.Context, cfg config.KubeSchedulerProfile, r frameworkruntime.Registry, recorderFact RecorderFactory,
+    opts ...frameworkruntime.Option) (framework.Framework, error) {
+    recorder := recorderFact(cfg.SchedulerName)
+    opts = append(opts, frameworkruntime.WithEventRecorder(recorder))
+    // NewFramework initializes plugins given the configuration and the registry
+    return frameworkruntime.NewFramework(ctx, r, &cfg, opts...)
+}
+```
+
+#### 3.setup scheduling queue
+```go
+podQueue := internalqueue.NewSchedulingQueue(
+    profiles[options.profiles[0].SchedulerName].QueueSortFunc(),
+    informerFactory,
+    internalqueue.WithPodInitialBackoffDuration(time.Duration(options.podInitialBackoffSeconds)*time.Second),
+    internalqueue.WithPodMaxBackoffDuration(time.Duration(options.podMaxBackoffSeconds)*time.Second),
+    internalqueue.WithPodLister(podLister),
+    internalqueue.WithPodMaxInUnschedulablePodsDuration(options.podMaxInUnschedulablePodsDuration),
+    internalqueue.WithPreEnqueuePluginMap(preEnqueuePluginMap),
+    internalqueue.WithQueueingHintMapPerProfile(queueingHintsPerProfile),
+    internalqueue.WithPluginMetricsSamplePercent(pluginMetricsSamplePercent),
+    internalqueue.WithMetricsRecorder(*metricsRecorder),
+)
 ```
 
 ***
