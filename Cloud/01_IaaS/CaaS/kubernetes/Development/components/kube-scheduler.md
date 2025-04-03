@@ -13,8 +13,16 @@
         - [(3) register metrics](#3-register-metrics)
       - [2.build frameworks](#2build-frameworks)
       - [3.setup scheduling queue](#3setup-scheduling-queue)
+        - [(1) priority queue](#1-priority-queue)
+      - [3.setup scheduler](#3setup-scheduler)
     - [run scheduler](#run-scheduler)
       - [1.run basic services](#1run-basic-services)
+      - [2.run scheduler](#2run-scheduler)
+        - [(1) run scheduling queue (prioprity queue)](#1-run-scheduling-queue-prioprity-queue)
+        - [(2) start scheduleOne loop](#2-start-scheduleone-loop)
+        - [(3) podsToActivate](#3-podstoactivate)
+        - [(4) schedulingCycle](#4-schedulingcycle)
+        - [(5) bindingCycle](#5-bindingcycle)
 
 <!-- /code_chunk_output -->
 
@@ -225,6 +233,81 @@ podQueue := internalqueue.NewSchedulingQueue(
 )
 ```
 
+```go
+// NewSchedulingQueue initializes a priority queue as a new scheduling queue.
+func NewSchedulingQueue(
+    lessFn framework.LessFunc,
+    informerFactory informers.SharedInformerFactory,
+    opts ...Option) SchedulingQueue {
+    return NewPriorityQueue(lessFn, informerFactory, opts...)
+}
+```
+
+##### (1) priority queue
+![](./imgs/ks_03.png)
+
+* use **heap sort** to sort queue
+    * the head is the highest priority
+* activeQ
+    * holds pods that are being considered for scheduling
+* backoffQ
+    * holds pods that moved from unschedulablePods and will move to activeQ when their backoff periods complete
+* unschedulablePods
+    * holds pods that were already attempted for scheduling and are currently determined to be unschedulable
+    ```go
+    type UnschedulablePods struct {
+        // podInfoMap is a map key by a pod's full-name and the value is a pointer to the QueuedPodInfo.
+        podInfoMap map[string]*framework.QueuedPodInfo
+        keyFunc    func(*v1.Pod) string
+        // unschedulableRecorder/gatedRecorder updates the counter when elements of an unschedulablePodsMap
+        // get added or removed, and it does nothing if it's nil.
+        unschedulableRecorder, gatedRecorder metrics.MetricRecorder
+    }
+    ```
+
+```go
+// implements PodNominator interface, SchedulingQueue interface, etc
+type PriorityQueue struct {
+
+    // when find a suitable node which is not feasible, it will check if preemption is allowed
+    // when preempt, it needs to store pods info temporarily 
+    *nominator
+
+    activeQ *heap.Heap
+
+    podBackoffQ *heap.Heap
+
+    unschedulablePods *UnschedulablePods
+
+    // ...
+}
+```
+
+#### 3.setup scheduler
+
+```go
+// Cache collects pods' information and provides node-level aggregated information.
+// It's intended for generic scheduler to do efficient lookup.
+schedulerCache := internalcache.New(ctx, durationToExpireAssumedPod)
+
+
+sched := &Scheduler{
+    Cache:                    schedulerCache,
+    client:                   client,
+    nodeInfoSnapshot:         snapshot,
+    percentageOfNodesToScore: options.percentageOfNodesToScore,
+    Extenders:                extenders,
+    StopEverything:           stopEverything,
+    SchedulingQueue:          podQueue,
+    Profiles:                 profiles,
+    logger:                   logger,
+}
+
+sched.NextPod = podQueue.Pop
+
+sched.applyDefaultHandlers()
+```
+
 ***
 
 ### run scheduler
@@ -239,7 +322,7 @@ defer cc.EventBroadcaster.Shutdown()
 // Start up the healthz server.
 // ...
 
-// start informerss
+// start informers
 startInformersAndWaitForSync := func(ctx context.Context) {
     // Start all informers.
     cc.InformerFactory.Start(ctx.Done())
@@ -270,3 +353,103 @@ if !cc.ComponentConfig.DelayCacheUntilActive || cc.LeaderElection == nil {
 // start scheduler
 sched.Run(ctx)
 ```
+
+#### 2.run scheduler
+```go
+// Run begins watching and scheduling. It starts scheduling and blocked until the context is done.
+func (sched *Scheduler) Run(ctx context.Context) {
+    logger := klog.FromContext(ctx)
+    sched.SchedulingQueue.Run(logger)
+
+    // We need to start scheduleOne loop in a dedicated goroutine,
+    // because scheduleOne function hangs on getting the next item
+    // from the SchedulingQueue.
+    // If there are no new pods to schedule, it will be hanging there
+    // and if done in this goroutine it will be blocking closing
+    // SchedulingQueue, in effect causing a deadlock on shutdown.
+    go wait.UntilWithContext(ctx, sched.ScheduleOne, 0)
+
+    <-ctx.Done()
+    sched.SchedulingQueue.Close()
+
+    // If the plugins satisfy the io.Closer interface, they are closed.
+    err := sched.Profiles.Close()
+    if err != nil {
+        logger.Error(err, "Failed to close plugins")
+    }
+}
+```
+
+##### (1) run scheduling queue (prioprity queue)
+```go
+sched.SchedulingQueue.Run(logger)
+```
+```go
+// Run starts the goroutine to pump from podBackoffQ to activeQ
+func (p *PriorityQueue) Run(logger klog.Logger) {
+    go wait.Until(func() {
+
+        // flushBackoffQCompleted Moves all pods from backoffQ which have completed backoff in to activeQ
+        p.flushBackoffQCompleted(logger)
+    }, 1.0*time.Second, p.stop)
+
+    go wait.Until(func() {
+        
+        // flushUnschedulablePodsLeftover moves pods which stay in unschedulablePods
+        // longer than podMaxInUnschedulablePodsDuration to backoffQ or activeQ.
+        p.flushUnschedulablePodsLeftover(logger)
+    }, 30*time.Second, p.stop)
+}
+```
+
+##### (2) start scheduleOne loop
+```go
+go wait.UntilWithContext(ctx, sched.ScheduleOne, 0)
+```
+```go
+func (sched *Scheduler) ScheduleOne(ctx context.Context) {
+
+    // pop the highest priority pod from activeQ
+    podInfo, err := sched.NextPod(logger)
+
+    // determine which framework to use based on pod.Spec.SchedulerName
+    fwk, err := sched.frameworkForPod(pod)
+
+    // a per-scheduling-cycle storage used by scheduler plugins to share data
+    state := framework.NewCycleState()
+
+
+    // why need podsToActivate:
+    //   * lets the scheduler reactivate specific pods that were previously unschedulable, in response to changes triggered by other pods getting scheduled
+    //   * otherwise, the scheduler would have to periodically retry everything
+    podsToActivate := framework.NewPodsToActivate()
+    state.Write(framework.PodsToActivateKey, podsToActivate)
+
+    scheduleResult, assumedPodInfo, status := sched.schedulingCycle(schedulingCycleCtx, state, fwk, podInfo, start, podsToActivate)
+
+
+    // bind the pod to its host asynchronously (we can do this becasue of the assumption step above).
+    // The assumption step refers to AssumePod() — the moment when the scheduler pretends the pod is already scheduled by updating its internal cache before doing the actual bind
+    go func() {
+        status := sched.bindingCycle(bindingCycleCtx, state, fwk, scheduleResult, assumedPodInfo, start, podsToActivate)
+
+        // Done must be called for pod returned by Pop. 
+        // This allows the queue to keep track of which pods are currently being processed
+        sched.SchedulingQueue.Done(assumedPodInfo.Pod.UID)
+    }()
+}
+```
+
+##### (3) podsToActivate
+
+* example:
+    * Pod A: low-priority pod already scheduled on Node-1
+    * Pod B: high-priority pod that needs Node-1, but it couldn't be scheduled earlier because Node-1 was full (so it’s in `unschedulablePods`)
+    * Pod C is very high priority and preempt Pod A to make room
+    * Now Node-1 is available again
+    * After Pod C is bound, the scheduler activates pods in podsToActivateAfter Pod C is bound, the scheduler activates pods in podsToActivate
+    * Now PodB is moved from `unschedulablePods` → `activeQ`
+
+##### (4) schedulingCycle
+
+##### (5) bindingCycle
