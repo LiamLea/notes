@@ -10,6 +10,9 @@
       - [3.执行多次时，确保某个函数只执行一次（常在并发中使用）](#3执行多次时确保某个函数只执行一次常在并发中使用)
       - [4.协程安全的map](#4协程安全的map)
       - [5.提供一些原子函数：`atomic.xx`](#5提供一些原子函数atomicxx)
+      - [6.Cond (condition)](#6cond-condition)
+        - [(1) `cond.Wait()` and `cond.Signal()`](#1-condwait-and-condsignal)
+        - [(2) Cond vs Channel](#2-cond-vs-channel)
 
 <!-- /code_chunk_output -->
 
@@ -59,3 +62,56 @@ func main() {
 
 #### 5.提供一些原子函数：`atomic.xx`
 即这些函数是原子的，是协程安全的
+
+#### 6.Cond (condition)
+
+```go
+type Cond struct {
+
+	// L is held while observing or changing the condition
+	L Locker
+	// contains filtered or unexported fields
+}
+
+func (c *Cond) Broadcast()
+
+func (c *Cond) Signal()
+
+func (c *Cond) Wait()
+```
+
+##### (1) `cond.Wait()` and `cond.Signal()`
+
+* Wait atomically **unlocks** c.L and **suspends** execution of the calling goroutine. After later resuming execution, Wait **locks** c.L before returning.
+  * unlock, wait, and lock
+
+* e.g.
+```go
+var mu sync.Mutex
+cond := sync.NewCond(&mu)
+queue := []int{}
+
+func consumer() {
+    mu.Lock()
+    for len(queue) == 0 {
+        // this function will unlock and wait
+        // if waked up, this goroutine will lock until return
+        cond.Wait()
+    }
+    item := queue[0]
+    queue = queue[1:]
+    mu.Unlock()
+    fmt.Println("Consumed:", item)
+}
+
+func producer(item int) {
+    mu.Lock()
+    queue = append(queue, item)
+    mu.Unlock()
+    cond.Signal() // Wake up one waiting goroutine
+}
+```
+
+##### (2) Cond vs Channel
+
+[xRef](http://garrett.damore.org/2018/12/golang-synccond-vs-channel.html)
