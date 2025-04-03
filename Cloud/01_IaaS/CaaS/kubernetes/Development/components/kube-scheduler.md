@@ -21,8 +21,9 @@
         - [(1) run scheduling queue (prioprity queue)](#1-run-scheduling-queue-prioprity-queue)
         - [(2) start scheduleOne loop](#2-start-scheduleone-loop)
         - [(3) podsToActivate](#3-podstoactivate)
-        - [(4) schedulingCycle](#4-schedulingcycle)
-        - [(5) bindingCycle](#5-bindingcycle)
+      - [3.schedulingCycle](#3schedulingcycle)
+        - [(1) SchedulePod](#1-schedulepod)
+      - [4.bindingCycle](#4bindingcycle)
 
 <!-- /code_chunk_output -->
 
@@ -219,6 +220,15 @@ func newProfile(ctx context.Context, cfg config.KubeSchedulerProfile, r framewor
 
 #### 3.setup scheduling queue
 ```go
+// run PreEnqueuePlugins and EnqueueExtensions
+for profileName, profile := range profiles {
+    preEnqueuePluginMap[profileName] = profile.PreEnqueuePlugins()
+    queueingHintsPerProfile[profileName], err = buildQueueingHintMap(ctx, profile.EnqueueExtensions())
+    if err != nil {
+        returnErr = errors.Join(returnErr, err)
+    }
+}
+
 podQueue := internalqueue.NewSchedulingQueue(
     profiles[options.profiles[0].SchedulerName].QueueSortFunc(),
     informerFactory,
@@ -450,6 +460,97 @@ func (sched *Scheduler) ScheduleOne(ctx context.Context) {
     * After Pod C is bound, the scheduler activates pods in podsToActivateAfter Pod C is bound, the scheduler activates pods in podsToActivate
     * Now PodB is moved from `unschedulablePods` → `activeQ`
 
-##### (4) schedulingCycle
+#### 3.schedulingCycle
+```go
+// schedulingCycle tries to schedule a single Pod.
+func (sched *Scheduler) schedulingCycle(
+    ctx context.Context,
+    state *framework.CycleState,
+    fwk framework.Framework,
+    podInfo *framework.QueuedPodInfo,
+    start time.Time,
+    podsToActivate *framework.PodsToActivate,
+) (ScheduleResult, *framework.QueuedPodInfo, *framework.Status) {
 
-##### (5) bindingCycle
+    scheduleResult, err := sched.SchedulePod(ctx, fwk, state, pod)
+
+    // assume modifies `assumedPod` by setting NodeName=scheduleResult.SuggestedHost
+    err = sched.assume(logger, assumedPod, scheduleResult.SuggestedHost)
+
+    // Run the Reserve method of reserve plugins.
+    // allow plugins to prepare and lock down resources in a safe, coordinated, and fail-fast way — before the pod is actually bound
+    if sts := fwk.RunReservePluginsReserve(ctx, state, assumedPod, scheduleResult.SuggestedHost); !sts.IsSuccess() {
+        // trigger un-reserve to clean up state associated with the reserved Pod
+        fwk.RunReservePluginsUnreserve(ctx, state, assumedPod, scheduleResult.SuggestedHost)
+    }
+
+    // Run "permit" plugins.
+    // why: e.g.
+    //      You want to schedule a group of pods together, or not at all
+    //      Maybe another system (e.g., a GPU allocator or custom orchestrator) must Approve the pod
+    runPermitStatus := fwk.RunPermitPlugins(ctx, state, assumedPod, scheduleResult.SuggestedHost)
+
+    // At the end of a successful scheduling cycle, pop and move up Pods if needed.
+    if len(podsToActivate.Map) != 0 {
+        sched.SchedulingQueue.Activate(logger, podsToActivate.Map)
+        // Clear the entries after activation.
+        podsToActivate.Map = make(map[string]*v1.Pod)
+    }
+
+    return scheduleResult, assumedPodInfo, nil
+}
+```
+
+##### (1) SchedulePod
+```go
+func (sched *Scheduler) schedulePod(ctx context.Context, fwk framework.Framework, state *framework.CycleState, pod *v1.Pod) (result ScheduleResult, err error) {
+
+    feasibleNodes, diagnosis, err := sched.findNodesThatFitPod(ctx, fwk, state, pod)
+
+    priorityList, err := prioritizeNodes(ctx, sched.Extenders, fwk, state, pod, feasibleNodes)
+
+    host, _, err := selectHost(priorityList, numberOfHighestScoredNodesToReport)
+
+    return ScheduleResult{
+        SuggestedHost:  host,
+        EvaluatedNodes: len(feasibleNodes) + len(diagnosis.NodeToStatusMap),
+        FeasibleNodes:  len(feasibleNodes),
+    }, err
+}
+```
+
+#### 4.bindingCycle
+```go
+// bindingCycle tries to bind an assumed Pod.
+func (sched *Scheduler) bindingCycle(
+    ctx context.Context,
+    state *framework.CycleState,
+    fwk framework.Framework,
+    scheduleResult ScheduleResult,
+    assumedPodInfo *framework.QueuedPodInfo,
+    start time.Time,
+    podsToActivate *framework.PodsToActivate) *framework.Status {
+
+    assumedPod := assumedPodInfo.Pod
+
+    // Run "prebind" plugins.
+    status := fwk.RunPreBindPlugins(ctx, state, assumedPod, scheduleResult.SuggestedHost)
+
+    // Run "bind" plugins.
+    if status := sched.bind(ctx, fwk, assumedPod, scheduleResult.SuggestedHost, state); !status.IsSuccess() {
+        return status
+    }
+
+    // Run "postbind" plugins.
+    fwk.RunPostBindPlugins(ctx, state, assumedPod, scheduleResult.SuggestedHost)
+
+    // At the end of a successful binding cycle, move up Pods if needed.
+    if len(podsToActivate.Map) != 0 {
+        sched.SchedulingQueue.Activate(logger, podsToActivate.Map)
+        // Unlike the logic in schedulingCycle(), we don't bother deleting the entries
+        // as `podsToActivate.Map` is no longer consumed.
+    }
+
+    return nil
+}
+```
