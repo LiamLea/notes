@@ -8,6 +8,8 @@
     - [概述](#概述)
       - [1.protobuf](#1protobuf)
       - [2.gRPC](#2grpc)
+      - [3.`grpc.ServiceDesc`](#3grpcservicedesc)
+      - [4.Serve gRPC over HTTP](#4serve-grpc-over-http)
     - [protobuf使用](#protobuf使用)
       - [1.下载protobuf编译器和插件](#1下载protobuf编译器和插件)
       - [2.使用规范](#2使用规范)
@@ -19,7 +21,7 @@
     - [gRPC使用](#grpc使用)
       - [1.下载protobuf编译器和gRPC插件](#1下载protobuf编译器和grpc插件)
       - [2.基本使用](#2基本使用)
-        - [（1）定义消息格式和rpc接口: `user.proto`](#1定义消息格式和rpc接口-userproto)
+        - [(1) 定义消息格式和rpc接口: `user.proto`](#1-定义消息格式和rpc接口-userproto)
         - [（2）对`<name>.proto`进行编译，生成相应的go语言代码: `<name>.pb.go`和`<name>_grpc.pb.go`](#2对nameproto进行编译生成相应的go语言代码-namepbgo和name_grpcpbgo)
         - [（3）server端](#3server端)
         - [（4）client端](#4client端)
@@ -33,6 +35,75 @@
 
 #### 2.gRPC
 [参考](../../../Architecture/distributed_system/microservice/rpc.md)
+
+#### 3.`grpc.ServiceDesc`
+* It describes a gRPC service and its methods in a server
+
+* structure
+	```go
+	type ServiceDesc struct {
+		ServiceName string          // Fully-qualified name of the service
+		HandlerType interface{}     // Interface that the service must implement
+		Methods     []MethodDesc    // Non-streaming RPCs
+		Streams     []StreamDesc    // Streaming RPCs
+		Metadata    interface{}     // Optional metadata, often set to the .proto filename
+	}
+	```
+
+* It is auto generated in `.pb.go`
+* example
+	* the `user.UserService` service has four methods (`CreateUser`, `GetUser`, `ListUsers`, `DeleteUser`)
+```go
+var UserServiceDesc = grpc.ServiceDesc{
+	ServiceName: "user.UserService",
+	HandlerType: (*UserServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateUser",
+			Handler: func(srv interface{}, ctx context.Context, dec func(interface{}) error, _ grpc.UnaryServerInterceptor) (interface{}, error) {
+				in := new(CreateUserRequest)
+				if err := dec(in); err != nil {
+					return nil, err
+				}
+				return srv.(UserServiceServer).CreateUser(ctx, in)
+			},
+		},
+		{
+			MethodName: "GetUser",
+			Handler: func(srv interface{}, ctx context.Context, dec func(interface{}) error, _ grpc.UnaryServerInterceptor) (interface{}, error) {
+				in := new(GetUserRequest)
+				if err := dec(in); err != nil {
+					return nil, err
+				}
+				return srv.(UserServiceServer).GetUser(ctx, in)
+			},
+		},
+		{
+			MethodName: "ListUsers",
+			Handler: func(srv interface{}, ctx context.Context, dec func(interface{}) error, _ grpc.UnaryServerInterceptor) (interface{}, error) {
+				in := new(ListUsersRequest)
+				if err := dec(in); err != nil {
+					return nil, err
+				}
+				return srv.(UserServiceServer).ListUsers(ctx, in)
+			},
+		},
+		{
+			MethodName: "DeleteUser",
+			Handler: func(srv interface{}, ctx context.Context, dec func(interface{}) error, _ grpc.UnaryServerInterceptor) (interface{}, error) {
+				in := new(DeleteUserRequest)
+				if err := dec(in); err != nil {
+					return nil, err
+				}
+				return srv.(UserServiceServer).DeleteUser(ctx, in)
+			},
+		},
+	},
+}
+```
+
+#### 4.Serve gRPC over HTTP
+* need a convertor, such as gRPC-Gateway
 
 ***
 
@@ -176,7 +247,8 @@ go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
 #### 2.基本使用
 
-#####（1）定义消息格式和rpc接口: `user.proto`
+##### (1) 定义消息格式和rpc接口: `user.proto`
+
 ```go
 syntax="proto3";
 

@@ -23,6 +23,14 @@
 ### Overview
 
 ```go
+func ListenAndServe(app func(context.Context, *http.ServeMux) error) {
+    ctx, m, closer, err := ContextAndMiddleware()
+
+    // ...
+    
+}
+```
+```go
 func ContextAndMiddleware() (context.Context, server.Middleware, io.Closer, error) {
     var funcClosers funcCloser
 
@@ -105,7 +113,7 @@ func middleware(ctx context.Context) (server.Middleware, io.Closer, error) {
         * implents ServeHTTP interface
     ```go
     type Handler interface {
-	    ServeHTTP(ResponseWriter, *Request)
+        ServeHTTP(ResponseWriter, *Request)
     }
     ```
 * compose
@@ -127,40 +135,40 @@ func middleware(ctx context.Context) (server.Middleware, io.Closer, error) {
 #### 1.default middleware
 ```go
 func DefaultMiddleware(logger log.Logger) func(http.Handler) http.Handler {
-	return Compose(
-		// Recovery should come before logReq to set the status code to 500
-		Recovery,
-		LogRequest,
-		log.WithLogger(logger),
-		trace.WithRequestTrace,
-		contexts.WithHTTPStatus,
-	)
+    return Compose(
+        // Recovery should come before logReq to set the status code to 500
+        Recovery,
+        LogRequest,
+        log.WithLogger(logger),
+        trace.WithRequestTrace,
+        contexts.WithHTTPStatus,
+    )
 }
 ```
 
 ##### (1) Recovery
 ```go
 func Recovery(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		var statusCode int
+    return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+        var statusCode int
 
-		defer func() {
-			if statusCode != 0 {
-				rw.WriteHeader(statusCode)
-			}
-		}()
+        defer func() {
+            if statusCode != 0 {
+                rw.WriteHeader(statusCode)
+            }
+        }()
 
-		defer RecoverAndSetStatusCode(&statusCode)
+        defer RecoverAndSetStatusCode(&statusCode)
 
-		h.ServeHTTP(rw, r)
-	})
+        h.ServeHTTP(rw, r)
+    })
 }
 
 func RecoverAndSetStatusCode(statusCode *int) {
-	if err := recover(); err != nil {
-		*statusCode = http.StatusInternalServerError
-		panic(err)
-	}
+    if err := recover(); err != nil {
+        *statusCode = http.StatusInternalServerError
+        panic(err)
+    }
 }
 ```
 

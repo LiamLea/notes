@@ -27,6 +27,7 @@
         - [(2) `npm install`](#2-npm-install)
         - [(3) `npm start`](#3-npm-start)
         - [(4) 一般用法](#4-一般用法)
+        - [(5) `yarn <script> [<args>]`](#5-yarn-script-args)
     - [node使用](#node使用)
       - [1.运行javascript](#1运行javascript)
 
@@ -176,6 +177,12 @@ yarn build
 #打包（package.json中需要有<package_command>）
 yarn <package_command>
 ```
+
+##### (5) `yarn <script> [<args>]`
+
+* first search `<script>` in User-defined script in `package.json`
+* if not find, then use Locally installed CLIs `<script>`
+  * it can be installed through `devDependencies` in `package.json`
 
 ***
 
