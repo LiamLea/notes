@@ -12,7 +12,8 @@
     - [Overview](#overview)
       - [1.OAuth2.0 vs OIDC](#1oauth20-vs-oidc)
       - [2.Setting up OAuth 2.0](#2setting-up-oauth-20)
-      - [3.OIDC discovery document](#3oidc-discovery-document)
+      - [3.OIDC discovery document (`$issuer_uri/.well-known/openid-configuration`)](#3oidc-discovery-document-issuer_uriwell-knownopenid-configuration)
+        - [(1) how does client use the token to authenticate](#1-how-does-client-use-the-token-to-authenticate)
       - [4.Auth2.0 implementation (web server application i.e. `response_type=code`)](#4auth20-implementation-web-server-application-ie-response_typecode)
         - [(1) create an state token](#1-create-an-state-token)
         - [(2) Authentication Request](#2-authentication-request)
@@ -79,9 +80,100 @@ modern OAuth2.0 implementations include OIDC such as google OAuth 2.0 implementa
 * redirect URI
     * The redirect URI that you set in the Cloud Console determines **where Google sends responses** to your authentication requests
 
-#### 3.OIDC discovery document
-* a well-known location containing key-value pairs which provide details about the OpenID Connect provider's configuration
-    * google: https://accounts.google.com/.well-known/openid-configuration
+#### 3.OIDC discovery document (`$issuer_uri/.well-known/openid-configuration`)
+
+a well-known location containing key-value pairs which provide details about the **OpenID Connect provider's configuration**
+
+* google issuer_uri: https://accounts.google.com
+
+* use s3 to serve as a self-hosted oidc provider
+  * upload JWKS (i.e. public keys) then specify its path in openid-configuration (such as path is `openid/v1/jwks`)
+  * upload open-configuration to `.well-known/openid-configuration`
+    ```json
+    {
+        "issuer": "<match the iss claim in the JWT tokens>",
+        "jwks_uri": "https://<s3_url>/openid/v1/jwks",
+        "authorization_endpoint": "urn:kubernetes:programmatic_authorization",
+        "response_types_supported": [
+            "id_token"
+        ],
+        "subject_types_supported": [
+            "public"
+        ],
+        "id_token_signing_alg_values_supported": [
+            "RS256"
+        ],
+        "claims_supported": [
+            "sub",
+            "iss"
+        ]
+    }
+    ```
+
+##### (1) how does client use the token to authenticate
+* first, audience needs to configure oidc provider (`issuer_uri` is required), e.g.
+  * aws
+    ```tf
+    resource "aws_iam_openid_connect_provider" "default" {
+      url = "https://my-k8s-oidc-endpoint.s3.ap-northeast-1.amazonaws.com"
+      // ...
+    }
+    ```
+  * google
+    ```tf
+    resource "google_iam_workload_identity_pool_provider" "test_provider" {
+      oidc {
+        issuer_uri = <issuer_uri>
+      }
+      // ...
+    }
+    ``` 
+
+* client send the token to an endpoint to requests resources
+  * the endpoint is specified through different ways in different clouds, e.g.
+
+  * aws
+    * IRSA (**openid provider** is specified in the trust policy of the role: `"Federated": "<openid_provider_arn>"`)
+    * 
+      ```yaml
+      - name: AWS_STS_REGIONAL_ENDPOINTS
+        value: regional
+      - name: AWS_REGION
+        value: ap-northeast-1
+      - name: AWS_ROLE_ARN
+        value: <role_arn_to_assume>
+      ```
+    * 
+      ```json
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Federated": "<openid_provider_arn>"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+              "StringEquals": {
+                "${var.cluster_identity_provider_url}:sub": "system:serviceaccount:${var.service_account_namespace}:${var.service_account_name}"
+              }
+            }
+          }
+        ]
+      }
+      ```
+
+  * google
+    * exchange the token for a new google's serviceaccount token using a config file which is downloaded from that serviceaccount in that workload_identity_pool_provider
+    * 
+      ```json
+      {
+        "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/test-sa@test-project.iam.gserviceaccount.com:generateAccessToken",
+        
+        // ...
+      }
+      ```
 
 #### 4.Auth2.0 implementation (web server application i.e. `response_type=code`)
 
@@ -341,7 +433,7 @@ Access token:
 ##### (5) Validate and Obtain user information from the ID token
 
 * [validate `id_token`](https://developers.google.com/identity/openid-connect/openid-connect#validatinganidtoken) before using it
-
+  * JWKS (JSON Web Key Set) is used to publish a set of **public keys** that can be used to verify JWT (such as OIDC ID tokens)
 
 * [decode JTW `id_token`](https://fusionauth.io/dev-tools/jwt-decoder)
 

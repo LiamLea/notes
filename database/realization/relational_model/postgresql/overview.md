@@ -200,6 +200,20 @@ ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT USAGE, S
 * `<database>` -> pg_catalog -> views
   * `pg_tables`
     * check the owner of every table
+* check how many roles does a role have
+```sql
+SELECT
+    grantee.rolname AS member,
+    role.rolname    AS granted_role
+FROM
+    pg_auth_members m
+JOIN
+    pg_roles grantee ON m.member = grantee.oid
+JOIN
+    pg_roles role ON m.roleid = role.oid
+WHERE
+    grantee.rolname = 'metabase_readonly';
+```
 
 
 ```sql
