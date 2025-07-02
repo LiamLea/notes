@@ -37,11 +37,8 @@
     ```
   * AWS needs to store the k8s's public key in S3, then use public key to authenticate request to make sure it comes from the k8s
     ```shell
-    # store openid related config
+    # store openid config which includes all info needed to connect to this oidc provider
     s3://$S3_BUCKET/.well-known/openid-configuration
-
-    # store k8s public key
-    s3://$S3_BUCKET/keys.json
     ```
     
 * Create an OIDC provider in IAM for your cluster

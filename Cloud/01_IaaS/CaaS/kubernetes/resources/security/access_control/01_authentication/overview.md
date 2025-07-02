@@ -7,6 +7,7 @@
     - [概述](#概述)
       - [1.两类用户](#1两类用户)
       - [2.serviceaccount principle (to mount the corresponding token)](#2serviceaccount-principle-to-mount-the-corresponding-token)
+        - [(1) token (JWT)](#1-token-jwt)
       - [3.使用serviceaccount](#3使用serviceaccount)
         - [（1）创建serviceaccount](#1创建serviceaccount)
         - [（2）指定pod使用哪个账号](#2指定pod使用哪个账号)
@@ -30,20 +31,56 @@
 #### 2.serviceaccount principle (to mount the corresponding token)
 * every namespace has
   * a serviceaccount: `default`
-  * get **token** method:
-    * old (deorecated):
-      * a secret correlated with the default serivceaccount: `default-token-xxxx`
-      * the secret includes: 
-        * **token** (the most important)
-        * namespace
-        * ca
-    * new:
-      * **kubelet** uses [TokenRequest API](https://kubernetes.io/docs/reference/kubernetes-api/authentication-resources/token-request-v1/) to request a **temporary token** for a given service account and then update it
 
 * when a pod starts, it will mount `token, namespace and ca` on the specific directory (`/var/run/secrets/kubernetes.io/serviceaccount/`) 
   * why this directory?
     * it is **conventional** so that when developers develop a app running in the pod they know how to find the token  
 * the app running in the pod can access k8s api with the token
+
+##### (1) token (JWT)
+* get token method:
+  * old (deprecated):
+    * a secret correlated with the default serivceaccount: `default-token-xxxx`
+    * the secret includes: 
+      * token (the most important)
+      * namespace
+      * ca
+  * new:
+    * kubelet uses [TokenRequest API](https://kubernetes.io/docs/reference/kubernetes-api/authentication-resources/token-request-v1/) to request a **temporary token** for a given service account and then update it
+
+<br>
+
+* request a token for a serviceaccount
+  * specify the **audience**
+    * if the token is for third-party such as aws, the audience can be set `--audience=amazonaws.com`
+  * subject is `system:serviceaccount:<namespace>:<serviceaccount>`
+```shell
+kubectl create  sa test-leo
+
+kubectl create token test-leo \  
+  --namespace default \
+  --duration=3600s \
+  --audience=api
+```
+
+* the **issuer** of token is set in apiserver
+```shell
+--service-account-issuer "https://my-k8s.s3.ap-northeast-1.amazonaws.com"
+```
+
+* decode the token (JWT)
+```json
+{
+  "aud": [
+    "api"
+  ],
+  "iss": "https://my-k8s.s3.ap-northeast-1.amazonaws.com",
+  "sub": "system:serviceaccount:default:test-leo",
+  "exp": 1751424577,
+  // ...
+}
+```
+
 
 #### 3.使用serviceaccount
 ##### （1）创建serviceaccount

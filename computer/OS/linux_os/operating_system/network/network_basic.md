@@ -18,6 +18,10 @@
         - [（1）`netnsid`唯一标识netns](#1netnsid唯一标识netns)
         - [（2）`link-netnsid`标识对端设备所在的netns的id](#2link-netnsid标识对端设备所在的netns的id)
       - [6.判断设备属于何种类型（TUN/TAP、veth等）](#6判断设备属于何种类型tuntap-veth等)
+    - [Route](#route)
+      - [1.policy routing](#1policy-routing)
+        - [(1) routing policy database (RPDB)](#1-routing-policy-database-rpdb)
+        - [(2) how does route matching work](#2-how-does-route-matching-work)
 
 <!-- /code_chunk_output -->
 
@@ -144,3 +148,34 @@ ip link show type <TYPE>  #<TYPE>：veth、bridge、dummy等
 ip tuntap show
 ip tunnel show
 ```
+
+***
+
+### Route
+
+#### 1.policy routing
+
+[xRef](https://www.man7.org/linux/man-pages/man8/ip-rule.8.html)
+
+* route packets differently depending not only on destination addresses but also on other packet fields: source address, IP protocol, transport protocol ports or even packet payload
+
+##### (1) routing policy database (RPDB)
+
+* policy routing rule: `<selector> <action predicate>`
+  * if the selector matches the packet, the action is performed
+
+* three default RPDB
+```shell
+# contain highest priority control routes for local and broadcast addresses
+0:	from all lookup local
+
+# contain all non-policy routes
+32766:	from all lookup main
+
+# It is reserved for some post-processing if no previous default rules selected the packet
+32767:	from all lookup default
+```
+
+##### (2) how does route matching work
+
+* it will walk through every rule in **every table** accroding to priority and selector. And it is **terminated** until it matches a rule in a table
