@@ -21,7 +21,11 @@
         - [(4) Exchange code for access token and ID token](#4-exchange-code-for-access-token-and-id-token)
         - [(5) Validate and Obtain user information from the ID token](#5-validate-and-obtain-user-information-from-the-id-token)
         - [(6) My APP to authenticate the user](#6-my-app-to-authenticate-the-user)
+      - [5.Auth2.0 implementation (service account)](#5auth20-implementation-service-account)
+        - [(1) create service account](#1-create-service-account)
+        - [(2) request resources](#2-request-resources)
     - [Demo](#demo)
+      - [1.Auth2.0 implementation (web server application)](#1auth20-implementation-web-server-application)
 
 <!-- /code_chunk_output -->
 
@@ -93,20 +97,9 @@ a well-known location containing key-value pairs which provide details about the
     {
         "issuer": "<match the iss claim in the JWT tokens>",
         "jwks_uri": "https://<s3_url>/openid/v1/jwks",
-        "authorization_endpoint": "urn:kubernetes:programmatic_authorization",
-        "response_types_supported": [
-            "id_token"
-        ],
-        "subject_types_supported": [
-            "public"
-        ],
-        "id_token_signing_alg_values_supported": [
-            "RS256"
-        ],
-        "claims_supported": [
-            "sub",
-            "iss"
-        ]
+        "authorization_endpoint": "",
+
+        // ...
     }
     ```
 
@@ -466,9 +459,43 @@ Access token:
 
 becacuse the user info is in the `id_token`
 
+#### 5.Auth2.0 implementation (service account)
+
+[xRef](https://developers.google.com/identity/protocols/oauth2/service-account)
+
+##### (1) create service account
+
+* create service account (grant roles to this service account)
+* generate and download key json file for this service account
+* delegate domain-wide authority to the service account (if needed)
+
+##### (2) request resources
+
+```python
+from google.oauth2 import service_account
+import googleapiclient.discovery
+
+SCOPES = ['https://www.googleapis.com/auth/admin.directory.user', 'https://www.googleapis.com/auth/admin.directory.user.readonly', 'https://www.googleapis.com/auth/cloud-platform']
+SERVICE_ACCOUNT_FILE = '<key_json_file>'
+
+credentials = service_account.Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+# delegate domain-wide authority to the service account
+# because The Admin SDK Directory API does not allow service accounts to access user data directly
+delegated_credentials = credentials.with_subject('user@example.org')
+
+service = googleapiclient.discovery.build('admin', 'directory_v1', credentials=delegated_credentials)
+
+result = service.users().list(domain="mycp.jp").execute()
+print(result)
+```
+
 ***
 
 ### Demo
+
+#### 1.Auth2.0 implementation (web server application)
 
 ```python
 client_id = '***'
