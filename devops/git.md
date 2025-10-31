@@ -34,6 +34,8 @@
         - [（4）push指定分支到新的库](#4push指定分支到新的库)
       - [7.git merge](#7git-merge)
       - [8.git rebase](#8git-rebase)
+      - [9.search in commit log](#9search-in-commit-log)
+      - [10.cherry-pick](#10cherry-pick)
 
 <!-- /code_chunk_output -->
 
@@ -300,6 +302,43 @@ git merge --abort
 * change the base of the current branch
 * NOTE: commit hash will change
 
+* rebase onto the same branch
 ```shell
 git pull --rebase
+```
+
+* rebase onto the master branch
+
+```shell
+my-branch> git rebase master
+my-branch> git push --force
+```
+
+#### 9.search in commit log
+
+```shell
+# search for exact string
+git log -S"exact text of the line" -p -- path/to/file
+
+# search for regex
+git log -G"regex pattern" -p -- path/to/file
+
+# -p show the diff (patch)
+#   why called patch: 
+#     a “patch file” contains the differences between two versions of a file — basically instructions to transform one version into another.
+```
+
+#### 10.cherry-pick
+
+* cherry-pick commits from test branch to stg
+```shell
+git checkout stg
+
+git log test --oneline
+
+# multiple
+git cherry-pick a1b2c3d 4e5f6g7
+
+# a range
+git cherry-pick a1b2c3d^..8h9i0j1
 ```

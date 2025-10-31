@@ -232,7 +232,7 @@ spec:
   ports:
   - port: 80
     name: xx         #标记该端口
-  clusterIP: Node    #设置成无头的service
+  clusterIP: None    #设置成无头的service
   selector:
     xx: xx           #通过标签关联pod
 
