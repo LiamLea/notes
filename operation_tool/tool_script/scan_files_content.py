@@ -18,8 +18,8 @@ def scan_files_content(dir, search_pattern):
                                 ret[item].append(line.strip())
                             else:
                                 ret[item] = [line.strip()]
-            except UnicodeDecodeError:
-                pass
+            except (UnicodeDecodeError, FileNotFoundError) as e:
+                print("%s failed: %s" %(item, e))
     return ret
 
 if __name__ == '__main__':
