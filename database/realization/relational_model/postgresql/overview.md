@@ -156,6 +156,15 @@ GRANT aiops_readwrite TO sre_dba WITH ADMIN OPTION;
 GRANT aiops_readonly TO sre_dba WITH ADMIN OPTION;
 
 /*
+  create app user instead role because role can't login in
+*/
+CREATE USER aiops;
+-- use an IAM policy for IAM database access for the user
+GRANT rds_iam TO aiops;
+GRANT aiops_readwrite TO aiops;
+GRANT aiops_readonly TO aiops;
+
+/*
   create migrator user
 */
 CREATE USER aiops_migrator;
@@ -172,6 +181,8 @@ GRANT CREATE on SCHEMA public to aiops_migrator;
 */
 -- switch role
 SET ROLE aiops_migrator;
+
+-- RESET ROLE;
 
 -- grant read privileges of the tables created by the migrator to readonly user
 ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT SELECT ON TABLES TO aiops_readonly;
@@ -248,8 +259,8 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO boost_readonly;
 ALTER DEFAULT PRIVILEGES FOR ROLE boost_migrator IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO boost_readwrite;
 ALTER DEFAULT PRIVILEGES FOR ROLE boost_migrator IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO boost_readwrite;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO boost_readwrite;
-GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO boost_readwrite;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO boost_readwrite;
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO boost_readwrite;
 ```
 
 ```sql
