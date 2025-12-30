@@ -16,7 +16,11 @@
         - [(1) orgin and edge](#1-orgin-and-edge)
         - [(2) cache hit ratio](#2-cache-hit-ratio)
       - [2.CloudFront cache params](#2cloudfront-cache-params)
-      - [3.Improve cache hit ratio](#3improve-cache-hit-ratio)
+      - [3.Policies](#3policies)
+        - [(1) Cache Policy](#1-cache-policy)
+        - [(2) Origin Request Policy](#2-origin-request-policy)
+        - [(3) Response Headers Policy](#3-response-headers-policy)
+      - [4.Cache Priority](#4cache-priority)
 
 <!-- /code_chunk_output -->
 
@@ -94,4 +98,23 @@ httpsexample.com/homefr-FR
 
 * Maximum TTL — the ceiling. If the origin says “cache for 2 days” but your Max TTL is 1 day, CloudFront will cache it no longer than 1 day.
 
-#### 3.Improve cache hit ratio
+#### 3.Policies
+
+##### (1) Cache Policy
+
+* Cache Key (headers, cookies, query strings)
+* cache TTL
+
+##### (2) Origin Request Policy
+
+* What to Forward after a cache miss
+
+##### (3) Response Headers Policy
+
+* What to Return
+
+#### 4.Cache Priority
+
+* `Cache-Control` from origin
+
+* CloudFront Default TTL
