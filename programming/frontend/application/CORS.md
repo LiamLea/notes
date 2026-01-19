@@ -8,6 +8,7 @@
   - [3.同源（same-origin policy）策略的概念](#3同源same-origin-policy策略的概念)
 - [Overview](#overview)
   - [1.CORS(cross-origin resource sharing)](#1corscross-origin-resource-sharing)
+    - [(1) Why](#1-why)
   - [2.preflight request (Test CORS)](#2preflight-request-test-cors)
   - [3.The HTTP response headers](#3the-http-response-headers)
   - [4.Requests with credentials](#4requests-with-credentials)
@@ -40,6 +41,17 @@ CORS is an HTTP-header based mechanism that allows **a server** to indicate any 
 
 * by adding new **HTTP headers** that let servers describe which origins are permitted to read that information from a web browser
 * for HTTP request methods that can cause side-effects on server data (in particular, HTTP methods other than GET, or POST with certain MIME types), the specification mandates **that browsers** **"preflight"** the request, soliciting supported methods from the server with the HTTP OPTIONS request method
+
+##### (1) Why
+
+prevent **malicious websites** from **reading/accessing the response data via JavaScript** from **our server** in a **user’s browser**
+
+With CORS:
+
+* Browser still sends the request (web compatibility)
+* Browser blocks JS from reading the response
+* Data stays confidential
+
 
 #### 2.preflight request (Test CORS)
 
