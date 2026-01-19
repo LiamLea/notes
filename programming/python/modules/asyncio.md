@@ -4,12 +4,14 @@
 <!-- code_chunk_output -->
 
 - [asyncio](#asyncio)
-    - [概述](#概述)
-      - [1.高层级API和低层级API](#1高层级api和低层级api)
-      - [2.基础概念](#2基础概念)
-      - [3关键字](#3关键字)
-        - [（1）`async`](#1async)
-        - [（2）`await`](#2await)
+    - [Overview](#overview)
+      - [1.callback vs async/await](#1callback-vs-asyncawait)
+      - [2.eventloop](#2eventloop)
+        - [(1) corountine/task and future](#1-corountinetask-and-future)
+        - [(2) async](#2-async)
+        - [(3) await](#3-await)
+        - [(4) example](#4-example)
+      - [3.callback and future](#3callback-and-future)
     - [使用](#使用)
       - [1.简单使用](#1简单使用)
         - [（1）基本使用](#1基本使用)
@@ -21,36 +23,131 @@
 
 <!-- /code_chunk_output -->
 
-### 概述
+### Overview
 
-#### 1.高层级API和低层级API
-要在程序中使用协程，依赖这两种API
-* 高层级API就是已经用协程写好的模块，协程只支持用协程写好的模块（比如：asynchttp、asyncssh等）
-  * 所以不是所有程序都可以使用协程，依赖已有的协程模块
-* 低层级API用于编写自己的协程代码（比如：async、await等关键字）
+#### 1.callback vs async/await
 
-#### 2.基础概念
-* event_loop
-事件循环，把 协程对象 注册到事件循环上
-</br>
-* coroutine
-协程对象，即使用`async`关键字定义的函数，这样 每次调用函数 就会返回一个 协程对象
-</br>
-* task（是Future的子类）
-任务，是对 协程对象 的封装，包含了任务的各种状态
-</br>
-* future
-跟task差不多，包含了任务的各种状态，当协程结束后，会将执行结果存入Future对象中
+* **Callback hell problem**: It creates a problem when we have multiple asynchronous operations. There it forms a nested structure which becomes complicated and hard to read code.
+```python
+import time
 
-#### 3关键字
+def legacy_system():
+    # Level 1: Get User
+    print("Fetching user...")
+    get_user_db(101, lambda user: 
+        # Level 2: Get Orders (using user['id'])
+        print(f"Got user {user['name']}. Fetching orders...")
+        get_orders_db(user['id'], lambda orders:
+            # Level 3: Calculate Price
+            print(f"Got {len(orders)} orders. Calculating total...")
+            calculate_total(orders, lambda total:
+                # Level 4: Save Log
+                print(f"Total is ${total}. Saving log...")
+                save_log(f"User {user['id']} spent ${total}", lambda:
+                    # Level 5: Final Completion
+                    print(">>> Flow Complete!")
+                )
+            )
+        )
+    )
 
-##### （1）`async`
-用于修改函数，被修饰的函数被执行就返回 协程对象
+# --- Mock functions to make the code runnable ---
+def get_user_db(id, cb): cb({"id": id, "name": "Alice"})
+def get_orders_db(uid, cb): cb([{"id": 1, "p": 50}, {"id": 2, "p": 30}])
+def calculate_total(orders, cb): cb(sum(o['p'] for o in orders))
+def save_log(msg, cb): cb()
 
-##### （2）`await`
-只有awaitable的函数，使用await才有意义
-* awaitable的函数都是用协程开发的函数
-  * 比如：asyncio.sleep()、asyncssh中的函数等
+legacy_system()
+```
+
+* how does async solve this problem
+```python
+import asyncio
+
+async def modern_system():
+    try:
+        # Step 1: Wait for User
+        print("Fetching user...")
+        user = await get_user_db(101)
+        
+        # Step 2: Wait for Orders
+        print(f"Got user {user['name']}. Fetching orders...")
+        orders = await get_orders_db(user['id'])
+        
+        # Step 3: Wait for Total
+        print(f"Got {len(orders)} orders. Calculating total...")
+        total = await calculate_total(orders)
+        
+        # Step 4: Wait for Log
+        print(f"Total is ${total}. Saving log...")
+        await save_log(f"User {user['id']} spent ${total}")
+        
+        print(">>> Flow Complete!")
+
+    except Exception as e:
+        # ONE error handler for all four steps!
+        print(f"An error occurred somewhere in the chain: {e}")
+
+# --- Modern Mock functions (Returning Awaitables) ---
+async def get_user_db(id): return {"id": id, "name": "Alice"}
+async def get_orders_db(uid): return [{"id": 1, "p": 50}, {"id": 2, "p": 30}]
+async def calculate_total(orders): return sum(o['p'] for o in orders)
+async def save_log(msg): pass
+
+asyncio.run(modern_system())
+```
+
+#### 2.eventloop
+
+**a single-thread system to manage tasks**
+
+##### (1) corountine/task and future
+* task is a corountine object that is running in eventloop
+
+##### (2) async
+* create a corountine which can be put into eventloop
+
+##### (3) await
+* a signal that tells eventlop that I’m stuck waiting for the completion of this code
+* so codes in a function modified by `await` can run in order 
+
+##### (4) example
+```python
+import asyncio
+
+async def slow_database_fetch():
+    async def inner():
+        print("inner: start")
+        await asyncio.sleep(1)
+        print("inner: end")
+        return 123
+
+    print("slow_database_fetch: before awaiting inner")
+    result = await inner()
+    print("slow_database_fetch: result =", result)
+
+async def do_other_work():
+    await asyncio.sleep(1)
+    return "Other work done"
+
+async def main():
+    # put tasks(slow_database_fetch, do_other_work) in the event loop
+    # wait for the results of the 2 tasks
+    results = await asyncio.gather(
+        slow_database_fetch(),
+        do_other_work()
+    )
+    print(results)
+
+# create the event loop
+# put the main task in
+asyncio.run(main())
+```
+* 3 tasks, but only 2 of them are “concurrent work tasks"
+
+#### 3.callback and future
+
+In modern asyncio, you can handle results for “every condition” without manually using callbacks or creating Futures yourself
 
 ***
 

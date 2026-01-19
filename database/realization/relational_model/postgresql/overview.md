@@ -153,7 +153,6 @@ ALTER ROLE sre_dba SET log_statement TO 'mod';
 GRANT rds_iam TO sre_dba WITH ADMIN OPTION;
 -- WITH ADMIN OPTION: the sre_dba can assign this role to others
 GRANT aiops_readwrite TO sre_dba WITH ADMIN OPTION;
-GRANT aiops_readonly TO sre_dba WITH ADMIN OPTION;
 
 /*
   create app user instead role because role can't login in
@@ -162,7 +161,6 @@ CREATE USER aiops;
 -- use an IAM policy for IAM database access for the user
 GRANT rds_iam TO aiops;
 GRANT aiops_readwrite TO aiops;
-GRANT aiops_readonly TO aiops;
 
 /*
   create migrator user
