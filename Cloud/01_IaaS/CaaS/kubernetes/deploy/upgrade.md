@@ -33,6 +33,14 @@
       - [6.升级node](#6升级node)
         - [（1）升级该node](#1升级该node)
         - [（2）升级kubelet](#2升级kubelet)
+    - [API Migration](#api-migration)
+      - [1.Served Version vs. Storage Version](#1served-version-vs-storage-version)
+      - [2.The "Two-Release" Rule](#2the-two-release-rule)
+      - [3.The Risk: The "Hidden" Legacy Data](#3the-risk-the-hidden-legacy-data)
+        - [(1) Use the "Storage Version Migrator" (The Pro Way)](#1-use-the-storage-version-migrator-the-pro-way)
+        - [(2) The Manual "Update All"](#2-the-manual-update-all)
+      - [4.Pay attention to versions](#4pay-attention-to-versions)
+        - [(1) feature-gates](#1-feature-gates)
 
 <!-- /code_chunk_output -->
 
@@ -204,3 +212,47 @@ systemctl restart kubelet
 ```shell
 kubectl uncordon <cp-node-name>
 ```
+
+***
+
+### API Migration
+
+#### 1.Served Version vs. Storage Version
+
+* Served Version (v1): This is the "User Interface." Since the feature is GA in v1.33, the API server accepts v1 requests.
+* Storage Version (v1beta1): This is the "Database Schema." Even if you send a v1 object, the API server transmutes it into a v1beta1 structure before writing the bytes to etcd.
+
+#### 2.The "Two-Release" Rule
+
+[xRef](https://kubernetes.io/docs/reference/using-api/deprecation-policy/)
+
+Kubernetes |Version	API Status	|Storage Version in etcd
+-|-|-
+v1.32	|Beta|	v1beta1
+v1.33 (Current)	|GA (v1)	|v1beta1 (For compatibility)
+v1.34+ (Future)	|GA (v1)	|v1 (The "Flip" happens here)
+
+#### 3.The Risk: The "Hidden" Legacy Data
+
+The danger arises when a legacy API is removed (no longer "served") by the API server.
+
+If you have an object in etcd stored as v1beta1, and you upgrade to a Kubernetes version where v1beta1 is completely gone, the API server might lose the "translator" needed to understand that old data. This can lead to:
+
+Failed Upgrades: The API server crashes because it can't decode the old data in etcd.
+
+Ghost Objects: Resources that exist in the database but cannot be managed or deleted through the API.
+
+##### (1) Use the "Storage Version Migrator" (The Pro Way)
+
+[xRef](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/storage-version-migration/)
+
+##### (2) The Manual "Update All"
+
+```shell
+kubectl annotate ingress --all migrated-on=$(date +%Y-%m-%d) --overwrite
+```
+
+#### 4.Pay attention to versions
+
+##### (1) feature-gates
+[xRef](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates)

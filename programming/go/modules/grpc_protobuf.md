@@ -25,6 +25,8 @@
         - [（2）对`<name>.proto`进行编译，生成相应的go语言代码: `<name>.pb.go`和`<name>_grpc.pb.go`](#2对nameproto进行编译生成相应的go语言代码-namepbgo和name_grpcpbgo)
         - [（3）server端](#3server端)
         - [（4）client端](#4client端)
+      - [3.Tool](#3tool)
+        - [(1) list all methods: `grpcurl`](#1-list-all-methods-grpcurl)
 
 <!-- /code_chunk_output -->
 
@@ -353,4 +355,13 @@ func main() {
 	info, err := client.GetUserInfo(context.Background(), &req)
 	fmt.Println(info)
 }
+```
+
+#### 3.Tool
+
+##### (1) list all methods: `grpcurl`
+
+```shell
+# grpc server needs to enable gRPC Server Reflection
+grpcurl -plaintext <grpc_server> list
 ```
