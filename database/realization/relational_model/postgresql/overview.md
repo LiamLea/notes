@@ -124,6 +124,11 @@ GRANT DDL_Change TO migrator;
 
 ```SQL
 CREATE DATABASE aiops;
+/*
+create admin user:
+  CREATE DATABASE aiops_admin;
+  GRANT USAGE, CREATE ON SCHEMA public TO aiops_admin;
+*/
 \c aiops
 
 -- Revoke the CREATE privilege and only grant it to necessary roles later.

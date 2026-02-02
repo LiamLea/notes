@@ -108,8 +108,10 @@ asyncio.run(modern_system())
 * create a corountine which can be put into eventloop
 
 ##### (3) await
+**Essentially, await puts wait in the background**
 * a signal that tells eventlop that I’m stuck waiting for the completion of this code
-* so codes in a function modified by `await` can run in order 
+* You can only await things that return a **coroutine** object, a **Task**, or a **Future**
+    * so if the await completes, it knows
 
 ##### (4) example
 ```python
