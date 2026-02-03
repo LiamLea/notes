@@ -30,7 +30,7 @@
 * access instance metadata from a **running instance** or **containers** running in the instance
     * container: `AWS_EXECUTION_ENV=AWS_ECS_EC2`
         * This indicates that the container is running inside an AWS EC2 instance within an ECS (Elastic Container Service) environment. This suggests the container might be accessing AWS resources via ECS metadata and IAM roles
-* instance access the AWS access **credentials** for the IAM role attached to the instance through IMDS
+* instances access the AWS access **credentials** for the IAM role attached to the instance through IMDS
     * The IMDS exposes this instance metadata through a special “link-local” IP address of `169.254.169.254`
 
 ##### (2) access IMDS

@@ -13,7 +13,7 @@
       - [1.OAuth2.0 vs OIDC](#1oauth20-vs-oidc)
       - [2.Setting up OAuth 2.0](#2setting-up-oauth-20)
       - [3.OIDC discovery document (`$issuer_uri/.well-known/openid-configuration`)](#3oidc-discovery-document-issuer_uriwell-knownopenid-configuration)
-        - [(1) how does client use the token to authenticate](#1-how-does-client-use-the-token-to-authenticate)
+        - [(1) how does subject use the token to authenticate](#1-how-does-subject-use-the-token-to-authenticate)
       - [4.Auth2.0 implementation (web server application i.e. `response_type=code`)](#4auth20-implementation-web-server-application-ie-response_typecode)
         - [(1) create an state token](#1-create-an-state-token)
         - [(2) Authentication Request](#2-authentication-request)
@@ -24,6 +24,7 @@
       - [5.Auth2.0 implementation (service account)](#5auth20-implementation-service-account)
         - [(1) create service account](#1-create-service-account)
         - [(2) request resources](#2-request-resources)
+      - [3.Workload identity federation](#3workload-identity-federation)
     - [Demo](#demo)
       - [1.Auth2.0 implementation (web server application)](#1auth20-implementation-web-server-application)
 
@@ -103,7 +104,7 @@ a well-known location containing key-value pairs which provide details about the
     }
     ```
 
-##### (1) how does client use the token to authenticate
+##### (1) how does subject use the token to authenticate
 * first, audience needs to configure oidc provider (`issuer_uri` is required), e.g.
   * aws
     ```tf
@@ -122,7 +123,9 @@ a well-known location containing key-value pairs which provide details about the
     }
     ``` 
 
-* client send the token to an endpoint to requests resources
+* second, subject needs to get JWT from the oidc provider
+
+* subject sends the token to an endpoint of the audience to requests resources
   * the endpoint is specified through different ways in different clouds, e.g.
 
   * aws
@@ -490,6 +493,9 @@ service = googleapiclient.discovery.build('admin', 'directory_v1', credentials=d
 result = service.users().list(domain="mycp.jp").execute()
 print(result)
 ```
+
+#### 3.Workload identity federation
+![](./imgs/oo_02.png)
 
 ***
 

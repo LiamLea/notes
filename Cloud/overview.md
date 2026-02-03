@@ -16,6 +16,8 @@
       - [5.cloud network](#5cloud-network)
       - [6.cloud native](#6cloud-native)
         - [（1）核心特性](#1核心特性)
+    - [Metadata Service (MDS)](#metadata-service-mds)
+      - [1.What](#1what)
 
 <!-- /code_chunk_output -->
 
@@ -106,3 +108,15 @@
 * 自动化
 * 自愈性
 * 可观测性
+
+***
+
+### Metadata Service (MDS)
+
+#### 1.What
+
+a specialized API endpoint that allows a virtual machine (VM) or container to programmatically retrieve information about itself
+
+* e.g.
+  * aws ec2: `http://169.254.169.254`
+  * GCP: `http://metadata.google.internal`
