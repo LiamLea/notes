@@ -35,6 +35,8 @@
 - [应用](#应用)
   - [1.https建立连接的过程](#1https建立连接的过程)
   - [2.ssh建立连接过程](#2ssh建立连接过程)
+- [Certificate Format](#certificate-format)
+  - [1.x509](#1x509)
 
 <!-- /code_chunk_output -->
 
@@ -355,4 +357,56 @@ server-->>client:server端发来公钥，client端确认是否接收
 client-->>server:随机生成对称密钥，通过公钥加密，发送给服务端
 client-->>server:利用对称密钥加密server端的用户名和密码，完成登录
 server-->>client:利用对称密钥进行数据的加密
+```
+
+***
+
+### Certificate Format
+
+#### 1.x509
+* Issuer
+  * For a Root CA, the Issuer and the Subject are identical
+* Subject
+  * the identity of the certificate belongs to
+* extensions:
+  * an extension is an additional structured field that provides extra information about the certificate
+```
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            04:7a:91:ab:22:cd:11:fe
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN=Example Intermediate CA, O=Example Org, C=US
+        Validity
+            Not Before: Jan  1 00:00:00 2026 GMT
+            Not After : Jan  1 00:00:00 2027 GMT
+        Subject: CN=api.internal.example.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (2048 bit)
+
+    X509v3 extensions:
+        X509v3 Basic Constraints:
+            CA:FALSE
+
+        X509v3 Key Usage:
+            Digital Signature, Key Encipherment
+
+        X509v3 Extended Key Usage:
+            TLS Web Server Authentication
+
+        X509v3 Subject Alternative Name:
+            DNS:api.internal.example.com
+            DNS:api
+            IP Address:10.96.0.10
+
+        X509v3 Subject Key Identifier:
+            9A:34:8C:1F:AB:22:44:EE:91:2B:AA:73:19:88:11:77:BC:AA:10:FF
+
+        X509v3 Authority Key Identifier:
+            keyid:12:77:AA:BC:99:44:EE:31:02:89:55:77:FA:01:02:BB:90:44:11:AA
+
+    Signature Algorithm: sha256WithRSAEncryption
+         7a:44:9d:aa:...
 ```
