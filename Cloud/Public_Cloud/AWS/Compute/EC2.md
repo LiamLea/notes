@@ -13,6 +13,8 @@
         - [(2) access IMDS](#2-access-imds)
       - [3.Auto Scaling Group](#3auto-scaling-group)
         - [(1) refresh](#1-refresh)
+      - [4.EC2 properties](#4ec2-properties)
+        - [(1) instance type](#1-instance-type)
 
 <!-- /code_chunk_output -->
 
@@ -40,4 +42,23 @@
 
 ##### (1) refresh
 
-update the instance to the latest launch template 
+update the instance to the latest launch template
+
+#### 4.EC2 properties
+
+##### (1) instance type
+`[Family][Generation][Attributes].[Size]`
+* Family
+  * T (Turbo/Burstable)
+    * Burstable Performance (T Family): Instead of reserving dedicated threads, these share resources with other instances on the same hardware
+  * M (Main/General Purpose)
+    * Fixed Performance (M or C Families): These reserve the physical resource (CPU threads) even when the instance doesn't need them
+      * using a Credit System to manage
+  * C (Compute)
+  * R (RAM/Memory)
+  * P (Accelerated Computing): The family for GPUs
+* Attributes
+  * `a`: AMD processors (10% cheaper than Intel)
+  * `i`: Intel processors
+  * `g`: Graviton (AWS-designed ARM chips; best price-performance)
+  * `n`: Network optimized (higher throughput)
