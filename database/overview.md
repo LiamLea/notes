@@ -25,6 +25,9 @@
       - [4.OLTP vs OLAP](#4oltp-vs-olap)
         - [(1) OLTP (online transactional processing)](#1-oltp-online-transactional-processing)
         - [(2) OLAP (online analytical processing)](#2-olap-online-analytical-processing)
+    - [Redo Log (WAL)](#redo-log-wal)
+      - [1.foramt](#1foramt)
+        - [(1) example](#1-example)
 
 <!-- /code_chunk_output -->
 
@@ -143,3 +146,58 @@ DDL + DML + DCL
 ##### (2) OLAP (online analytical processing)
 分析处理，就是对数据进行分析
 * 比如：聚合、排序等操作
+
+***
+
+### Redo Log (WAL)
+
+#### 1.foramt
+* Record Header
+* Block references
+    * WHERE changes happen (which disk pages to modify)
+* Operation data
+    * What exactly changed inside the page
+
+##### (1) example
+```
+-- 更新第 10 号 Page
+rmgr: Heap  len (rec/tot):  80/  80, tx: 59555587, lsn: 76/7E000300, desc: UPDATE off 5 xid 59555587, blkref #0: rel 1663/5/53434 blk 10
+
+-- 更新第 45 号 Page
+rmgr: Heap  len (rec/tot):  80/  80, tx: 59555587, lsn: 76/7E000380, desc: UPDATE off 12 xid 59555587, blkref #0: rel 1663/5/53434 blk 45
+
+-- 更新第 92 号 Page
+rmgr: Heap  len (rec/tot):  80/  80, tx: 59555587, lsn: 76/7E000400, desc: UPDATE off 2 xid 59555587, blkref #0: rel 1663/5/53434 blk 92
+
+-- 最后统一提交
+rmgr: Transaction len (rec/tot): 46/ 46, tx: 59555587, lsn: 76/7E000480, desc: COMMIT
+```
+* header
+```shell
+# This record is handled by the B-tree resource manager
+rmgr: Heap
+
+# Logical WAL record size
+# Total bytes actually written to WAL
+len (rec/tot): 80/80
+
+# The transaction id
+tx: 59555587
+
+# log sequential number
+lsn: 76/7E000300
+
+# updating tuple at offset 5 in page
+desc: UPDATE off 5
+```
+
+* Block References
+```
+blkref #0: rel 1663/5/53434 blk 10
+```
+
+* Operation Data
+    * this doesn't show up when dump wal simply
+```
+data: [ 02 00 00 00 00 00 00 00 18 00 01 00 44 4f 4e 45 ... ]
+```
