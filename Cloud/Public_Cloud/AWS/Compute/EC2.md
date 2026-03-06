@@ -15,6 +15,7 @@
         - [(1) refresh](#1-refresh)
       - [4.EC2 properties](#4ec2-properties)
         - [(1) instance type](#1-instance-type)
+      - [(2) AMI](#2-ami)
 
 <!-- /code_chunk_output -->
 
@@ -62,3 +63,26 @@ update the instance to the latest launch template
   * `i`: Intel processors
   * `g`: Graviton (AWS-designed ARM chips; best price-performance)
   * `n`: Network optimized (higher throughput)
+
+#### (2) AMI
+
+`[Product]-ami-[Kernel]-[Virtualization]-[Version]-[Architecture]-[Storage]`
+* `Product`
+  * amzn2, al2023, ubuntu, RHEL, ...
+* `Kernel`
+  * Kernel Version
+* `Virtualization`
+  * e.g. hvm, pv
+* `Version`
+  * e.g. `2.0.20220207.1`
+* `Architecture`
+  * `x86_64`, `amd64`
+* `Storage`
+  * gp2: General Purpose SSD (Gen 2)
+  * standard: Magnetic (HDD)
+  * ebs: Generic EBS (Elastic Block Store)
+
+list all latest AMIs
+```shell
+aws ssm get-parameters-by-path --path /aws/service/ami-amazon-linux-latest
+```

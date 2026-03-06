@@ -9,7 +9,7 @@
       - [2.两类hypervisor](#2两类hypervisor)
         - [（1）bare metal](#1bare-metal)
         - [（2）hosted](#2hosted)
-      - [3. full virtulization vs paravirtulization](#3-full-virtulization-vs-paravirtulization)
+      - [3. full virtulization (HVM) vs paravirtulization (PV)](#3-full-virtulization-hvm-vs-paravirtulization-pv)
         - [（1）paravirtualizatio常用的设备驱动标准： virtio](#1paravirtualizatio常用的设备驱动标准-virtio)
       - [4.其他](#4其他)
         - [（1）虚拟机分配](#1虚拟机分配)
@@ -46,9 +46,10 @@ hypervisor装在操作系统上（一般用于测试和实验环境）
 * qemu hypervisor
 
 
-#### 3. full virtulization vs paravirtulization
+#### 3. full virtulization (HVM) vs paravirtulization (PV)
+> **Note:** full virtulization is also called Hardware Virtual Machine (HVM)
 
-||full virtualization|paravirtualization|
+||full virtualization (HVM)|paravirtualization (PV)|
 |-|-|-|
 |本质区别|需要模拟真实的物理设备，导致性能很差（虚拟机的device driver不知道自己是虚拟机）|虚拟机的device driver知道自己是虚拟机，会和hypervisor配合，从而性能会提高很多|
 |额外依赖|无|虚拟机依赖特殊的设备驱动（比如virtio），才能识别虚拟的设备|
