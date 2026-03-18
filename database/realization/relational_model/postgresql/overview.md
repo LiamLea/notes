@@ -127,6 +127,9 @@ CREATE DATABASE aiops;
 /*
 create admin user:
   CREATE DATABASE aiops_admin;
+  \c aiops_admin
+  GRANT CREATE ON DATABASE aiops_admin TO aiops_admin;
+  REVOKE CREATE ON SCHEMA public FROM PUBLIC;
   GRANT USAGE, CREATE ON SCHEMA public TO aiops_admin;
 */
 \c aiops
