@@ -1,6 +1,5 @@
 # Operation
 
-
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
@@ -12,6 +11,7 @@
         - [(2) autovacuum](#2-autovacuum)
         - [(3) autovaccuum parameters](#3-autovaccuum-parameters)
       - [2.Visibility Map](#2visibility-map)
+      - [3.Check Vacuum (manual and auto)](#3check-vacuum-manual-and-auto)
 
 <!-- /code_chunk_output -->
 
@@ -59,3 +59,49 @@ autovacuum_vacuum_cost_limit = 600
 * The VM records whether all tuples (rows) on that heap page are visible to all transactions
     * Heap fetches = 0 → the VM let it skip all heap lookups
     * Heap fetches > 0 → VM wasn’t helpful, had to touch the heap
+
+#### 3.Check Vacuum (manual and auto)
+
+* check when stats has been reset
+```sql
+SELECT
+    stats_reset,
+    NOW() - stats_reset AS time_since_reset
+FROM pg_stat_database
+WHERE datname = current_database();
+```
+
+* check vacuum stats
+```sql
+SELECT
+    t.schemaname,
+    t.relname,
+    t.last_vacuum,
+    t.last_autovacuum,
+    COALESCE(
+        (SELECT option_value
+         FROM pg_options_to_table(c.reloptions)
+         WHERE option_name = 'autovacuum_enabled'),
+        'true'
+    ) AS autovacuum_enabled,
+    t.vacuum_count,
+    t.autovacuum_count,
+    t.n_tup_ins,
+    t.n_tup_upd,
+    t.n_tup_del,
+    t.n_live_tup,
+    t.n_dead_tup,
+    ROUND(100.0 * t.n_dead_tup / NULLIF(t.n_live_tup + t.n_dead_tup, 0), 2) AS dead_pct
+FROM pg_stat_user_tables t
+JOIN pg_class c ON c.relname = t.relname AND c.relnamespace = (
+    SELECT oid FROM pg_namespace WHERE nspname = t.schemaname
+)
+ORDER BY t.last_autovacuum DESC NULLS LAST;
+```
+
+* `n_tup_ins`: Number of rows inserted since the last stats reset
+* `n_tup_upd`: Number of rows updated since the last stats reset
+* `n_tup_del`: Number of rows deleted since the last stats reset
+* `n_live_tup`: Estimated number of live (visible) rows currently in the table
+* `n_dead_tup`: Estimated number of dead (obsolete) rows currently in the table
+* `dead_pct > 20%` → Table needs vacuuming
