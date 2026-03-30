@@ -20,6 +20,7 @@
       - [5.check roles and privileges](#5check-roles-and-privileges)
         - [(1) check user and role](#1-check-user-and-role)
         - [(2) check privileges of a role](#2-check-privileges-of-a-role)
+    - [demo](#demo)
 
 <!-- /code_chunk_output -->
 
@@ -232,6 +233,9 @@ WHERE
     grantee.rolname = 'metabase_readonly';
 ```
 
+***
+
+### demo
 
 ```sql
 -- Revoke the CREATE privilege and only grant it to necessary roles later.

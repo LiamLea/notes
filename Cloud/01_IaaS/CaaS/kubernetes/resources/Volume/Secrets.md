@@ -64,6 +64,8 @@ use external secrets, such as get db passwords from aws secret manager
 
 * also can create a cluster-wide secret store: `kind: ClusterSecretStore`
 
+* **key**: must set an aws role which is able to read secretmanagers
+
 * example-1
 ```yaml
 apiVersion: external-secrets.io/v1beta1
