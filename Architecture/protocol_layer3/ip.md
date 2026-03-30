@@ -210,6 +210,10 @@ $ sysctl -p
 |192.168.0.0/24|全范围|Private Network|私有网络内通信|
 |169.254.0.0/16|全范围|Subnet|链路地址（用于没有ip时，同一链路上的主机能够设置链路地址，进行通信）|
 
+* On most modern Linux distros (like Ubuntu or Amazon Linux), there is actually a specific route added for this range:
+  * `169.254.0.0/16 dev eth0 scope link`
+  * but it's not mandatory
+
 [更多参考](https://en.wikipedia.org/wiki/Reserved_IP_addresses)
 
 ***
