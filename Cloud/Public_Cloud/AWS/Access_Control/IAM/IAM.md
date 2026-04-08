@@ -12,11 +12,17 @@
         - [(3) API](#3-api)
         - [(4) external credentials](#4-external-credentials)
         - [(5) `:q~/.aws/credentials` vs `~/.aws/config`](#5-qawscredentials-vs-awsconfig)
-      - [2.role](#2role)
+      - [2.role permission](#2role-permission)
         - [(1) assume a role](#1-assume-a-role)
         - [(2) trust policy](#2-trust-policy)
         - [(3) permission policy](#3-permission-policy)
-      - [3.account and organization](#3account-and-organization)
+      - [3.Organization-Managed Roles](#3organization-managed-roles)
+        - [(1) `arn:aws:iam::<ACCOUNT>:root`](#1-arnawsiamaccountroot)
+        - [(2) `arn:aws:iam::<ACCOUNT>:OrganizationAccountAccessRole`](#2-arnawsiamaccountorganizationaccountaccessrole)
+      - [4.Grant Permission](#4grant-permission)
+        - [(1) Role Assumption (both sides)](#1-role-assumption-both-sides)
+        - [(2) Resource-Based Policy (one side or both sides)](#2-resource-based-policy-one-side-or-both-sides)
+      - [5.account and organization](#5account-and-organization)
 
 <!-- /code_chunk_output -->
 
@@ -75,7 +81,7 @@ credential_process = <shell_command>
 * `~/.aws/credentials` Stores **access credentials** (Access Key, Secret Key, and Session Token)
 * `~/.aws/config` Stores AWS CLI configurations (region, output format, IAM roles, etc.)
 
-#### 2.role
+#### 2.role permission
 
 ##### (1) assume a role
 * when you assume a role, it provides you with **temporary** security credentials for your role session
@@ -154,9 +160,6 @@ aws sts get-caller-identity --profile my-profile
 [policy grammar](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_grammar.html)
 
 * define whcih role this user can assume
-  * so if a AWS user wants to assume a role, it needs to 
-    * set corresponding permission policy for the user
-    * set corresponding trust policy for that role
 * define permissions for specific services and resources
 * a permission policy can **attach** to role, user and etc.
 
@@ -182,7 +185,42 @@ aws sts get-caller-identity --profile my-profile
 }
 ```
 
-#### 3.account and organization
+#### 3.Organization-Managed Roles
+
+##### (1) `arn:aws:iam::<ACCOUNT>:root`
+Not a user or role - it's a principal representing **the entire AWS account**
+
+##### (2) `arn:aws:iam::<ACCOUNT>:OrganizationAccountAccessRole`
+
+admin role, it has the permission:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "*",
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+
+#### 4.Grant Permission 
+
+##### (1) Role Assumption (both sides)
+if a AWS user wants to assume a role, it needs to 
+* set corresponding **permission policy** for the **source-role**
+* set corresponding **trust policy** for that **assume-role**
+
+##### (2) Resource-Based Policy (one side or both sides)
+
+* Same Account: The "Either/Or" Rule
+* Cross-Account: The "Double-Handshake" Rule
+
+#### 5.account and organization
 
 * organization
     * a collection of multiple AWS 

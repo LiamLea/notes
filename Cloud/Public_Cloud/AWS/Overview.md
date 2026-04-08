@@ -83,3 +83,14 @@ an intermediate location (datacenter or collection of hardware) between an AWS r
 -   CDK: cloud development kit, ensures idempotent of your infrastructure
     -   CDK has the same aim with terraform
     -   use couldformation underneath
+
+##### (3) Governance Mode vs Compliance Mode
+
+Some AWS services (S3 Object Lock, AWS Backup Vault Lock) support WORM (Write Once Read Many) protection with two enforcement levels:
+
+-   **Governance Mode** — privileged users with specific IAM permissions can still override the lock (e.g., delete objects, remove vault lock). Useful for operational flexibility and testing.
+-   **Compliance Mode** — the lock is fully immutable. No one — including the AWS root account — can remove or shorten the retention period once the grace period expires. Designed for strict regulatory requirements.
+
+Services that use this pattern:
+-   **S3 Object Lock** — protects object versions from deletion/overwrite
+-   **AWS Backup Vault Lock** — protects backup recovery points from deletion

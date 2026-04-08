@@ -180,6 +180,7 @@ ALTER ROLE aiops_migrator SET log_statement TO 'all';
 -- use an IAM policy for IAM database access for the user
 GRANT rds_iam TO aiops_migrator;
 -- Grant the revoked CREATE privilege
+GRANT CREATE on DATABASE aiops to aiops_migrator;
 GRANT CREATE on SCHEMA public to aiops_migrator;
 
 /*
@@ -197,6 +198,19 @@ ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT USAGE, S
 -- grant read and write privileges of the tables created by the migrator to readwrite user
 ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO aiops_readwrite;
 ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO aiops_readwrite;
+
+/*
+GRANT USAGE ON SCHEMA <new_schema> TO aiops_readwrite;
+GRANT USAGE ON SCHEMA <new_schema> TO aiops_readonly;
+-- switch role
+SET ROLE aiops_migrator;
+-- grant read privileges of the tables created by the migrator to readonly user
+ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA <new_schema> GRANT SELECT ON TABLES TO aiops_readonly;
+ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA <new_schema> GRANT USAGE, SELECT ON SEQUENCES TO aiops_readonly;
+-- grant read and write privileges of the tables created by the migrator to readwrite user
+ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA <new_schema> GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO aiops_readwrite;
+ALTER DEFAULT PRIVILEGES FOR ROLE aiops_migrator IN SCHEMA <new_schema> GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO aiops_readwrite;
+*/
 ```
 
 #### 5.check roles and privileges
