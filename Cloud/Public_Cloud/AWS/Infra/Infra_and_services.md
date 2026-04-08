@@ -67,6 +67,18 @@
 * local zones: No dedicated control plane; managed by the parent region
 
 #### 2.regional services
+* Services scoped to a single AWS region; resources are not automatically replicated across regions
+* Regional control plane manages resources across all AZs within that region
+* Examples:
+    * EC2 (instances are zonal, but AMIs/key pairs/security groups are regional)
+    * S3 (buckets are regional; data stored redundantly across AZs within the region)
+    * RDS
+    * ELB (ALB, NLB)
+    * VPC
+    * Lambda
+    * ECS / EKS
+* Failure of a region affects all resources in that region
+* Cross-region replication/failover must be explicitly configured
 
 #### 3.global services
 * Some global AWS services exist in each partition
