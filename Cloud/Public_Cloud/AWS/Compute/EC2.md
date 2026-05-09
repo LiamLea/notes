@@ -52,6 +52,8 @@ update the instance to the latest launch template
 * Family
   * T (Turbo/Burstable)
     * Burstable Performance (T Family): Instead of reserving dedicated threads, these share resources with other instances on the same hardware
+    * **Unlimited mode** (default for most T-class): bursts beyond baseline indefinitely; surplus credits billed extra. No throttling.
+    * Still shares physical CPU threads with other instances on the same host — can experience contention under sustained load (unlike M/R/C which reserve dedicated threads)
   * M (Main/General Purpose)
     * Fixed Performance (M or C Families): These reserve the physical resource (CPU threads) even when the instance doesn't need them
       * using a Credit System to manage
