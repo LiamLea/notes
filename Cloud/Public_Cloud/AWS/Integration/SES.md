@@ -11,6 +11,7 @@
         - [(2) how does this verification work](#2-how-does-this-verification-work)
       - [2.Sender Policy Framework (SPF)](#2sender-policy-framework-spf)
         - [(1) SPF records](#1-spf-records)
+        - [(2) how does it work](#2-how-does-it-work)
       - [3.Custom MAIL FROM domain](#3custom-mail-from-domain)
         - [(1) what](#1-what)
         - [(2) why](#2-why)
@@ -37,13 +38,18 @@ abcdefg12345._domainkey.yourdomain.com TXT v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0
 ##### (2) how does this verification work
 
 * When you send an email through Amazon SES (or any mail service), SES digitally signs your message using a private key.
-* The recipient’s mail server then uses the public key—published in your domain’s DNS as a DKIM record—to verify that:
+* The recipient’s mail server 
+  * Sees `d=mycompany.com; s=selector1` in the signature header
+  * Does a DNS lookup for the public key: 
+    * `selector1._domainkey.mycompany.com  TXT  "v=DKIM1; k=rsa; p=<public key>"`
+  * then uses the public key to verify that:
     * The email was indeed authorized by your domain
     * The contents of the email haven’t been tampered with
 
 #### 2.Sender Policy Framework (SPF)
 
-Verifies the sending server is allowed
+* Verifies the sending server is allowed
+* when use **Custom MAIL FROM** this should be set
 
 ##### (1) SPF records
 
@@ -52,8 +58,15 @@ An SPF record is a DNS TXT record that tells the world:
 
 * e.g.
 ```
-mail.aiops.mycompany.com   TXT   "v=spf1 include:amazonses.com -all"
+MX      mail.aiops.com       10 feedback-smtp.ap-northeast-1.amazonses.com
+TXT     mail.aiops.com       "v=spf1 include:amazonses.com ~all"
 ```
+
+##### (2) how does it work
+* Recipient's server sees the **MAIL FROM** domain (`mycompany.com`)
+* Looks up the SPF TXT record for that domain in DNS
+  * `dig mycompany.com TXT`
+* Checks whether the connecting server's IP is in the authorized list
 
 #### 3.Custom MAIL FROM domain
 ##### (1) what 
