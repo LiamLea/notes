@@ -10,6 +10,7 @@
       - [3.Ingress](#3ingress)
       - [4.Ingress如何指定代理的pod](#4ingress如何指定代理的pod)
       - [5.整个流程：](#5整个流程)
+    - [AWS 上如何创建 LoadBalancer](#aws-上如何创建-loadbalancer)
     - [安装](#安装)
       - [1.设置转发TCP](#1设置转发tcp)
         - [（1）方式一：](#1方式一)
@@ -57,6 +58,31 @@ a -> b
 b -> c
 c -> d
 ```
+***
+### AWS 上如何创建 LoadBalancer
+
+ingress-nginx 安装时会创建一个 `type: LoadBalancer` 的 Service。
+
+AWS Cloud Controller Manager (CCM) 监听到该 Service 后，自动在 AWS 上创建 NLB（Network Load Balancer），并将 NLB 的 DNS 名称写回 Service 的 `EXTERNAL-IP`。
+
+```
+Internet → NLB (AWS) → ingress-nginx Service → ingress-nginx Pod → backend Pod
+```
+
+默认创建的是 Classic LB，加注解可指定 NLB：
+
+```yaml
+# 在 ingress-nginx controller 的 Service 上加
+annotations:
+  service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+```
+
+查看分配的 NLB 地址：
+```shell
+kubectl get svc -n ingress-nginx ingress-nginx-controller
+# EXTERNAL-IP 即 NLB 的 DNS 名称
+```
+
 ***
 ### 安装
 利用helm
