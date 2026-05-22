@@ -1,110 +1,90 @@
-# lambda
-
+# Lambda
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [lambda](#lambda)
-    - [Handler](#handler)
-      - [1.Environments](#1environments)
-      - [2.Global state](#2global-state)
-      - [3.Context](#3context)
-        - [(1) Supported variables, methods, and properties](#1-supported-variables-methods-and-properties)
-        - [(2) Accessing invoke context information](#2-accessing-invoke-context-information)
-        - [(3) Using the context in AWS SDK client initializations and calls](#3-using-the-context-in-aws-sdk-client-initializations-and-calls)
-    - [Apply lambda](#apply-lambda)
-      - [1.upload lambda](#1upload-lambda)
-        - [(1) package (take go)](#1-package-take-go)
-      - [2.integrate with other services](#2integrate-with-other-services)
+- [Lambda](#lambda)
+    - [Ovewiew](#ovewiew)
+      - [1.Permission](#1permission)
+        - [(1) Lambda Permission](#1-lambda-permission)
+        - [(2) Lambda Execution Role](#2-lambda-execution-role)
+      - [2.Cross Account Permission](#2cross-account-permission)
+        - [(1) Lambda Permission](#1-lambda-permission-1)
+        - [(2) Assume role in other accounts](#2-assume-role-in-other-accounts)
 
 <!-- /code_chunk_output -->
 
-### Handler
 
-[go handler](https://docs.aws.amazon.com/lambda/latest/dg/golang-handler.html)
+### Ovewiew
 
-#### 1.Environments
-[xRef](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html)
+#### 1.Permission
 
-#### 2.Global state
-* define these global variables in a `var` block or statement.
-* declare an `init()` function that is executed during the initialization phase
+##### (1) Lambda Permission
 
-#### 3.Context
+Inbound (Who can access the Lambda)
 
-##### (1) Supported variables, methods, and properties
+##### (2) Lambda Execution Role
 
-[xRef](https://docs.aws.amazon.com/lambda/latest/dg/golang-context.html#golang-context-library)
+Outbound (What the Lambda can access)
+* the roles needs to be able to been assumed by `Service = "lambda.amazonaws.com"`
 
-##### (2) Accessing invoke context information
+#### 2.Cross Account Permission
 
-* use the context object to monitor how long your Lambda function takes to complete
+##### (1) Lambda Permission
 
-```go
-package main
-
-import (
-        "context"
-        "log"
-        "time"
-        "github.com/aws/aws-lambda-go/lambda"
-)
-
-func LongRunningHandler(ctx context.Context) (string, error) {
-
-        deadline, _ := ctx.Deadline()
-        deadline = deadline.Add(-100 * time.Millisecond)
-        timeoutChannel := time.After(time.Until(deadline))
-
-        for {
-
-                select {
-
-                case <- timeoutChannel:
-                        return "Finished before timing out.", nil
-
-                default:
-                        log.Print("hello!")
-                        time.Sleep(50 * time.Millisecond)
-                }
-        }
-}
-
-func main() {
-        lambda.Start(LongRunningHandler)
-}
-```
-
-##### (3) Using the context in AWS SDK client initializations and calls
-
-```go
-// Upload an object to S3
-    _, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-        ...
-    })
-```
-
-***
-
-### Apply lambda
-
-#### 1.upload lambda
-
-##### (1) package (take go)
-
-```shell
-GOOS=linux GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o bootstrap main.go
-```
+* all organization can invoke this lambda:
+* Users in the other account must have the corresponding user permissions to use the Lambda API
 
 ```tf
-data "archive_file" "my_lambda" {
-  type        = "zip"
-  source_file = "./data/bootstrap"
-  output_path = "my_lambda.zip"
+resource "aws_lambda_permission" "allow_organization" {
+  statement_id  = "AllowOrganizationInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.bcdr_tags_rule.function_name
+  
+  # Wildcard principal combined with the Org ID limits it strictly to your Organization
+  principal        = "*"
+  principal_org_id = data.aws_organizations_organization.my_org.id
 }
 ```
 
-#### 2.integrate with other services
+##### (2) Assume role in other accounts
 
-* [s3](https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html)
+* ToAssumeRole in the memeber accounts
+* ToAssumeRole needs to be allowed to be assumed by the execution role in lambda account
+* ToAssumeRole is passed to lambda through parameters
+
+* e.g. (ToAssumeRole is ExecutionRoleName parameter)
+```python
+def get_client(service, event, region=None):
+    """Return the service boto client. It should be used instead of directly calling the client.
+
+    Keyword arguments:
+    service -- the service name used for calling the boto.client()
+    event -- the event variable given in the lambda handler
+    region -- the region where the client is called (default: None)
+    """
+    if not ASSUME_ROLE_MODE:
+        return boto3.client(service, region)
+    credentials = get_assume_role_credentials(get_execution_role_arn(event), region)
+    return boto3.client(service, aws_access_key_id=credentials['AccessKeyId'],
+                        aws_secret_access_key=credentials['SecretAccessKey'],
+                        aws_session_token=credentials['SessionToken'],
+                        region_name=region
+                       )
+
+# Get execution role for Lambda function
+def get_execution_role_arn(event):
+    role_arn = None
+    if 'ruleParameters' in event:
+        rule_params = json.loads(event['ruleParameters'])
+        role_name = rule_params.get("ExecutionRoleName")
+        if role_name:
+            execution_role_prefix = event["executionRoleArn"].split("/")[0]
+            role_arn = "{}/{}".format(execution_role_prefix, role_name)
+
+    if not role_arn:
+        role_arn = event['executionRoleArn']
+
+    return role_arn
+```

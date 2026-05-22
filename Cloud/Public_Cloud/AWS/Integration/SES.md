@@ -17,6 +17,10 @@
         - [(2) why](#2-why)
         - [(3) example](#3-example)
       - [4. set to receive emails](#4-set-to-receive-emails)
+      - [5. Configuration Set](#5-configuration-set)
+        - [(1) example](#1-example)
+      - [6. Bounce Rate & Suppression List](#6-bounce-rate--suppression-list)
+        - [(1) Suppression List](#1-suppression-list)
 
 <!-- /code_chunk_output -->
 
@@ -103,3 +107,86 @@ set a MX record, e.g.:
 aiops.mycompany.com   MX   10   inbound-smtp.ap-northeast-1.amazonaws.com
 ```
 then sent email to: `aiops.mycompany.com`
+
+#### 5. Configuration Set
+
+A named policy attached to emails **at send time**. Controls IP pool, suppression, TLS, and event publishing for that sending stream.
+
+SES records the config set name with each message ID. When a bounce/complaint arrives, SES traces it back to that message ID → looks up the config set → applies its rules.
+
+`suppressed_reasons = []` — skip suppression list entirely, send regardless
+
+##### (1) example
+
+```hcl
+# Transactional — order confirmations, OTPs
+resource "aws_sesv2_configuration_set" "transactional" {
+  configuration_set_name = "transactional-emails"
+
+  delivery_options {
+    tls_policy        = "REQUIRE"       # reject delivery if recipient server doesn't support TLS
+    sending_pool_name = "transactional-pool"  # use IPs from this pool as the outgoing sender IP; isolated from marketing reputation — shared IPs are affected by other SES customers' spam complaints
+  }
+
+  suppression_options {
+    suppressed_reasons = ["BOUNCE"]     # when an email hard bounces, add that address to the suppression list — future sends to it are blocked; complaints excluded (rare, worth investigating manually)
+  }
+
+  reputation_options {
+    reputation_metrics_enabled = true   # expose bounce/complaint rates as CloudWatch metrics
+  }
+}
+
+# Marketing — newsletters, promotions
+resource "aws_sesv2_configuration_set" "marketing" {
+  configuration_set_name = "marketing-emails"
+
+  delivery_options {
+    tls_policy        = "OPTIONAL"      # allow fallback to unencrypted to maximise deliverability
+    sending_pool_name = "marketing-pool"  # isolated IPs — a bounce spike here won't affect transactional
+  }
+
+  suppression_options {
+    suppressed_reasons = ["BOUNCE", "COMPLAINT"]  # auto-suppress both — large send volumes make manual review impractical
+  }
+
+  reputation_options {
+    reputation_metrics_enabled = true
+  }
+}
+
+# Forward bounce/complaint events to SNS so a Lambda can handle list hygiene
+resource "aws_sesv2_configuration_set_event_destination" "marketing_sns" {
+  configuration_set_name = "marketing-emails"
+  event_destination_name = "sns-bounces"
+
+  event_destination {
+    enabled              = true
+    matching_event_types = ["BOUNCE", "COMPLAINT"]  # only forward actionable events
+
+    sns_destination {
+      topic_arn = aws_sns_topic.marketing_events.arn
+    }
+  }
+}
+```
+
+At send time:
+
+```go
+ses.SendEmail({ ConfigurationSetName: "transactional-emails", ... })
+ses.SendEmail({ ConfigurationSetName: "marketing-emails", ... })
+```
+
+#### 6. Bounce Rate & Suppression List
+
+Hard bounces can count toward enforcement metrics without appearing in the account-level suppression list — particularly bounces from SES's **global suppression list** (`bounceSubType: "Suppressed"`), which count toward your bounce rate but don't get added to your account-level list.
+
+##### (1) Suppression List
+
+Each suppressed address is stored with the reason (`BOUNCE` or `COMPLAINT`). At send time, SES checks if the stored reason matches the config set's `suppressed_reasons` — only matching reasons are blocked.
+
+```sh
+# inspect why an address is suppressed
+aws sesv2 get-suppressed-destination --email-address customer@example.com
+```
