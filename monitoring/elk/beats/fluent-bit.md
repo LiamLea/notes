@@ -8,6 +8,7 @@
 - [fluent-bit](#fluent-bit)
     - [Configuration](#configuration)
       - [1.basic](#1basic)
+      - [2.CRI Multiline Parsing](#2cri-multiline-parsing)
 
 <!-- /code_chunk_output -->
 
@@ -61,3 +62,17 @@
     Time_Key            time
     Time_Format         %Y-%m-%dT%H:%M:%S.%LZ
 ```
+
+#### 2.CRI Multiline Parsing
+
+Containerd reads container stdout/stderr in **16KB chunks**. If a single log line exceeds 16KB, it splits it with `P` (partial) / `F` (final) tags:
+
+```
+2024-01-15T10:23:45.123Z stdout P {"level":"info","msg":"processing order","order_id":"abc
+2024-01-15T10:23:45.123Z stdout P 123","items":[...continuing...more data...more data...mo
+2024-01-15T10:23:45.123Z stdout F re data...]}
+```
+
+`multiline.parser: cri` buffers `P` chunks and emits one record on `F`. Without it, each chunk is a separate broken event.
+
+> Note: this is not application-level multiline (e.g. stacktraces) — those need a separate multiline filter.

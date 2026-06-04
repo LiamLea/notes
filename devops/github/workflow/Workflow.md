@@ -22,7 +22,8 @@
         - [(2) step outputs](#2-step-outputs)
       - [4.conditions](#4conditions)
       - [5.dependency](#5dependency)
-      - [6.context](#6context)
+      - [6.concurrency](#6concurrency)
+      - [7.context](#7context)
 
 <!-- /code_chunk_output -->
 
@@ -178,11 +179,38 @@ jobs:
     needs: [job1, job2]
 ```
 
-#### 6.context
+#### 6.concurrency
+
+* prevent multiple runs from stepping on each other (e.g. two `workflow_dispatch` pushing to the same branch)
+
+```yaml
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}  # one run at a time per workflow+branch
+  cancel-in-progress: false                         # queue the new run instead of cancelling the running one
+```
+
+* all `github.*` context values are locked at dispatch time (they describe the event, not the current repo state)
+
+#### 7.Workflow Runtime Context
 
 [ref](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/accessing-contextual-information-about-workflow-runs)
 
-* dump github context
+##### (1) common context
+
+| variable | `workflow_dispatch` | `pull_request` |
+|---|---|---|
+| `github.sha` | HEAD SHA at dispatch time (stale if queued) | merge commit SHA |
+| `github.ref` | `refs/heads/main` | `refs/pull/123/merge` (synthetic) |
+| `github.head_ref` | empty | source branch (e.g. `my-feature`) |
+
+**which ref to use in `actions/checkout`:**
+
+| event | use | reason |
+|---|---|---|
+| `workflow_dispatch` | `ref: ${{ github.ref }}` | resolves to current HEAD, avoids stale SHA |
+| `pull_request` | `ref: ${{ github.head_ref }}` | actual source branch; `github.ref` gives the synthetic merge commit |
+
+##### (2) dump github context
 
 ```yaml
 - name: "dump githup context"
