@@ -20,7 +20,17 @@
       - [5. Configuration Set](#5-configuration-set)
         - [(1) example](#1-example)
       - [6. Bounce Rate & Suppression List](#6-bounce-rate--suppression-list)
-        - [(1) Suppression List](#1-suppression-list)
+        - [(1) soft bounce and hard bounce](#1-soft-bounce-and-hard-bounce)
+        - [(2) Suppression List](#2-suppression-list)
+      - [7.Reputation Impact Factors](#7reputation-impact-factors)
+        - [(1) Bounce Rate](#1-bounce-rate)
+        - [(2) Complaint Rate](#2-complaint-rate)
+      - [8.Improve Reputation](#8improve-reputation)
+        - [(1) List validation](#1-list-validation)
+        - [(2) Suppression list hygiene](#2-suppression-list-hygiene)
+        - [(3) Engagement-based sending](#3-engagement-based-sending)
+        - [(4) Dedicated IPs & IP warm-up](#4-dedicated-ips--ip-warm-up)
+        - [(5) Authentication](#5-authentication)
 
 <!-- /code_chunk_output -->
 
@@ -180,9 +190,20 @@ ses.SendEmail({ ConfigurationSetName: "marketing-emails", ... })
 
 #### 6. Bounce Rate & Suppression List
 
-Hard bounces can count toward enforcement metrics without appearing in the account-level suppression list — particularly bounces from SES's **global suppression list** (`bounceSubType: "Suppressed"`), which count toward your bounce rate but don't get added to your account-level list.
+##### (1) soft bounce and hard bounce
 
-##### (1) Suppression List
+* soft bounce
+  * the email address is valid, but the receiving server rejected the email temporarily
+  * SES will usually retry automatically
+
+* hard bounce
+  * the recipient's address is invalid or no longer exists (possible reasons: your ips has been blocked by the receiver)
+  * count toward enforcement metrics without appearing in the account-level suppression list
+    * particularly bounces from SES's **global suppression list** (`bounceSubType: "Suppressed"`), which count toward your bounce rate but don't get added to your account-level list.
+  * why it impacts reputation
+    * the receiver server will flag the sender server, if it sends to many invalid emails
+
+##### (2) Suppression List
 
 Each suppressed address is stored with the reason (`BOUNCE` or `COMPLAINT`). At send time, SES checks if the stored reason matches the config set's `suppressed_reasons` — only matching reasons are blocked.
 
@@ -190,3 +211,43 @@ Each suppressed address is stored with the reason (`BOUNCE` or `COMPLAINT`). At 
 # inspect why an address is suppressed
 aws sesv2 get-suppressed-destination --email-address customer@example.com
 ```
+
+#### 7.Reputation Impact Factors
+
+[xRef](https://docs.aws.amazon.com/pinpoint/latest/userguide/channels-email-deliverability-dashboard-bounce-complaint.html)
+
+##### (1) Bounce Rate
+
+ignore soft bounce
+
+* Under 2%: Healthy and expected.
+* 5%: AWS will send you a Warning notification.
+* 10%: AWS will likely Suspend your account's ability to send mail.
+
+##### (2) Complaint Rate
+
+* Under 0.1%: Healthy (1 complaint per 1,000 emails).
+* 0.1%: AWS will send you a Warning notification.
+* 0.5%: AWS will likely Suspend your account. (Spam complaints are weighted much more heavily than bounces).
+
+#### 8.Improve Reputation
+
+##### (1) List validation
+
+Verify addresses before sending — use double opt-in or an email validation API (e.g. ZeroBounce, NeverBounce) to remove invalid/disposable addresses before they bounce.
+
+##### (2) Suppression list hygiene
+
+Honor unsubscribes immediately. Remove complainers from future sends. Never retry hard-bounced addresses.
+
+##### (3) Engagement-based sending
+
+Only send to active recipients. Sunset contacts with no opens/clicks in 90–180 days — low engagement signals spam to ISPs.
+
+##### (4) Dedicated IPs & IP warm-up
+
+Use a dedicated IP pool for transactional mail. Warm up new IPs gradually (start low volume, ramp over weeks) to build reputation before full-scale sending. New IPs have no history — ISPs treat them as unknown and are more likely to filter their mail.
+
+##### (5) Authentication
+
+Ensure DKIM, SPF, and DMARC are all passing — most ISPs weight authenticated senders more favorably.
