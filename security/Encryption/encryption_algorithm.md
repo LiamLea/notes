@@ -4,14 +4,12 @@
 
 - [概述](#概述)
   - [1.BASE 64编码](#1base-64编码)
-  - [2.HASH](#2hash)
-    - [（1）常用HASH加密算法](#1常用hash加密算法)
-    - [（2）特点](#2特点)
-    - [（3）应用场景：用户密码](#3应用场景用户密码)
-    - [（4）缺点](#4缺点)
-  - [3.散列碰撞](#3散列碰撞)
-  - [4.HMAC](#4hmac)
-    - [（1）特点](#1特点)
+  - [2. Hash](#2-hash)
+    - [(1) Common Hash Algorithms](#1-common-hash-algorithms)
+    - [(2) Characteristics](#2-characteristics)
+    - [(3) When to Use Hash](#3-when-to-use-hash)
+    - [(4) Limitations of Plain Hash](#4-limitations-of-plain-hash)
+  - [3. Hash Collision](#3-hash-collision)
 
 <!-- /code_chunk_output -->
 
@@ -21,37 +19,35 @@
 将任意二进制数据进行编码，编码成由65个字符（`0~9 a~z A-Z + / =`）中的某些字符组成 的文本文件
 * 会使文件比原来更大
 
-#### 2.HASH
+#### 2. Hash
 
-##### （1）常用HASH加密算法
-* MD5
-* SHA1
-* SHA256
-* HMAC
+##### (1) Common Hash Algorithms
+* MD5 (broken, avoid for security use)
+* SHA1 (broken, avoid for security use)
+* SHA256 (general purpose, widely used)
+* bcrypt (password storage)
+* Argon2 (password storage, modern standard)
 
-##### （2）特点
-* 得到的结果是**定长**的
-* 信息摘要，信息指纹，用于做**数据校验**
-* 不可逆运算
+##### (2) Characteristics
+* Produces a **fixed-length** output regardless of input size
+* **One-way**: cannot be reversed even if the algorithm is known
+* **Deterministic**: same input always produces the same output
+* **Many-to-one mapping**: infinite inputs map to a finite output space — information is permanently lost
 
-##### （3）应用场景：用户密码
-* 用户在客户端**注册**时，将**密码的hash值**，**发送**到服务器，服务器保存用户密码的hash值
-* 用户登录时，在客户端将**密码的hash值**，**发送**到服务器，服务器**比对**本地保存的用户hash值和用户发来的hash值，如果一样，表明用户密码正确
-* 所以现在都**没有找回密码**这个功能，只有**重置密码**这个功能
+##### (3) When to Use Hash
 
-##### （4）缺点
-可以在cmd5网站中查找，从而破解密码
-* 早期解决方法：加盐（salt）
-  * 加salt的缺点：salt是在程序里写死的，一旦泄露会密码就不安全了
-* 现在的解决方法：HMAC
+| Scenario | Algorithm | Reason |
+|---|---|---|
+| Password storage | Argon2 / bcrypt | Deliberately slow, resists brute-force |
+| PII lookup (email, phone) | HMAC-SHA256 | Fast for DB queries, key prevents rainbow tables |
+| Data integrity check | SHA256 | Detect if data was tampered with |
+| File deduplication / checksums | SHA256 | Identify identical content |
 
-#### 3.散列碰撞
-两个数据的hash值是一样的，这样的情况叫做散列碰到
+##### (4) Limitations of Plain Hash
+* Can be cracked via rainbow tables (precomputed hash → value lookup)
+* Early mitigation: **salt** — append a random value before hashing
+  * Downside: salt hardcoded in code; if leaked, passwords become vulnerable
+* Better solution: **HMAC**
 
-#### 4.HMAC
-* 用户注册时，服务端会发送一个key到客户端，客户端用这个key对密码进行hash，服务端会保存这个hash结果
-* 用户登录时，会将hash结果加上时间戳，再次进行hash，然后发送给服务端，服务端同样这个做进行验证
-  * 注意，加的时间戳最多精确到分钟，如果服务器用当前时间计算出来的与客户端发来的不匹配，服务端会将时间减1分钟，再进行hash匹配
-
-##### （1）特点
-* 一个账号一个key
+#### 3. Hash Collision
+When two different inputs produce the same hash output. MD5 and SHA1 are vulnerable to this. SHA256 is considered collision-resistant for practical purposes.
