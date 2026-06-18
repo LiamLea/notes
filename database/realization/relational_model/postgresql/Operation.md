@@ -10,8 +10,10 @@
         - [(1) `VACUUM` vs `VACUUM FULL`](#1-vacuum-vs-vacuum-full)
         - [(2) autovacuum](#2-autovacuum)
         - [(3) autovaccuum parameters](#3-autovaccuum-parameters)
-      - [2.Visibility Map](#2visibility-map)
-      - [3.Check Vacuum (manual and auto)](#3check-vacuum-manual-and-auto)
+      - [2.Regular Vacuum vs Anti-wraparound Vacuum](#2regular-vacuum-vs-anti-wraparound-vacuum)
+        - [(1) Wraparound](#1-wraparound)
+      - [3.Visibility Map](#3visibility-map)
+      - [4.Check Vacuum (manual and auto)](#4check-vacuum-manual-and-auto)
 
 <!-- /code_chunk_output -->
 
@@ -52,7 +54,28 @@ autovacuum_vacuum_cost_delay = 25
 autovacuum_vacuum_cost_limit = 600
 ```
 
-#### 2.Visibility Map
+#### 2.Regular Vacuum vs Anti-wraparound Vacuum
+
+| | Regular Vacuum | Anti-wraparound Vacuum |
+|---|---|---|
+| **Trigger** | Dead tuples accumulate past a threshold | Table's XID age approaches wraparound limit |
+| **Pages read** | Only pages with dead tuples (uses visibility map) | Every page, no exceptions |
+| **Goal** | Reclaim dead tuple space | Freeze old XIDs before wraparound |
+| **Freezing** | Freezes rows it happens to visit | Freezes all unfrozen rows it finds |
+| **Cost** | Cheap — skips most pages | Expensive — reads entire table |
+| **Urgency** | Can be deferred | Cannot be cancelled — PG will block writes if needed |
+
+##### (1) Wraparound
+* XID (transaction id) has a 2billion counter
+* if XID in current XID - 1billion
+    * then the XID is in the pass
+* if XID in current XID + 1billion
+    * then the XID is in the futute(it is invisiable to users)
+* froze XID will always be visible to users because they are considered as past transaction
+    * Vacuum will freeze rows which is handled by it
+    * Vacuum FREEZE will freeze all old rows
+
+#### 3.Visibility Map
 
 * Every table in PostgreSQL has a visibility map (VM) 
     * a **bitmap** where each bit corresponds to a heap page (8kB block of table data)
@@ -60,7 +83,7 @@ autovacuum_vacuum_cost_limit = 600
     * Heap fetches = 0 → the VM let it skip all heap lookups
     * Heap fetches > 0 → VM wasn’t helpful, had to touch the heap
 
-#### 3.Check Vacuum (manual and auto)
+#### 4.Check Vacuum (manual and auto)
 
 * check when stats has been reset
 ```sql

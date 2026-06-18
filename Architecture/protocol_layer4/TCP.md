@@ -37,6 +37,10 @@
         - [（1）慢开始原理](#1慢开始原理)
         - [（2）利用慢开始实现 拥塞控制](#2利用慢开始实现-拥塞控制)
       - [2.改进：快重传和快恢复](#2改进快重传和快恢复)
+    - [Connection Establishment and Termination](#connection-establishment-and-termination)
+      - [1.Three-Way Handshake](#1three-way-handshake)
+      - [2.Four-Way Termination](#2four-way-termination)
+      - [3.SYN Retries and Connection Timeout](#3syn-retries-and-connection-timeout)
 
 <!-- /code_chunk_output -->
 
@@ -197,3 +201,49 @@ cwnd：congestion window
 当接收方接收到1，2，3，5字节时，就知道丢包了（网络拥塞），会连续发送 3个 确认号为4的包到发送端
 发送端接收到这3个包，就表明可能没有拥塞，但也会调整拥塞窗口，调整成 cwnd/2
 其他情况还是按慢开始算法处理
+
+***
+
+### Connection Establishment and Termination
+
+#### 1.Three-Way Handshake
+
+The client and server exchange three segments to establish a connection and synchronize sequence numbers before any data is sent.
+
+```
+Client                    Server
+  |------- SYN --------->|   (client picks ISN, sets SYN flag)
+  |<---- SYN + ACK ------|   (server picks its own ISN, acks client ISN+1)
+  |------- ACK --------->|   (client acks server ISN+1; connection open)
+```
+
+- **SYN**: initiator sends its Initial Sequence Number (ISN)
+- **SYN-ACK**: responder acknowledges and sends its own ISN
+- **ACK**: initiator acknowledges; both sides are now in `ESTABLISHED`
+
+MSS is negotiated in the SYN/SYN-ACK options (see §6 above).
+
+#### 2.Four-Way Termination
+
+Either side can initiate close. Because TCP is full-duplex, each direction is shut down independently.
+
+```
+Active closer             Passive closer
+  |------- FIN --------->|   → active enters FIN_WAIT_1
+  |<------- ACK ---------|   → passive enters CLOSE_WAIT; active enters FIN_WAIT_2
+  |<------- FIN ---------|   → passive enters LAST_ACK
+  |------- ACK --------->|   → active enters TIME_WAIT (2×MSL); passive → CLOSED
+```
+
+**TIME_WAIT** lasts 2×MSL (typically 60 s) to ensure the final ACK reaches the peer and to prevent delayed segments from a previous connection being misread by a new one using the same 4-tuple.
+
+#### 3.SYN Retries and Connection Timeout
+
+Linux default `tcp_syn_retries = 6`. Each retry doubles the backoff:
+
+```
+1s → 2s → 4s → 8s → 16s → 32s → 64s
+Total: 1 + 2 + 4 + 8 + 16 + 32 + 64 = 127s + initial attempt overhead ≈ ~134s
+```
+
+This means if a SYN gets no response (e.g. network path is dead, SNAT port exhausted, packets dropped), the kernel waits ~134s before declaring `ETIMEDOUT` — even if the route recovers seconds after the first SYN is sent. The connection is stuck on that dead socket; there is no mid-connection "route is back" detection.
