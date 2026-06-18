@@ -21,11 +21,14 @@
       - [5.`/etc/resolv.conf`使用注意](#5etcresolvconf使用注意)
         - [(1) 最多只有3个nameserver生效](#1-最多只有3个nameserver生效)
         - [(2) 只会按顺序查询一个nameserver（如果nameserver超时，才会查询下一个）](#2-只会按顺序查询一个nameserver如果nameserver超时才会查询下一个)
-      - [6.DNS security](#6dns-security)
+      - [6.resolve options](#6resolve-options)
+        - [(1) ndots](#1-ndots)
+        - [(2) single-request-reopen](#2-single-request-reopen)
+      - [7.DNS security](#7dns-security)
         - [(1) DNS over TLS](#1-dns-over-tls)
         - [(2) DNS over HTTPS](#2-dns-over-https)
         - [(3) 常用DOT和DOH的nameserver](#3-常用dot和doh的nameserver)
-      - [7.reverse DNS (ip -> domain name)](#7reverse-dns-ip---domain-name)
+      - [8.reverse DNS (ip -> domain name)](#8reverse-dns-ip---domain-name)
         - [(1) why](#1-why)
         - [(2) 前提： 只有存在PTR记录的域名，才能做reverse DNS](#2-前提-只有存在ptr记录的域名才能做reverse-dns)
         - [(3) 工作原理（以10.107.93.137为例）](#3-工作原理以1010793137为例)
@@ -144,7 +147,29 @@ ping <HOST>
   * 第二个nameserver能查询到结果
   * 则返回的结果是查询不到结果
 
-#### 6.DNS security
+#### 6.resolve options
+
+##### (1) ndots
+
+* if dots in name `>= ndots`: try as absolute name first
+* if dots in name `< ndots`: try search domains first, then absolute
+* Kubernetes default: `ndots:5` — so short names like `myservice` resolve via search domains to `myservice.namespace.svc.cluster.local`
+
+##### (2) single-request-reopen
+
+* DNS clients send A and AAAA queries in parallel by default
+* in Kubernetes, both UDP packets can share the same 5-tuple, triggering a Linux conntrack race → one response dropped → intermittent `i/o timeout`
+* `single-request-reopen` forces sequential A then AAAA, eliminating the race
+
+```yaml
+# kubernetes pod dnsConfig fix
+spec:
+  dnsConfig:
+    options:
+      - name: single-request-reopen
+```
+
+#### 7.DNS security
 
 ##### (1) DNS over TLS
 
@@ -153,7 +178,7 @@ ping <HOST>
 ##### (3) 常用DOT和DOH的nameserver
 [参考](https://dnsprivacy.org/public_resolvers/)
 
-#### 7.reverse DNS (ip -> domain name)
+#### 8.reverse DNS (ip -> domain name)
 
 [参考](https://phoenixnap.com/kb/reverse-dns-lookup)
 

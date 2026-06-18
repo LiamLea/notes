@@ -40,3 +40,14 @@ The key acts as a secret parameter. Without it, an attacker cannot recompute any
 | Use case | PII query matching | Password storage |
 | Brute-force resistance | Depends on key secrecy | Strong by design |
 | Reversible | No | No |
+
+##### (3) PII Storage Pattern
+
+Only useful when PII is stored **encrypted** (not plaintext):
+
+| Column | Value | Purpose |
+|---|---|---|
+| `email_encrypted` | `KMS_encrypt(email)` | Read original (display, send email) |
+| `email_hash` | `HMAC(email, key)` | Indexed DB lookup |
+
+Encrypted value can't be queried directly — encryption uses a random IV so the same input produces a different output each time. HMAC is deterministic, so it can be indexed.

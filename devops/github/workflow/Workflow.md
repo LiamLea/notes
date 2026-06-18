@@ -93,7 +93,7 @@ steps:
 
 ##### (1) default variables
 
-[more variables](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables)
+[more variables](https://docs.github.com/en/actions/reference/workflows-and-actions/variables)
 
 ##### (2) common actions
 [more actions](https://github.com/actions)
