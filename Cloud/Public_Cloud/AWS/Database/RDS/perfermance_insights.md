@@ -10,6 +10,9 @@
         - [(1) What](#1-what)
         - [(2) Active Sessions in **performance insights**:](#2-active-sessions-in-performance-insights)
         - [(3) Analyze](#3-analyze)
+      - [2.Metrics](#2metrics)
+        - [(1) IPC:BufferIO](#1-ipcbufferio)
+        - [(2) IO:DataFileRead](#2-iodatafileread)
 
 <!-- /code_chunk_output -->
 
@@ -37,3 +40,11 @@ Every second, the RDS engine takes a "snapshot" of all currently running threads
 ##### (3) Analyze
 
 **AAS > Max vCPU**: Your database is "bottlenecked." There are more active sessions than there are CPU cores to handle them
+
+#### 2.Metrics
+
+##### (1) IPC:BufferIO
+Multiple concurrent processes waiting for the same page to be loaded from disk into shared_buffers.
+
+##### (2) IO:DataFileRead
+A process reading a page directly from disk because it wasn't found in shared_buffers (cache miss).

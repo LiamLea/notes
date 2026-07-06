@@ -16,6 +16,12 @@
     - [Buildx](#buildx)
       - [1. concepts](#1-concepts)
       - [2.build for multiple platforms](#2build-for-multiple-platforms)
+      - [3.bake](#3bake)
+    - [Multiple Stages](#multiple-stages)
+      - [1.Why and How](#1why-and-how)
+      - [2.Usage](#2usage)
+        - [(1) name a stage](#1-name-a-stage)
+        - [(2) build a stage](#2-build-a-stage)
 
 <!-- /code_chunk_output -->
 
@@ -155,4 +161,76 @@ docker login
 
 # build and load: --load
 docker buildx build --push --platform=linux/amd64,linux/arm64,linux/s390x,linux/ppc64le -t <image:tag> .
+```
+
+#### 3.bake
+
+Bake lets you define your build configuration using a declarative file
+
+```hcl
+# The group block defines a group of targets that can be built concurrently
+group "default" {
+  targets = ["base", "backend"]
+}
+
+target "base" {
+  dockerfile = "Dockerfile"
+  args = {
+    GO_VERSION = "1.25"
+  }
+}
+
+target "backend" {
+
+  # it will inherit all attributes (e.g.dockerfile, args) from base 
+  # and these can be overrided
+  inherits = ["base"]
+
+  target   = "<stage_name>"
+  tags = ["myapp/backend:latest"]
+}
+```
+
+```shell
+docker buildx bake
+```
+
+***
+
+### Multiple Stages
+
+#### 1.Why and How
+
+cache every stage so that it can speed up build process and reduce image size
+
+**Cache key**: each stage's cache is keyed on its `FROM` base image + all instructions up to that point; for `COPY`/`ADD`, the key includes a checksum of the copied file contents. A change invalidates that stage's cache and all stages after it.
+
+#### 2.Usage
+
+##### (1) name a stage
+
+one `FROM` is one stage
+
+```dockerfile
+FROM golang:1.25 AS build
+WORKDIR /src
+COPY <<EOF /src/main.go
+package main
+
+import "fmt"
+
+func main() {
+  fmt.Println("hello, world")
+}
+EOF
+RUN go build -o /bin/hello ./main.go
+
+FROM scratch
+COPY --from=build /bin/hello /bin/hello
+CMD ["/bin/hello"]
+```
+
+##### (2) build a stage
+```shell
+docker build --target <stage_name> -t <tag> .
 ```
