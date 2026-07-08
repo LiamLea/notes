@@ -12,6 +12,7 @@
         - [(3) partition](#3-partition)
       - [2.index](#2index)
         - [(1) index size](#1-index-size)
+        - [(2) hit percentage](#2-hit-percentage)
 
 <!-- /code_chunk_output -->
 
@@ -91,3 +92,15 @@ ORDER BY pg_relation_size(indexrelid) DESC;
 ```
 
 Indexes with `idx_scan = 0` are never used for queries — pure write overhead. Drop them.
+
+##### (2) hit percentage
+
+`hit_pct = idx_blks_hit / (idx_blks_hit + idx_blks_read)`
+
+* idx_blks_read = number of times PostgreSQL had to fetch an index page from disk (buffer cache miss).
+* idx_blks_hit = number of times it found the index page already in the buffer cache.
+
+**high idx_blks_read + low hit_pct** means this index is accessed frequently AND is generating a lot of disk I/O each time
+* Low hit_pct alone could just mean the index is cold (e.g. rarely used)
+* High idx_blks_read alone could mean a very active index that happens to be cached well
+    * If an index is accessed 10 million times and 9.9 million hit the cache, that's 99% hit rate but still 100,000 disk reads.
