@@ -170,3 +170,41 @@ Prevent with a lifecycle rule — S3 auto-deletes incomplete uploads after N day
 ```json
 { "Rules": [{ "Status": "Enabled", "Filter": {}, "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 7 } }] }
 ```
+
+#### 7.Upload while producing (unknown final size)
+
+S3 single `PutObject` requires `Content-Length` upfront — multipart does not. You can flush a part whenever the buffer is full and upload the remainder at the end.
+
+Example: pipe `pg_dump` directly into S3 without a temp file:
+```python
+import boto3, subprocess
+
+s3 = boto3.client("s3")
+response = s3.create_multipart_upload(Bucket="my-bucket", Key="backups/db-dump.tar.gz")
+upload_id = response["UploadId"]
+
+parts = []
+part_number = 1
+CHUNK = 5 * 1024 * 1024 * 1024  # 5GB minimum part size
+
+proc = subprocess.Popen(["pg_dump", "mydb"], stdout=subprocess.PIPE)
+
+buffer = b""
+for chunk in proc.stdout:
+    buffer += chunk
+    if len(buffer) >= CHUNK:
+        r = s3.upload_part(Bucket="my-bucket", Key="backups/db-dump.tar.gz",
+                           UploadId=upload_id, PartNumber=part_number, Body=buffer)
+        parts.append({"PartNumber": part_number, "ETag": r["ETag"]})
+        part_number += 1
+        buffer = b""
+
+# upload remaining bytes as final part (can be < 5GB)
+if buffer:
+    r = s3.upload_part(Bucket="my-bucket", Key="backups/db-dump.tar.gz",
+                       UploadId=upload_id, PartNumber=part_number, Body=buffer)
+    parts.append({"PartNumber": part_number, "ETag": r["ETag"]})
+
+s3.complete_multipart_upload(Bucket="my-bucket", Key="backups/db-dump.tar.gz",
+                             UploadId=upload_id, MultipartUpload={"Parts": parts})
+```
