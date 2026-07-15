@@ -10,6 +10,8 @@
       - [2.Upload Methods](#2upload-methods)
       - [3.single-part vs multiple-part upload](#3single-part-vs-multiple-part-upload)
       - [4.resumable upload protocols](#4resumable-upload-protocols)
+      - [5.multipart upload steps](#5multipart-upload-steps)
+      - [6.Force quit multipart upload](#6force-quit-multipart-upload)
 
 <!-- /code_chunk_output -->
 
@@ -71,3 +73,100 @@ chunk 2 [===============================X  drop at 3.9GB
          ↑ resume from here, not from X
 ```
 
+#### 5.multipart upload steps
+
+**Step 1: Initiate — `POST /{key}?uploads`**
+```http
+POST /backups/db-dump.tar.gz?uploads HTTP/1.1
+Host: my-bucket.s3.amazonaws.com
+Authorization: AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20260715/ap-northeast-1/s3/aws4_request, SignedHeaders=host;x-amz-checksum-algorithm;x-amz-date, Signature=<sig>
+x-amz-date: 20260715T120000Z
+x-amz-checksum-algorithm: SHA256
+Content-Length: 0
+```
+```xml
+<!-- response -->
+<InitiateMultipartUploadResult>
+  <Bucket>my-bucket</Bucket>
+  <Key>backups/db-dump.tar.gz</Key>
+  <UploadId>VXBsb2FkIElE...</UploadId>
+</InitiateMultipartUploadResult>
+```
+
+**Step 2: Upload parts — `PUT /{key}?partNumber=N&uploadId=...`**
+```http
+PUT /backups/db-dump.tar.gz?partNumber=1&uploadId=VXBsb2FkIElE... HTTP/1.1
+Host: my-bucket.s3.amazonaws.com
+Authorization: AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20260715/ap-northeast-1/s3/aws4_request, SignedHeaders=content-length;host;x-amz-checksum-sha256;x-amz-date, Signature=<sig>
+x-amz-date: 20260715T120001Z
+Content-Length: 5000000000
+x-amz-checksum-sha256: dGhlIHNhbXBsZSBjaGVja3N1bSBmb3IgcGFydCAxCg==
+
+<binary chunk data>
+```
+```http
+<!-- response — S3 verified checksum before storing; collect ETag for complete step -->
+HTTP/1.1 200 OK
+ETag: "d8e8fca2dc0f896fd7cb4cb0031ba249"
+x-amz-checksum-sha256: dGhlIHNhbXBsZSBjaGVja3N1bSBmb3IgcGFydCAxCg==
+```
+
+**Step 3: Complete — `POST /{key}?uploadId=...` with ordered ETag list**
+```http
+POST /backups/db-dump.tar.gz?uploadId=VXBsb2FkIElE... HTTP/1.1
+Host: my-bucket.s3.amazonaws.com
+Authorization: AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20260715/ap-northeast-1/s3/aws4_request, SignedHeaders=content-length;host;x-amz-date, Signature=<sig>
+x-amz-date: 20260715T120010Z
+Content-Type: application/xml
+Content-Length: 272
+
+<?xml version="1.0" encoding="UTF-8"?>
+<CompleteMultipartUpload>
+  <Part>
+    <PartNumber>1</PartNumber>
+    <ETag>"d8e8fca2dc0f896fd7cb4cb0031ba249"</ETag>
+    <ChecksumSHA256>dGhlIHNhbXBsZSBjaGVja3N1bSBmb3IgcGFydCAxCg==</ChecksumSHA256>
+  </Part>
+  <Part>
+    <PartNumber>2</PartNumber>
+    <ETag>"b026324c6904b2a9cb4b88d6d61c81d1"</ETag>
+    <ChecksumSHA256>dGhlIHNhbXBsZSBjaGVja3N1bSBmb3IgcGFydCAyCg==</ChecksumSHA256>
+  </Part>
+</CompleteMultipartUpload>
+```
+```xml
+<!-- response — object is now visible; ETag format is MD5-of-part-MD5s-<partcount> -->
+<CompleteMultipartUploadResult>
+  <Location>https://my-bucket.s3.amazonaws.com/backups/db-dump.tar.gz</Location>
+  <Bucket>my-bucket</Bucket>
+  <Key>backups/db-dump.tar.gz</Key>
+  <ETag>"d41d8cd98f00b204e9800998ecf8427e-2"</ETag>
+  <ChecksumSHA256>wqBTnUPBGMjBPRFGkDpd0mZTDMJmCMsMqJE5QVSM3pA=</ChecksumSHA256>
+</CompleteMultipartUploadResult>
+```
+
+**Abort — `DELETE /{key}?uploadId=...`**
+```http
+DELETE /backups/db-dump.tar.gz?uploadId=VXBsb2FkIElE... HTTP/1.1
+Host: my-bucket.s3.amazonaws.com
+Authorization: ...
+x-amz-date: 20260715T120020Z
+```
+```http
+HTTP/1.1 204 No Content
+```
+
+#### 6.Force quit multipart upload
+
+Uploaded parts stay in S3 as orphaned bytes — invisible in object listings, but still billed. `a.zip` does not exist until `CompleteMultipartUpload` is called.
+
+Check orphaned parts:
+```sh
+aws s3api list-multipart-uploads --bucket my-bucket
+aws s3api list-parts --bucket my-bucket --key backups/a.zip --upload-id VXBsb2FkIElE...
+```
+
+Prevent with a lifecycle rule — S3 auto-deletes incomplete uploads after N days:
+```json
+{ "Rules": [{ "Status": "Enabled", "Filter": {}, "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 7 } }] }
+```
