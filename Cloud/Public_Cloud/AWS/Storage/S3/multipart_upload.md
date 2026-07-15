@@ -12,6 +12,7 @@
       - [4.resumable upload protocols](#4resumable-upload-protocols)
       - [5.multipart upload steps](#5multipart-upload-steps)
       - [6.Force quit multipart upload](#6force-quit-multipart-upload)
+      - [7.Upload while producing (unknown final size)](#7upload-while-producing-unknown-final-size)
 
 <!-- /code_chunk_output -->
 
