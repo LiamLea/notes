@@ -11,7 +11,9 @@
         - [(1) Cookie Storage](#1-cookie-storage)
         - [(2) Lifetime Of A Cookie](#2-lifetime-of-a-cookie)
         - [(3) Security](#3-security)
+        - [(4) Define where cookies are sent](#4-define-where-cookies-are-sent)
       - [3.Coookie vs Access/Refresh Token](#3coookie-vs-accessrefresh-token)
+        - [(1) which one to choose](#1-which-one-to-choose)
 
 <!-- /code_chunk_output -->
 
@@ -88,3 +90,18 @@ Set-Cookie: session=abc; Domain=example.com; Path=/shop
 ```
 
 #### 3.Coookie vs Access/Refresh Token
+
+| Feature | Cookie Access | Refresh Token |
+|---|---|---|
+| Origin Layer | Built into HTTP protocol layer | Application layer (OAuth 2.0) |
+| Handler | Browser (automatically attaches to matching domain requests) | Code (JavaScript manually attaches via request headers) |
+| Storage Location | Browser Cookie Store | LocalStorage, JS Memory, or HttpOnly Cookie |
+
+##### (1) which one to choose
+
+| Scenario | Choose | Why |
+|---|---|---|
+| Single-domain web app (Next.js, Django, Rails…) | **Cookies** (session or HttpOnly JWT) | Easiest to secure; `SameSite` handles CSRF; no XSS token theft |
+| Mobile / desktop app or third-party API | **Tokens** (OAuth 2.0 / JWT) | Native apps don't handle cookie domains; clients expect `Authorization: Bearer` |
+| Decoupled SPA + separate API domain | **Hybrid** (access token in memory + refresh token in HttpOnly cookie) | Combines XSS protection with cross-domain flexibility |
+
