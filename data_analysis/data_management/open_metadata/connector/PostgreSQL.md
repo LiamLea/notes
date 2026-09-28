@@ -28,7 +28,8 @@ GRANT pg_read_all_stats TO <your_user>;
 ```
 
 #### 2.config yaml
-[demo](https://docs.open-metadata.org/v1.12.x/connectors/database/postgres/yaml)
+[workflow config](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-spec/src/main/resources/json/schema/metadataIngestion/workflow.json)
+[demo](https://docs.open-metadata.org/v1.13.x/connectors/database/postgres/yaml)
 [config](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-spec/src/main/resources/json/schema/entity/services/connections/database/postgresConnection.json)
 
 #### 3.demo

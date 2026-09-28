@@ -23,6 +23,8 @@
         - [(1) Role Assumption (both sides)](#1-role-assumption-both-sides)
         - [(2) Resource-Based Policy (one side or both sides)](#2-resource-based-policy-one-side-or-both-sides)
       - [5.account and organization](#5account-and-organization)
+      - [6.Acess Key](#6acess-key)
+        - [(1) How it authenticates](#1-how-it-authenticates)
 
 <!-- /code_chunk_output -->
 
@@ -230,3 +232,21 @@ if a AWS user wants to assume a role, it needs to
     * will create a role `OrganizationAccountAccessRole` in this account which is the admin of the account
 
 ![](./imgs/iam_01.png)
+
+#### 6.Acess Key
+
+| Piece | Role | Secret? |
+|---|---|---|
+| Access key ID | Who you are | No |
+| Secret access key | Proves it's you | Yes |
+| Session token | Session details, temp creds only | No |
+
+`AKIA...` = permanent, 2 pieces, never expires
+`ASIA...` = temporary, 3 pieces, expires in hours
+
+##### (1) How it authenticates
+1. Your machine signs the request with the secret key
+2. Sends: request + key ID + signature (+ token if temporary)
+3. AWS looks up your secret — from its database (`AKIA`) or from inside the token (`ASIA`)
+4. AWS re-signs the request and compares signatures
+5. Match → it's you
