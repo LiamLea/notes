@@ -14,8 +14,9 @@
       - [3.Auto Scaling Group](#3auto-scaling-group)
         - [(1) refresh](#1-refresh)
       - [4.EC2 properties](#4ec2-properties)
-        - [(1) instance type](#1-instance-type)
+        - [(1) instance type (hardware)](#1-instance-type-hardware)
       - [(2) AMI](#2-ami)
+      - [5.Purchasing option](#5purchasing-option)
 
 <!-- /code_chunk_output -->
 
@@ -47,7 +48,7 @@ update the instance to the latest launch template
 
 #### 4.EC2 properties
 
-##### (1) instance type
+##### (1) instance type (hardware)
 `[Family][Generation][Attributes].[Size]`
 * Family
   * T (Turbo/Burstable)
@@ -88,3 +89,16 @@ list all latest AMIs
 ```shell
 aws ssm get-parameters-by-path --path /aws/service/ami-amazon-linux-latest
 ```
+
+#### 5.Purchasing option
+[REF](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-purchasing-options.html)
+
+| Option | How it works | Discount | Use case |
+|-|-|-|-|
+| On-Demand | pay per second, no commitment | - | short-term, unpredictable workloads |
+| Savings Plans | commit to $/hour for 1 or 3 years (flexible across instance types) | up to ~72% | steady usage, flexible |
+| Reserved Instances | commit to a specific instance type/region for 1 or 3 years | up to ~72% | steady, predictable workloads |
+| Spot | use spare capacity; can be **interrupted** with 2-min notice | up to ~90% | fault-tolerant, batch, stateless jobs |
+| Dedicated Hosts | a whole physical server for you | - | licensing (BYOL), compliance |
+| Dedicated Instances | run on hardware not shared with other accounts | - | compliance/isolation |
+| Capacity Reservations | reserve capacity in an AZ (billed at On-Demand rate) | - | guarantee capacity for critical workloads |
