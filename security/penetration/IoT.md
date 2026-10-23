@@ -20,6 +20,20 @@
 
 #### 0.Set up a lab network
 * turn a spare laptop / Raspberry Pi into a Wi-Fi hotspot, connect the device to it
+```shell
+# 1. create the Wi-Fi hotspot (NetworkManager)
+nmcli device wifi hotspot ifname wlan0 ssid iot-lab password lab12345
+
+# 2. allow forwarding traffic between interfaces
+sysctl -w net.ipv4.ip_forward=1
+
+# 3. redirect the device's web traffic into mitmproxy (port 8080)
+iptables -t nat -A PREROUTING -i wlan0 -p tcp --dport 80  -j REDIRECT --to-port 8080
+iptables -t nat -A PREROUTING -i wlan0 -p tcp --dport 443 -j REDIRECT --to-port 8080
+
+# 4. start mitmproxy
+mitmproxy --mode transparent --showhost
+```
 * note model, firmware version, MAC address
 
 #### 1.Find the device and its open ports
