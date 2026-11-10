@@ -13,6 +13,9 @@
         - [(2) access IMDS](#2-access-imds)
       - [3.Auto Scaling Group](#3auto-scaling-group)
         - [(1) refresh](#1-refresh)
+        - [(2) AZ balancing](#2-az-balancing)
+        - [(3) Spot](#3-spot)
+        - [(4) graceful termination (lifecycle hook)](#4-graceful-termination-lifecycle-hook)
       - [4.EC2 properties](#4ec2-properties)
         - [(1) instance type (hardware)](#1-instance-type-hardware)
       - [(2) AMI](#2-ami)
@@ -45,6 +48,33 @@
 ##### (1) refresh
 
 update the instance to the latest launch template
+
+##### (2) AZ balancing
+* on scale-out, the ASG picks the AZ itself (the AZ with the fewest instances), you can't choose it
+* **AZRebalance**: when AZs are unbalanced, the ASG launches new instances and terminates healthy ones just to rebalance
+    * without a lifecycle hook (see [graceful termination](#4-graceful-termination-lifecycle-hook)), nodes are terminated **without draining**
+    * suspend it when cluster-autoscaler manages the ASG (e.g. kOps instance group):
+    ```yaml
+    suspendProcesses:
+    - AZRebalance
+    ```
+* zone-bound workloads (e.g. pods with an EBS volume): use **one ASG per AZ**
+    * a multi-AZ ASG can't put the new node in the AZ of the volume, so the pod stays Pending
+
+##### (3) Spot
+* **Capacity Rebalance**: replace a Spot instance when AWS sends a **rebalance recommendation** (an early warning, before the 2-min interruption notice)
+    * replaces instances earlier, but causes more replacements
+* allocation strategy `price-capacity-optimized` (recommended): picks pools with low interruption risk, then the lowest price
+
+##### (4) graceful termination (lifecycle hook)
+* by default, the ASG terminates a node immediately (no drain)
+* a **lifecycle hook** (`EC2_INSTANCE_TERMINATING`) does two things, so **Node Termination Handler (NTH)** can drain the node first:
+    * **pauses the termination**: the instance stays running (`Terminating:Wait`)
+    * **announces it**: sends a "terminating" event (here: EventBridge → SQS → NTH)
+    * NTH drains the node, then tells the ASG to continue
+    * kOps sets this up by default (`spec.nodeTerminationHandler`)
+* if the drain takes longer than the timeout (e.g. 300s), the node is terminated anyway
+* Spot interruptions skip the hook: NTH only has **2 min** to drain
 
 #### 4.EC2 properties
 
