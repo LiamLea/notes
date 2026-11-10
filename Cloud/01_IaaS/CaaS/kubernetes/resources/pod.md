@@ -23,6 +23,7 @@
         - [（2）preemption policy](#2preemption-policy)
       - [9.restart 和 recreate](#9restart-和-recreate)
       - [10.security](#10security)
+      - [11.Terminate a Pod](#11terminate-a-pod)
     - [资源清单](#资源清单)
       - [1.基本格式](#1基本格式)
       - [2.环境变量设置](#2环境变量设置)
@@ -180,6 +181,17 @@ securityContext:
   - name: net.ipv4.ip_forward
     value: "1"
 ```
+
+#### 11.Terminate a Pod
+
+| # | Event | Pod (what `kubectl get pod` shows) | Pod Ready condition | EndpointSlice ready / serving / terminating |
+|---|---|---|---|---|
+| 0 | Before deletion | Running | True | true / true / false |
+| 1 | API server sets deletionTimestamp | Terminating (phase is still Running) | True | → false / true / true |
+| 2 | kubelet runs preStop, then sends SIGTERM | Terminating | True (probes keep running) | false / true / true |
+| 3a | App fails its readiness probe while draining (optional) | Terminating | False | false / false / true |
+| 3b | Containers exit (or get SIGKILL at the 30s limit) | Terminating | False | false / false / true |
+| 4 | kubelet finishes cleanup and the object is deleted | gone | — | endpoint removed from the slice |
 
 ***
 

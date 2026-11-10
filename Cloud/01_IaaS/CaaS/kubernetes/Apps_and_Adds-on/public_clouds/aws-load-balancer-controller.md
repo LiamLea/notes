@@ -13,6 +13,7 @@
       - [4.pod readiness gate](#4pod-readiness-gate)
       - [5.pod termination](#5pod-termination)
         - [(1)`ip` targets](#1ip-targets)
+        - [(2)`instance` targets](#2instance-targets)
 
 <!-- /code_chunk_output -->
 
@@ -157,3 +158,53 @@ spec:
   shutdown:
     minDrainDuration: 30s   # longer than the deregistration takes
 ```
+
+##### (2)`instance` targets
+
+target = node, not pod → nothing is deregistered, the NLB relies on the health check
+
+key: a `LoadBalancer` Service with `externalTrafficPolicy: Local` gets **two node ports**
+```yaml
+spec:
+  ports:
+  - port: 443
+    nodePort: 31234          # traffic
+  healthCheckNodePort: 32100 # health check (only with Local)
+```
+
+```
+NLB health check → node:32100 → HTTP server in kube-proxy → 200 / 503 (counts only ready pods)
+NLB traffic      → node:31234 → kernel rules (iptables/IPVS) → pod (ready, else terminating + serving)
+```
+
+→ different ports, different logic → health check can fail while traffic still reaches the pod
+
+`healthCheckNodePort`: kube-proxy on each node answers "does **this node** have a `ready` pod for this Service?"
+
+how it works:
+
+1. start deleting the pod
+   - pod → `Terminating`, its endpoint → `ready=false`
+   - `preStop` runs → Envoy starts draining, but keeps running and serving
+
+2. NLB runs a health check (every 10s)
+   - NLB → node's `healthCheckNodePort` → answered by **kube-proxy**, not Envoy
+   - kube-proxy: "any `ready` Envoy pod on this node?" → no → 503
+   - 1st failure → node still `healthy`; 2nd failure (~20s) → node `unhealthy`
+
+3. new traffic comes in
+   - before the node is `unhealthy`: NLB → node → kube-proxy
+     - no `ready` pod → kube-proxy falls back to the terminating pod, if its readiness probe still passes → Envoy serves it
+     - readiness probe fails → kube-proxy drops it → error
+   - after the node is `unhealthy`: NLB sends it to other healthy nodes
+
+4. `minDrainDuration` over (30s > ~20s) → `preStop` returns → Envoy exits
+
+```yaml
+# EnvoyProxy
+spec:
+  shutdown:
+    minDrainDuration: 30s   # longer than the health checks take (~20s)
+```
+
+risk: readiness fails during the drain → kube-proxy drops traffic → fix: `ip` targets
